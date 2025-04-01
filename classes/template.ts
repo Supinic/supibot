@@ -184,12 +184,13 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 	}
 
 	if (propertyData.Cached) {
-		if (!cacheMap.has(instance)) {
-			cacheMap.set(instance, new Map());
+		let instanceCache = cacheMap.get(instance);
+		if (!instanceCache) {
+			instanceCache = new Map();
+			cacheMap.set(instance, instanceCache);
 		}
 
-		const instanceCache = cacheMap.get(instance);
-		instanceCache!.set(propertyName, value); // Type known because of condition above
+		instanceCache.set(propertyName, value);
 	}
 
 	await row.save({ skipLoad: true });

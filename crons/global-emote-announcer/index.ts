@@ -21,7 +21,7 @@ const fetchTwitchGlobalEmotes = () => sb.Got.get("Helix")<HelixResponse>({
 	throwHttpErrors: false
 });
 
-let previousEmoteIds: Set<string>;
+let previousEmoteIds: Set<string> | undefined;
 const definition: CronDefinition = {
 	name: "global-emote-announcer",
 	expression: "0 */5 * * * *",

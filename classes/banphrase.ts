@@ -22,7 +22,7 @@ type ConstructorData = {
 	Type: Banphrase["Type"];
 	Platform: Banphrase["Platform"];
 	Channel: Banphrase["Channel"];
-	Active: Banphrase["Active"];
+	Active?: boolean;
 	Code: string;
 };
 
@@ -85,8 +85,8 @@ type BanphraseCodeFunction = ReplacementFunction | CustomResponseFunction;
 
 const isBanphraseFunction = (input: unknown): input is Banphrase["Code"] => (typeof input === "function");
 
-class ExternalBanphraseAPI {
-	static async pajbot (message: string, url: string) {
+const ExternalBanphraseAPI = {
+	async pajbot (message: string, url: string) {
 		message = message.trim().replaceAll(/\s+/g, " ");
 
 		const response = await sb.Got.get("GenericAPI")<PajbotResponse>({
@@ -117,7 +117,7 @@ class ExternalBanphraseAPI {
 
 		return data;
 	}
-}
+};
 
 export class Banphrase extends TemplateWithId {
 	readonly ID: number;
@@ -160,7 +160,7 @@ export class Banphrase extends TemplateWithId {
 		}
 
 		try {
-			return this.Code(message, banphraseConfigData);
+			return await this.Code(message, banphraseConfigData);
 		}
 		catch (e) {
 			console.warn("banphrase failed", message, this, e);
@@ -298,7 +298,7 @@ export class Banphrase extends TemplateWithId {
 
 			response = responseData[apiResultSymbol];
 
-			if (response !== false) { // @todo platform-specific logging flag
+			if (!response) { // @todo platform-specific logging flag
 				const row = await sb.Query.getRow<BanphraseApiDenialLog>("chat_data", "Banphrase_API_Denial_Log");
 				row.setValues({
 					API: channelData.Banphrase_API_URL,
@@ -318,7 +318,7 @@ export class Banphrase extends TemplateWithId {
 
 			await sb.Logger.log(
 				"System.Warning",
-				`Banphrase API fail - code: ${e.code ?? "N/A"}, message: ${e.message ?? "N/A"}`,
+				`Banphrase API fail - code: ${e.code}, message: ${e.message}`,
 				channelData
 			);
 
@@ -380,7 +380,7 @@ export class Banphrase extends TemplateWithId {
 
 		// If the message is banphrased, check for API responses and return one accordingly.
 		// If not found, return a default one.
-		if (response !== false) {
+		if (response) {
 			for (const banphrase of Banphrase.data.values()) {
 				if (banphrase.Type !== "API response") {
 					continue;
@@ -419,6 +419,8 @@ export class Banphrase extends TemplateWithId {
 		options: ExternalExecuteOptions = {}
 	): Promise<string | false | ExternalApiResponse> {
 		let result: ExternalApiResponse | null = null;
+		// Likely unnecessary, since Pajbot is the only API type supported. But, could still be extended in the future.
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (type === "Pajbot") {
 			result = await ExternalBanphraseAPI.pajbot(message, url);
 		}

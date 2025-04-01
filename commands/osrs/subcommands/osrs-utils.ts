@@ -1,4 +1,5 @@
-import type User from "../../../classes/user.js";
+import type { Context } from "../../../classes/command.js";
+import type { User } from "../../../classes/user.js";
 // import type { CheerioNode } from "supi-core";
 import GameData from "../game-data.json" with { type: "json" };
 
@@ -83,11 +84,6 @@ type GameWorld = {
 };
 type GameWorlds = Record<string, GameWorld>;
 
-// @todo Import from Command when done in Typescript
-interface Context {
-	user: User;
-}
-
 export const OSRS_GAME_USERNAME_KEY = "osrsGameUsername";
 
 export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
@@ -111,6 +107,8 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 			const [idEl] = list;
 			const [countryEl, typeEl, activityEl] = list.slice(1);
 
+			// Element might not be present -> optional chaining is warranted
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1);
 			if (!id) {
 				continue;

@@ -32,6 +32,12 @@ export default tseslint.config(
 		rules: {
 			// "@typescript-eslint/no-floating-promises": "error",
 			// "@typescript-eslint/no-unused-vars": "warn",
+			"@typescript-eslint/restrict-template-expressions": ["warn", {
+				allowNumber: true
+			}],
+			"@typescript-eslint/no-confusing-void-expression": ["warn", {
+				ignoreVoidReturningFunctions: true
+			}],
 			"array-bracket-newline": ["warn", "consistent"],
 			"array-bracket-spacing": ["warn", "never"],
 			"array-element-newline": ["warn", "consistent"],
@@ -182,6 +188,7 @@ export default tseslint.config(
 			"unicorn/catch-error-name": ["warn", {
 				name: "e"
 			}],
+			"unicorn/prefer-spread": "off",
 			"unicorn/empty-brace-spaces": "warn",
 			"unicorn/new-for-builtins": "error",
 			"unicorn/no-array-for-each": "error",

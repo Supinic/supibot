@@ -166,7 +166,7 @@ export const uploadToNuuls = async (fileData: string): Promise<ImageUploadResult
 
 	return {
 		statusCode: response.statusCode,
-		link: (response.body ?? null)
+		link: (response.ok) ? response.body : null
 	};
 };
 
@@ -192,7 +192,7 @@ export const getPathFromURL = (stringURL: string): string | null => {
 		return null;
 	}
 
-	const path = (url.pathname ?? "").replace(/^\//, "");
+	const path = url.pathname.replace(/^\//, "");
 	return `${path}${url.search}`;
 };
 
@@ -728,12 +728,6 @@ export const handleGenericFilter = async (type: FilterType, data: GenericFilterD
 		context,
 		filterData
 	} = data;
-
-	if (!context.user) {
-		throw new SupiError({
-			message: "No user found in Context, cannot create string from Filter"
-		});
-	}
 
 	let replyFn: (commandString: string, filter: Filter) => string;
 	const { invocation } = context;

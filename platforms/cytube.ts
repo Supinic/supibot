@@ -242,15 +242,6 @@ class CytubeClient {
 
 		// This listener assumes that the emote list is only ever passed post-login.
 		client.on("emoteList", (emoteList) => {
-			if (!emoteList) {
-				console.warn("emoteList event received no emotes", {
-					channelID: this.channelData.ID,
-					channelName: this.channelData.Name
-				});
-
-				return;
-			}
-
 			this._emotes = emoteList.map(i => CytubeClient.parseEmote(i));
 		});
 
@@ -298,6 +289,9 @@ class CytubeClient {
 	async handleCommand (command: string, user: User, args: string[] = [], replyIntoPM: boolean = false) {
 		const channelData = this.channelData;
 		const userData = await sb.User.get(user, false);
+		if (!userData) {
+			return;
+		}
 
 		const execution = await sb.Command.checkAndExecute({
 			command,
@@ -308,7 +302,7 @@ class CytubeClient {
 			platformSpecificData: null,
 			options: { privateMessage: Boolean(replyIntoPM) }
 		});
-		if (!execution || !execution.reply) {
+		if (!execution.reply) {
 			return;
 		}
 
@@ -530,7 +524,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 	 * @param {boolean} [options.commandUsed] = false
 	 */
 	async mirror (message: string, userData: User, channelData: Channel, options: MirrorOptions = {}) {
-		if (userData && userData.Name === "[server]") {
+		if (userData.Name === "[server]") {
 			return;
 		}
 

@@ -100,7 +100,7 @@ export class User extends TemplateWithIdString {
 	}
 
 	async setDataProperty (propertyName: string, value: CacheValue, options: GenericFetchData = {}) {
-		return await setGenericDataProperty(this, {
+		await setGenericDataProperty(this, {
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
 			databaseTable: "User_Alias_Data",
@@ -126,8 +126,6 @@ export class User extends TemplateWithIdString {
 
 	static async initialize () {}
 
-	static async get (identifier: Like, strict: false, options?: GetOptions): Promise<User>;
-	static async get (identifier: Like, strict?: boolean, options?: GetOptions): Promise<User | null>;
 	static async get (identifier: Like, strict: boolean = true, options: GetOptions = {}): Promise<User | null> {
 		if (identifier instanceof User) {
 			return identifier;
@@ -162,7 +160,7 @@ export class User extends TemplateWithIdString {
 			}
 
 			// 2. attempt to fetch the user from medium-cache (sb.Cache)
-			if (sb.Cache && sb.Cache.ready) {
+			if (sb.Cache.ready) {
 				const redisCacheUser = await User.createFromCache({ name: username });
 				if (redisCacheUser) {
 					if (!User.data.has(username)) {
@@ -240,7 +238,7 @@ export class User extends TemplateWithIdString {
 					continue;
 				}
 
-				if (sb.Cache && sb.Cache.ready) {
+				if (sb.Cache.ready) {
 					const redisCacheUser = await User.createFromCache({ name: username });
 					if (redisCacheUser) {
 						User.data.set(username, redisCacheUser);

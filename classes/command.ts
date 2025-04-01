@@ -52,7 +52,7 @@ type ParameterDefinition = {
 type ParameterDefinitions = readonly ParameterDefinition[];
 
 type ParamFromDefinition<T extends ParameterDefinitions> = {
-	[P in T[number] as P["name"]]: ParameterValueMap[P["type"]];
+	[P in T[number] as P["name"]]: ParameterValueMap[P["type"]] | undefined;
 };
 
 type AppendedParameters = Record<string, ParameterValue>;
@@ -159,12 +159,6 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	// setMeta (name: string, value: unknown) { this.meta.set(name, value); }
 
 	getMentionStatus (): boolean {
-		if (!this.user) {
-			throw new SupiError({
-				message: "Cannot get the mention status of Context without User"
-			});
-		}
-
 		return Filter.getMentionStatus({
 			user: this.user,
 			command: this.command,
@@ -180,13 +174,8 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 				this.channel.mirror(string, null)
 			]);
 		}
-		else if (this.platform && this.user) {
-			await this.platform.pm(string, this.user.Name);
-		}
 		else {
-			throw new SupiError({
-				message: "Cannot send intermediate message - missing channel, platform and user"
-			});
+			await this.platform.pm(string, this.user.Name);
 		}
 	}
 
@@ -199,10 +188,10 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			userData.getDataProperty("administrator") as Promise<boolean | null>
 		];
 		if (channelData) {
-			promises.push(channelData.isUserAmbassador(userData));
-		}
-		if (platformData && userData && channelData) {
-			promises.push(platformData.isUserChannelOwner(channelData, userData));
+			promises.push(
+				channelData.isUserAmbassador(userData),
+				platformData.isUserChannelOwner(channelData, userData)
+			);
 		}
 
 		const data = await Promise.all(promises);
@@ -228,16 +217,8 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 
 		return {
 			flag,
-			is: (type: keyof typeof User.permissions): boolean => {
-				if (!User.permissions[type]) {
-					throw new SupiError({
-						message: "Invalid user permission type provided"
-					});
-				}
-
-				// eslint-disable-next-line no-bitwise
-				return ((flag & User.permissions[type]) !== 0);
-			}
+			// eslint-disable-next-line no-bitwise
+			is: (type: keyof typeof User.permissions) => ((flag & User.permissions[type]) !== 0)
 		};
 	}
 
@@ -247,11 +228,9 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		if (channelData) {
 			return await channelData.getBestAvailableEmote(emotes, fallback, options);
 		}
-		else if (platformData) {
+		else {
 			return await platformData.getBestAvailableEmote(null, emotes, fallback, options);
 		}
-
-		return fallback;
 	}
 
 	async randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
@@ -279,7 +258,7 @@ export interface CommandDefinition extends TemplateDefinition {
 	Description: Command["Description"];
 	Cooldown: Command["Cooldown"];
 	Flags: Command["Flags"];
-	Params: Command["Params"];
+	Params: Command["Params"] | null;
 	Whitelist_Response: Command["Whitelist_Response"];
 	Code: Command["Code"];
 	Dynamic_Description: Command["Dynamic_Description"];
@@ -335,7 +314,7 @@ export class Command extends TemplateWithoutId {
 	static readonly privilegedCommandCharacters = ["$"];
 	static readonly ignoreParametersDelimiter = "--";
 
-	static #prefixRegex: RegExp;
+	static #prefixRegex: RegExp | null = null;
 
 	constructor (data: CommandDefinition) {
 		super();
@@ -346,7 +325,7 @@ export class Command extends TemplateWithoutId {
 		this.Cooldown = data.Cooldown ?? null;
 		this.Whitelist_Response = data.Whitelist_Response ?? null;
 
-		this.Flags = Object.freeze(data.Flags ?? []);
+		this.Flags = Object.freeze(data.Flags);
 		this.Params = data.Params ?? [];
 
 		this.Code = data.Code;
@@ -656,7 +635,7 @@ export class Command extends TemplateWithoutId {
 			channel: channelData ?? null,
 			platform: channelData?.Platform ?? null,
 			targetUser: args[0] ?? null,
-			args: args ?? []
+			args
 		});
 
 		const isFilterGlobalBan = Boolean(
@@ -733,7 +712,7 @@ export class Command extends TemplateWithoutId {
 
 			metric.inc({
 				name: command.Name,
-				result: (commandExecution?.success === false) ? "fail" : "success"
+				result: (commandExecution.success === false) ? "fail" : "success"
 			});
 
 			sb.Logger.logCommandExecution({
@@ -784,7 +763,7 @@ export class Command extends TemplateWithoutId {
 				invocation: identifier,
 				channel: channelData?.ID ?? null,
 				Platform: platformData.ID,
-				params: context.params ?? {},
+				params: context.params,
 				isPrivateMessage
 			};
 
@@ -857,7 +836,7 @@ export class Command extends TemplateWithoutId {
 		// Read-only commands never reply with anything - banphrases, mentions and cooldowns are not checked
 		if (command.Flags.includes("readOnly")) {
 			return {
-				success: execution?.success ?? true
+				success: execution.success ?? true
 			};
 		}
 
@@ -868,12 +847,6 @@ export class Command extends TemplateWithoutId {
 		}
 
 		if (Array.isArray(execution.partialReplies)) {
-			if (execution.partialReplies.some(i => i && i.constructor !== Object)) {
-				throw new SupiError({
-					message: "If set, partialReplies must be an Array of Objects"
-				});
-			}
-
 			const partResult = [];
 			for (const { message, bancheck } of execution.partialReplies) {
 				if (bancheck) {
@@ -898,7 +871,7 @@ export class Command extends TemplateWithoutId {
 			execution.reply = "(empty message)";
 		}
 
-		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
+		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution.meta?.skipBanphrases));
 		if (!command.Flags.includes("skipBanphrase") && !metaSkip) {
 			let messageSlice = execution.reply.slice(0, 2000);
 			if (!execution.meta?.skipWhitespaceCheck) {
@@ -953,8 +926,8 @@ export class Command extends TemplateWithoutId {
 			&& Filter.getMentionStatus({
 				user: userData,
 				command,
-				channel: channelData ?? null,
-				platform: channelData?.Platform ?? null
+				channel: channelData,
+				platform: channelData.Platform
 			})
 		);
 
@@ -1152,9 +1125,9 @@ export class Command extends TemplateWithoutId {
 	static createFakeContext (command: Command, contextData: ContextData): Context {
 		const data = {
 			user: contextData.user,
+			platform: contextData.platform,
 			invocation: contextData.invocation ?? command.Name,
 			channel: contextData.channel ?? null,
-			platform: contextData.platform ?? null,
 			transaction: contextData.transaction ?? null,
 			privateMessage: contextData.privateMessage ?? false,
 			append: contextData.append ?? {},
@@ -1325,16 +1298,12 @@ export class Command extends TemplateWithoutId {
 
 	static is (string: string) {
 		const prefix = Command.prefix;
-		if (prefix === null) {
-			return false;
-		}
-
 		return (string.startsWith(prefix) && string.trim().length > prefix.length);
 	}
 
 	static destroy () {
 		for (const command of Command.data.values()) {
-			void command.destroy();
+			command.destroy();
 		}
 	}
 
@@ -1344,11 +1313,7 @@ export class Command extends TemplateWithoutId {
 		}
 
 		const prefix = Command.prefix;
-		if (!prefix) {
-			return null;
-		}
-
-		const body = [...prefix].map(char => (/\w/.test(char))
+		const body = prefix.split("").map(char => (/\w/.test(char))
 			? char
 			: `\\${char}`
 		).join("");

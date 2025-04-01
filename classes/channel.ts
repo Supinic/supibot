@@ -100,7 +100,7 @@ export class Channel extends TemplateWithId {
 		this.Banphrase_API_Downtime = data.Banphrase_API_Downtime;
 		this.Message_Limit = data.Message_Limit;
 		this.NSFW = data.NSFW;
-		this.Logging = new Set(data.Logging ?? []);
+		this.Logging = new Set(data.Logging);
 		this.Mirror = data.Mirror;
 		this.Description = data.Description ?? null;
 
@@ -171,7 +171,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	async toggleAmbassador (userData: User): Promise<void> {
-		const ambassadors = <number[]> await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? [];
+		const ambassadors = (await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? []) as number[];
 		if (ambassadors.includes(userData.ID)) {
 			const index = ambassadors.indexOf(userData.ID);
 			ambassadors.splice(index, 1);
@@ -203,7 +203,7 @@ export class Channel extends TemplateWithId {
 			});
 		}
 
-		return await this.Platform.mirror(message, userData, this, options);
+		await this.Platform.mirror(message, userData, this, options);
 	}
 
 	async fetchUserList (): Promise<string[]> {
@@ -269,7 +269,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	async setDataProperty (propertyName: string, value: GenericDataPropertyValue, options = {}) {
-		return await setGenericDataProperty(this, {
+		await setGenericDataProperty(this, {
 			cacheMap: Channel.dataCache,
 			databaseProperty: "Channel",
 			databaseTable: "Channel_Data",
@@ -427,7 +427,7 @@ export class Channel extends TemplateWithId {
 		return activePlatforms;
 	}
 
-	static async getLiveEventSubscribedChannels (platform = null) {
+	static async getLiveEventSubscribedChannels (platform: Platform | null = null) {
 		const eventChannelIDs = await sb.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Channel_Chat_Module")

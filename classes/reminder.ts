@@ -215,8 +215,8 @@ export class Reminder extends TemplateWithId {
 					if (preparedMessage) {
 						const fixedMessage = await Filter.applyUnping({
 							command: Command.get("remind"),
-							channel: channelData ?? null,
-							platform: channelData?.Platform ?? null,
+							channel: channelData,
+							platform: channelData.Platform,
 							string: preparedMessage,
 							executor: fromUserData
 						});
@@ -283,7 +283,7 @@ export class Reminder extends TemplateWithId {
 			help: "Total amount of users that currently have at least one reminder pending for them."
 		});
 
-		return await super.initialize();
+		await super.initialize();
 	}
 
 	static async loadData () {
@@ -303,15 +303,13 @@ export class Reminder extends TemplateWithId {
 			Reminder.#add(reminder);
 		}
 
-		if (sb.Metrics) {
-			Reminder.#activeGauge.set(Reminder.available.size);
-			Reminder.#userGauge.set(Reminder.data.size);
-		}
+		Reminder.#activeGauge.set(Reminder.available.size);
+		Reminder.#userGauge.set(Reminder.data.size);
 	}
 
 	static async reloadData () {
 		this.clear();
-		return await this.loadData();
+		await this.loadData();
 	}
 
 	static async reloadSpecific (...list: Reminder["ID"][]) {
@@ -379,11 +377,9 @@ export class Reminder extends TemplateWithId {
 		if (!skipChecks && data.User_From !== null) {
 			const limitResult = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule, data.Type);
 			if (!limitResult.success) {
-				if (sb.Metrics) {
-					Reminder.#limitRejectedCounter.inc({
-						cause: limitResult.cause
-					});
-				}
+				Reminder.#limitRejectedCounter.inc({
+					cause: limitResult.cause
+				});
 
 				return limitResult;
 			}
@@ -397,26 +393,23 @@ export class Reminder extends TemplateWithId {
 			Text: data.Text ?? null,
 			Created: new SupiDate(),
 			Schedule: data.Schedule ?? null,
-			Private_Message: data.Private_Message ?? false,
+			Private_Message: data.Private_Message,
 			Platform: data.Platform,
-			Type: data.Type ?? "Reminder"
+			Type: data.Type
 		});
 
 		await row.save({ skipLoad: false });
 
 		const reminder = new Reminder(row.valuesObject);
+
 		Reminder.#add(reminder);
-
-		if (sb.Metrics) {
-			Reminder.#totalCounter.inc({
-				type: row.values.Type,
-				scheduled: String(Boolean(row.values.Schedule)),
-				system: String(skipChecks)
-			});
-
-			Reminder.#activeGauge.set(Reminder.available.size);
-			Reminder.#userGauge.set(Reminder.data.size);
-		}
+		Reminder.#activeGauge.set(Reminder.available.size);
+		Reminder.#userGauge.set(Reminder.data.size);
+		Reminder.#totalCounter.inc({
+			type: row.values.Type,
+			scheduled: String(Boolean(row.values.Schedule)),
+			system: String(skipChecks)
+		});
 
 		return {
 			success: true,
@@ -436,7 +429,7 @@ export class Reminder extends TemplateWithId {
 		}
 
 		const excludedUserIDs = Filter.getReminderPreventions({
-			platform: channelData?.Platform ?? null,
+			platform: channelData.Platform,
 			channel: channelData
 		});
 
@@ -461,13 +454,6 @@ export class Reminder extends TemplateWithId {
 		const reply = [];
 		const privateReply = [];
 		const platformData = channelData.Platform;
-		if (!platformData) {
-			// @todo Remove check after Channel has well-known Platform
-			throw new SupiError({
-				message: "Missing platform'"
-			});
-		}
-
 		for (const reminder of reminders) {
 			const fromUserData = (reminder.User_From)
 				? await User.get(reminder.User_From)
@@ -515,7 +501,7 @@ export class Reminder extends TemplateWithId {
 
 				const uncheckedAuthorMention = await reminderPlatform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
-				const authorMention = (authorBanphraseCheck.passed) ? `${uncheckedAuthorMention}` : "[Banphrased username]";
+				const authorMention = (authorBanphraseCheck.passed) ? uncheckedAuthorMention : "[Banphrased username]";
 
 				const targetMention = await reminderPlatform.createUserMention(targetUserData);
 				let message = `${authorMention}, ${targetMention} just typed in channel ${channelStringName}`;
@@ -548,8 +534,8 @@ export class Reminder extends TemplateWithId {
 					else {
 						const fixedMessage = await Filter.applyUnping({
 							command: Command.get("remind"),
-							channel: channelData ?? null,
-							platform: channelData?.Platform ?? null,
+							channel: channelData,
+							platform: channelData.Platform,
 							string: banphraseResult.string,
 							executor: fromUserData
 						});
@@ -618,8 +604,8 @@ export class Reminder extends TemplateWithId {
 				// Apply unpings, governed by the reminder command itself
 				message = await Filter.applyUnping({
 					command: Command.get("remind"),
-					channel: channelData ?? null,
-					platform: channelData?.Platform ?? null,
+					channel: channelData,
+					platform: channelData.Platform,
 					string: message,
 					executor: targetUserData
 				});
@@ -701,10 +687,8 @@ export class Reminder extends TemplateWithId {
 		const deactivatePromises = reminders.map(reminder => reminder.deactivate(true, false));
 		await Promise.all(deactivatePromises);
 
-		if (sb.Metrics) {
-			Reminder.#activeGauge.set(Reminder.available.size);
-			Reminder.#userGauge.set(Reminder.data.size);
-		}
+		Reminder.#activeGauge.set(Reminder.available.size);
+		Reminder.#userGauge.set(Reminder.data.size);
 	}
 
 	/**

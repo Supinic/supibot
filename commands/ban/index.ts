@@ -237,14 +237,16 @@ export default {
 			userData = await sb.User.get(options.User_Alias);
 		}
 
-		const [existing] = sb.Filter.getLocals(type, {
+		const filterResult = sb.Filter.getLocals(type, {
 			channel: channelData,
 			user: userData,
 			command: options.Command,
 			invocation: options.Invocation
 		});
 
-		if (existing) {
+		if (filterResult.length !== 0) {
+			const [existing] = filterResult;
+
 			if (existing.Issued_By !== context.user.ID && !isAdmin) {
 				return {
 					success: false,

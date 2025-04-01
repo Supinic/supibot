@@ -53,10 +53,7 @@ export type MessageData = Omit<HandleCommandData["options"], "privateMessage">;
 const IGNORED_CHANNEL_TYPES = new Set([
 	ChannelType.GuildAnnouncement,
 	ChannelType.GuildCategory,
-	ChannelType.GuildNews,
-	ChannelType.GuildNewsThread,
-	ChannelType.GuildPrivateThread,
-	ChannelType.GuildPublicThread,
+	ChannelType.AnnouncementThread,
 	ChannelType.PrivateThread,
 	ChannelType.PublicThread
 ]);
@@ -71,7 +68,8 @@ const MARKDOWN_TESTS = {
 const isTextChannel = (input: DiscordChannel): input is TextChannel => (input instanceof TextChannel);
 
 const formatEmoji = (emote: Emote) => {
-	const name = emote.name ?? "_";
+	// const name = emote.name ?? "_";
+	const { name } = emote;
 	if (emote.animated) {
 		return `<a:${name}:${emote.ID}>`;
 	}
@@ -126,7 +124,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				GatewayIntentBits.Guilds,
 				GatewayIntentBits.GuildMembers,
 				GatewayIntentBits.GuildMessages,
-				GatewayIntentBits.GuildEmojisAndStickers,
+				GatewayIntentBits.GuildExpressions,
 				GatewayIntentBits.GuildMessageReactions,
 				GatewayIntentBits.DirectMessages,
 				GatewayIntentBits.DirectMessageReactions,
@@ -183,7 +181,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			return;
 		}
 
-		if (message && channelObject.guild) {
+		if (message) {
 			const emojiNameRegex = /^[\w\d]+$/;
 			const words = message
 				.split(/\s+/)
@@ -248,31 +246,25 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			this.incrementMessageMetric("sent", channelData);
 		}
 		catch (e) {
+			const errorContext = {
+				hasEmbeds: Boolean(options.embeds),
+				channelID: channelObject.id,
+				channelName: channelObject.name,
+				guildID: channelObject.guild.id,
+				guildName: channelObject.guild.name
+			};
+
 			if (e instanceof DiscordAPIError) {
 				await sb.Logger.logError("Backend", e, {
 					origin: "External",
-					context: {
-						message,
-						hasEmbeds: Boolean(options?.embeds),
-						channelID: channelObject.id,
-						channelName: channelObject.name ?? null,
-						guildID: channelObject.guild?.id ?? null,
-						guildName: channelObject.guild?.name ?? null
-					}
+					context: errorContext
 				});
 			}
 			else {
 				const cause = (e instanceof Error) ? e : new Error(String(e));
 				throw new SupiError({
 					message: "Sending Discord channel message failed",
-					args: {
-						message,
-						hasEmbeds: Boolean(options?.embeds),
-						channelID: channelObject.id,
-						channelName: channelObject.name ?? null,
-						guildID: channelObject.guild?.id ?? null,
-						guildName: channelObject.guild?.name ?? null
-					},
+					args: errorContext,
 					cause
 				});
 			}
@@ -411,6 +403,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			}
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-misused-spread
 		const usernameCharacterLength = [...user].length;
 		if (usernameCharacterLength > 32) {
 			const json = JSON.stringify({
@@ -419,6 +412,8 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				guildName: guild?.name ?? null,
 				guildMembers: guild?.memberCount ?? null,
 				msg,
+				messageID: messageObject.id,
+				author: messageObject.author,
 				user,
 				userLength: user.length
 			});
@@ -508,10 +503,6 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			// Change its mode back to active.
 			if (channelData.Mode === "Inactive") {
 				await channelData.saveProperty("Mode", "Write");
-			}
-
-			if (!messageObject.channel) {
-				await sb.Logger.log("Discord.Warning", JSON.stringify(messageObject), channelData);
 			}
 
 			const discordChannel = messageObject.channel;
@@ -649,7 +640,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			options: { privateMessage }
 		});
 
-		if (!execution) {
+		if (!execution.reply) {
 			return;
 		}
 
@@ -705,7 +696,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				}));
 			}
 
-			if (channelData?.Mirror) {
+			if (channelData.Mirror) {
 				await this.mirror(reply, userData, channelData, {
 					...commandOptions,
 					commandUsed: true
@@ -749,7 +740,13 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 	async handleGuildDelete (guild: Guild) {
 		const platformMap = sb.Channel.data.get(this);
-		for (const channelData of platformMap!.values()) {
+		if (!platformMap) {
+			throw new SupiError({
+				message: "Assert error: No Discord platform available in Channel"
+			});
+		}
+
+		for (const channelData of platformMap.values()) {
 			if (channelData.Specific_ID !== guild.id) {
 				continue;
 			}
@@ -782,7 +779,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 	}
 
 	parseMessage (messageObject: DiscordMessage): SimpleMessage {
-		const stickers = messageObject.stickers.map(i => i.url ?? i.name);
+		const stickers = messageObject.stickers.map(i => i.url);
 		const links = messageObject.attachments.map(i => i.proxyURL);
 		const content = messageObject.content.replaceAll(/<(https?:\/\/.+?)>/g, "$1"); // Replaces all "un-embed" links' brackets
 		const args: string[] = [
@@ -934,7 +931,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 	}
 
 	async createUserMention (userData: User, channelData: Channel) {
-		if (!userData.Discord_ID || !channelData || !channelData.Specific_ID) {
+		if (!userData.Discord_ID || !channelData.Specific_ID) {
 			return userData.Name;
 		}
 

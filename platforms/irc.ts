@@ -338,7 +338,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			options
 		});
 
-		if (!execution || !execution.reply) {
+		if (!execution.reply) {
 			return execution;
 		}
 
@@ -357,7 +357,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			await this.pm(message, user.Name);
 		}
 		else if (channel) {
-			if (channel?.Mirror) {
+			if (channel.Mirror) {
 				await this.mirror(execution.reply, user, channel, {
 					...commandOptions,
 					commandUsed: true

@@ -78,16 +78,22 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
 
 	await createReminders(inactiveUsers, message);
 
-	const channelUsers: Record<string, UserSubscription[]> = {};
+	const channelUsers: Map<number, UserSubscription[]> = new Map();
 	for (const user of [...activeUsers, ...inactiveUsers]) {
 		const channelID = user.Reminder_Channel ?? DEFAULT_CHANNEL_ID;
-		channelUsers[channelID] ??= [];
-		channelUsers[channelID].push(user);
+
+		let userArray = channelUsers.get(channelID);
+		if (!userArray) {
+			userArray = [];
+			channelUsers.set(channelID, userArray);
+		}
+
+		userArray.push(user);
 	}
 
-	for (const [channelID, userDataList] of Object.entries(channelUsers)) {
+	for (const [channelID, userDataList] of channelUsers.entries()) {
 		const chatPing = userDataList.map(i => `@${i.Username}`).join(" ");
-		const channelData = sb.Channel.get(Number(channelID));
+		const channelData = sb.Channel.get(channelID);
 		if (!channelData) {
 			continue;
 		}
@@ -167,7 +173,7 @@ export type RssEventDefinition = BaseEventDefinition & {
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
-	process: () => Promise<void | { message: string }>;
+	process: () => Promise<null | { message: string }>;
 };
 export type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
 

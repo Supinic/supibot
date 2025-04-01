@@ -674,7 +674,7 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 	});
 
 	const result: EnabledSubscription[] = [...response.body.data];
-	let cursor: string | null = response.body.pagination?.cursor ?? null;
+	let cursor: string | null = response.body.pagination.cursor ?? null;
 	while (cursor) {
 		const loopResponse = await sb.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 			url: "https://api.twitch.tv/helix/eventsub/subscriptions",
@@ -692,7 +692,7 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 		});
 
 		result.push(...loopResponse.body.data);
-		cursor = loopResponse.body.pagination?.cursor ?? null;
+		cursor = loopResponse.body.pagination.cursor ?? null;
 	}
 
 	return result;

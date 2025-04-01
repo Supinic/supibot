@@ -136,7 +136,7 @@ type BttvEmote = {
 	id: string;
 	code: string;
 	imageType: "gif" | "png";
-	animated: boolean;
+	animated?: boolean;
 	userId: string;
 	height?: number;
 	width?: number;
@@ -546,7 +546,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async me (message: string, channel: Channel) {
-		return await this.send(message, channel, { meAction: true });
+		await this.send(message, channel, { meAction: true });
 	}
 
 	async pm (message: string, userData: User) {
@@ -564,8 +564,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				}
 			});
 
-			const helixUserData = response.body?.data?.[0];
-			if (!response.ok || !helixUserData) {
+			const helixUserData = response.body.data;
+			if (!response.ok || helixUserData.length === 0) {
 				throw new SupiError({
 					message: "No Helix data found for user",
 					args: {
@@ -575,8 +575,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				});
 			}
 
-			await userData.saveProperty("Twitch_ID", helixUserData.id);
-			targetUserId = helixUserData.id;
+			await userData.saveProperty("Twitch_ID", helixUserData[0].id);
+			targetUserId = helixUserData[0].id;
 		}
 
 		const trimmedMessage = message
@@ -609,16 +609,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async timeout (channelData: Channel, user: User | string, duration: number = 1, reason: string | null = null) {
-		if (!channelData || !user) {
-			throw new SupiError({
-				message: "Missing user or channel",
-				args: {
-					channel: channelData.Name,
-					user: (typeof user === "string") ? user : user.Name
-				}
-			});
-		}
-		else if (channelData.Platform !== this) {
+		if (channelData.Platform !== this) {
 			throw new SupiError({
 				message: "Non-Twitch channel provided",
 				args: { channel: channelData.Name }
@@ -776,7 +767,6 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			return;
 		}
 
-		/** @type {Channel | null} */
 		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
 		if (channelData && channelData.Name !== channelName && !this.#unsuccessfulRenameChannels.has(channelId)) {
 			await this.fixChannelRename(channelData, channelName, channelId);
@@ -833,7 +823,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		this.incrementMessageMetric("read", channelData);
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
-		if (channelData && senderUserId === this.selfId) {
+		if (senderUserId === this.selfId) {
 			const flatBadges = new Set(badges.map(i => i.set_id));
 			const oldMode = channelData.Mode;
 
@@ -942,12 +932,12 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			null
 		);
 
-		if (!result || !result.success) {
-			if (!result?.reply && result?.reason === "filter") {
+		if (!result.success) {
+			if (!result.reply && result.reason === "filter") {
 				const filteredMessage = this.config.privateMessageResponseFiltered ?? PRIVATE_COMMAND_FILTERED_RESPONSE;
 				await this.pm(filteredMessage, userData);
 			}
-			else if (result?.reason === "no-command") {
+			else if (result.reason === "no-command") {
 				const noCommandResponse = this.config.privateMessageResponseNoCommand ?? PRIVATE_COMMAND_NO_COMMAND_RESPONSE;
 				await this.pm(noCommandResponse, userData);
 			}
@@ -1034,7 +1024,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				await this.addLiveChannelIdList(channelId);
 			}
 		}
-		else if (type === "stream.offline") {
+		else {
 			channelData.events.emit("offline", {
 				event: "offline",
 				channel: channelData
@@ -1063,7 +1053,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			platformSpecificData: specificData
 		});
 
-		if (!execution || !execution.reply) {
+		if (!execution.reply) {
 			return execution;
 		}
 
@@ -1228,8 +1218,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		const emotes = [
-			...(response.body.channelEmotes ?? []),
-			...(response.body.sharedEmotes ?? [])
+			...response.body.channelEmotes,
+			...response.body.sharedEmotes
 		];
 
 		return emotes.map(i => ({
@@ -1280,7 +1270,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			return [];
 		}
 
-		const rawEmotes = response.body.emote_set?.emotes ?? [];
+		const rawEmotes = response.body.emote_set.emotes ?? [];
 		return rawEmotes.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -1308,10 +1298,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		const rawTwitchEmotes = (twitch.status === "fulfilled") ? twitch.value : [];
 		const rawFFZEmotes = (ffz.status === "fulfilled") ? Object.values(ffz.value.body.sets) : [];
-		const rawBTTVEmotes = (bttv.status === "fulfilled" && typeof bttv.value?.body === "object")
+		const rawBTTVEmotes = (bttv.status === "fulfilled" && typeof bttv.value.body === "object")
 			? Object.values(bttv.value.body)
 			: [];
-		const rawSevenTvEmotes = (sevenTv.status === "fulfilled" && Array.isArray(sevenTv.value?.body?.emotes))
+		const rawSevenTvEmotes = (sevenTv.status === "fulfilled" && Array.isArray(sevenTv.value.body.emotes))
 			? sevenTv.value.body.emotes
 			: [];
 
@@ -1330,7 +1320,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				type,
 				global: true,
 				animated: i.format.includes("animated"),
-				channel: i.owner_id ?? null
+				channel: i.owner_id
 			};
 		});
 		const ffzEmotes = rawFFZEmotes.flatMap(i => i.emoticons).map(i => ({
@@ -1412,25 +1402,26 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	#pingWebsocket () {
-		if (!this.client) {
+		const client = this.client;
+		if (!client) {
 			return;
 		}
 
 		const reconnectTimeout = setTimeout(() => {
 			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
-			this.client!.close();
+			client.close();
 			void this.connect({ skipSubscriptions: true });
 		}, NO_EVENT_RECONNECT_TIMEOUT);
 
 		const start = SupiDate.now();
-		this.client.once("pong", () => {
+		client.once("pong", () => {
 			clearTimeout(reconnectTimeout);
 
 			const end = SupiDate.now();
 			this.#websocketLatency = end - start;
 		});
 
-		this.client.ping();
+		client.ping();
 	}
 
 	async fixChannelRename (channelData: Channel, twitchChanelName: string, channelId: string) {
@@ -1516,20 +1507,3 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 }
 
 export default TwitchPlatform;
-
-/**
- * @typedef {Object} TwitchEmoteSetDataObject Describes a Twitch emote set.
- * @property {string} setID
- * @property {Object} channel
- * @property {string} channel.name Channel display name
- * @property {string} channel.login Channel login name (as it appears e.g. in URLs)
- * @property {string} channel.ID Internal Twitch channel ID
- * @property {"1"|"2"|"3"|"Custom"|null} tier Determines the subscription tier of an emote
- * @property {EmoteDataObject[]} emotes List of emotes
- */
-
-/**
- * @typedef {Object} EmoteDataObject
- * @property {string} ID Internal Twitch emote ID
- * @property {string} token Emote name
- */

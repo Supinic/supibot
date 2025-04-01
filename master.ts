@@ -104,7 +104,7 @@ const MODULE_INITIALIZE_ORDER = [
 ] as const;
 
 const platformsConfig = config.platforms;
-if (!platformsConfig || platformsConfig.length === 0) {
+if (platformsConfig.length === 0) {
 	throw new Error("No platforms configured! Supibot will now exit.");
 }
 
@@ -149,9 +149,7 @@ console.timeEnd("supi-core");
 const platforms: Set<Platform> = new Set();
 for (const definition of platformsConfig) {
 	const platform = await Platform.create(definition.type, definition);
-	if (platform) {
-		platforms.add(platform);
-	}
+	platforms.add(platform);
 }
 
 console.time("basic bot modules");
@@ -196,11 +194,8 @@ console.timeEnd("basic bot modules");
 console.time("chat modules");
 
 supiCore.Got.importData(filterModuleDefinitions("name", gotDefinitions as GotInstanceDefinition[], config.modules.gots));
-
-await Promise.all([
-	Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands)),
-	ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"]))
-]);
+Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands));
+await ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"]));
 
 console.timeEnd("chat modules");
 
@@ -245,7 +240,7 @@ process.on("unhandledRejection", (reason) => {
 		return;
 	}
 
-	const origin = (reason.message?.includes("RequestError: Timeout awaiting 'request'"))
+	const origin = (reason.message.includes("RequestError: Timeout awaiting 'request'"))
 		? "External"
 		: "Internal";
 

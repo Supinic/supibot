@@ -97,16 +97,16 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 
 		this.host = config.host ?? null;
-		this.messageLimit = config.messageLimit ?? null;
+		this.messageLimit = config.messageLimit;
 		this.selfId = config.selfId ?? null;
-		this.selfName = config.selfName?.toLowerCase() ?? null;
+		this.selfName = config.selfName.toLowerCase();
 		this.mirrorIdentifier = config.mirrorIdentifier ?? null;
 
 		this.platform = config.platform;
 		this.logging = config.logging;
 
 		this.globalEmoteCacheKey = `global-emotes-${this.id}`;
-		this.active = config.active ?? false;
+		this.active = config.active;
 
 		this.checkConfig();
 

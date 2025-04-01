@@ -95,7 +95,7 @@ export const isArgumentsData = (input: Filter["Data"]): input is ArgumentDescrip
 
 	return input.every(i => (
 		(typeof i.string === "string" || i.regex instanceof RegExp)
-		&& ((Array.isArray(i.range) && i.range.length === 2) || typeof i.index === "number")
+		&& (Array.isArray(i.range) || typeof i.index === "number")
 	));
 };
 
@@ -710,7 +710,9 @@ export class Filter extends TemplateWithId {
 
 	static getCooldownModifiers (options: LocalsOptions) {
 		const filters = Filter.getLocals("Cooldown", options).sort((a, b) => b.priority - a.priority);
-		return filters[0] ?? null;
+		return (filters.length === 0)
+			? null
+			: filters[0];
 	}
 
 	static getFlags (options: LocalsOptions) {

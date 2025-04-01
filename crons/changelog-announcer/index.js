@@ -84,7 +84,8 @@ export default {
 						Text: message,
 						Schedule: null,
 						Private_Message: true,
-						Platform: sub.Platform ?? 1
+						Platform: sub.Platform ?? 1,
+						Type: "Reminder"
 					}, true);
 				}
 			}
