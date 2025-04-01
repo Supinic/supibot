@@ -32,7 +32,7 @@ export default {
 		}) as GithubRepoResponse;
 
 		if (!response.ok) {
-			return;
+			return null;
 		}
 
 		const data = response.body.sort((a, b) => new SupiDate(b.created_at).valueOf() - new SupiDate(a.created_at).valueOf());
@@ -40,7 +40,7 @@ export default {
 
 		const latestCacheVersion = await sb.Cache.getByPrefix(LATEST_NODE_JS_VERSION);
 		if (latest.tag_name === latestCacheVersion) {
-			return;
+			return null;
 		}
 
 		await sb.Cache.setByPrefix(LATEST_NODE_JS_VERSION, latest.tag_name);

@@ -1,4 +1,4 @@
-import { type Counter, SupiError, SupiPromise } from "supi-core";
+import { type Counter, SupiError } from "supi-core";
 
 import { User, Like as UserLike } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
@@ -53,8 +53,9 @@ export type MirrorOptions = PrepareMessageOptions & { commandUsed?: boolean; };
 type MessageAwaiterResolution = { message: string; } | null;
 type MessageAwaiterObject = {
 	timeout: NodeJS.Timeout;
-	promise: SupiPromise<MessageAwaiterResolution>;
-}
+	promise: Promise<MessageAwaiterResolution>;
+	resolve: (value: MessageAwaiterResolution | PromiseLike<MessageAwaiterResolution>) => void;
+};
 type MessageAwaiterOptions = { timeout?: number; };
 
 export type GenericSendOptions = Record<string, unknown>;
@@ -184,10 +185,10 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	 * Whenever the user sends a message the bot is supposed to react to, that SupiPromise will be resolved
 	 * "externally" from the Platform instance - see the `resolveUserMessage` method.
 	 */
-	public waitForUserMessage (channelData: Channel, userData: User, options: MessageAwaiterOptions = {}): SupiPromise<MessageAwaiterResolution> {
+	public waitForUserMessage (channelData: Channel, userData: User, options: MessageAwaiterOptions = {}): Promise<MessageAwaiterResolution> {
 		const delay = options.timeout ?? DEFAULT_MESSAGE_WAIT_TIMEOUT;
-		const promise = new SupiPromise<MessageAwaiterResolution | null>();
 
+		const { promise, resolve } = Promise.withResolvers<MessageAwaiterResolution | null>();
 		let userMap = this.userMessagePromises.get(channelData.ID);
 		if (!userMap) {
 			userMap = new Map();
@@ -201,12 +202,11 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 
 		const timeout = setTimeout(() => {
-			// @todo replace SupiPromise usage with Promise.withResolvers
-			promise.resolve(null);
+			resolve(null);
 			userMap.delete(userData.ID);
 		}, delay);
 
-		userMap.set(userData.ID, { promise, timeout });
+		userMap.set(userData.ID, { promise, resolve, timeout });
 
 		return promise;
 	}
@@ -227,12 +227,14 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			return;
 		}
 
-		const { promise, timeout } = awaiter;
+		const r = awaiter.resolve;
+		r({ message });
+
+		const { resolve, timeout } = awaiter;
 		clearTimeout(timeout);
 
 		userMap.delete(userData.ID);
-		// @todo replace SupiPromise usage with Promise.withResolvers
-		promise.resolve({ message });
+		resolve({ message });
 	}
 
 	/**

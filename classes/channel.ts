@@ -493,7 +493,6 @@ export class Channel extends TemplateWithId {
 		const platformMap = Channel.getPlatformMap(channelData.Platform);
 		platformMap.set(channelName, channelData);
 
-		await channelData.setupLoggingTable();
 		return channelData;
 	}
 

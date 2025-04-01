@@ -31,7 +31,6 @@ type PopulateOptions = {
 interface GlobalSb {
 	Date: typeof supiCore.SupiDate;
 	Error: typeof supiCore.SupiError;
-	Promise: typeof supiCore.SupiPromise;
 	Got: typeof supiCore.Got;
 
 	Metrics: supiCore.Metrics;
@@ -135,7 +134,6 @@ globalThis.core = {
 globalThis.sb = {
 	Date: supiCore.Date,
 	Error: supiCore.Error,
-	Promise: supiCore.Promise,
 	Got: supiCore.Got,
 
 	get Query () { return core.Query; },
