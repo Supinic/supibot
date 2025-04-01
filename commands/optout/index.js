@@ -32,13 +32,16 @@ export default {
 		}
 		else {
 			filterData = parse.filterData;
-			filter = sb.Filter.data.find(i => (
-				i.Type === "Opt-out"
-				&& i.Channel === filterData.channel
-				&& i.Command === filterData.command
+
+			const optOutFilters = sb.Filter.getLocals("Opt-out", {
+				user: context.User,
+				command: filterData.command,
+				invocation: filterData.invocation
+			});
+
+			filter = optOutFilters.find(i => (
+				i.Channel === filterData.channel
 				&& i.Platform === filterData.platform
-				&& i.Invocation === filterData.invocation
-				&& i.User_Alias === context.user.ID
 			));
 		}
 

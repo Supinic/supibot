@@ -1,4 +1,4 @@
-import LanguageCodes from "../../utils/languages.js";
+import { getCode } from "../../utils/languages.js";
 import locales from "./tts-locales.json" with { type: "json" };
 
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
@@ -87,7 +87,7 @@ export default {
 			input = randomItem.locale;
 		}
 		else {
-			code = LanguageCodes.getCode(input);
+			code = getCode(input);
 		}
 
 		const currentLocale = locales.find(i => i.locale === input || i.code === code);

@@ -9,8 +9,9 @@ export default tseslint.config(
 	importPlugin.flatConfigs.errors,
 	unicornPlugin.configs["flat/recommended"],
 	// tseslint.configs.recommendedTypeChecked,
+	tseslint.configs.strictTypeChecked,
 	{
-		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
+		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs"]
 	},
 	{
 		languageOptions: {
@@ -31,6 +32,12 @@ export default tseslint.config(
 		rules: {
 			// "@typescript-eslint/no-floating-promises": "error",
 			// "@typescript-eslint/no-unused-vars": "warn",
+			"@typescript-eslint/restrict-template-expressions": ["warn", {
+				allowNumber: true
+			}],
+			"@typescript-eslint/no-confusing-void-expression": ["warn", {
+				ignoreVoidReturningFunctions: true
+			}],
 			"array-bracket-newline": ["warn", "consistent"],
 			"array-bracket-spacing": ["warn", "never"],
 			"array-element-newline": ["warn", "consistent"],
@@ -128,7 +135,7 @@ export default tseslint.config(
 			"no-var": "error",
 			"no-whitespace-before-property": "warn",
 			"no-unused-private-class-members": "warn",
-			"no-use-before-define": "error",
+			// "no-use-before-define": "error",
 			"no-with": "error",
 			"object-curly-newline": ["warn", {
 				consistent: true
@@ -181,6 +188,7 @@ export default tseslint.config(
 			"unicorn/catch-error-name": ["warn", {
 				name: "e"
 			}],
+			"unicorn/prefer-spread": "off",
 			"unicorn/empty-brace-spaces": "warn",
 			"unicorn/new-for-builtins": "error",
 			"unicorn/no-array-for-each": "error",

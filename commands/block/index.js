@@ -42,7 +42,7 @@ export default {
 					reply: `You must provide someone to block!`
 				};
 			}
-			else if (filterData.user === context.platform.Self_ID) {
+			else if (filterData.user === context.platform.Self_ID) { // @todo this condition is wrong, please fix
 				const emote = await context.randomEmote("monkaStare", "supiniStare", "😬🫵");
 				return {
 					success: false,
@@ -52,13 +52,15 @@ export default {
 
 			blockedUserData = await sb.User.get(filterData.user);
 
-			filter = sb.Filter.data.find(i => (
-				i.Type === "Block"
-				&& i.Blocked_User === filterData.user
+			const blockFilters = sb.Filter.getLocals("Block", {
+				user: context.User,
+				command: filterData.command,
+			});
+
+			filter = blockFilters.find(i => (
+				i.Blocked_User === filterData.user
 				&& i.Channel === filterData.channel
-				&& i.Command === filterData.command
 				&& i.Platform === filterData.platform
-				&& i.User_Alias === context.user.ID
 			));
 		}
 

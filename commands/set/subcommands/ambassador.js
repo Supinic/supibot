@@ -53,7 +53,8 @@ const handleAmbassadors = async (type, context, ...args) => {
 				Channel: context.channel.ID,
 				Schedule: null,
 				Text: message,
-				Private_Message: false
+				Private_Message: false,
+				Type: "Reminder"
 			}, true);
 		}
 	}

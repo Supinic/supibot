@@ -68,7 +68,8 @@ export default {
 				Text: `Your suggestion ${oldRow.ID} changed: is now ${newRow.Status ?? "(pending)"}. ${extraInfoString}`,
 				Schedule: null,
 				Created: new sb.Date(),
-				Private_Message: true
+				Private_Message: true,
+				Type: "Reminder"
 			}, true);
 		}
 
