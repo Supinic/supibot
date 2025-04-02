@@ -8,7 +8,6 @@ export default tseslint.config(
 	eslintJs.configs.recommended,
 	importPlugin.flatConfigs.errors,
 	unicornPlugin.configs["flat/recommended"],
-	// tseslint.configs.recommendedTypeChecked,
 	tseslint.configs.strictTypeChecked,
 	{
 		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs"]
@@ -24,20 +23,13 @@ export default tseslint.config(
 				...globals.browser,
 				...globals.es2025,
 				...globals.node,
+				core: "readonly",
 				sb: "readonly"
 			},
 			ecmaVersion: 2025,
 			sourceType: "module"
 		},
 		rules: {
-			// "@typescript-eslint/no-floating-promises": "error",
-			// "@typescript-eslint/no-unused-vars": "warn",
-			"@typescript-eslint/restrict-template-expressions": ["warn", {
-				allowNumber: true
-			}],
-			"@typescript-eslint/no-confusing-void-expression": ["warn", {
-				ignoreVoidReturningFunctions: true
-			}],
 			"array-bracket-newline": ["warn", "consistent"],
 			"array-bracket-spacing": ["warn", "never"],
 			"array-element-newline": ["warn", "consistent"],
@@ -216,6 +208,13 @@ export default tseslint.config(
 			"unicorn/prefer-string-starts-ends-with": "warn",
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
+
+			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
+				allowNumber: true
+			}],
+			"@typescript-eslint/no-confusing-void-expression": ["warn", { // Ignore arrow functions implicitly "returning" another void function's result
+				ignoreVoidReturningFunctions: true
+			}],
 
 			"unicorn/prevent-abbreviations": "off",
 			"unicorn/no-null": "off",

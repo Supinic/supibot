@@ -165,7 +165,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			channel = channelData.Name;
 		}
 
-		const metric = sb.Metrics.get(`supibot_messages_${type}_total`) as Counter | undefined;
+		const metric = core.Metrics.get(`supibot_messages_${type}_total`) as Counter | undefined;
 		if (!metric) {
 			return;
 		}
@@ -284,14 +284,14 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 	public async fetchChannelUserList (channelData: Channel): Promise<string[]> {
 		const key = this.getChannelUserListKey(channelData);
-		const cacheData = await sb.Cache.getByPrefix(key) as string[] | null;
+		const cacheData = await core.Cache.getByPrefix(key) as string[] | null;
 		if (cacheData) {
 			return cacheData;
 		}
 
 		const userList = await this.populateUserList(channelData);
 
-		await sb.Cache.setByPrefix(key, userList, {
+		await core.Cache.setByPrefix(key, userList, {
 			expiry: 300_000 // 5 minutes
 		});
 
@@ -300,13 +300,13 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 	public async fetchGlobalEmotes (): Promise<Emote[]> {
 		const key = this.globalEmoteCacheKey;
-		const cacheData = await sb.Cache.getByPrefix(key) as Emote[] | null;
+		const cacheData = await core.Cache.getByPrefix(key) as Emote[] | null;
 		if (cacheData) {
 			return cacheData;
 		}
 
 		const data = await this.populateGlobalEmotes();
-		await sb.Cache.setByPrefix(key, data, {
+		await core.Cache.setByPrefix(key, data, {
 			expiry: 864e5 // 24 hours
 		});
 
@@ -315,7 +315,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 	public async invalidateGlobalEmotesCache (): Promise<void> {
 		const key = this.globalEmoteCacheKey;
-		await sb.Cache.setByPrefix(key, null);
+		await core.Cache.setByPrefix(key, null);
 	}
 
 	public async getBestAvailableEmote<T extends string> (
@@ -330,7 +330,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 		const availableEmotes = await this.fetchGlobalEmotes();
 		const emoteArray = (options.shuffle)
-			? sb.Utils.shuffleArray(emotes)
+			? core.Utils.shuffleArray(emotes)
 			: emotes;
 
 		const caseSensitive = options.caseSensitivity ?? true;
@@ -375,7 +375,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 			// Remove all links, if the channel requires it - replace all links with a placeholder
 			if (!channelData.Links_Allowed) {
-				message = sb.Utils.replaceLinks(message, "[LINK]");
+				message = core.Utils.replaceLinks(message, "[LINK]");
 			}
 
 			if (!options.skipLengthCheck) {
@@ -383,7 +383,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			}
 		}
 
-		let resultMessage: string | null = sb.Utils.wrapString(message, limit, {
+		let resultMessage: string | null = core.Utils.wrapString(message, limit, {
 			keepWhitespace: Boolean(options.keepWhitespace)
 		});
 
@@ -440,7 +440,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	get config () { return this.platform; }
 	get Logging () { return this.logging; }
 
-	get capital () { return sb.Utils.capitalize(this.name); }
+	get capital () { return core.Utils.capitalize(this.name); }
 	get privateMessageLoggingTableName () {
 		const name = this.getFullName("_");
 		return `#${name}_private_messages`;

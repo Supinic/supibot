@@ -87,9 +87,9 @@ type GameWorlds = Record<string, GameWorld>;
 export const OSRS_GAME_USERNAME_KEY = "osrsGameUsername";
 
 export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
-	let data = await sb.Cache.getByPrefix("osrs-worlds-data") as GameWorlds | null;
+	let data = await core.Cache.getByPrefix("osrs-worlds-data") as GameWorlds | null;
 	if (!data) {
-		const response = await sb.Got.get("FakeAgent")({
+		const response = await core.Got.get("FakeAgent")({
 			url: "https://oldschool.runescape.com/slu",
 			responseType: "text"
 		}) as GameWorldResult;
@@ -98,7 +98,7 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 			return null;
 		}
 
-		const $ = sb.Utils.cheerio(response.body);
+		const $ = core.Utils.cheerio(response.body);
 		const rows = $("tr.server-list__row");
 		const worlds: GameWorlds = {};
 
@@ -127,7 +127,7 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 		}
 
 		data = worlds;
-		await sb.Cache.setByPrefix("osrs-worlds-data", data, {
+		await core.Cache.setByPrefix("osrs-worlds-data", data, {
 			expiry: 864e5 // 1 day
 		});
 	}
@@ -141,7 +141,7 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 		: `osrs-user-data-${user}-seasonal`;
 
 	if (!options.force) {
-		const cacheData = await sb.Cache.getByPrefix(key) as FetchData | null;
+		const cacheData = await core.Cache.getByPrefix(key) as FetchData | null;
 		if (cacheData) {
 			return {
 				success: true,
@@ -152,12 +152,12 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 
 	let response;
 	if (!options.seasonal) {
-		response = await sb.Got.get("Supinic")<FetchResult>({
+		response = await core.Got.get("Supinic")<FetchResult>({
 			url: `osrs/lookup/${user}`
 		});
 	}
 	else {
-		response = await sb.Got.get("Supinic")<FetchResult>({
+		response = await core.Got.get("Supinic")<FetchResult>({
 			url: `osrs/lookup/${user}`,
 			searchParams: {
 				seasonal: "1"
@@ -190,7 +190,7 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 	}
 
 	const data = body.data as FetchData;
-	await sb.Cache.setByPrefix(key, data, {
+	await core.Cache.setByPrefix(key, data, {
 		expiry: 600_000
 	});
 

@@ -28,7 +28,7 @@ export default {
 	subName: "OSRS article",
 	type: "custom",
 	process: async () => {
-		const response = await sb.Got.get("GenericAPI")<OsrsResponse>({
+		const response = await core.Got.get("GenericAPI")<OsrsResponse>({
 			url,
 			responseType: "json",
 			throwHttpErrors: true
@@ -39,7 +39,7 @@ export default {
 		}
 
 		const newsItems = response.body.newsItems.filter(i => !i.sticky);
-		const previousArticleId = (await sb.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) as number | null) ?? 0;
+		const previousArticleId = (await core.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) as number | null) ?? 0;
 
 		// Huge assumption: Jagex will release new articles on "top" of the JSON feed
 		const previousArticleIndex = newsItems.findIndex(i => i.newsId === previousArticleId);
@@ -52,7 +52,7 @@ export default {
 		// Ignore if no previous article found - save the latest one
 		if (previousArticleIndex === -1) {
 			const topArticleId = newsItems[0].newsId;
-			await sb.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, topArticleId, {
+			await core.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, topArticleId, {
 				expiry: 14 * 864e5 // 14 days
 			});
 			//
@@ -72,7 +72,7 @@ export default {
 		const eligibleArticles = newsItems.slice(0, previousArticleIndex);
 		const latestArticleId = eligibleArticles[0].newsId;
 
-		await sb.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, latestArticleId, {
+		await core.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, latestArticleId, {
 			expiry: 14 * 864e5 // 14 days
 		});
 

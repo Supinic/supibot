@@ -153,13 +153,13 @@ export class Reminder extends TemplateWithId {
 
 			let message;
 			if (this.User_From === this.User_To) {
-				message = `${toMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `${toMention}, reminder from yourself (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (!this.User_From) {
-				message = `${toMention}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `${toMention}, system reminder (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (this.User_To) {
-				message = `${toMention}, timed reminder from ${fromMention} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `${toMention}, timed reminder from ${fromMention} (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 
 			const statusAFK = AwayFromKeyboard.get(toUserData);
@@ -194,13 +194,13 @@ export class Reminder extends TemplateWithId {
 					if (channelData.Mirror) {
 						let mirrorMessage: string;
 						if (this.User_From === this.User_To) {
-							mirrorMessage = `${toUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+							mirrorMessage = `${toUserData.Name}, reminder from yourself (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else if (!this.User_From) {
-							mirrorMessage = `${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+							mirrorMessage = `${toUserData.Name}, system reminder (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else if (this.User_To && fromUserData) {
-							mirrorMessage = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+							mirrorMessage = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else {
 							throw new SupiError({
@@ -261,24 +261,24 @@ export class Reminder extends TemplateWithId {
 	}
 
 	static async initialize () {
-		Reminder.#limitRejectedCounter = sb.Metrics.registerCounter({
+		Reminder.#limitRejectedCounter = core.Metrics.registerCounter({
 			name: "supibot_reminders_limit_rejected_total",
 			help: "Total amount of all reminders that have not been registered due to a limit being hit.",
 			labelNames: ["cause"] as const
 		});
 
-		Reminder.#totalCounter = sb.Metrics.registerCounter({
+		Reminder.#totalCounter = core.Metrics.registerCounter({
 			name: "supibot_reminders_created_total",
 			help: "Total amount of all reminders created.",
 			labelNames: ["type", "scheduled", "system"] as const
 		});
 
-		Reminder.#activeGauge = sb.Metrics.registerGauge({
+		Reminder.#activeGauge = core.Metrics.registerGauge({
 			name: "supibot_active_reminders_count",
 			help: "Total amount of currently active reminders."
 		});
 
-		Reminder.#userGauge = sb.Metrics.registerGauge({
+		Reminder.#userGauge = core.Metrics.registerGauge({
 			name: "supibot_reminder_recipient_user_count",
 			help: "Total amount of users that currently have at least one reminder pending for them."
 		});
@@ -287,7 +287,7 @@ export class Reminder extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
+		const data = await core.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "Reminder")
 		);
@@ -318,7 +318,7 @@ export class Reminder extends TemplateWithId {
 		}
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Reminder");
+			const row = await core.Query.getRow<ConstructorData>("chat_data", "Reminder");
 			await row.load(ID, true);
 
 			await Reminder.#remove(ID);
@@ -385,7 +385,7 @@ export class Reminder extends TemplateWithId {
 			}
 		}
 
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Reminder");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "Reminder");
 		row.setValues({
 			User_From: data.User_From,
 			User_To: data.User_To,
@@ -523,7 +523,7 @@ export class Reminder extends TemplateWithId {
 
 					const banphraseResult = await sb.Banphrase.execute(message, channelData);
 					if (!banphraseResult.passed) {
-						await channelData.send(sb.Utils.tag.trim `
+						await channelData.send(core.Utils.tag.trim `
 							${authorMention},
 							a user you set up a "pingme" reminder for has typed somewhere, but I can't post it here.
 							I have whispered you the result instead.
@@ -556,7 +556,7 @@ export class Reminder extends TemplateWithId {
 
 			const reminderTextCheck = await Banphrase.execute(reminder.Text, channelData);
 			const reminderText = (reminderTextCheck.passed) ? reminder.Text : "[Banphrased]";
-			const delta = sb.Utils.timeDelta(reminder.Created);
+			const delta = core.Utils.timeDelta(reminder.Created);
 
 			let reminderMessage;
 			if (reminder.User_From === targetUserData.ID) {
@@ -589,7 +589,7 @@ export class Reminder extends TemplateWithId {
 		if (reply.length !== 0) {
 			let message = `reminder(s) from: ${reply.join("; ")}`;
 			if (!channelData.Links_Allowed) {
-				message = sb.Utils.replaceLinks(message, "[LINK]");
+				message = core.Utils.replaceLinks(message, "[LINK]");
 			}
 
 			// Check banphrases and do not check length limits, because it is later split manually
@@ -621,13 +621,13 @@ export class Reminder extends TemplateWithId {
 						? await Reminder.createRelayLink("lookup", listID)
 						: "[LINK]";
 
-					message = sb.Utils.tag.trim `
+					message = core.Utils.tag.trim `
 						Hey ${userMention}
 						you have ${reminderIDs.length} reminders, but they're too long to be posted.
 						Check them here: ${link}
 						or by ID: ${reminderIDs.join(" ")}
 					`;
-					mirrorMessage = sb.Utils.tag.trim `
+					mirrorMessage = core.Utils.tag.trim `
 						Hey ${targetUserData.Name}
 						you have ${reminderIDs.length} reminders, but they're too long to be posted.
 						Check them here: ${link}
@@ -635,7 +635,7 @@ export class Reminder extends TemplateWithId {
 					`;
 				}
 
-				const [resultMessage] = sb.Utils.partitionString(message, limit, 1);
+				const [resultMessage] = core.Utils.partitionString(message, limit, 1);
 				await Promise.all([
 					channelData.send(resultMessage),
 					channelData.mirror(mirrorMessage, null, { commandUsed: false })
@@ -648,13 +648,13 @@ export class Reminder extends TemplateWithId {
 					? await Reminder.createRelayLink("lookup", listID)
 					: "[LINK]";
 
-				const resultMessage = sb.Utils.tag.trim `
+				const resultMessage = core.Utils.tag.trim `
 					Hey ${userMention}
 					you have ${reminderIDs.length} reminders, but they couldn't be posted.
 					Check them here: ${link}
 					or by ID: ${reminderIDs.join(" ")}
 				`;
-				const mirrorMessage = sb.Utils.tag.trim `
+				const mirrorMessage = core.Utils.tag.trim `
 					Hey ${targetUserData.Name}
 					you have ${reminderIDs.length} reminders, but they couldn't be posted.
 					Check them here: ${link}
@@ -698,13 +698,13 @@ export class Reminder extends TemplateWithId {
 	static async checkLimits (userFrom: User["ID"], userTo: User["ID"], schedule: Reminder["Schedule"], type: Type = "Reminder"): Promise<LimitCheckResult> {
 		type Item = { Private_Message: Reminder["Private_Message"]; };
 		const [incomingData, outgoingData] = await Promise.all([
-			sb.Query.getRecordset<Item[]>(rs => rs
+			core.Query.getRecordset<Item[]>(rs => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_To = %n", userTo)
 			),
-			sb.Query.getRecordset<Item[]>(rs => rs
+			core.Query.getRecordset<Item[]>(rs => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("Schedule IS NULL")
@@ -715,8 +715,8 @@ export class Reminder extends TemplateWithId {
 
 		const incomingLimit = config.values.maxIncomingActiveReminders;
 		const outgoingLimit = config.values.maxOutgoingActiveReminders;
-		const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, (i: Item) => i.Private_Message);
-		const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, (i: Item) => i.Private_Message);
+		const [privateIncoming, publicIncoming] = core.Utils.splitByCondition(incomingData, (i: Item) => i.Private_Message);
+		const [privateOutgoing, publicOutgoing] = core.Utils.splitByCondition(outgoingData, (i: Item) => i.Private_Message);
 
 		if (publicIncoming.length >= incomingLimit) {
 			return {
@@ -748,7 +748,7 @@ export class Reminder extends TemplateWithId {
 			const outgoingScheduledLimit = config.values.maxOutgoingScheduledReminders;
 
 			const [scheduledIncoming, scheduledOutgoing] = await Promise.all([
-				sb.Query.getRecordset<number>(rs => rs
+				core.Query.getRecordset<number>(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
 					.where("Schedule IS NOT NULL")
@@ -761,7 +761,7 @@ export class Reminder extends TemplateWithId {
 					.single()
 					.flat("Count")
 				),
-				sb.Query.getRecordset<number>(rs => rs
+				core.Query.getRecordset<number>(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
 					.where("Schedule IS NOT NULL")
@@ -791,7 +791,7 @@ export class Reminder extends TemplateWithId {
 		}
 
 		if (type === "Pingme") {
-			const existingPingmeReminderID = await sb.Query.getRecordset<number | undefined>(rs => rs
+			const existingPingmeReminderID = await core.Query.getRecordset<number | undefined>(rs => rs
 				.select("ID")
 				.from("chat_data", "Reminder")
 				.where("Type = %s", "Pingme")
@@ -816,7 +816,7 @@ export class Reminder extends TemplateWithId {
 
 	static async createRelayLink (endpoint: string, params: string) {
 		type RelayResponse = { data: { link: string; }; };
-		const relay = await sb.Got.get("Supinic")<RelayResponse>({
+		const relay = await core.Got.get("Supinic")<RelayResponse>({
 			method: "POST",
 			url: "relay",
 			throwHttpErrors: false,
@@ -859,11 +859,11 @@ export class Reminder extends TemplateWithId {
 	static async #remove (ID: Reminder["ID"], options: { cancelled?: boolean; permanent?: boolean; } = {}) {
 		const { cancelled, permanent } = options;
 		if (permanent) {
-			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Reminder");
+			const row = await core.Query.getRow<ConstructorData>("chat_data", "Reminder");
 			await row.load(ID, true);
 
 			if (row.loaded) {
-				const historyRow = await sb.Query.getRow<HistoryConstructorData>("chat_data", "Reminder_History");
+				const historyRow = await core.Query.getRow<HistoryConstructorData>("chat_data", "Reminder_History");
 
 				historyRow.setValues({
 					ID,

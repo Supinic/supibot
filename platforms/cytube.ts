@@ -87,7 +87,7 @@ class CytubeClient {
 			const originalUsername = data.username;
 			data.username = data.username.toLowerCase();
 
-			const msg = sb.Utils.fixHTML(data.msg).replaceAll(/<(?:.|\n)*?>/gm, "");
+			const msg = core.Utils.fixHTML(data.msg).replaceAll(/<(?:.|\n)*?>/gm, "");
 			if (!msg) {
 				return; // Ignore if the result message becomes empty string (HTML issues, seemingly)
 			}

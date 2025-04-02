@@ -52,7 +52,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function ban (context: Context<typeof paramsDefinition>): Promise<StrictResult> {
 		const { invocation } = context;
-		const type = sb.Utils.capitalize(context.params.type ?? "Blacklist");
+		const type = core.Utils.capitalize(context.params.type ?? "Blacklist");
 		if (!isFilterType(type)) {
 			return {
 				success: false,
@@ -287,7 +287,7 @@ export default {
 							changed = true;
 							newData.push({ range: [0, Infinity], string });
 						}
-						else if (sb.Utils.isValidInteger(index)) {
+						else if (core.Utils.isValidInteger(index)) {
 							changed = true;
 							newData.push({ index, string });
 						}
@@ -307,7 +307,7 @@ export default {
 					};
 				}
 				else if (invocation === "unban") {
-					if ((sb.Utils.isValidInteger(index) || context.params.all === true) && typeof string === "string") {
+					if ((core.Utils.isValidInteger(index) || context.params.all === true) && typeof string === "string") {
 						for (let i = 0; i < existing.Data.length; i++) {
 							const item = existing.Data[i];
 							const condition = (context.params.all === true)
@@ -425,7 +425,7 @@ export default {
 
 			if (type === "Arguments") {
 				const { index, string } = context.params;
-				if (sb.Utils.isValidInteger(index) && typeof string === "string") {
+				if (core.Utils.isValidInteger(index) && typeof string === "string") {
 					options.Data = JSON.stringify({
 						args: [{ index, string }]
 					});

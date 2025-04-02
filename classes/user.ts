@@ -78,7 +78,7 @@ export class User extends TemplateWithIdString {
 	}
 
 	async saveProperty<T extends keyof ConstructorData> (property: T, value: this[T]) {
-		const row: Row = await sb.Query.getRow<ConstructorData>("chat_data", "User_Alias");
+		const row: Row = await core.Query.getRow<ConstructorData>("chat_data", "User_Alias");
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);
@@ -136,7 +136,7 @@ export class User extends TemplateWithIdString {
 				return mapCacheUser;
 			}
 
-			const name = await sb.Query.getRecordset<string | undefined>(rs => rs
+			const name = await core.Query.getRecordset<string | undefined>(rs => rs
 				.select("Name")
 				.from("chat_data", "User_Alias")
 				.where("ID = %n", identifier)
@@ -159,8 +159,8 @@ export class User extends TemplateWithIdString {
 				return mapCacheUser;
 			}
 
-			// 2. attempt to fetch the user from medium-cache (sb.Cache)
-			if (sb.Cache.ready) {
+			// 2. attempt to fetch the user from medium-cache (core.Cache)
+			if (core.Cache.ready) {
 				const redisCacheUser = await User.createFromCache({ name: username });
 				if (redisCacheUser) {
 					if (!User.data.has(username)) {
@@ -172,7 +172,7 @@ export class User extends TemplateWithIdString {
 			}
 
 			// 3. attempt to get the user out of the database
-			const dbUserData = await sb.Query.getRecordset<ConstructorData | undefined>(rs => rs
+			const dbUserData = await core.Query.getRecordset<ConstructorData | undefined>(rs => rs
 				.select("*")
 				.from("chat_data", "User_Alias")
 				.where("Name = %s", username)
@@ -238,7 +238,7 @@ export class User extends TemplateWithIdString {
 					continue;
 				}
 
-				if (sb.Cache.ready) {
+				if (core.Cache.ready) {
 					const redisCacheUser = await User.createFromCache({ name: username });
 					if (redisCacheUser) {
 						User.data.set(username, redisCacheUser);
@@ -252,8 +252,8 @@ export class User extends TemplateWithIdString {
 		}
 
 		if (toFetch.length > 0) {
-			const [strings, numbers] = sb.Utils.splitByCondition(toFetch, (i: string | number) => typeof i === "string") as [string[], number[]];
-			const fetched = await sb.Query.getRecordset<ConstructorData[]>(rs => {
+			const [strings, numbers] = core.Utils.splitByCondition(toFetch, (i: string | number) => typeof i === "string") as [string[], number[]];
+			const fetched = await core.Query.getRecordset<ConstructorData[]>(rs => {
 				rs.select("*");
 				rs.from("chat_data", "User_Alias");
 
@@ -301,7 +301,7 @@ export class User extends TemplateWithIdString {
 	}
 
 	static async add (name: string, properties = {}): Promise<User | null> {
-		await sb.Cache.setByPrefix(`${HIGH_LOAD_CACHE_PREFIX}-${name}`, "1", {
+		await core.Cache.setByPrefix(`${HIGH_LOAD_CACHE_PREFIX}-${name}`, "1", {
 			expiry: HIGH_LOAD_CACHE_EXPIRY
 		});
 
@@ -311,7 +311,7 @@ export class User extends TemplateWithIdString {
 			return pendingNewUser;
 		}
 
-		const keys = await sb.Cache.getKeysByPrefix(`${HIGH_LOAD_CACHE_PREFIX}*`);
+		const keys = await core.Cache.getKeysByPrefix(`${HIGH_LOAD_CACHE_PREFIX}*`);
 
 		// If there are too many new users queued (above criticalLoadThreshold), all new users being added are skipped
 		if (keys.length > config.values.userAdditionCriticalLoadThreshold) {
@@ -333,7 +333,7 @@ export class User extends TemplateWithIdString {
 		// If the number of new users is manageable, immediately add the new user and return the User object
 		else {
 			const promise = (async () => {
-				const existingName = await sb.Query.getRecordset<string | undefined>(rs => rs
+				const existingName = await core.Query.getRecordset<string | undefined>(rs => rs
 					.select("Name")
 					.from("chat_data", "User_Alias")
 					.where("Name = %s", preparedName)
@@ -356,7 +356,7 @@ export class User extends TemplateWithIdString {
 	}
 
 	static async #add (name: string, properties: GetOptions) {
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "User_Alias");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "User_Alias");
 		row.values.Name = name;
 
 		if (properties.Twitch_ID) {
@@ -383,8 +383,8 @@ export class User extends TemplateWithIdString {
 			User.data.set(user.Name, user);
 		}
 
-		if (sb.Cache.ready) {
-			await sb.Cache.setByPrefix(user.getCacheKey(), user.getCacheProperties(), {
+		if (core.Cache.ready) {
+			await core.Cache.setByPrefix(user.getCacheKey(), user.getCacheProperties(), {
 				expiry: User.redisCacheExpiration
 			});
 		}
@@ -392,7 +392,7 @@ export class User extends TemplateWithIdString {
 
 	static async createFromCache (options: NameObject) {
 		const key = User.createCacheKey(options);
-		const cacheData = await sb.Cache.getByPrefix(key) as UserCacheData | undefined;
+		const cacheData = await core.Cache.getByPrefix(key) as UserCacheData | undefined;
 		if (!cacheData) {
 			return null;
 		}
@@ -403,18 +403,18 @@ export class User extends TemplateWithIdString {
 	static async invalidateUserCache (identifier: User | string) {
 		if (identifier instanceof User) {
 			User.data.delete(identifier.Name);
-			await sb.Cache.delete(identifier);
+			await core.Cache.delete(identifier);
 		}
 		else {
 			User.data.delete(identifier);
 
 			const cacheKey = User.createCacheKey({ name: identifier });
-			await sb.Cache.delete(cacheKey);
+			await core.Cache.delete(cacheKey);
 		}
 	}
 
 	static async handleHighLoad () {
-		User.highLoadUserBatch ??= await sb.Query.getBatch(
+		User.highLoadUserBatch ??= await core.Query.getBatch(
 			"chat_data",
 			"User_Alias",
 			["Name", "Twitch_ID", "Discord_ID"]

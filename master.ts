@@ -29,13 +29,20 @@ type PopulateOptions = {
 };
 
 interface GlobalSb {
+	/** @deprecated use `import { SupiDate } from "supi-core"` instead */
 	Date: typeof supiCore.SupiDate;
+	/** @deprecated use `import { SupiError } from "supi-core"` instead */
 	Error: typeof supiCore.SupiError;
-	Got: typeof supiCore.Got;
 
+	/** @deprecated use `core.Got` instead */
+	Got: typeof supiCore.Got;
+	/** @deprecated use `core.Metrics` instead */
 	Metrics: supiCore.Metrics;
+	/** @deprecated use `core.Cache` instead */
 	Cache: supiCore.Cache;
+	/** @deprecated use `core.Query` instead */
 	Query: supiCore.Query;
+	/** @deprecated use `core.Utils` instead */
 	Utils: supiCore.Utils;
 
 	API: ReturnType<typeof initializeInternalApi>;
@@ -201,13 +208,13 @@ console.time("crons");
 initializeCrons(config.modules.crons);
 console.timeEnd("crons");
 
-sb.Metrics.registerCounter({
+core.Metrics.registerCounter({
 	name: "supibot_messages_sent_total",
 	help: "Total number of Twitch messages sent by the bot.",
 	labelNames: ["platform", "channel"]
 });
 
-sb.Metrics.registerCounter({
+core.Metrics.registerCounter({
 	name: "supibot_messages_read_total",
 	help: "Total number of Twitch messages seen (read) by the bot.",
 	labelNames: ["platform", "channel"]

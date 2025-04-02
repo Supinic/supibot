@@ -269,7 +269,7 @@ export class ChatModule extends TemplateWithoutId {
 			return [];
 		}
 
-		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
+		const hasConnectorTable = await core.Query.isTablePresent("chat_data", "Channel_Chat_Module");
 		if (!hasConnectorTable) {
 			throw new SupiError({
 				message: "Cannot import chat module(s), attachment table is missing"
@@ -345,7 +345,7 @@ export class ChatModule extends TemplateWithoutId {
 		ChatModule.detachChannelModules(channelData, { remove: true });
 
 		type PartialDescriptor = Pick<Descriptor, "Args" | "Chat_Module">;
-		const attachmentData = await sb.Query.getRecordset<PartialDescriptor[]>(rs => rs
+		const attachmentData = await core.Query.getRecordset<PartialDescriptor[]>(rs => rs
 			.select("Chat_Module", "Specific_Arguments AS Args")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Channel = %n", channelData.ID)
@@ -399,7 +399,7 @@ export class ChatModule extends TemplateWithoutId {
 	}
 
 	static async #fetch (specificNames?: string | string[]): Promise<Descriptor[]> {
-		return await sb.Query.getRecordset<Descriptor[]>(rs => {
+		return await core.Query.getRecordset<Descriptor[]>(rs => {
 			rs.select("Channel", "Chat_Module", "Specific_Arguments as Args");
 			rs.from("chat_data", "Channel_Chat_Module");
 

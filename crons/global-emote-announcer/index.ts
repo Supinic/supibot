@@ -15,7 +15,7 @@ type EmoteJsonObject = {
 };
 
 const cacheKey = "twitch-global-emotes";
-const fetchTwitchGlobalEmotes = () => sb.Got.get("Helix")<HelixResponse>({
+const fetchTwitchGlobalEmotes = () => core.Got.get("Helix")<HelixResponse>({
 	url: "chat/emotes/global",
 	method: "GET",
 	throwHttpErrors: false
@@ -40,7 +40,7 @@ const definition: CronDefinition = {
 		}
 
 		if (!previousEmoteIds || previousEmoteIds.size === 0) {
-			let data = await sb.Cache.getByPrefix(cacheKey) as string[] | null;
+			let data = await core.Cache.getByPrefix(cacheKey) as string[] | null;
 			if (!data) {
 				const response = await fetchTwitchGlobalEmotes();
 				if (!response.ok) {
@@ -48,7 +48,7 @@ const definition: CronDefinition = {
 				}
 
 				data = response.body.data.map(i => i.id);
-				await sb.Cache.setByPrefix(cacheKey, data, {
+				await core.Cache.setByPrefix(cacheKey, data, {
 					expiry: 7 * 864e5 // 7 days
 				});
 			}
@@ -100,7 +100,7 @@ const definition: CronDefinition = {
 		}
 
 		previousEmoteIds = newEmoteIds;
-		await sb.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
+		await core.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
 			expiry: 7 * 864e5 // 7 days
 		});
 

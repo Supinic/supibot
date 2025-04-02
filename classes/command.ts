@@ -420,11 +420,11 @@ export class Command extends TemplateWithoutId {
 			name: metricLabel
 		};
 
-		return sb.Metrics.register(type, metricOptions);
+		return core.Metrics.register(type, metricOptions);
 	}
 
 	static initialize () {
-		sb.Metrics.registerCounter({
+		core.Metrics.registerCounter({
 			name: "supibot_command_executions_total",
 			help: "The total number of command executions.",
 			labelNames: ["name", "result", "reason"]
@@ -550,7 +550,7 @@ export class Command extends TemplateWithoutId {
 			return { success: false, reason: "no-command" };
 		}
 
-		const metric = sb.Metrics.get("supibot_command_executions_total") as Counter; // Always defined
+		const metric = core.Metrics.get("supibot_command_executions_total") as Counter; // Always defined
 
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
@@ -611,7 +611,7 @@ export class Command extends TemplateWithoutId {
 		// If the command is rollback-able, set up a transaction.
 		// The command must use the connection in transaction - that's why it is passed to context
 		if (command.Flags.includes("rollback")) {
-			contextOptions.transaction = await sb.Query.getTransaction();
+			contextOptions.transaction = await core.Query.getTransaction();
 		}
 
 		let failedParamsParseResult;
@@ -725,7 +725,7 @@ export class Command extends TemplateWithoutId {
 				Invocation: identifier,
 				Arguments: JSON.stringify(args.filter(Boolean)),
 				Result: result,
-				Execution_Time: sb.Utils.round(Number(end - start) / 1_000_000, 3)
+				Execution_Time: core.Utils.round(Number(end - start) / 1_000_000, 3)
 			});
 
 			execution = commandExecution;
@@ -1080,7 +1080,7 @@ export class Command extends TemplateWithoutId {
 			}
 
 			case "regex": {
-				const regex = sb.Utils.parseRegExp(value);
+				const regex = core.Utils.parseRegExp(value);
 				if (!regex) {
 					return null;
 				}

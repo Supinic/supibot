@@ -59,7 +59,7 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 	}
 
 	const rsOptions = (options.transaction) ? { transaction: options.transaction } : {};
-	const data = await sb.Query.getRecordset<GenericDataPropertyResult | undefined>(
+	const data = await core.Query.getRecordset<GenericDataPropertyResult | undefined>(
 		rs => rs
 			.select("Property", "Value")
 			.select("Custom_Data_Property.Type AS Type", "Custom_Data_Property.Cached AS Cached")
@@ -134,7 +134,7 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 	} = inputData;
 
 	const transactionOptions = (options.transaction) ? { transaction: options.transaction } : {};
-	const propertyData = await sb.Query.getRecordset<SetGenericDataPropertyResult | undefined>(
+	const propertyData = await core.Query.getRecordset<SetGenericDataPropertyResult | undefined>(
 		rs => rs
 			.select("Type", "Cached")
 			.from("chat_data", "Custom_Data_Property")
@@ -151,7 +151,7 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 		});
 	}
 
-	const row = await sb.Query.getRow("chat_data", databaseTable, transactionOptions);
+	const row = await core.Query.getRow("chat_data", databaseTable, transactionOptions);
 	await row.load({
 		[databaseProperty]: self.ID,
 		Property: propertyName
@@ -209,7 +209,7 @@ abstract class Template {
 			key = { type: key };
 		}
 
-		return sb.Cache.getByPrefix(this.getCacheKey(), {
+		return core.Cache.getByPrefix(this.getCacheKey(), {
 			keys: { ...key }
 		});
 	}
@@ -225,7 +225,7 @@ abstract class Template {
 			key = { type: key };
 		}
 
-		return sb.Cache.setByPrefix(this.getCacheKey(), value, {
+		return core.Cache.setByPrefix(this.getCacheKey(), value, {
 			keys: { ...key },
 			...options
 		});

@@ -488,7 +488,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			data: (MessageSendSuccess | MessageSendFailure)[];
 		};
 
-		const response = await sb.Got.get("Helix")<SendMessageResponse>({
+		const response = await core.Got.get("Helix")<SendMessageResponse>({
 			url: "chat/messages",
 			method: "POST",
 			throwHttpErrors: false,
@@ -557,7 +557,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		let targetUserId = userData.Twitch_ID;
 		if (!targetUserId) {
-			const response = await sb.Got.get("Helix")<UserLookupResponse>({
+			const response = await core.Got.get("Helix")<UserLookupResponse>({
 				url: "users",
 				searchParams: {
 					login: userData.Name
@@ -584,7 +584,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			.trim();
 
 		const whisperMessageLimit = this.config.whisperMessageLimit ?? FALLBACK_WHISPER_MESSAGE_LIMIT;
-		const response = await sb.Got.get("Helix")({
+		const response = await core.Got.get("Helix")({
 			method: "POST",
 			url: "whispers",
 			searchParams: {
@@ -592,7 +592,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				to_user_id: targetUserId
 			},
 			json: {
-				message: sb.Utils.wrapString(trimmedMessage, whisperMessageLimit)
+				message: core.Utils.wrapString(trimmedMessage, whisperMessageLimit)
 			}
 		});
 
@@ -642,7 +642,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				end_time: string;
 			}[];
 		};
-		const response = await sb.Got.get("Helix")<ModerationBanResponse>({
+		const response = await core.Got.get("Helix")<ModerationBanResponse>({
 			method: "POST",
 			url: "moderation/bans",
 			searchParams: {
@@ -713,7 +713,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				}
 
 				const { challenge } = await TwitchPlatform.createAccountChallenge(userData, senderUserId);
-				const message = sb.Utils.tag.trim `
+				const message = core.Utils.tag.trim `
 					You were found to be likely to own a Discord account with the same name as your current Twitch account.
 					If you want to use my commands on Twitch, whisper me the following command on Discord:
 					${sb.Command.prefix}link ${challenge}
@@ -735,7 +735,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			if (!channelName || (channelData && sb.Command.is(messageData.text))) {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification") as boolean | undefined;
 				if (!notified) {
-					const replyMessage = sb.Utils.tag.trim `
+					const replyMessage = core.Utils.tag.trim `
 						@${userData.Name}, you have been flagged as suspicious.
 						This is because I have seen your Twitch username on a different account before.
 						This is usually caused by renaming into an account that existed before.
@@ -838,7 +838,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 
 			if (oldMode !== channelData.Mode) {
-				const row = await sb.Query.getRow("chat_data", "Channel");
+				const row = await core.Query.getRow("chat_data", "Channel");
 				await row.load(channelData.ID);
 				row.values.Mode = channelData.Mode;
 				await row.save();
@@ -1106,7 +1106,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async getUserID (user: string): Promise<string | null> {
-		const response = await sb.Got.get("Helix")<UserLookupResponse>({
+		const response = await core.Got.get("Helix")<UserLookupResponse>({
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: {
@@ -1134,7 +1134,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	 * Determines whether a user is subscribed to a given Twitch channel.
 	 */
 	async fetchUserAdminSubscription (userData: User) {
-		const subscriberList = await sb.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST) as BroadcasterSubscription[] | null;
+		const subscriberList = await core.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST) as BroadcasterSubscription[] | null;
 		if (!subscriberList || !Array.isArray(subscriberList)) {
 			return false;
 		}
@@ -1143,15 +1143,15 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async getLiveChannelIdList (): Promise<string[]> {
-		return await sb.Cache.server.lrange(LIVE_STREAMS_KEY, 0, -1);
+		return await core.Cache.server.lrange(LIVE_STREAMS_KEY, 0, -1);
 	}
 
 	async addLiveChannelIdList (channelId: string): Promise<number> {
-		return await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
+		return await core.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
 	}
 
 	async removeLiveChannelIdList (channelId: string): Promise<number> {
-		return await sb.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
+		return await core.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
 	}
 
 	async isChannelLive (channelData: Channel) {
@@ -1167,7 +1167,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	static async fetchTwitchEmotes (selfId: string) {
-		const response = await sb.Got.get("Helix")<HelixEmoteResponse>({
+		const response = await core.Got.get("Helix")<HelixEmoteResponse>({
 			url: "chat/emotes/user",
 			method: "GET",
 			throwHttpErrors: false,
@@ -1179,7 +1179,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		const result = response.body.data;
 		let { cursor } = response.body.pagination;
 		while (cursor) {
-			const pageResponse = await sb.Got.get("Helix")<HelixEmoteResponse>({
+			const pageResponse = await core.Got.get("Helix")<HelixEmoteResponse>({
 				url: "chat/emotes/user",
 				method: "GET",
 				throwHttpErrors: false,
@@ -1205,7 +1205,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			});
 		}
 
-		const response = await sb.Got.get("TwitchEmotes")<BttvEmoteResponse>({
+		const response = await core.Got.get("TwitchEmotes")<BttvEmoteResponse>({
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
 
@@ -1233,7 +1233,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	static async fetchChannelFFZEmotes (channelData: Channel): Promise<Emote[]> {
-		const response = await sb.Got.get("TwitchEmotes")<FfzEmoteResponse>({
+		const response = await core.Got.get("TwitchEmotes")<FfzEmoteResponse>({
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
 
@@ -1258,7 +1258,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	static async fetchChannelSevenTVEmotes (channelData: Channel): Promise<Emote[]> {
-		const response = await sb.Got.get("TwitchEmotes")<SevenTvEmoteResponse>({
+		const response = await core.Got.get("TwitchEmotes")<SevenTvEmoteResponse>({
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
 
@@ -1285,13 +1285,13 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	async populateGlobalEmotes (): Promise<Emote[]> {
 		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchPlatform.fetchTwitchEmotes(this.selfId),
-			sb.Got.get("TwitchEmotes")<BttvEmote[]>({
+			core.Got.get("TwitchEmotes")<BttvEmote[]>({
 				url: "https://api.betterttv.net/3/cached/emotes/global"
 			}),
-			sb.Got.get("TwitchEmotes")<FfzEmoteResponse>({
+			core.Got.get("TwitchEmotes")<FfzEmoteResponse>({
 				url: "https://api.frankerfacez.com/v1/set/global"
 			}),
-			sb.Got.get("TwitchEmotes")<GlobalSevenTvEmoteResponse>({
+			core.Got.get("TwitchEmotes")<GlobalSevenTvEmoteResponse>({
 				url: "https://7tv.io/v3/emote-sets/global"
 			})
 		]);
@@ -1378,7 +1378,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async fetchUsernameByUserPlatformID (userPlatformID: string): Promise<string | null> {
-		const response = await sb.Got.get("Helix")<UserLookupResponse>({
+		const response = await core.Got.get("Helix")<UserLookupResponse>({
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: {
@@ -1425,7 +1425,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async fixChannelRename (channelData: Channel, twitchChanelName: string, channelId: string) {
-		const existingChannelName = await sb.Query.getRecordset<string | undefined>(rs => rs
+		const existingChannelName = await core.Query.getRecordset<string | undefined>(rs => rs
 			.select("Name")
 			.from("chat_data", "Channel")
 			.where("Name = %s", twitchChanelName)
@@ -1468,7 +1468,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	get websocketLatency () { return this.#websocketLatency; }
 
 	static async fetchAccountChallengeStatus (userData: User, twitchID: string) {
-		return await sb.Query.getRecordset<string | undefined>(rs => rs
+		return await core.Query.getRecordset<string | undefined>(rs => rs
 			.select("Status")
 			.from("chat_data", "User_Verification_Challenge")
 			.where("User_Alias = %n", userData.ID)
@@ -1481,7 +1481,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	static async createAccountChallenge (userData: User, twitchID: string) {
-		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
+		const row = await core.Query.getRow("chat_data", "User_Verification_Challenge");
 		const challenge = randomBytes(16).toString("hex");
 
 		const discordPlatform = Platform.get("discord");

@@ -332,12 +332,12 @@ type AccessTokenData = {
 };
 
 const getAppAccessToken = async (): Promise<string> => {
-	const cacheToken = await sb.Cache.getByPrefix(APP_ACCESS_CACHE_KEY) as string | undefined;
+	const cacheToken = await core.Cache.getByPrefix(APP_ACCESS_CACHE_KEY) as string | undefined;
 	if (cacheToken) {
 		return cacheToken;
 	}
 
-	const response = await sb.Got.get("GenericAPI")<AccessTokenData>({
+	const response = await core.Got.get("GenericAPI")<AccessTokenData>({
 		url: "https://id.twitch.tv/oauth2/token",
 		method: "POST",
 		searchParams: {
@@ -355,7 +355,7 @@ const getAppAccessToken = async (): Promise<string> => {
 	}
 
 	const token = response.body.access_token;
-	await sb.Cache.setByPrefix(APP_ACCESS_CACHE_KEY, token, {
+	await core.Cache.setByPrefix(APP_ACCESS_CACHE_KEY, token, {
 		expiry: (response.body.expires_in * 1000)
 	});
 
@@ -365,7 +365,7 @@ const getAppAccessToken = async (): Promise<string> => {
 let conduitValidated = false;
 const getConduitId = async (): Promise<string> => {
 	const appToken = await getAppAccessToken();
-	const cacheId = await sb.Cache.getByPrefix(CONDUIT_ID_KEY) as string | undefined;
+	const cacheId = await core.Cache.getByPrefix(CONDUIT_ID_KEY) as string | undefined;
 	if (cacheId && conduitValidated) {
 		return cacheId;
 	}
@@ -375,7 +375,7 @@ const getConduitId = async (): Promise<string> => {
 	type ConduitData = {
 		data: { id: string; shard_count: number; }[];
 	};
-	const checkConduitResponse = await sb.Got.get("GenericAPI")<ConduitData>({
+	const checkConduitResponse = await core.Got.get("GenericAPI")<ConduitData>({
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
 		method: "GET",
 		responseType: "json",
@@ -395,14 +395,14 @@ const getConduitId = async (): Promise<string> => {
 			console.debug("Exactly one valid conduit found, all good!");
 
 			conduitValidated = true;
-			await sb.Cache.setByPrefix(CONDUIT_ID_KEY, conduitIdList[0]);
+			await core.Cache.setByPrefix(CONDUIT_ID_KEY, conduitIdList[0]);
 			return conduitIdList[0];
 		}
 		else {
 			console.debug("Multiple conduits found, removing to avoid conflict...");
 
 			for (const id of conduitIdList) {
-				await sb.Got.get("GenericAPI")({
+				await core.Got.get("GenericAPI")({
 					url: "https://api.twitch.tv/helix/eventsub/conduits",
 					method: "DELETE",
 					responseType: "json",
@@ -418,7 +418,7 @@ const getConduitId = async (): Promise<string> => {
 			}
 
 			console.debug("Clearing subscription cache...");
-			await sb.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, null);
+			await core.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, null);
 		}
 	}
 	else {
@@ -427,7 +427,7 @@ const getConduitId = async (): Promise<string> => {
 
 	console.debug("Re-making conduit...");
 
-	const response = await sb.Got.get("GenericAPI")<ConduitData>({
+	const response = await core.Got.get("GenericAPI")<ConduitData>({
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
 		method: "POST",
 		responseType: "json",
@@ -452,7 +452,7 @@ const getConduitId = async (): Promise<string> => {
 	console.debug("Conduit set up successfully!");
 
 	const [shard] = response.body.data;
-	await sb.Cache.setByPrefix(CONDUIT_ID_KEY, shard.id);
+	await core.Cache.setByPrefix(CONDUIT_ID_KEY, shard.id);
 	conduitValidated = true;
 
 	return shard.id;
@@ -469,7 +469,7 @@ const assignWebsocketToConduit = async (sessionId: string): Promise<void> => {
 			transport: { method: string; callback: string; };
 		}[];
 	};
-	const response = await sb.Got.get("GenericAPI")<ShardAssignmentData>({
+	const response = await core.Got.get("GenericAPI")<ShardAssignmentData>({
 		method: "PATCH",
 		url: "https://api.twitch.tv/helix/eventsub/conduits/shards",
 		responseType: "json",
@@ -549,7 +549,7 @@ const createSubscription = async (data: CreateSubscriptionData) => {
 		});
 	}
 
-	const response = await sb.Got.get("GenericAPI")<CreateSubscriptionResponse>({
+	const response = await core.Got.get("GenericAPI")<CreateSubscriptionResponse>({
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 		method: "POST",
 		responseType: "json",
@@ -659,7 +659,7 @@ const createChannelRedemptionSubscription = (channelId: string) => createSubscri
 
 const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 	const accessToken = await getAppAccessToken();
-	const response = await sb.Got.get("GenericAPI")<ListSubscriptionsResponse>({
+	const response = await core.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 		method: "GET",
 		responseType: "json",
@@ -676,7 +676,7 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 	const result: EnabledSubscription[] = [...response.body.data];
 	let cursor: string | null = response.body.pagination.cursor ?? null;
 	while (cursor) {
-		const loopResponse = await sb.Got.get("GenericAPI")<ListSubscriptionsResponse>({
+		const loopResponse = await core.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 			url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 			method: "GET",
 			responseType: "json",
@@ -700,14 +700,14 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 
 const getExistingSubscriptions = async (force = false): Promise<EnabledSubscription[]> => {
 	if (!force) {
-		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY) as EnabledSubscription[] | undefined;
+		const cacheData = await core.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY) as EnabledSubscription[] | undefined;
 		if (cacheData) {
 			return cacheData;
 		}
 	}
 
 	const subscriptions = await fetchExistingSubscriptions();
-	await sb.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, subscriptions, {
+	await core.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, subscriptions, {
 		expiry: SUBSCRIPTIONS_CACHE_EXPIRY
 	});
 
@@ -715,7 +715,7 @@ const getExistingSubscriptions = async (force = false): Promise<EnabledSubscript
 };
 
 const fetchToken = async () => {
-	const refreshToken = (await sb.Cache.getByPrefix("TWITCH_REFRESH_TOKEN") as string | undefined)
+	const refreshToken = (await core.Cache.getByPrefix("TWITCH_REFRESH_TOKEN") as string | undefined)
 		?? env.TWITCH_REFRESH_TOKEN;
 
 	if (!refreshToken) {
@@ -724,7 +724,7 @@ const fetchToken = async () => {
 		});
 	}
 
-	const response = await sb.Got.get("GenericAPI")<AccessTokenData>({
+	const response = await core.Got.get("GenericAPI")<AccessTokenData>({
 		url: "https://id.twitch.tv/oauth2/token",
 		method: "POST",
 		searchParams: {
@@ -736,8 +736,8 @@ const fetchToken = async () => {
 	});
 
 	await Promise.all([
-		sb.Cache.setByPrefix("TWITCH_REFRESH_TOKEN", response.body.refresh_token),
-		sb.Cache.setByPrefix("TWITCH_OAUTH", response.body.access_token, {
+		core.Cache.setByPrefix("TWITCH_REFRESH_TOKEN", response.body.refresh_token),
+		core.Cache.setByPrefix("TWITCH_OAUTH", response.body.access_token, {
 			// Reduce expiration time by 10 seconds to allow for latency
 			expiry: (response.body.expires_in * 1000) - 10_000
 		})
@@ -776,20 +776,20 @@ const emitRawUserMessageEvent = (username: string, channelName: string, platform
 
 const populateUserChannelActivity = async (userData: User, channelData: Channel) => {
 	const key = `${USER_CHANNEL_ACTIVITY_PREFIX}-${channelData.ID}-${userData.Name}`;
-	await sb.Cache.setByPrefix(key, "1", {
+	await core.Cache.setByPrefix(key, "1", {
 		expiry: 36e5 // 60 minutes
 	});
 };
 
 const getActiveUsernamesInChannel = async (channelData: Channel) => {
 	const prefix = `${USER_CHANNEL_ACTIVITY_PREFIX}-${channelData.ID}-`;
-	const prefixes = await sb.Cache.getKeysByPrefix(`${prefix}*`, {});
+	const prefixes = await core.Cache.getKeysByPrefix(`${prefix}*`, {});
 
 	return prefixes.map(i => i.replace(prefix, ""));
 };
 
 const initTokenCheckInterval = async () => {
-	const tokenExists = await sb.Cache.getByPrefix("TWITCH_OAUTH");
+	const tokenExists = await core.Cache.getByPrefix("TWITCH_OAUTH");
 	if (!tokenExists) {
 		await fetchToken();
 	}

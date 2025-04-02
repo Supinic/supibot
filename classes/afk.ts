@@ -70,13 +70,13 @@ export class AwayFromKeyboard extends TemplateWithId {
 	}
 
 	static async initialize () {
-		AwayFromKeyboard.#totalCounter = sb.Metrics.registerCounter({
+		AwayFromKeyboard.#totalCounter = core.Metrics.registerCounter({
 			name: "supibot_afk_statuses_created_total",
 			help: "Total amount of all AFK statuses created.",
 			labelNames: ["type"]
 		});
 
-		AwayFromKeyboard.#activeGauge = sb.Metrics.registerGauge({
+		AwayFromKeyboard.#activeGauge = core.Metrics.registerGauge({
 			name: "supibot_active_afk_statuses_count",
 			help: "Total amount of currently active AFK status."
 		});
@@ -90,7 +90,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
+		const data = await core.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "AFK")
 			.where("Active = %b", true)
@@ -112,7 +112,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 		const values = [...AwayFromKeyboard.data.values()];
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow<DatabaseConstructorData>("chat_data", "AFK");
+			const row = await core.Query.getRow<DatabaseConstructorData>("chat_data", "AFK");
 			await row.load(ID);
 
 			const existing = values.find(i => i.ID === ID);
@@ -144,7 +144,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 		AwayFromKeyboard.data.delete(userData.ID);
 
 		// This should only ever update one row, if everything is working properly.
-		await sb.Query.getRecordUpdater(ru => ru
+		await core.Query.getRecordUpdater(ru => ru
 			.update("chat_data", "AFK")
 			.set("Active", false)
 			.where("ID = %n", data.ID)
@@ -163,19 +163,19 @@ export class AwayFromKeyboard extends TemplateWithId {
 				const maximum = definition.interval[1] ?? Infinity;
 
 				if (minimum < minutesDelta && minutesDelta < maximum) {
-					statusMessage = sb.Utils.randArray(definition.responses);
+					statusMessage = core.Utils.randArray(definition.responses);
 					break;
 				}
 			}
 
-			statusMessage ??= sb.Utils.randArray(responses.static[status]);
+			statusMessage ??= core.Utils.randArray(responses.static[status]);
 		}
 		else {
 			// Fallback for missing responses in the `afk-responses.json` file
 			// This check exists for the potential new AFK type being added and missing in the responses JSON
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			const staticResponses = responses.static[status] ?? responses.static[DEFAULT_AFK_STATUS];
-			statusMessage = sb.Utils.randArray(staticResponses);
+			statusMessage = core.Utils.randArray(staticResponses);
 		}
 
 		/**
@@ -188,9 +188,9 @@ export class AwayFromKeyboard extends TemplateWithId {
 			const preparedMessage = await channelData.prepareMessage(data.Text);
 			const fixedReminderText = (preparedMessage !== false) ? preparedMessage : configResponses.defaultBanphrase;
 
-			const message = `${userMention} ${statusMessage}: ${fixedReminderText} (${sb.Utils.timeDelta(data.Started)})`;
+			const message = `${userMention} ${statusMessage}: ${fixedReminderText} (${core.Utils.timeDelta(data.Started)})`;
 			if (channelData.Mirror) {
-				const mirroredMessage = `${userData.Name} ${statusMessage}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
+				const mirroredMessage = `${userData.Name} ${statusMessage}: ${data.Text} (${core.Utils.timeDelta(data.Started)})`;
 				await channelData.mirror(mirroredMessage, null, { commandUsed: false });
 			}
 
@@ -240,7 +240,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 			Interrupted_ID: data.Interrupted_ID ?? null
 		} as const;
 
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "AFK");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "AFK");
 		row.setValues(afkData);
 
 		await row.save({ skipLoad: false });

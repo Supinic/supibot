@@ -87,7 +87,7 @@ export default {
 
 		const { data } = userStats;
 		const activities = data.activities.map(i => i.name.toLowerCase());
-		const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true });
+		const bestMatch = core.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true });
 		if (!bestMatch) {
 			return {
 				success: false,
@@ -105,7 +105,7 @@ export default {
 		const { name, rank, value } = bestActivity;
 		const ironman = (context.params.seasonal)
 			? "Seasonal user"
-			: sb.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));
+			: core.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));
 
 		return {
 			reply: (rank === null)

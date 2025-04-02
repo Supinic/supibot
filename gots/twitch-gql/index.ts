@@ -10,7 +10,7 @@ export default {
 	optionsType: "function",
 	options: (() => {
 		if (list.some(key => !process.env[key])) {
-			throw new Error("Twitch GQL sb.Got instance cannot initialize - missing configuration variable(s)");
+			throw new Error("Twitch GQL core.Got instance cannot initialize - missing configuration variable(s)");
 		}
 
 		return {

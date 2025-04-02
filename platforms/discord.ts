@@ -204,7 +204,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					emote = eligibleGuildEmotes[0];
 				}
 				else if (!skipGlobalEmotes && GLOBAL_EMOTE_ALLOWED_REGEX.test(word) && word.length > 2) {
-					emote = sb.Utils.randArray(eligibleEmotes);
+					emote = core.Utils.randArray(eligibleEmotes);
 				}
 				else {
 					continue;
@@ -225,7 +225,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		}
 		else if (typeof message === "string") {
 			const limit = channelData.Message_Limit ?? this.messageLimit;
-			sendTarget = sb.Utils.wrapString(message, limit, {
+			sendTarget = core.Utils.wrapString(message, limit, {
 				keepWhitespace: true
 			});
 		}
@@ -441,7 +441,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					}
 
 					const { challenge } = await DiscordPlatform.createAccountChallenge(userData, discordID);
-					const message = sb.Utils.tag.trim `
+					const message = core.Utils.tag.trim `
 						You were found to be likely to own a Twitch account with the same name as your current Discord account.
 						If you want to use my commands on Discord, whisper me the following command on Twitch:
 						${sb.Command.prefix}link ${challenge}
@@ -540,7 +540,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				}
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(sb.Utils.wrapString(msg, this.messageLimit), userData, channelData);
+				await sb.Logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
 			}
 
 			channelData.events.emit("message", {
@@ -768,7 +768,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 	async prepareMessage (message: string, channelData: Channel | null, options: PrepareMessageOptions) {
 		// wrapping a link in angle brackets removes its embedding from the Discord message
 		if (options.removeEmbeds === true) {
-			message = sb.Utils.replaceLinks(message, "<$1>");
+			message = core.Utils.replaceLinks(message, "<$1>");
 		}
 
 		return await super.prepareMessage(message, channelData, options);
@@ -952,7 +952,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 	}
 
 	static async fetchAccountChallengeStatus (userData: User, discordID: string) {
-		return await sb.Query.getRecordset<PlatformVerificationStatus>(rs => rs
+		return await core.Query.getRecordset<PlatformVerificationStatus>(rs => rs
 			.select("Status")
 			.from("chat_data", "User_Verification_Challenge")
 			.where("User_Alias = %n", userData.ID)
@@ -965,7 +965,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 	}
 
 	static async createAccountChallenge (userData: User, discordID: string) {
-		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
+		const row = await core.Query.getRow("chat_data", "User_Verification_Challenge");
 		const challenge = randomBytes(16).toString("hex");
 
 		const discordPlatform = Platform.get("discord");

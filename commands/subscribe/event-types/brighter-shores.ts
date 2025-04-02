@@ -29,7 +29,7 @@ const definition: CustomEventDefinition = {
 	subName: "BS update",
 	type: "custom",
 	process: async () => {
-		const response = await sb.Got.get("GenericAPI")<SteamApiResponse>({
+		const response = await core.Got.get("GenericAPI")<SteamApiResponse>({
 			url: steamNewsUrl,
 			searchParams: {
 				appid: steamGameId,
@@ -55,10 +55,10 @@ const definition: CustomEventDefinition = {
 			return null;
 		}
 
-		const previousSteamUpdateDate = await sb.Cache.getByPrefix(LATEST_STEAM_NEWS_DATE) as number | null;
+		const previousSteamUpdateDate = await core.Cache.getByPrefix(LATEST_STEAM_NEWS_DATE) as number | null;
 		if (!previousSteamUpdateDate) {
 			const latest = updates[0];
-			await sb.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, latest.date, {
+			await core.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, latest.date, {
 				expiry: 14 * 864e5 // 14 days
 			});
 
@@ -70,7 +70,7 @@ const definition: CustomEventDefinition = {
 			return null;
 		}
 
-		await sb.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, newUpdates[0].date, {
+		await core.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, newUpdates[0].date, {
 			expiry: 14 * 864e5 // 14 days
 		});
 

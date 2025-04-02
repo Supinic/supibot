@@ -1,12 +1,12 @@
 export default async (tableName: string) => {
-	const alreadySetup = await sb.Query.isTablePresent("chat_line", tableName);
+	const alreadySetup = await core.Query.isTablePresent("chat_line", tableName);
 	if (alreadySetup) {
 		return {
 			success: false
 		};
 	}
 
-	await sb.Query.raw(sb.Utils.tag.trim `
+	await core.Query.raw(core.Utils.tag.trim `
 		CREATE TABLE IF NOT EXISTS chat_line.\`${tableName}\` (
 			\`ID\` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			\`Platform_ID\` VARCHAR(100) NOT NULL,

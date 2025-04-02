@@ -19,7 +19,7 @@ type FetchUsersResult = {
 };
 
 const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSeenThreshold = 36e5): Promise<FetchUsersResult> {
-	const users = await sb.Query.getRecordset<UserSubscription[]>(rs => rs
+	const users = await core.Query.getRecordset<UserSubscription[]>(rs => rs
 		.select("Event_Subscription.Channel as Reminder_Channel")
 		.select("Event_Subscription.User_Alias AS ID")
 		.select("Event_Subscription.Flags AS Flags")
@@ -39,7 +39,7 @@ const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSe
 	);
 
 	const now: number = SupiDate.now();
-	const [activeUsers, inactiveUsers] = sb.Utils.splitByCondition(users, (user: UserSubscription): boolean => {
+	const [activeUsers, inactiveUsers] = core.Utils.splitByCondition(users, (user: UserSubscription): boolean => {
 		const lastSeen = now - user.Last_Seen.valueOf();
 		if (lastSeen < lastSeenThreshold) {
 			return true;
@@ -107,7 +107,7 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
  */
 const parseRssNews = async function (xml: string, cacheKey: string): Promise<string[] | null> {
 	const feed = await parseRSS(xml);
-	const lastPublishDate = (await sb.Cache.getByPrefix(cacheKey) ?? 0) as number;
+	const lastPublishDate = (await core.Cache.getByPrefix(cacheKey) ?? 0) as number;
 	const eligibleArticles = feed.items
 		.filter(i => new SupiDate(i.pubDate).valueOf() > lastPublishDate)
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
@@ -117,7 +117,7 @@ const parseRssNews = async function (xml: string, cacheKey: string): Promise<str
 	}
 
 	const [topArticle] = eligibleArticles;
-	await sb.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf(), {
+	await core.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf(), {
 		expiry: 7 * 864e5 // 7 days
 	});
 
@@ -186,7 +186,7 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 	let message;
 	if (type === "rss") {
 		const { cacheKey, url } = definition;
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url,
 			responseType: "text",
 			timeout: {

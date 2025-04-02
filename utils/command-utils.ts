@@ -78,7 +78,7 @@ export const fetchTimeData = async (data: { coordinates: Coordinates, date?: Sup
 		date = new SupiDate()
 	} = data;
 
-	const response = await sb.Got.get("Google")<LocationTimeData>({
+	const response = await core.Got.get("Google")<LocationTimeData>({
 		url: "timezone/json",
 		searchParams: {
 			timestamp: Math.trunc(date.valueOf() / 1000),
@@ -113,7 +113,7 @@ export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" 
 	formData.append("title", "Simple upload");
 
 	type ImgurResponse = { data: { link: string; } | null; };
-	const response = await sb.Got.get("GenericAPI")<ImgurResponse>({
+	const response = await core.Got.get("GenericAPI")<ImgurResponse>({
 		url: `https://api.imgur.com/3/${endpoint}`,
 		responseType: "json",
 		method: "POST",
@@ -150,7 +150,7 @@ export const uploadToNuuls = async (fileData: string): Promise<ImageUploadResult
 	const formData = new FormData();
 	formData.append("attachment", fileData);
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		method: "POST",
 		throwHttpErrors: false,
 		url: "https://i.nuuls.com/upload",
@@ -249,7 +249,7 @@ export const fetchGeoLocationData = async (query: string) => {
 		results: GoogleGeoData[];
 	};
 
-	const response = await sb.Got.get("GenericAPI")<GeoApiResponse>({
+	const response = await core.Got.get("GenericAPI")<GeoApiResponse>({
 		url: "https://maps.googleapis.com/maps/api/geocode/json",
 		searchParams: {
 			key: process.env.API_GOOGLE_GEOCODING,
@@ -347,7 +347,7 @@ export async function searchYoutube (query: string, options?: { maxResults?: num
 		params.maxResults = 1;
 	}
 
-	const response = await sb.Got.get("GenericAPI")<YoutubeSearchResult>({
+	const response = await core.Got.get("GenericAPI")<YoutubeSearchResult>({
 		url: `https://www.googleapis.com/youtube/v3/search`,
 		searchParams: {
 			key: process.env.API_GOOGLE_YOUTUBE,
@@ -465,7 +465,7 @@ export const fetchYoutubePlaylist = async (options: YoutubePlaylistOptions): Pro
 			searchParams.pageToken = pageToken;
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://www.googleapis.com/youtube/v3/playlistItems",
 			searchParams,
 			throwHttpErrors: false,
@@ -542,7 +542,7 @@ type TwitchGameDetail = {
  * Returns the Twitch game ID for the given game name.
  */
 export const getTwitchGameID = async (name: string): Promise<{ name: string; id: string; }[]> => {
-	const response = await sb.Got.get("Helix")<{ data: TwitchGameDetail[]; }>({
+	const response = await core.Got.get("Helix")<{ data: TwitchGameDetail[]; }>({
 		url: "games",
 		searchParams: { name }
 	});
@@ -855,7 +855,7 @@ export const postToPastebin = async (text: string, options: PastebinPostOptions 
 		params.append("api_paste_format", options.format);
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		method: "POST",
 		url: "https://pastebin.com/api/api_post.php",
 		throwHttpErrors: false,
@@ -896,7 +896,7 @@ export const postToHastebin = async (text: string, options: { title?: string } =
 	}
 
 	type HastebinApiResponse = { key: string; };
-	const response = await sb.Got.get("GenericAPI")<HastebinApiResponse>({
+	const response = await core.Got.get("GenericAPI")<HastebinApiResponse>({
 		method: "POST",
 		url: "https://haste.zneix.eu/documents",
 		throwHttpErrors: false,

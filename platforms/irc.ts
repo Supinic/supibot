@@ -144,7 +144,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		// });
 
 		client.on("nick in use", () => {
-			const string = sb.Utils.randomString(16);
+			const string = core.Utils.randomString(16);
 			this.client.changeNick(string);
 			this.#nicknameChanged = true;
 		});
@@ -196,7 +196,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		}
 
 		const limit = (this.messageLimit * 2) - (options.extraLength ?? 0);
-		return sb.Utils.wrapString(preparedMessage, limit);
+		return core.Utils.wrapString(preparedMessage, limit);
 	}
 
 	async handleMessage (event: IrcMessageEvent) {
@@ -233,7 +233,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			// TODO: verification challenge creation for Discord/Twitch and sending the message
 			if (!platformVerification.notificationSent) {
 				const accountType = (userData.Twitch_ID) ? "Twitch" : "Discord";
-				const message = sb.Utils.tag.trim `
+				const message = core.Utils.tag.trim `
 					@${userData.Name},
 					You were found to be likely to own a ${accountType} account with the same name as your current IRC account.
 					Please contact @Supinic to resolve this manually (for now).

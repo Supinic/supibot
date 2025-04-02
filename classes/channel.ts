@@ -184,7 +184,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	async saveProperty <T extends EditableProperty> (property: T, value: this[T]) {
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Channel");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "Channel");
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);
@@ -231,7 +231,7 @@ export class Channel extends TemplateWithId {
 	async getBestAvailableEmote <T extends string> (emotes: T[], fallbackEmote: T, options: GetEmoteOptions = {}): Promise<Emote | T> {
 		const availableEmotes = await this.fetchEmotes();
 		const emoteArray = (options.shuffle)
-			? sb.Utils.shuffleArray(emotes)
+			? core.Utils.shuffleArray(emotes)
 			: emotes;
 
 		const caseSensitive = options.caseSensitivity ?? true;
@@ -294,7 +294,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset<ConstructorData[]>((rs) => rs
+		const data = await core.Query.getRecordset<ConstructorData[]>((rs) => rs
 			.select("*")
 			.from("chat_data", "Channel")
 		);
@@ -428,7 +428,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	static async getLiveEventSubscribedChannels (platform: Platform | null = null) {
-		const eventChannelIDs = await sb.Query.getRecordset<Channel["ID"][]>(rs => rs
+		const eventChannelIDs = await core.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Chat_Module IN %s+", ["offline-only-mode", "offline-only-mirror"])
@@ -437,7 +437,7 @@ export class Channel extends TemplateWithId {
 			.flat("Channel")
 		);
 
-		const configChannelIDs = await sb.Query.getRecordset<Channel["ID"][]>(rs => rs
+		const configChannelIDs = await core.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Channel_Data")
 			.where("Property = %s", "offlineOnlyBot")
@@ -446,7 +446,7 @@ export class Channel extends TemplateWithId {
 			.flat("Channel")
 		);
 
-		const filterChannelIDs = await sb.Query.getRecordset<Channel["ID"][]>(rs => rs
+		const filterChannelIDs = await core.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Filter")
 			.where("Type IN %s+", ["Online-only", "Offline-only"])
@@ -480,7 +480,7 @@ export class Channel extends TemplateWithId {
 		}
 
 		// Creates Channel row
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Channel");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "Channel");
 		row.setValues({
 			Name: channelName,
 			Platform: platformData.ID,
@@ -498,7 +498,7 @@ export class Channel extends TemplateWithId {
 
 	static async moveData (oldChannelData: Channel, newChannelData: Channel, options: MoveDataOptions = {}) {
 		type MoveData = { Property: string; Value: string; };
-		const properties = await sb.Query.getRecordset<MoveData[]>((rs) => rs
+		const properties = await core.Query.getRecordset<MoveData[]>((rs) => rs
 			.select("Property", "Value")
 			.from("chat_data", "Channel_Data")
 			.where("Channel = %n", oldChannelData.ID)
@@ -511,7 +511,7 @@ export class Channel extends TemplateWithId {
 				continue;
 			}
 
-			const propertyRow = await sb.Query.getRow<DatabaseChannelData>("chat_data", "Channel_Data");
+			const propertyRow = await core.Query.getRow<DatabaseChannelData>("chat_data", "Channel_Data");
 			await propertyRow.load({
 				Channel: newChannelData.ID,
 				Property: row.Property
@@ -533,7 +533,7 @@ export class Channel extends TemplateWithId {
 		await Promise.all(savePromises);
 
 		if (options.deleteOriginalValues) {
-			await sb.Query.getRecordDeleter(rd => rd
+			await core.Query.getRecordDeleter(rd => rd
 				.delete()
 				.from("chat_data", "Channel_Data")
 				.where("Channel = %n", oldChannelData.ID)
@@ -547,7 +547,7 @@ export class Channel extends TemplateWithId {
 			return false;
 		}
 
-		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
+		const data = await core.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "Channel")
 			.where("ID IN %n+", channelsData.map(i => i.ID))

@@ -312,7 +312,7 @@ export class Filter extends TemplateWithId {
 
 				if (obj.range && Array.isArray(obj.range)) {
 					// `Infinity` is allowed specifically because it matches the <x, ..> range identifier
-					const allowed = obj.range.every(i => sb.Utils.isValidInteger(i) || i === Infinity);
+					const allowed = obj.range.every(i => core.Utils.isValidInteger(i) || i === Infinity);
 					if (!allowed) {
 						console.warn("Invalid numbers provided for filter Args range", { arg, filter: this.ID });
 						continue;
@@ -345,7 +345,7 @@ export class Filter extends TemplateWithId {
 
 	async toggle () {
 		this.Active = !this.Active;
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "Filter");
 		await row.load(this.ID);
 
 		row.values.Active = this.Active;
@@ -353,7 +353,7 @@ export class Filter extends TemplateWithId {
 	}
 
 	async saveProperty (property: keyof this, value?: this[keyof Filter]) {
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "Filter");
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);
@@ -372,7 +372,7 @@ export class Filter extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
+		const data = await core.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "Filter")
 		);
@@ -653,7 +653,7 @@ export class Filter extends TemplateWithId {
 			Issued_By: options.Issued_By
 		};
 
-		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
+		const row = await core.Query.getRow<ConstructorData>("chat_data", "Filter");
 		row.setValues(data);
 		await row.save();
 
@@ -757,7 +757,7 @@ export class Filter extends TemplateWithId {
 		}
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
+			const row = await core.Query.getRow<ConstructorData>("chat_data", "Filter");
 			await row.load(ID);
 
 			const existingFilter = Filter.data.get(ID);

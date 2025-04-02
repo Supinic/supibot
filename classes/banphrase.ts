@@ -89,7 +89,7 @@ const ExternalBanphraseAPI = {
 	async pajbot (message: string, url: string) {
 		message = message.trim().replaceAll(/\s+/g, " ");
 
-		const response = await sb.Got.get("GenericAPI")<PajbotResponse>({
+		const response = await core.Got.get("GenericAPI")<PajbotResponse>({
 			method: "POST",
 			url: `https://${url}/api/v1/banphrases/test`,
 			json: { message },
@@ -178,7 +178,7 @@ export class Banphrase extends TemplateWithId {
 
 	async toggle () {
 		this.Active = !this.Active;
-		await sb.Query.getRecordUpdater((ru: RecordUpdater) => ru
+		await core.Query.getRecordUpdater((ru: RecordUpdater) => ru
 			.update("chat_data", "Banphrase")
 			.set("Active", this.Active)
 			.where("ID = %n", this.ID)
@@ -186,7 +186,7 @@ export class Banphrase extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
+		const data = await core.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("Banphrase.*")
 			.from("chat_data", "Banphrase")
 			.where("Type <> %s", "Inactive")
@@ -205,7 +205,7 @@ export class Banphrase extends TemplateWithId {
 		}
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Banphrase");
+			const row = await core.Query.getRow<ConstructorData>("chat_data", "Banphrase");
 			await row.load(ID);
 
 			const existing = Banphrase.data.get(ID);
@@ -299,7 +299,7 @@ export class Banphrase extends TemplateWithId {
 			response = responseData[apiResultSymbol];
 
 			if (!response) { // @todo platform-specific logging flag
-				const row = await sb.Query.getRow<BanphraseApiDenialLog>("chat_data", "Banphrase_API_Denial_Log");
+				const row = await core.Query.getRow<BanphraseApiDenialLog>("chat_data", "Banphrase_API_Denial_Log");
 				row.setValues({
 					API: channelData.Banphrase_API_URL,
 					Channel: channelData.ID,
