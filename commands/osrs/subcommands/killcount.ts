@@ -33,8 +33,8 @@ export default {
 		"For given user and activity, prints their kill-count and ranking.",
 		"",
 
-		`<code>$osrs kc (activity)`,
-		`<code>$osrs kc jad`,
+		`<code>$osrs kc (activity)</code>`,
+		`<code>$osrs kc jad</code>`,
 		`If you have set up your username via the <code>$set ${SetCommand.name}</code>, you can use the name of the activity directly!`,
 		"",
 
