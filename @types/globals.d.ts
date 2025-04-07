@@ -34,5 +34,6 @@ declare var sb: {
     Error: core.Error,
     Promise: core.Promise,
     Got: core.Got,
+    Cache: core.Cache,
     // TODO add others
 }
