@@ -111,13 +111,16 @@ export default {
 	},
 
 	list: () => {
-		const data = sb.Command.data.map(i => ({
-			name: i.Name,
-			aliases: i.Aliases,
-			description: i.Description,
-			cooldown: i.Cooldown,
-			flags: Object.keys(i.Flags)
-		}));
+		const data = [];
+		for (const command of sb.Command.data.values()) {
+			data.push({
+				name: i.Name,
+				aliases: i.Aliases,
+				description: i.Description,
+				cooldown: i.Cooldown,
+				flags: i.Flags
+			});
+		}
 
 		return {
 			statusCode: 200,
