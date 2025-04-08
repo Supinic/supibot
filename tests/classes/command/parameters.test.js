@@ -1,21 +1,9 @@
 import assert from "node:assert";
 import { Command } from "../../../classes/command.js";
-import { Date as SupiDate } from "supi-core";
+import { SupiDate, Utils } from "supi-core";
 
-beforeEach(async() => {
-	globalThis.sb = {
-		Date: SupiDate,
-		Utils: {
-			parseRegExp: (input) => {
-				try {
-					return new RegExp(input);
-				}
-				catch {
-					return null;
-				}
-			}
-		}
-	};
+before(() => {
+	globalThis.core = { Utils: new Utils() };
 });
 
 describe("Command parameter parsing", () => {
@@ -43,7 +31,7 @@ describe("Command parameter parsing", () => {
 			assert.strictEqual(value instanceof RegExp, true, "Regex-type param must be instanceof RegExp");
 		}
 		else if (type === "date") {
-			assert.strictEqual(value instanceof sb.Date, true, "Date-type param must be instanceof sb.Date");
+			assert.strictEqual(value instanceof SupiDate, true, "Date-type param must be instanceof SupiDate");
 		}
 		else if (type === "object") {
 			assert.strictEqual(value instanceof Object, true, "Object-type param must be instanceof Object");
