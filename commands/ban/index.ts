@@ -241,7 +241,8 @@ export default {
 			channel: channelData,
 			user: userData,
 			command: options.Command,
-			invocation: options.Invocation
+			invocation: options.Invocation,
+			includeInactive: true
 		});
 
 		if (filterResult.length !== 0) {

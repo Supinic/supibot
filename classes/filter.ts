@@ -51,8 +51,9 @@ type LocalsOptions = {
 	invocation?: Command["Name"] | null;
 	command?: Command | Command["Name"] | null;
 	skipUserCheck?: boolean;
+	includeInactive?: boolean;
 };
-type ExecuteOptions = Omit<LocalsOptions, "skipUserCheck"> & {
+type ExecuteOptions = Omit<LocalsOptions, "skipUserCheck" | "includeInactive"> & {
 	user: User;
 	command: Command;
 	invocation?: Command["Name"] | null;
@@ -380,6 +381,7 @@ export class Filter extends TemplateWithId {
 		for (const definition of data) {
 			const instance = new Filter(definition);
 			Filter.data.set(instance.ID, instance);
+			Filter.types[instance.Type].add(instance);
 		}
 	}
 
@@ -409,10 +411,10 @@ export class Filter extends TemplateWithId {
 			: command?.Name ?? null;
 
 		for (const filter of set) {
-			if (!filter.Active) {
+			if (!options.includeInactive && !filter.Active) {
 				continue;
 			}
-			else if (!options.skipUserCheck && filter.User_Alias !== null && filter.User_Alias === userId) {
+			else if (!options.skipUserCheck && filter.User_Alias !== null && filter.User_Alias !== userId) {
 				continue;
 			}
 			else if (filter.Channel !== null && filter.Channel !== channelId) {
@@ -663,6 +665,7 @@ export class Filter extends TemplateWithId {
 		});
 
 		Filter.data.set(filter.ID, filter);
+		Filter.types[filter.Type].add(filter);
 		return filter;
 	}
 
