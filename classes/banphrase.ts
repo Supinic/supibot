@@ -287,7 +287,7 @@ export class Banphrase extends TemplateWithId {
 
 		// If the channel has a banphrase API, check it afterwards
 		// Skip this check if it has been requested to be skipped
-		let response: boolean | null = null;
+		let isExternallyBanphrased: boolean | null = null;
 		try {
 			const responseData = await Banphrase.executeExternalAPI(
 				message.slice(0, 1000),
@@ -296,9 +296,9 @@ export class Banphrase extends TemplateWithId {
 				{ fullResponse: true }
 			);
 
-			response = responseData[apiResultSymbol];
+			isExternallyBanphrased = responseData[apiResultSymbol];
 
-			if (!response) { // @todo platform-specific logging flag
+			if (isExternallyBanphrased) { // @todo platform-specific logging flag
 				const row = await core.Query.getRow<BanphraseApiDenialLog>("chat_data", "Banphrase_API_Denial_Log");
 				row.setValues({
 					API: channelData.Banphrase_API_URL,
@@ -380,7 +380,7 @@ export class Banphrase extends TemplateWithId {
 
 		// If the message is banphrased, check for API responses and return one accordingly.
 		// If not found, return a default one.
-		if (response) {
+		if (isExternallyBanphrased) {
 			for (const banphrase of Banphrase.data.values()) {
 				if (banphrase.Type !== "API response") {
 					continue;
