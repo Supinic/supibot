@@ -114,11 +114,11 @@ export default {
 		const data = [];
 		for (const command of sb.Command.data.values()) {
 			data.push({
-				name: i.Name,
-				aliases: i.Aliases,
-				description: i.Description,
-				cooldown: i.Cooldown,
-				flags: i.Flags
+				name: command.Name,
+				aliases: command.Aliases,
+				description: command.Description,
+				cooldown: command.Cooldown,
+				flags: command.Flags
 			});
 		}
 
