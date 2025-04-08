@@ -4,7 +4,7 @@ import { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
 import { Platform, BaseConfig, PrepareMessageOptions, PlatformVerification } from "./template.js";
-import { User, Like as UserLike } from "../classes/user.js";
+import { User } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
 

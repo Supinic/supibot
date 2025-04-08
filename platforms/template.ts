@@ -1,6 +1,6 @@
 import { type Counter, SupiError } from "supi-core";
 
-import { User, Like as UserLike } from "../classes/user.js";
+import { User } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
