@@ -1,4 +1,14 @@
 import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
+import { Filter } from "../../classes/filter.js";
+import type { Command, Context } from "../../classes/command.js";
+
+const params = [
+	{ name: "command", type: "string" },
+	{ name: "channel", type: "string" },
+	{ name: "id", type: "number" },
+	{ name: "invocation", type: "string" },
+	{ name: "platform", type: "string" }
+] as const;
 
 export default {
 	Name: "optout",
@@ -6,56 +16,64 @@ export default {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Makes it so you cannot be the target of a command - the command will not be executed at all. For detailed usage, please check the extended help.",
-	Flags: ["mention","skip-banphrase"],
-	Params: [
-		{ name: "command", type: "string" },
-		{ name: "channel", type: "string" },
-		{ name: "id", type: "number" },
-		{ name: "invocation", type: "string" },
-		{ name: "platform", type: "string" }
-	],
+	Flags: ["mention", "skip-banphrase"],
+	Params: params,
 	Whitelist_Response: null,
-	Code: (async function optOut (context, ...args) {
-		let filter;
-		let filterData;
+	Code: (async function optOut (this: Command, context: Context<typeof params>, ...args: string[]) {
 		const parse = await parseGenericFilterOptions("Opt-out", context.params, args, {
 			argsOrder: ["command"],
-			requiredCommandFlag: "optOut",
+			requiredCommandFlag: "opt-out",
 			requiredCommandFlagResponse: "You cannot opt out from this command!"
 		});
 
 		if (!parse.success) {
 			return parse;
 		}
-		else if (parse.filter) {
-			filter = parse.filter;
-		}
-		else {
-			filterData = parse.filterData;
 
-			const optOutFilters = sb.Filter.getLocals("Opt-out", {
-				user: context.User,
-				command: filterData.command,
-				invocation: filterData.invocation
-			});
-
-			filter = optOutFilters.find(i => (
-				i.Channel === filterData.channel
-				&& i.Platform === filterData.platform
-			));
-		}
-
-		return await handleGenericFilter("Opt-out", {
+		const baseOptions = {
 			context,
-			filter,
-			filterData,
+			filter: null,
+			filterData: null,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
 			enableVerb: "opted out from",
 			disableVerb: "removed your opt-out from"
+		};
+
+		if (parse.filter instanceof Filter) {
+			return await handleGenericFilter("Opt-out", {
+				...baseOptions,
+				filter: parse.filter
+			});
+		}
+
+		const parseFilterData = parse.filter;
+		const optOutFilters = sb.Filter.getLocals("Opt-out", {
+			user: context.user,
+			command: parseFilterData.command,
+			invocation: parseFilterData.invocation,
+			includeInactive: true
 		});
+
+		const optoutFilter = optOutFilters.find(i => (
+			i.Channel === parseFilterData.channel
+			&& i.Platform === parseFilterData.platform
+		));
+
+		if (optoutFilter) {
+			return await handleGenericFilter("Opt-out", {
+				...baseOptions,
+				filter: optoutFilter
+			});
+		}
+		else {
+			return await handleGenericFilter("Opt-out", {
+				...baseOptions,
+				filterData: parseFilterData
+			});
+		}
 	}),
-	Dynamic_Description: (async () => [
+	Dynamic_Description: () => ([
 		"Opts you out of a specific command.",
 		"While opted out from command, nobody can use it with you as the parameter.",
 		"",

@@ -1,4 +1,15 @@
 import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
+import { Filter } from "../../classes/filter.js";
+import type { Command, Context } from "../../classes/command.js";
+
+const params = [
+	{ name: "command", type: "string" },
+	{ name: "channel", type: "string" },
+	{ name: "id", type: "number" },
+	{ name: "invocation", type: "string" },
+	{ name: "platform", type: "string" },
+	{ name: "user", type: "string" }
+] as const;
 
 export default {
 	Name: "unping",
@@ -7,18 +18,9 @@ export default {
 	Cooldown: 5000,
 	Description: "Sets/unsets a command pinging you when it's being invoked.",
 	Flags: ["mention"],
-	Params: [
-		{ name: "command", type: "string" },
-		{ name: "channel", type: "string" },
-		{ name: "id", type: "number" },
-		{ name: "invocation", type: "string" },
-		{ name: "platform", type: "string" },
-		{ name: "user", type: "string" }
-	],
+	Params: params,
 	Whitelist_Response: null,
-	Code: (async function unping (context, ...args) {
-		let filter;
-		let filterData;
+	Code: (async function unping (this: Command, context: Context<typeof params>, ...args: string[]) {
 		const parse = await parseGenericFilterOptions("Unping", context.params, args, {
 			argsOrder: ["command"],
 			includeUser: true
@@ -27,36 +29,52 @@ export default {
 		if (!parse.success) {
 			return parse;
 		}
-		else if (parse.filter) {
-			filter = parse.filter;
-		}
-		else {
-			filterData = parse.filterData;
 
-			const optOutFilters = sb.Filter.getLocals("Unping", {
-				user: context.User,
-				command: filterData.command,
-				invocation: filterData.invocation
-			});
-
-			filter = optOutFilters.find(i => (
-				i.Channel === filterData.channel
-				&& i.Platform === filterData.platform
-				&& i.Blocked_User === filterData.user
-			));
-		}
-
-		return await handleGenericFilter("Unping", {
+		const baseOptions = {
 			context,
-			filter,
-			filterData,
+			filter: null,
+			filterData: null,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
 			enableVerb: "removed pings from",
 			disableVerb: "returned pings to"
+		};
+
+		if (parse.filter instanceof Filter) {
+			return await handleGenericFilter("Unping", {
+				...baseOptions,
+				filter: parse.filter
+			});
+		}
+
+		const parseFilterData = parse.filter;
+		const unpingFilters = sb.Filter.getLocals("Unping", {
+			user: context.user,
+			command: parseFilterData.command,
+			invocation: parseFilterData.invocation,
+			includeInactive: true
 		});
+
+		const unpingFilter = unpingFilters.find(i => (
+			i.Channel === parseFilterData.channel
+			&& i.Platform === parseFilterData.platform
+			&& i.Blocked_User === parseFilterData.user
+		));
+
+		if (unpingFilter) {
+			return await handleGenericFilter("Unping", {
+				...baseOptions,
+				filter: unpingFilter
+			});
+		}
+		else {
+			return await handleGenericFilter("Unping", {
+				...baseOptions,
+				filterData: parseFilterData
+			});
+		}
 	}),
-	Dynamic_Description: (async () => [
+	Dynamic_Description: () => ([
 		`Makes a specific command/channel/platform/user combination not "ping" you - the message will not be highlighted.`,
 		"This is achieved by inserting an invisible character to your username, which will \"trick\" your chat program into not highlighting the message.",
 		"",

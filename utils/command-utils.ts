@@ -5,12 +5,12 @@ import { parse as chronoParse, type ParsingOption } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
 
 import { Filter, type Type as FilterType } from "../classes/filter.js";
-import type { Command, Context as CommandContext } from "../classes/command.js";
+import type { Command, Context as CommandContext, Flag as CommandFlag } from "../classes/command.js";
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import type { Platform } from "../platforms/template.js";
 
-type CommandContextParams = Record<string, string | number | undefined>; // @todo remove type cast when CommandContext is Typescript
+type CommandContextParams = CommandContext["params"];
 
 const rssParser = new RSSParser();
 const MAX_SAFE_RANGE = 281474976710655;
@@ -558,7 +558,7 @@ export const getTwitchGameID = async (name: string): Promise<{ name: string; id:
 	}));
 };
 
-type ParsedGenericFilterData = {
+export type ParsedGenericFilterData = {
 	command: Command["Name"] | null;
 	channel: Channel["ID"] | null;
 	platform: Platform["ID"] | null;
@@ -568,13 +568,13 @@ type ParsedGenericFilterData = {
 type ParsedGenericFilterOptions = {
 	argsOrder: string[];
 	includeUser?: boolean;
-	requiredCommandFlag?: string;
+	requiredCommandFlag?: CommandFlag;
 	requiredCommandFlagResponse?: string;
 };
 type ParsedGenericFilterResponse =
 	{ success: false; reply: string; }
 	| { success: true; filter: Filter; }
-	| { success: true; filterData: ParsedGenericFilterData; };
+	| { success: true; filter: ParsedGenericFilterData; };
 
 /**
  * Standard parser function for all Filter-related commands.
@@ -659,7 +659,7 @@ export const parseGenericFilterOptions = async (
 		};
 	}
 
-	if (params.channel) {
+	if (typeof params.channel === "string") {
 		const channelData = sb.Channel.get(params.channel);
 		if (!channelData) {
 			return {
@@ -671,7 +671,7 @@ export const parseGenericFilterOptions = async (
 		filterData.channel = channelData.ID;
 	}
 
-	if (params.platform) {
+	if (typeof params.platform === "string") {
 		const platformData = sb.Platform.get(params.platform);
 		if (!platformData) {
 			return {
@@ -687,7 +687,7 @@ export const parseGenericFilterOptions = async (
 		filterData.user = null;
 
 		const userArgId = options.argsOrder.indexOf("user");
-		const userName = params.user ?? args[userArgId];
+		const userName = (params.user as string | undefined) ?? args[userArgId];
 
 		if (userName) {
 			const userData = await sb.User.get(userName);
@@ -704,19 +704,26 @@ export const parseGenericFilterOptions = async (
 
 	return {
 		success: true,
-		filterData
+		filter: filterData
 	};
 };
 
-type GenericFilterData = {
-	filter: Filter | null;
+type BaseFilterData = {
 	enableInvocation: string;
 	disableInvocation: string;
 	enableVerb: string;
 	disableVerb: string;
 	context: CommandContext;
+};
+type FilterFilledGenericData = BaseFilterData & {
+	filter: Filter;
+	filterData: null;
+};
+type FilterDataFilledGenericData = BaseFilterData & {
+	filter: null;
 	filterData: Partial<ParsedGenericFilterData>;
 };
+type GenericFilterData = FilterFilledGenericData | FilterDataFilledGenericData;
 
 export const handleGenericFilter = async (type: FilterType, data: GenericFilterData): Promise<{ reply: string; success: boolean }> => {
 	const {
@@ -731,12 +738,12 @@ export const handleGenericFilter = async (type: FilterType, data: GenericFilterD
 
 	let replyFn: (commandString: string, filter: Filter) => string;
 	const { invocation } = context;
-	const params = context.params as CommandContextParams;
+	const params = context.params;
 
 	const verb = (invocation === enableInvocation) ? enableVerb : disableVerb;
 
 	let resultFilter: Filter;
-	if (filter !== null) {
+	if (filter) {
 		if (filter.Issued_By !== context.user.ID) {
 			return {
 				success: false,
@@ -748,7 +755,7 @@ export const handleGenericFilter = async (type: FilterType, data: GenericFilterD
 			const state = (invocation === enableInvocation) ? "enabled" : "disabled";
 			return {
 				success: false,
-				reply: (params.id)
+				reply: (typeof params.id === "number")
 					? `Your filter ID ${params.id} is already ${state}!`
 					: `This combination is already ${state}!`
 			};
@@ -779,10 +786,10 @@ export const handleGenericFilter = async (type: FilterType, data: GenericFilterD
 		});
 
 		let location = "";
-		if (params.channel) {
+		if (typeof params.channel === "string") {
 			location = ` in channel ${params.channel}`;
 		}
-		else if (params.platform) {
+		else if (typeof params.platform === "string") {
 			location = ` in platform ${params.platform}`;
 		}
 

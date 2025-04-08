@@ -121,6 +121,9 @@ type PermissionOptions = {
 };
 type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & GetEmoteOptions>;
 
+export type Flag = "block" | "developer" | "external-input" | "mention" | "non-nullable" | "opt-out"
+	| "read-only" | "ping" | "pipe" | "rollback" | "skip-banphrase" | "system" | "whitelist";
+
 export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	readonly command: Command;
 	readonly invocation: string;
@@ -295,7 +298,7 @@ export class Command extends TemplateWithoutId {
 	readonly Aliases: string[];
 	readonly Description: string | null;
 	readonly Cooldown: number | null;
-	readonly Flags: Readonly<string[]>;
+	readonly Flags: Readonly<Flag[]>;
 	readonly Params: ParameterDefinitions = [];
 	readonly Whitelist_Response: string | null;
 	readonly Code: ExecuteFunction;
@@ -834,7 +837,7 @@ export class Command extends TemplateWithoutId {
 		Command.#cooldownManager.unsetPending(userData.ID);
 
 		// Read-only commands never reply with anything - banphrases, mentions and cooldowns are not checked
-		if (command.Flags.includes("readOnly")) {
+		if (command.Flags.includes("read-only")) {
 			return {
 				success: execution.success ?? true
 			};
@@ -872,7 +875,7 @@ export class Command extends TemplateWithoutId {
 		}
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution.meta?.skipBanphrases));
-		if (!command.Flags.includes("skipBanphrase") && !metaSkip) {
+		if (!command.Flags.includes("skip-banphrase") && !metaSkip) {
 			let messageSlice = execution.reply.slice(0, 2000);
 			if (!execution.meta?.skipWhitespaceCheck) {
 				messageSlice = messageSlice.replace(whitespaceRegex, "");

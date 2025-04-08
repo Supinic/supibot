@@ -485,11 +485,11 @@ export class Filter extends TemplateWithId {
 			};
 		}
 
-		if ((command.Flags.includes("optOut") || command.Flags.includes("block")) && targetUser) {
+		if ((command.Flags.includes("opt-out") || command.Flags.includes("block")) && targetUser) {
 			userTo = await User.get(targetUser);
 		}
 
-		if (command.Flags.includes("optOut") && userTo) {
+		if (command.Flags.includes("opt-out") && userTo) {
 			const optout = localFilters.find(i => i.Type === "Opt-out"
 				&& i.User_Alias === userTo.ID
 			);

@@ -1,4 +1,6 @@
 import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
+import { Filter } from "../../classes/filter.js";
+import type { Command, Context } from "../../classes/command.js";
 
 export default {
 	Name: "unmention",
@@ -9,9 +11,7 @@ export default {
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
-	Code: (async function unmention (context, ...args) {
-		let filter;
-		let filterData;
+	Code: (async function unmention (this: Command, context: Context<[]>, ...args: string[]) {
 		const parse = await parseGenericFilterOptions("Unmention", context.params, args, {
 			argsOrder: ["command"]
 		});
@@ -19,35 +19,51 @@ export default {
 		if (!parse.success) {
 			return parse;
 		}
-		else if (parse.filter) {
-			filter = parse.filter;
-		}
-		else {
-			filterData = parse.filterData;
 
-			const unmentionFilters = sb.Filter.getLocals("Unmention", {
-				user: context.User,
-				command: filterData.command,
-				invocation: filterData.invocation
-			});
-
-			filter = unmentionFilters.find(i => (
-				i.Channel === filterData.channel
-				&& i.Platform === filterData.platform
-			));
-		}
-
-		return await handleGenericFilter("Unmention", {
+		const baseOptions = {
 			context,
-			filter,
-			filterData,
+			filter: null,
+			filterData: null,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
 			enableVerb: "removed mentions from",
 			disableVerb: "returned mentions to"
+		};
+
+		if (parse.filter instanceof Filter) {
+			return await handleGenericFilter("Unmention", {
+				...baseOptions,
+				filter: parse.filter
+			});
+		}
+
+		const parseFilterData = parse.filter;
+		const unmentionFilters = sb.Filter.getLocals("Unmention", {
+			user: context.user,
+			command: parseFilterData.command,
+			invocation: parseFilterData.invocation,
+			includeInactive: true
 		});
+
+		const unmentionFilter = unmentionFilters.find(i => (
+			i.Channel === parseFilterData.channel
+			&& i.Platform === parseFilterData.platform
+		));
+
+		if (unmentionFilter) {
+			return await handleGenericFilter("Unmention", {
+				...baseOptions,
+				filter: unmentionFilter
+			});
+		}
+		else {
+			return await handleGenericFilter("Unmention", {
+				...baseOptions,
+				filterData: parseFilterData
+			});
+		}
 	}),
-	Dynamic_Description: (async () => [
+	Dynamic_Description: () => ([
 		`Removes the "mention" of a specific command.`,
 		`A mention is simply the "user," part at the start of the command response. E.g.:`,
 		`<u>supinic,</u> Your roll is 99.`,
