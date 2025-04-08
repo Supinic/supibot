@@ -10,7 +10,7 @@ type SteamApiResponse = {
 			title: string;
 			date: number;
 			url: string;
-			tags: string[];
+			tags?: string[];
 		}[];
 	};
 };
@@ -44,7 +44,7 @@ const definition: CustomEventDefinition = {
 		}
 
 		const updates = response.body.appnews.newsitems
-			.filter(i => i.tags.includes("patchnotes") || i.title.toLowerCase().includes("patch notes"))
+			.filter(i => i.tags?.includes("patchnotes") || i.title.toLowerCase().includes("patch notes"))
 			.sort((a, b) => b.date - a.date)
 			.map(i => ({
 				...i,
