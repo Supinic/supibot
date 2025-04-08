@@ -90,6 +90,9 @@ function filterModuleDefinitions <T extends "name" | "Name", U extends { [K in T
 	else if (disableAll) {
 		return [];
 	}
+	else if (whitelist.length === 0 && blacklist.length === 0) {
+		return definitions;
+	}
 
 	return (blacklist.length > 0)
 		? definitions.filter(i => !blacklist.includes(i[property]))
