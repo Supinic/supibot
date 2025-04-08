@@ -1,3 +1,4 @@
+import { GenericRequestError } from "supi-core";
 import { fetchTimeData } from "../../utils/command-utils.js";
 import timezones from "./timezones.json" with { type: "json" };
 
@@ -178,7 +179,7 @@ export default {
 		const timeData = response.body;
 
 		if (response.statusCode !== 200) {
-			throw new sb.Error.GenericRequest({
+			throw new GenericRequestError({
 				statusCode: response.statusCode,
 				hostname: "maps.googleapis.com",
 				statusMessage: timeData.statusMessage ?? null,

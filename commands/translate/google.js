@@ -1,3 +1,4 @@
+import { GenericRequestError } from "supi-core";
 import { get as getLanguage, getName } from "../../utils/languages.js";
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
 
@@ -102,7 +103,7 @@ const execute = async function (context, query) {
 		};
 	}
 	else if (!response.ok) {
-		throw new sb.Error.GenericRequest({
+		throw new GenericRequestError({
 			statusCode: response.statusCode,
 			statusMessage: response.statusMessage,
 			hostname: "TranslateAPI",
