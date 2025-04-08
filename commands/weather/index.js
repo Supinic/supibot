@@ -262,7 +262,7 @@ export default {
 				if (isOwnLocation) {
 					await context.platform.pm(
 						message,
-						context.user.Name,
+						context.user,
 						context.channel
 					);
 

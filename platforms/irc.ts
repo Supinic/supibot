@@ -170,14 +170,11 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		return Promise.resolve();
 	}
 
-	async pm (message: string, user: UserLike) {
-		const userData = await User.get(user);
-		if (!userData) {
-			return;
-		}
-
+	pm (message: string, userData: User) {
 		this.client.say(userData.Name, message);
 		this.incrementMessageMetric("sent", null);
+
+		return Promise.resolve();
 	}
 
 	directPm (message: string, userName: string) {
@@ -243,7 +240,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 					await this.send(message, event.target);
 				}
 				else {
-					await this.pm(message, userData.Name);
+					await this.pm(message, userData);
 				}
 
 				platformVerification.notificationSent = true;
@@ -354,7 +351,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 				return;
 			}
 
-			await this.pm(message, user.Name);
+			await this.pm(message, user);
 		}
 		else if (channel) {
 			if (channel.Mirror) {

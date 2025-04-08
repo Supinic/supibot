@@ -51,9 +51,11 @@ export default {
 		const twitchPlatform = sb.Platform.get("twitch");
 		for (const request of resolvedRequests) {
 			const url = `https://supinic.com/data/suggestion/${request.ID}`;
+			const userData = await sb.User.get(request.Username);
+
 			await twitchPlatform.pm(
 				`Your Supibot request (ID ${request.ID}) has been ${request.Status.toLowerCase()}! Check the suggestion detail for more info: ${url}`,
-				request.Username
+				userData
 			);
 
 			trackedRequestIDs.delete(request.ID);

@@ -42,7 +42,7 @@ const handleAmbassadors = async (type, context, ...args) => {
 				`;
 
 		try {
-			await context.platform.pm(message, userData.Name);
+			await context.platform.pm(message, userData);
 		}
 		catch {
 			const selfBotUserData = await sb.User.get(context.platform.Self_Name);

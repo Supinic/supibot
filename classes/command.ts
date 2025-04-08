@@ -178,7 +178,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			]);
 		}
 		else {
-			await this.platform.pm(string, this.user.Name);
+			await this.platform.pm(string, this.user);
 		}
 	}
 

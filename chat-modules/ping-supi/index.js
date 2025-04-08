@@ -37,7 +37,7 @@ export default {
 			this.data.timeout = now + 1000;
 
 			const pingMessage = `[ ${channel.Description ?? channel.Name} ]: ${userName} : ${message}`;
-			await platformData.pm(pingMessage, "supinic");
+			await platformData.pm(pingMessage, await sb.User.get("supinic"));
 		}
 	}),
 	Global: true,

@@ -66,7 +66,7 @@ export default async (context, type, rawIdentifier) => {
 		return { reply };
 	}
 
-	await context.platform.pm(reply, context.user.Name, context.channel ?? null);
+	await context.platform.pm(reply, context.user, context.channel ?? null);
 	return {
 		reply: "I private messaged you with the link to the error stack Pastebin 💻"
 	};

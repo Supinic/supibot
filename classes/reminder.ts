@@ -529,7 +529,7 @@ export class Reminder extends TemplateWithId {
 							I have whispered you the result instead.
 						`);
 
-						await reminderPlatform.pm(message, fromUserData.Name, channelData);
+						await reminderPlatform.pm(message, fromUserData, channelData);
 					}
 					else {
 						const fixedMessage = await Filter.applyUnping({
