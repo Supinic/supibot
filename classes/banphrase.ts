@@ -5,6 +5,7 @@ import type Platform from "../platforms/template.js";
 import config from "../config.json" with { type: "json" };
 import regexes from "../utils/regexes.js";
 import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
+import { transliterate as executeTransliteration } from "transliteration";
 
 const { responses, values } = config;
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
@@ -13,6 +14,7 @@ const inactiveSymbol: unique symbol = Symbol("banphrase-inactive");
 
 const banphraseConfigData = {
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
+	transliterate: (input: string) => executeTransliteration(input),
 	...regexes
 } as const;
 
