@@ -407,7 +407,7 @@ export class Banphrase extends TemplateWithId {
 		}
 
 		return {
-			string: message,
+			string: resultMessage,
 			passed: true
 		};
 	}
