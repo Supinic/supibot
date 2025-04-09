@@ -930,8 +930,8 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		return response.username;
 	}
 
-	async createUserMention (userData: User, channelData: Channel) {
-		if (!userData.Discord_ID || !channelData.Specific_ID) {
+	async createUserMention (userData: User, channelData?: Channel) {
+		if (!userData.Discord_ID || !channelData || !channelData.Specific_ID) {
 			return userData.Name;
 		}
 
