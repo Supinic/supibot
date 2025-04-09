@@ -250,7 +250,7 @@ export class Banphrase extends TemplateWithId {
 			else if (banphrase.Type === "API response") {
 				continue;
 			}
-			else if (banphrase.Channel !== channelId && banphrase.Platform !== platformId) {
+			else if (banphrase.Channel !== channelId || banphrase.Platform !== platformId) {
 				continue;
 			}
 
