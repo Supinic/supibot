@@ -270,7 +270,7 @@ export interface CommandDefinition extends TemplateDefinition {
 	destroy?: CustomDestroyFunction;
 }
 export type ExecuteFunction = (this: Command, context: Context, ...args: string[]) => StrictResult | Promise<StrictResult>;
-export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
+export type DescriptionFunction = (this: Command, prefix: string) => string[] | Promise<string[]>;
 export type CustomInitFunction = (this: Command) => Promise<void> | void;
 export type CustomDestroyFunction = (this: Command) => void;
 
@@ -388,7 +388,7 @@ export class Command extends TemplateWithoutId {
 			return null;
 		}
 		else {
-			return await this.Dynamic_Description();
+			return await this.Dynamic_Description(COMMAND_PREFIX);
 		}
 	}
 
