@@ -1,15 +1,29 @@
+import { SupiDate, SupiError } from "supi-core";
+import type { Context, CommandDefinition } from "../../classes/command.js";
+
+type NormalUserInfo = {
+	banned: false;
+};
+type BannedUserInfo = {
+	banReason: "TOS_INDEFINITE" | "TOS_TEMPORARY" | "DMCA" | "DEACTIVATED";
+	banned: true;
+};
+type IvrUserInfo = NormalUserInfo | BannedUserInfo;
+type IvrUserResponse = IvrUserInfo | IvrUserInfo[];
+
+const omittedBanReasons: Set<BannedUserInfo["banReason"]> = new Set(["TOS_TEMPORARY", "TOS_INDEFINITE"]);
+
 export default {
 	Name: "stalk",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "For a given user, attempts to find the message they last sent in chat, plus the channel and time when they posted it.",
 	Flags: ["block","external-input","mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Code: (async function stalk (context, user) {
+	Code: (async function stalk (context: Context<[]>, user) {
 		if (!user) {
-			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
+			const emote = await context.getBestAvailableEmote(["forsen1"], "👀") as string; // @todo fix emote fetching method types
 			return {
 				success: false,
 				reply: `${emote} I'm watching you... (no user provided!)`
@@ -24,22 +38,23 @@ export default {
 			};
 		}
 		else if (targetUser.ID === context.user.ID && context.channel) {
-			// Only post the "easter egg" message if used on the executing user in a channel chat
-			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
+			// Only post the "Easter egg" message if used on the executing user in a channel chat
+			const emote = await context.getBestAvailableEmote(["forsen1"], "👀") as string; // @todo fix emote fetching method types
 			return {
 				success: false,
 				reply: `${emote} You're right here ${emote}`
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
-			const emote = await context.getBestAvailableEmote(["MrDestructoid"], "🤖");
+			const emote = await context.getBestAvailableEmote(["MrDestructoid"], "🤖") as string; // @todo fix emote fetching method types
 			return {
 				success: false,
 				reply: `${emote} I'm right here ${emote}`
 			};
 		}
 
-		const stalkData = await sb.Query.getRecordset(rs => rs
+		type StalkData = { Text: string, Date: SupiDate, ChannelID: number };
+		const stalkData = await core.Query.getRecordset<StalkData | undefined>(rs => rs
 			.select("Last_Message_Text AS Text", "Last_Message_Posted AS Date", "Channel.ID AS ChannelID")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.join("chat_data", "Channel")
@@ -51,20 +66,25 @@ export default {
 
 		if (!stalkData) {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					That user is in the database, but never showed up in chat.
-					They were first spotted ${sb.Utils.timeDelta(targetUser.Started_Using)}.
+					They were first spotted ${core.Utils.timeDelta(targetUser.Started_Using)}.
 				`
 			};
 		}
 
 		const stalkChannelData = sb.Channel.get(stalkData.ChannelID);
-		const delta = sb.Utils.timeDelta(stalkData.Date);
+		if (!stalkChannelData) {
+			throw new SupiError({
+				message: "Assert error: Stalked channel ID is not available",
+				args: { stalkData }
+			});
+		}
 
 		// Automated protection of the bot from being banned:
 		// Do not allow stalking of banned Twitch users in Twitch channels - available in Twitch whispers and other platforms.
 		if (targetUser.Twitch_ID && context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
-			const response = await sb.Got.get("IVR")({
+			const response = await core.Got.get("IVR")<IvrUserResponse | undefined>({
 				url: "v2/twitch/user",
 				searchParams: {
 					id: targetUser.Twitch_ID
@@ -81,8 +101,7 @@ export default {
 				userInfo = response.body;
 			}
 
-			const omittedBanReasons = ["TOS_TEMPORARY", "TOS_INDEFINITE"];
-			if (userInfo && userInfo.banned && omittedBanReasons.includes(userInfo.banReason)) {
+			if (userInfo && userInfo.banned && omittedBanReasons.has(userInfo.banReason)) {
 				return {
 					success: false,
 					reply: "You cannot stalk that user as they're currently banned on Twitch!"
@@ -90,6 +109,7 @@ export default {
 			}
 		}
 
+		const delta = core.Utils.timeDelta(stalkData.Date);
 		const who = (context.user === targetUser)
 			? "You were"
 			: "That user was";
@@ -106,7 +126,7 @@ export default {
 			meta: {
 				skipWhitespaceCheck: true
 			},
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${who} last seen in chat ${delta}, 
 				(${channelString})
 				last message:
@@ -115,4 +135,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+} satisfies CommandDefinition;
