@@ -754,7 +754,7 @@ export class Command extends TemplateWithoutId {
 				Success: false,
 				Invocation: identifier,
 				Arguments: JSON.stringify(args.filter(Boolean)),
-				Result: null,
+				Result: e.message,
 				Execution_Time: null
 			});
 
