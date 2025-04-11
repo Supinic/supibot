@@ -1,3 +1,4 @@
+import { GenericRequestError } from "supi-core";
 import config from "./config.json" with { type: "json" };
 import Subreddit from "./subreddit.js";
 
@@ -76,7 +77,7 @@ export default {
 				};
 			}
 			else if (statusCode !== 200 && statusCode !== 404) {
-				throw new sb.Error.GenericRequest({
+				throw new GenericRequestError({
 					statusCode,
 					hostname: "reddit.com",
 					statusMessage: body.statusMessage ?? null,
@@ -133,7 +134,7 @@ export default {
 				};
 			}
 			else if (statusCode !== 200) {
-				throw new sb.Error.GenericRequest({
+				throw new GenericRequestError({
 					statusCode,
 					hostname: "reddit.com",
 					statusMessage: body.statusMessage ?? null,

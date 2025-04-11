@@ -1,6 +1,7 @@
 import { CustomEventDefinition } from "../generic-event.js";
 
 import cacheKeys from "../../../utils/shared-cache-keys.json" with { type: "json" };
+import { SupiDate } from "supi-core";
 const { LATEST_NODE_JS_VERSION } = cacheKeys;
 
 type GithubRepoResponse = {
@@ -26,27 +27,27 @@ export default {
 	subName: "Node.js version",
 	type: "custom",
 	process: async () => {
-		const response = await sb.Got.get("GitHub")({
+		const response = await core.Got.get("GitHub")({
 			url: "repos/nodejs/node/releases"
 		}) as GithubRepoResponse;
 
 		if (!response.ok) {
-			return;
+			return null;
 		}
 
-		const data = response.body.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at));
+		const data = response.body.sort((a, b) => new SupiDate(b.created_at).valueOf() - new SupiDate(a.created_at).valueOf());
 		const latest = data[0];
 
-		const latestCacheVersion = await sb.Cache.getByPrefix(LATEST_NODE_JS_VERSION);
+		const latestCacheVersion = await core.Cache.getByPrefix(LATEST_NODE_JS_VERSION);
 		if (latest.tag_name === latestCacheVersion) {
-			return;
+			return null;
 		}
 
-		await sb.Cache.setByPrefix(LATEST_NODE_JS_VERSION, latest.tag_name);
+		await core.Cache.setByPrefix(LATEST_NODE_JS_VERSION, latest.tag_name);
 
-		const releaseDate = new sb.Date(latest.created_at).format("Y-m-d H:i");
+		const releaseDate = new SupiDate(latest.created_at).format("Y-m-d H:i");
 		return {
-			message: sb.Utils.tag.trim `
+			message: core.Utils.tag.trim `
 				New Node.js version detected! 
 				PagChomp 👉 ${latest.tag_name};
 				Released on ${releaseDate}; 

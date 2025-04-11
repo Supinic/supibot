@@ -1,38 +1,30 @@
-import type * as core from "supi-core";
-
-export declare type Message = string;
-export declare type Emote = {
-    ID: string;
+export type Message = string;
+export type Emote = {
+    ID: string | number;
     name: string;
-    type: "twitch-subscriber" | "twitch-global" | "ffz" | "bttv" | "7tv";
+    type: "twitch-subscriber" | "twitch-global" | "twitch-follower" | "ffz" | "bttv" | "7tv" | "discord" | "cytube";
     global: boolean;
     animated: boolean | null;
+    guild?: string;
+    zeroWidth?: boolean;
 };
-export declare type Port = number;
-export declare type URL = string;
-export declare type Stringifiable = boolean | number | string;
-export declare type JSONifiable = null | boolean | number | string | { [P: string]: JSONifiable } | JSONifiable[];
-export declare type SimpleGenericData = Record<string, JSONifiable>;
-export declare interface GenericFlagsObject {
+export type Port = number;
+export type URL = string;
+export type Stringifiable = boolean | number | string;
+export type JSONifiable = null | boolean | number | string | { [P: string]: JSONifiable } | JSONifiable[];
+export type SimpleGenericData = Record<string, JSONifiable>;
+export interface GenericFlagsObject {
     [key: string]: boolean
 }
-export declare type Without<T, U> = {
+export type Without<T, U> = {
     [P in Exclude<keyof T, keyof U>]?: never
 };
-export declare type XOR<T, U> = (T | U) extends object
+export type XOR<T, U> = (T | U) extends object
     ? (Without<T, U> & U) | (Without<U, T> & T)
     : T | U;
-export declare type OnlyKeysOfType<T, U> = {
+export type OnlyKeysOfType<T, U> = {
     [P in keyof T]: T[P] extends U ? P : never
 }[keyof T];
-export declare type TypeExtract<T, U> = {
+export type TypeExtract<T, U> = {
     [P in OnlyKeysOfType<T, U>]: U;
 };
-
-declare var sb: {
-    Date: core.Date,
-    Error: core.Error,
-    Promise: core.Promise,
-    Got: core.Got,
-    // TODO add others
-}

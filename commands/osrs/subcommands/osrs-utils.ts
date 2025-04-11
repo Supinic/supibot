@@ -1,4 +1,5 @@
-import type User from "../../../classes/user.js";
+import type { Context } from "../../../classes/command.js";
+import type { User } from "../../../classes/user.js";
 // import type { CheerioNode } from "supi-core";
 import GameData from "../game-data.json" with { type: "json" };
 
@@ -6,12 +7,10 @@ import GameData from "../game-data.json" with { type: "json" };
 // export type SkillName = typeof GameData["skills"][number]["name"];
 export type ActivityAlias = keyof typeof GameData["activityAliases"];
 
-export const isValidActivityAlias = (input: string): input is ActivityAlias => {
-	return Object.keys(GameData.activityAliases).includes(input);
-};
-export const getActivityFromAlias = (input: ActivityAlias): string => {
-	return GameData.activityAliases[input];
-};
+export const isValidActivityAlias = (input: string): input is ActivityAlias => (
+	Object.keys(GameData.activityAliases).includes(input)
+);
+export const getActivityFromAlias = (input: ActivityAlias) => GameData.activityAliases[input];
 
 type Activity = {
 	name: string;
@@ -45,20 +44,12 @@ type FetchData = {
 };
 
 type FetchSuccess = {
-	ok: true;
-	statusCode: 200;
-	body: {
-		data: FetchData;
-		error: null;
-	};
+	data: FetchData;
+	error: null;
 };
 type FetchFailure = {
-	ok: false;
-	statusCode: 404 | 502 | 503;
-	body: {
-		data: null;
-		error: { message: string; };
-	};
+	data: null;
+	error: { message: string; };
 };
 type FetchResult = FetchSuccess | FetchFailure;
 
@@ -93,17 +84,12 @@ type GameWorld = {
 };
 type GameWorlds = Record<string, GameWorld>;
 
-// @todo Import from Command when done in Typescript
-interface Context {
-	user: User;
-}
-
 export const OSRS_GAME_USERNAME_KEY = "osrsGameUsername";
 
 export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
-	let data: GameWorlds | null = await sb.Cache.getByPrefix("osrs-worlds-data");
+	let data = await core.Cache.getByPrefix("osrs-worlds-data") as GameWorlds | null;
 	if (!data) {
-		const response = await sb.Got.get("FakeAgent")({
+		const response = await core.Got.get("FakeAgent")({
 			url: "https://oldschool.runescape.com/slu",
 			responseType: "text"
 		}) as GameWorldResult;
@@ -112,21 +98,25 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 			return null;
 		}
 
-		const $ = sb.Utils.cheerio(response.body);
+		const $ = core.Utils.cheerio(response.body);
 		const rows = $("tr.server-list__row");
 		const worlds: GameWorlds = {};
 
 		for (const row of rows) {
-			// @todo check with Cheerio types when supi-core#exports-refactor is merged
-			const [idEl, playersEl, countryEl, typeEl, activityEl] = $("td", row);
-			const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1)
+			const list = $("td", row);
+			const [idEl] = list;
+			const [countryEl, typeEl, activityEl] = list.slice(1);
+
+			// Element might not be present -> optional chaining is warranted
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1);
 			if (!id) {
 				continue;
 			}
 
 			const country = $(countryEl).text() as GameCountry;
 			const type = $(typeEl).text().toLowerCase() as "free" | "members";
-			const activity = $(activityEl).text() as string;
+			const activity = $(activityEl).text();
 
 			worlds[id] = {
 				country,
@@ -137,7 +127,7 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 		}
 
 		data = worlds;
-		await sb.Cache.setByPrefix("osrs-worlds-data", data, {
+		await core.Cache.setByPrefix("osrs-worlds-data", data, {
 			expiry: 864e5 // 1 day
 		});
 	}
@@ -150,54 +140,59 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 		? `osrs-user-data-${user}`
 		: `osrs-user-data-${user}-seasonal`;
 
-	let data: FetchData | null = (options.force)
-		? null
-		: await sb.Cache.getByPrefix(key);
-
-	if (!data) {
-		let response: FetchResult;
-		if (!options.seasonal) {
-			response = await sb.Got.get("Supinic")({
-				url: `osrs/lookup/${user}`
-			}) as FetchResult;
+	if (!options.force) {
+		const cacheData = await core.Cache.getByPrefix(key) as FetchData | null;
+		if (cacheData) {
+			return {
+				success: true,
+				data: cacheData
+			};
 		}
-		else {
-			response = await sb.Got.get("Supinic")({
-				url: `osrs/lookup/${user}`,
-				searchParams: {
-					seasonal: "1"
-				}
-			});
-		}
+	}
 
-		if (!response.ok) {
-			if (response.statusCode === 404) {
-				return {
-					success: false,
-					reply: `No data found for player name "${user}"!`
-				};
-			}
-			else if (response.statusCode === 502 || response.statusCode === 503) {
-				const { message } = response.body.error;
-				return {
-					success: false,
-					reply: `Could not reach the OSRS API: ${response.statusCode} ${message}`
-				};
-			}
-			else {
-				const { message } = response.body.error;
-				return {
-					success: false,
-					reply: `Supinic OSRS API has failed: ${response.statusCode} ${message}`
-				};
-			}
-		}
-
-		data = response.body.data;
-		await sb.Cache.setByPrefix(key, data, {
-			expiry: 600_000
+	let response;
+	if (!options.seasonal) {
+		response = await core.Got.get("Supinic")<FetchResult>({
+			url: `osrs/lookup/${user}`
 		});
 	}
+	else {
+		response = await core.Got.get("Supinic")<FetchResult>({
+			url: `osrs/lookup/${user}`,
+			searchParams: {
+				seasonal: "1"
+			}
+		});
+	}
+
+	const { body, ok, statusCode } = response;
+	if (!ok && body.error) {
+		if (statusCode === 404) {
+			return {
+				success: false,
+				reply: `No data found for player name "${user}"!`
+			};
+		}
+		else if (statusCode === 502 || statusCode === 503) {
+			const { message } = body.error;
+			return {
+				success: false,
+				reply: `Could not reach the OSRS API: ${statusCode} ${message}`
+			};
+		}
+		else {
+			const { message } = body.error;
+			return {
+				success: false,
+				reply: `Supinic OSRS API has failed: ${statusCode} ${message}`
+			};
+		}
+	}
+
+	const data = body.data as FetchData;
+	await core.Cache.setByPrefix(key, data, {
+		expiry: 600_000
+	});
 
 	return {
 		success: true,
@@ -232,7 +227,7 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		return {
 			success: true,
 			username: identifier,
-			type: "string",
+			type: "string"
 		};
 	}
 
@@ -241,18 +236,20 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		targetUser = context.user;
 	}
 	else {
-		targetUser = await sb.User.get(identifier);
-		if (!targetUser) {
+		const userData = await sb.User.get(identifier);
+		if (!userData) {
 			return {
 				success: false,
 				reply: "No such user exists!"
 			};
 		}
+
+		targetUser = userData;
 	}
 
 	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY) as null | string;
 	if (!gameUsername) {
-		const verb = (targetUser === context.user) ? "You" : "They"
+		const verb = (targetUser === context.user) ? "You" : "They";
 		return {
 			success: false,
 			reply: `${verb} don't have an OSRS username set up!`

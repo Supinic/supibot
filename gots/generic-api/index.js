@@ -1,3 +1,5 @@
+import { GenericRequestError } from "supi-core";
+
 export default {
 	name: "GenericAPI",
 	optionsType: "function",
@@ -6,7 +8,7 @@ export default {
 		throwHttpErrors: true,
 		hooks: {
 			beforeError: [
-				(e) => new sb.Error.GenericRequest({
+				(e) => new GenericRequestError({
 					body: e.response?.body ?? null,
 					statusCode: e.response?.statusCode,
 					statusMessage: e.response?.statusMessage,

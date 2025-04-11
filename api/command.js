@@ -39,21 +39,22 @@ export default {
 			};
 		}
 
-		const result = await sb.Command.checkAndExecute(
-			invocation,
+		const execution = await sb.Command.checkAndExecute({
+			command: invocation,
 			args,
-			channelData,
-			userData,
-			{
-				platform: platformData,
+			channel: channelData,
+			user: userData,
+			platform: platformData,
+			platformSpecificData: null,
+			options: {
 				skipGlobalBan: url.searchParams.has("skipGlobalBan")
 			}
-		);
+		});
 
 		return {
 			statusCode: 200,
 			data: {
-				result
+				result: execution
 			}
 		};
 	},
@@ -110,13 +111,16 @@ export default {
 	},
 
 	list: () => {
-		const data = sb.Command.data.map(i => ({
-			name: i.Name,
-			aliases: i.Aliases,
-			description: i.Description,
-			cooldown: i.Cooldown,
-			flags: Object.keys(i.Flags)
-		}));
+		const data = [];
+		for (const command of sb.Command.data.values()) {
+			data.push({
+				name: command.Name,
+				aliases: command.Aliases,
+				description: command.Description,
+				cooldown: command.Cooldown,
+				flags: command.Flags
+			});
+		}
 
 		return {
 			statusCode: 200,

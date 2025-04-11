@@ -37,7 +37,7 @@ export default {
 			};
 		}
 		else {
-			if (!module.hasReloadSpecific()) {
+			if (typeof module.reloadSpecific !== "function") {
 				return {
 					success: false,
 					reply: `This module does not support reloading a specific item!`

@@ -57,7 +57,7 @@ export default {
 
 			await context.platform.pm(
 				`${source.sourceURL}${clipKey}`,
-				context.user.Name,
+				context.user,
 				context.channel ?? null
 			);
 

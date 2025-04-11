@@ -63,7 +63,7 @@ declare namespace DankDebug {
 		 */
 		parseParametersFromArguments: typeof Command.parseParametersFromArguments;
 
-		// These are all sb.Utils methods:
+		// These are all core.Utils methods:
 		/**
 		 * Capitalizes the string's first letter.
 		 */

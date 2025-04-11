@@ -5,16 +5,14 @@ const steamNewsUrl = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v000
 const steamGameId = "2791440";
 
 type SteamApiResponse = {
-	body: {
-		appnews: {
-			newsitems: {
-				title: string;
-				date: number;
-				url: string;
-				tags: string[];
-			}[];
-		};
-	}
+	appnews: {
+		newsitems: {
+			title: string;
+			date: number;
+			url: string;
+			tags?: string[];
+		}[];
+	};
 };
 
 const definition: CustomEventDefinition = {
@@ -31,7 +29,7 @@ const definition: CustomEventDefinition = {
 	subName: "BS update",
 	type: "custom",
 	process: async () => {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")<SteamApiResponse>({
 			url: steamNewsUrl,
 			searchParams: {
 				appid: steamGameId,
@@ -39,10 +37,14 @@ const definition: CustomEventDefinition = {
 				maxlength: 1000,
 				format: "json"
 			}
-		}) as SteamApiResponse;
+		});
+
+		if (!response.ok) {
+			return null;
+		}
 
 		const updates = response.body.appnews.newsitems
-			.filter(i => i.tags?.includes("patchnotes") || i.title?.toLowerCase().includes("patch notes"))
+			.filter(i => i.tags?.includes("patchnotes") || i.title.toLowerCase().includes("patch notes"))
 			.sort((a, b) => b.date - a.date)
 			.map(i => ({
 				...i,
@@ -50,25 +52,25 @@ const definition: CustomEventDefinition = {
 			}));
 
 		if (updates.length === 0) {
-			return;
+			return null;
 		}
 
-		const previousSteamUpdateDate = await sb.Cache.getByPrefix(LATEST_STEAM_NEWS_DATE) as number | null;
+		const previousSteamUpdateDate = await core.Cache.getByPrefix(LATEST_STEAM_NEWS_DATE) as number | null;
 		if (!previousSteamUpdateDate) {
 			const latest = updates[0];
-			await sb.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, latest.date, {
+			await core.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, latest.date, {
 				expiry: 14 * 864e5 // 14 days
 			});
 
-			return;
+			return null;
 		}
 
 		const newUpdates = updates.filter(i => (i.date) > previousSteamUpdateDate);
 		if (newUpdates.length === 0) { // No new updates, do nothing
-			return;
+			return null;
 		}
 
-		await sb.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, newUpdates[0].date, {
+		await core.Cache.setByPrefix(LATEST_STEAM_NEWS_DATE, newUpdates[0].date, {
 			expiry: 14 * 864e5 // 14 days
 		});
 

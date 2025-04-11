@@ -9,7 +9,7 @@ export default {
 		},
 		retry: {
 			limit: 0
-		},
+		}
 	},
 	parent: "GenericAPI",
 	description: null

@@ -54,7 +54,7 @@ export default {
 			}
 
 			let filteredResponse = "";
-			if (command.Flags.whitelist) {
+			if (command.Flags.includes("whitelist")) {
 				const whitelist = sb.Filter.getLocals("Whitelist", {
 					command,
 					invocation: identifier,

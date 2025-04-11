@@ -42,7 +42,7 @@ const handleAmbassadors = async (type, context, ...args) => {
 				`;
 
 		try {
-			await context.platform.pm(message, userData.Name);
+			await context.platform.pm(message, userData);
 		}
 		catch {
 			const selfBotUserData = await sb.User.get(context.platform.Self_Name);
@@ -53,7 +53,8 @@ const handleAmbassadors = async (type, context, ...args) => {
 				Channel: context.channel.ID,
 				Schedule: null,
 				Text: message,
-				Private_Message: false
+				Private_Message: false,
+				Type: "Reminder"
 			}, true);
 		}
 	}

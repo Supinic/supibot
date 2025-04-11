@@ -1,15 +1,12 @@
 import { postToHastebin } from "../../utils/command-utils.js";
 import type { CronDefinition } from "../temp-definitions.d.ts";
+import { SupiDate } from "supi-core";
 
 type HelixResponse = {
 	data: {
 		id: string;
 		name: string;
 	}[];
-};
-type GotHelixResponse = {
-	ok: boolean;
-	body: HelixResponse;
 };
 type EmoteJsonObject = {
 	timestamp: number;
@@ -18,13 +15,13 @@ type EmoteJsonObject = {
 };
 
 const cacheKey = "twitch-global-emotes";
-const fetchTwitchGlobalEmotes = (): Promise<GotHelixResponse> => sb.Got.get("Helix")({
+const fetchTwitchGlobalEmotes = () => core.Got.get("Helix")<HelixResponse>({
 	url: "chat/emotes/global",
 	method: "GET",
 	throwHttpErrors: false
 });
 
-let previousEmoteIds: Set<string>;
+let previousEmoteIds: Set<string> | undefined;
 const definition: CronDefinition = {
 	name: "global-emote-announcer",
 	expression: "0 */5 * * * *",
@@ -43,7 +40,7 @@ const definition: CronDefinition = {
 		}
 
 		if (!previousEmoteIds || previousEmoteIds.size === 0) {
-			let data: string[] = await sb.Cache.getByPrefix(cacheKey);
+			let data = await core.Cache.getByPrefix(cacheKey) as string[] | null;
 			if (!data) {
 				const response = await fetchTwitchGlobalEmotes();
 				if (!response.ok) {
@@ -51,7 +48,7 @@ const definition: CronDefinition = {
 				}
 
 				data = response.body.data.map(i => i.id);
-				await sb.Cache.setByPrefix(cacheKey, data, {
+				await core.Cache.setByPrefix(cacheKey, data, {
 					expiry: 7 * 864e5 // 7 days
 				});
 			}
@@ -66,13 +63,13 @@ const definition: CronDefinition = {
 		}
 
 		const emotes = response.body.data;
-		const newEmoteIds: Set<string> = new Set(emotes.map(i => i.id));
+		const newEmoteIds = new Set(emotes.map(i => i.id));
 		const differentEmoteIds = previousEmoteIds.symmetricDifference(newEmoteIds);
 		if (differentEmoteIds.size === 0) {
 			return;
 		}
 
-		const now = new sb.Date();
+		const now = new SupiDate();
 		const result: string[] = [];
 		const json: EmoteJsonObject = {
 			timestamp: now.valueOf(),
@@ -103,7 +100,7 @@ const definition: CronDefinition = {
 		}
 
 		previousEmoteIds = newEmoteIds;
-		await sb.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
+		await core.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
 			expiry: 7 * 864e5 // 7 days
 		});
 

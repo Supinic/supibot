@@ -1,9 +1,5 @@
 {
-  "include": [
-    "**/*.js",
-    "**/*.ts",
-    "**/*.json"
-  ],
+  "include": ["./**/*.js", "./**/*.ts", "./**/*.json"],
   "compilerOptions": {
     "target": "esnext",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "module": "nodenext",                                /* Specify what module code is generated. */

@@ -1,7 +1,5 @@
-// import { type Recordset } from "supi-core";
-import { Date as SupiDate } from "supi-core";
-type Recordset = any; // @todo uncomment above lines when supi-core exports refactor is finished
-
+import { type Context } from "../../classes/command.js";
+import { Date as SupiDate, type Row } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
 
 const DEFAULT_CHANNEL_ID = 38;
@@ -21,7 +19,7 @@ type FetchUsersResult = {
 };
 
 const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSeenThreshold = 36e5): Promise<FetchUsersResult> {
-	const users = await sb.Query.getRecordset((rs: Recordset) => rs
+	const users = await core.Query.getRecordset<UserSubscription[]>(rs => rs
 		.select("Event_Subscription.Channel as Reminder_Channel")
 		.select("Event_Subscription.User_Alias AS ID")
 		.select("Event_Subscription.Flags AS Flags")
@@ -38,16 +36,16 @@ const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSe
 		.groupBy("Meta.User_Alias")
 		.where("Type = %s", subType)
 		.where("Active = %b", true)
-	) as UserSubscription[];
+	);
 
-	const now: number = sb.Date.now();
-	const [activeUsers, inactiveUsers] = sb.Utils.splitByCondition(users, (user: UserSubscription): boolean => {
+	const now: number = SupiDate.now();
+	const [activeUsers, inactiveUsers] = core.Utils.splitByCondition(users, (user: UserSubscription): boolean => {
 		const lastSeen = now - user.Last_Seen.valueOf();
 		if (lastSeen < lastSeenThreshold) {
 			return true;
 		}
 
-		const flags = JSON.parse(user.Flags ?? "{}");
+		const flags = JSON.parse(user.Flags ?? "{}") as { skipPrivateReminder?: boolean; };
 		return (flags.skipPrivateReminder === true);
 	});
 
@@ -57,14 +55,7 @@ const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSe
 	};
 };
 
-// @todo remove when Reminder is well-known
-type ReminderCreateResult = {
-	success: boolean;
-	cause: string | null;
-	ID?: number;
-};
-
-const createReminders = async function (users: UserSubscription[], message: string): Promise<ReminderCreateResult[]> {
+const createReminders = async function (users: UserSubscription[], message: string) {
 	return await Promise.all(users.map(user => (
 		sb.Reminder.create({
 			Channel: null,
@@ -73,7 +64,9 @@ const createReminders = async function (users: UserSubscription[], message: stri
 			Text: `${message} (you were not around when it was announced)`,
 			Schedule: null,
 			Private_Message: true,
-			Platform: 1
+			Platform: 1,
+			Type: "Reminder",
+			Created: new SupiDate()
 		}, true)
 	)));
 };
@@ -85,16 +78,25 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
 
 	await createReminders(inactiveUsers, message);
 
-	const channelUsers: Record<string, UserSubscription[]> = {};
+	const channelUsers: Map<number, UserSubscription[]> = new Map();
 	for (const user of [...activeUsers, ...inactiveUsers]) {
 		const channelID = user.Reminder_Channel ?? DEFAULT_CHANNEL_ID;
-		channelUsers[channelID] ??= [];
-		channelUsers[channelID].push(user);
+
+		let userArray = channelUsers.get(channelID);
+		if (!userArray) {
+			userArray = [];
+			channelUsers.set(channelID, userArray);
+		}
+
+		userArray.push(user);
 	}
 
-	for (const [channelID, userDataList] of Object.entries(channelUsers)) {
+	for (const [channelID, userDataList] of channelUsers.entries()) {
 		const chatPing = userDataList.map(i => `@${i.Username}`).join(" ");
-		const channelData = sb.Channel.get(Number(channelID));
+		const channelData = sb.Channel.get(channelID);
+		if (!channelData) {
+			continue;
+		}
 
 		await channelData.send(`${chatPing} ${message}`);
 	}
@@ -105,17 +107,17 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
  */
 const parseRssNews = async function (xml: string, cacheKey: string): Promise<string[] | null> {
 	const feed = await parseRSS(xml);
-	const lastPublishDate = await sb.Cache.getByPrefix(cacheKey) ?? 0;
+	const lastPublishDate = (await core.Cache.getByPrefix(cacheKey) ?? 0) as number;
 	const eligibleArticles = feed.items
-		.filter(i => new sb.Date(i.pubDate) > lastPublishDate)
-		.sort((a, b) => new sb.Date(b.pubDate) - new sb.Date(a.pubDate));
+		.filter(i => new SupiDate(i.pubDate).valueOf() > lastPublishDate)
+		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
 
 	if (eligibleArticles.length === 0) {
 		return null;
 	}
 
 	const [topArticle] = eligibleArticles;
-	await sb.Cache.setByPrefix(cacheKey, new sb.Date(topArticle.pubDate).valueOf(), {
+	await core.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf(), {
 		expiry: 7 * 864e5 // 7 days
 	});
 
@@ -161,8 +163,8 @@ export type SpecialEventDefinition = {
 		added: string;
 		removed: string;
 	};
-	// @todo change context to Context and subscription to Row after supi-core exports types
-	handler?: (context: any, subscription: any, ...args: string[]) => Promise<CommandResult>;
+	// @todo perhaps specify the Context by typing it with the $subscribe command params?
+	handler?: (context: Context, subscription: Row<UserSubscription>, ...args: string[]) => Promise<CommandResult>;
 };
 export type RssEventDefinition = BaseEventDefinition & {
 	type: "rss";
@@ -171,7 +173,7 @@ export type RssEventDefinition = BaseEventDefinition & {
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
-	process: () => Promise<void | { message: string }>;
+	process: () => Promise<null | { message: string }>;
 };
 export type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
 
@@ -184,7 +186,7 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 	let message;
 	if (type === "rss") {
 		const { cacheKey, url } = definition;
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url,
 			responseType: "text",
 			timeout: {

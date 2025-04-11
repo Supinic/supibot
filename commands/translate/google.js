@@ -1,4 +1,5 @@
-import LanguageCodes from "../../utils/languages.js";
+import { GenericRequestError } from "supi-core";
+import { get as getLanguage, getName } from "../../utils/languages.js";
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
 
 const execute = async function (context, query) {
@@ -45,7 +46,7 @@ const execute = async function (context, query) {
 						return false;
 					}
 
-					return Boolean(LanguageCodes.get(i));
+					return Boolean(getLanguage(i));
 				}));
 
 				codeList = [...list];
@@ -58,7 +59,7 @@ const execute = async function (context, query) {
 			lang = sb.Utils.randArray(codeList);
 		}
 
-		const newLang = LanguageCodes.get(lang);
+		const newLang = getLanguage(lang);
 		const code = newLang?.iso6391 ?? newLang?.iso6392 ?? newLang?.iso6393 ?? null;
 		if (!code) {
 			return {
@@ -95,14 +96,14 @@ const execute = async function (context, query) {
 
 	if (response.statusCode === 400) {
 		const targets = [options.from, options.to].filter(i => i !== "en" && i !== "auto");
-		const languages = targets.map(i => `${i}: ${LanguageCodes.getName(i)}`);
+		const languages = targets.map(i => `${i}: ${getName(i)}`);
 		return {
 			success: false,
 			reply: `One or both languages are not supported! (${languages.join(", ")})`
 		};
 	}
 	else if (!response.ok) {
-		throw new sb.Error.GenericRequest({
+		throw new GenericRequestError({
 			statusCode: response.statusCode,
 			statusMessage: response.statusMessage,
 			hostname: "TranslateAPI",
@@ -115,7 +116,7 @@ const execute = async function (context, query) {
 	const text = data[0].map(i => i[0]).join(" ");
 
 	const languageID = data[2].replace(/-.*/, "");
-	const fromLanguageName = LanguageCodes.getName(languageID);
+	const fromLanguageName = getName(languageID);
 	if (!fromLanguageName) {
 		console.warn("$translate - could not get language name", { data, options, languageID });
 		return {
@@ -133,7 +134,7 @@ const execute = async function (context, query) {
 			additionalInfo.push(`(${confidence})`);
 		}
 
-		const toLanguageName = sb.Utils.capitalize(LanguageCodes.getName(options.to));
+		const toLanguageName = sb.Utils.capitalize(getName(options.to));
 		additionalInfo.push("→", `${toLanguageName}:`);
 	}
 
