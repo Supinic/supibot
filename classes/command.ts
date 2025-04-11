@@ -136,7 +136,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	readonly platformSpecificData: ContextPlatformSpecificData;
 	readonly params: ParamFromDefinition<T>;
 
-	readonly meta: Map<string, unknown> = new Map();
+	// readonly meta: Map<string, unknown> = new Map();
 
 	constructor (command: Command, data: ContextData<T>) {
 		this.command = command;
