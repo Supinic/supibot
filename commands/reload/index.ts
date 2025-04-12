@@ -76,7 +76,8 @@ export default {
 						const dynamicImports = await import(filePath) as { default: CommandDefinition };
 						definitions.push(dynamicImports.default);
 					}
-					catch {
+					catch (e) {
+						console.warn(e);
 						failures.push(commandData.Name);
 					}
 				}
