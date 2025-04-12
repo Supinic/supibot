@@ -1,3 +1,5 @@
+import { CommandDefinition } from "../../classes/command.js";
+
 const EIGHT_BALL_RESPONSES = [
 	"😃 It is certain.",
 	"😃 It is decidedly so.",
@@ -24,18 +26,17 @@ const EIGHT_BALL_RESPONSES = [
 export default {
 	Name: "8ball",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks your question against the fortune-telling 8-ball.",
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Code: (async function _8ball () {
+	Code: (function _8ball () {
 		return {
-			reply: sb.Utils.randArray(EIGHT_BALL_RESPONSES)
+			reply: core.Utils.randArray(EIGHT_BALL_RESPONSES)
 		};
 	}),
-	Dynamic_Description: (async function (prefix) {
+	Dynamic_Description: (function (prefix) {
 		const list = EIGHT_BALL_RESPONSES.map(i => `<li>${i}</li>`).join("");
 
 		return [
@@ -50,4 +51,4 @@ export default {
 			`<ul>${list}</ul>`
 		];
 	})
-};
+} satisfies CommandDefinition;
