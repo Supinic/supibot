@@ -71,7 +71,7 @@ export default {
 					}
 
 					const hash = randomBytes(16).toString("hex");
-					const filePath = path.join(BASE_PATH, name, commandData.Name, `index.js?randomHash=${hash}`);
+					const filePath = path.join(BASE_PATH, "commands", commandData.Name, `index.js?randomHash=${hash}`);
 					try {
 						const dynamicImports = await import(filePath) as { default: CommandDefinition };
 						definitions.push(dynamicImports.default);
