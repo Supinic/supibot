@@ -385,6 +385,15 @@ export class Filter extends TemplateWithId {
 		}
 	}
 
+	static async reloadData () {
+		for (const map of Object.values(Filter.types)) {
+			map.clear();
+		}
+
+		Filter.data.clear();
+		await Filter.loadData();
+	}
+
 	static get (identifier: Filter): Filter;
 	static get (identifier: Filter["ID"]): Filter | null;
 	static get (identifier: Filter | Filter["ID"]) {

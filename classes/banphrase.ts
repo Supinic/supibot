@@ -201,6 +201,11 @@ export class Banphrase extends TemplateWithId {
 		}
 	}
 
+	static async reloadData () {
+		Banphrase.data.clear();
+		await Banphrase.loadData();
+	}
+
 	static async reloadSpecific (...list: Banphrase["ID"][]): Promise<boolean> {
 		if (list.length === 0) {
 			return false;
