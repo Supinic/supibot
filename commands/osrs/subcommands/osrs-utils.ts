@@ -105,7 +105,9 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 		for (const row of rows) {
 			const list = $("td", row);
 			const [idEl] = list;
-			const [countryEl, typeEl, activityEl] = list.slice(1);
+
+			// [World name, Player count, Location, Type, Activity]
+			const [countryEl, typeEl, activityEl] = list.slice(2);
 
 			// Element might not be present -> optional chaining is warranted
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
