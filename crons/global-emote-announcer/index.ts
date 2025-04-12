@@ -13,6 +13,7 @@ type EmoteJsonObject = {
 	added: HelixResponse["data"];
 	deleted: HelixResponse["data"];
 };
+type EmoteDescriptor = { name: string; id: string; };
 
 const cacheKey = "twitch-global-emotes";
 const fetchTwitchGlobalEmotes = () => core.Got.get("Helix")<HelixResponse>({
@@ -21,7 +22,7 @@ const fetchTwitchGlobalEmotes = () => core.Got.get("Helix")<HelixResponse>({
 	throwHttpErrors: false
 });
 
-let previousEmoteIds: Set<string> | undefined;
+let previousEmotes: EmoteDescriptor[] | undefined;
 const definition: CronDefinition = {
 	name: "global-emote-announcer",
 	expression: "0 */5 * * * *",
@@ -39,21 +40,25 @@ const definition: CronDefinition = {
 			return;
 		}
 
-		if (!previousEmoteIds || previousEmoteIds.size === 0) {
-			let data = await core.Cache.getByPrefix(cacheKey) as string[] | null;
+		if (!previousEmotes || previousEmotes.length === 0) {
+			let data = await core.Cache.getByPrefix(cacheKey) as EmoteDescriptor[] | null;
 			if (!data) {
 				const response = await fetchTwitchGlobalEmotes();
 				if (!response.ok) {
 					return;
 				}
 
-				data = response.body.data.map(i => i.id);
+				data = response.body.data.map(i => ({
+					id: i.id,
+					name: i.name
+				}));
+
 				await core.Cache.setByPrefix(cacheKey, data, {
 					expiry: 7 * 864e5 // 7 days
 				});
 			}
 
-			previousEmoteIds = new Set(data);
+			previousEmotes = data;
 			return;
 		}
 
@@ -62,8 +67,9 @@ const definition: CronDefinition = {
 			return;
 		}
 
-		const emotes = response.body.data;
-		const newEmoteIds = new Set(emotes.map(i => i.id));
+		const newEmotes = response.body.data;
+		const previousEmoteIds = new Set(previousEmotes.map(i => i.id));
+		const newEmoteIds = new Set(newEmotes.map(i => i.id));
 		const differentEmoteIds = previousEmoteIds.symmetricDifference(newEmoteIds);
 		if (differentEmoteIds.size === 0) {
 			return;
@@ -78,7 +84,7 @@ const definition: CronDefinition = {
 		};
 
 		for (const emoteId of differentEmoteIds) {
-			const emote = emotes.find(i => i.id === emoteId);
+			const emote = previousEmotes.find(i => i.id === emoteId);
 			if (!emote) {
 				continue;
 			}
@@ -99,7 +105,7 @@ const definition: CronDefinition = {
 			}
 		}
 
-		previousEmoteIds = newEmoteIds;
+		previousEmotes = newEmotes.map(i => ({ id: i.id, name: i.name }));
 		await core.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
 			expiry: 7 * 864e5 // 7 days
 		});
@@ -108,9 +114,16 @@ const definition: CronDefinition = {
 			title: `Twitch global emote change ${now.sqlDateTime()}`
 		});
 
-		const hastebinLink = (hastebinResult.ok)
-			? hastebinResult.link
-			: "(Hastebin link N/A)";
+		const hastebinLink = (hastebinResult.ok) ? hastebinResult.link : "(Hastebin link N/A)";
+		const suggestionRow = await core.Query.getRow("data", "Suggestion");
+		suggestionRow.setValues({
+			User_Alias: 1,
+			Text: `Global emote change, add to Origin: ${hastebinLink}`,
+			Priority: 255,
+			Category: "Data"
+		});
+
+		await suggestionRow.save({ skipLoad: true });
 
 		await channelData.send(`Global Twitch emotes changed: ${result.join(" ")} ${hastebinLink}`);
 	})
