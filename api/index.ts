@@ -11,6 +11,24 @@ import MetricsDefinition from "./metrics.js";
 import PlatformDefinition from "./platform.js";
 import ReminderDefinition from "./reminder.js";
 import UserDefinition from "./user.js";
+import { JSONifiable } from "../@types/globals.js";
+
+type ApiSuccessResponse = {
+	statusCode?: number;
+	data: Record<string, JSONifiable>;
+	skipResponseHandling?: boolean;
+	headers?: Record<string, string>;
+};
+type ApiFailureResponse = {
+	statusCode: number;
+	error: {
+		message: string;
+		reason?: string;
+	};
+};
+type ApiResponse = ApiSuccessResponse | ApiFailureResponse;
+type ApiFunction = (req: http.IncomingMessage, res: http.ServerResponse, url: URL) => Promise<ApiResponse>;
+export type ApiDefinition = Record<string, ApiFunction>;
 
 const routeDefinitions = {
 	afk: AfkDefinition,
@@ -22,7 +40,67 @@ const routeDefinitions = {
 	platform: PlatformDefinition,
 	reminder: ReminderDefinition,
 	user: UserDefinition
+} as const;
+const routes = Object.keys(routeDefinitions);
+
+const isValidRoute = (input: string): input is keyof typeof routeDefinitions => routes.includes(input);
+const isValidEndpoint = (route: ApiDefinition, input: string): input is keyof typeof route => {
+	const endpoints = Object.keys(route);
+	return endpoints.includes(input);
 };
+
+const handleNotFound = (res: http.ServerResponse, path: string) => {
+	res.writeHead(404, { "Content-Type": "application/json" });
+	res.end(JSON.stringify({
+		statusCode: 404,
+		data: null,
+		error: {
+			path,
+			message: "Endpoint not found"
+		},
+		timestamp: Date.now()
+	}));
+};
+
+async function handler (req: http.IncomingMessage, res: http.ServerResponse, baseUrl: string) {
+	if (!req.url) {
+		return;
+	}
+
+	const url = new URL(req.url, baseUrl);
+	const [route, endpoint] = url.pathname.split("/").filter(Boolean);
+	if (!isValidRoute(route)) {
+		handleNotFound(res, route);
+		return;
+	}
+
+	const routeDefinition = routeDefinitions[route];
+	if (!isValidEndpoint(routeDefinition, endpoint)) {
+		handleNotFound(res, `${route}/${endpoint}`);
+		return;
+	}
+
+	const endpointDefinition = routeDefinition[endpoint];
+	const {
+		skipResponseHandling = false,
+		error = null,
+		data = null,
+		headers = {},
+		statusCode = 200
+	} = await target(req, res, url);
+
+	if (!skipResponseHandling) {
+		headers["Content-Type"] ??= "application/json";
+		res.writeHead(statusCode, headers);
+
+		res.end(JSON.stringify({
+			statusCode,
+			data,
+			error,
+			timestamp: Date.now()
+		}));
+	}
+}
 
 export default function initialize () {
 	const { api } = config;
@@ -34,6 +112,8 @@ export default function initialize () {
 	const port = api.port;
 	const protocol = (api.secure) ? "https" : "http";
 	const baseURL = `${protocol}://localhost:${port}`;
+
+
 
 	const httpInterface = (api.secure) ? https : http;
 	const server = httpInterface.createServer(async (req, res) => {
