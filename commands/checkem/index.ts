@@ -1,3 +1,15 @@
+import { SupiDate } from "supi-core";
+import type { CommandDefinition, Context, ContextPlatformSpecificData } from "../../classes/command.js";
+import type { MessageData as TwitchMessageData } from "../../platforms/twitch.js";
+
+const platformHasMessageId = (input: ContextPlatformSpecificData): input is TwitchMessageData => {
+	if (!input) {
+		return false;
+	}
+
+	return Object.hasOwn(input, "id");
+};
+
 const REPEATED_NUMBERS_NAMES = new Map([
 	[2, "dubs"],
 	[3, "trips"],
@@ -12,29 +24,33 @@ const REPEATED_NUMBERS_NAMES = new Map([
 
 export default {
 	Name: "checkem",
-	Aliases: ["CheckEm","check'em"],
-	Author: "supinic",
-	Cooldown: 30000,
+	Aliases: ["CheckEm", "check'em"],
+	Cooldown: 10_000,
 	Description: "Similar to 4chan, posts the ID of your message as a number. Then, it checks it for dubs and higher.",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention", "pipe", "skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Code: (async function checkEm (context) {
-		let messageNumber;
-		const messageData = context.platformSpecificData;
-		if (typeof messageData?.id === "string") {
-			const pseudoUuid = messageData.id.replaceAll("-", "");
-			messageNumber = BigInt(`0x${pseudoUuid}`);
+	Code: function checkEm (context: Context<[]>) {
+		if (!context.channel) {
+			return {
+			    success: false,
+			    reply: "This command is not available in private messages!"
+			};
 		}
-		else {
+
+		const messageData = context.platformSpecificData;
+		if (!platformHasMessageId(messageData)) {
 			return {
 				success: false,
 				reply: `This command is not available on ${context.platform.capital}!`
 			};
 		}
 
-		const croppedNumber = String(messageNumber).slice(-12);
-		const list = [...croppedNumber];
+		const pseudoUuid = messageData.id.replaceAll("-", "");
+		const messageNumber = BigInt(`0x${pseudoUuid}`);
+
+		const croppedNumber = String(messageNumber).slice(0, 12);
+		const list = croppedNumber.split("");
 		const repeatedDigit = list.pop();
 
 		let repeatsAmount = 1;
@@ -60,7 +76,7 @@ export default {
 
 		const checkEmName = REPEATED_NUMBERS_NAMES.get(repeatsAmount);
 		if (repeatsAmount > 2) {
-			console.log(`${checkEmName}!`, new sb.Date(), context.channel.Name, context.user.Name);
+			console.log(`${checkEmName}!`, new SupiDate(), context.channel.Name, context.user.Name);
 		}
 
 		if (!checkEmName) {
@@ -74,6 +90,6 @@ export default {
 			reply: `${croppedNumber} - VisLaud Clap Congratulations on the ${checkEmName}!`,
 			cooldown
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+} satisfies CommandDefinition;

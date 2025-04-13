@@ -285,9 +285,9 @@ type ExecuteOptions = {
 };
 
 type CooldownObject = {
-	length?: number;
-	channel?: Channel["ID"],
-	user?: User["ID"]
+	length?: number | null;
+	channel?: Channel["ID"] | null,
+	user?: User["ID"] | null;
 	command?: Command["Name"];
 	ignoreCooldownFilters?: boolean;
 };
@@ -968,7 +968,7 @@ export class Command extends TemplateWithoutId {
 					? { length: cooldownData }
 					: cooldownData;
 
-				let { length = 0 } = cooldown;
+				let length = cooldown.length ?? 0;
 				const {
 					channel = channelID,
 					user = userData.ID,
