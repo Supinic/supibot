@@ -237,13 +237,19 @@ export default {
 			userData = await sb.User.get(options.User_Alias);
 		}
 
-		const filterResult = sb.Filter.getLocals(type, {
+		const rawFilterResult = sb.Filter.getLocals(type, {
 			channel: channelData,
 			user: userData,
 			command: options.Command,
 			invocation: options.Invocation,
 			includeInactive: true
 		});
+
+		const filterResult = rawFilterResult.filter(i => (
+			(i.Channel === (channelData?.ID ?? null))
+			&& (i.User_Alias === (userData?.ID ?? null))
+			&& (i.Command === options.Command)
+		));
 
 		if (filterResult.length !== 0) {
 			const [existing] = filterResult;
