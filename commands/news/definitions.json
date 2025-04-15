@@ -842,11 +842,25 @@
     "language": "Thai",
     "sources": [
       {
-        "name": "Prachachat",
+        "name": "ประชาชาติ",
         "url": "https://prachachat.net",
         "path": null,
         "endpoints": ["feed"],
         "helpers": ["rod41732"]
+      },
+      {
+        "name": "แนวหน้า",
+        "url": "https://naewna.com",
+        "path": null,
+        "endpoints": ["rss.php"],
+        "helpers": ["doge41732"]
+      },
+      {
+        "name": "ไทยรัฐออนไลน์",
+        "url": "https://www.thairath.co.th",
+        "path": "rss",
+        "endpoints": ["news"],
+        "helpers": ["doge41732"]
       }
     ]
   },
