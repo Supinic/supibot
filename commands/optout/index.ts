@@ -58,6 +58,8 @@ export default {
 		const optoutFilter = optOutFilters.find(i => (
 			i.Channel === parseFilterData.channel
 			&& i.Platform === parseFilterData.platform
+			&& i.Command === parseFilterData.command
+			&& i.Invocation === parseFilterData.invocation
 		));
 
 		if (optoutFilter) {

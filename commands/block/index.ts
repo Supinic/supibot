@@ -101,6 +101,7 @@ export default {
 			i.Channel === parseFilterData.channel
 			&& i.Platform === parseFilterData.platform
 			&& i.Blocked_User === parseFilterData.user
+			&& i.Command === parseFilterData.command
 		));
 
 		if (blockFilter) {
