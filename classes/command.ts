@@ -165,6 +165,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		return Filter.getMentionStatus({
 			user: this.user,
 			command: this.command,
+			invocation: this.invocation,
 			channel: this.channel ?? null,
 			platform: this.platform
 		});
@@ -929,6 +930,7 @@ export class Command extends TemplateWithoutId {
 			&& Filter.getMentionStatus({
 				user: userData,
 				command,
+				invocation: identifier,
 				channel: channelData,
 				platform: channelData.Platform
 			})
