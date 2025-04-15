@@ -2,7 +2,7 @@ import config from "./config.json" with { type: "json" };
 import Template from "./gpt-template.js";
 import GptHistory from "./history-control.js";
 
-const DEFAULT_SYSTEM_MESSAGE = "Keep the response as short and concise as possible.";
+const DEFAULT_SYSTEM_MESSAGE = "Keep the response as short and concise as possible. Don't include URLs and other links in the response unless explicitly asked.";
 
 export default class GptOpenAI extends Template {
 	static async getHistoryMode (context) {
@@ -32,12 +32,11 @@ export default class GptOpenAI extends Template {
 
 		if (context.params.image) {
 			return [
-				{ role: "system", content: DEFAULT_SYSTEM_MESSAGE },
 				...promptHistory,
 				{
 					role: "user",
 					content: [
-						{ type: "text", text: query },
+						{ type: "text", text: `${DEFAULT_SYSTEM_MESSAGE} ${query}` },
 						{ type: "image_url", image_url: { url: context.params.image } }
 					]
 				}
@@ -45,9 +44,8 @@ export default class GptOpenAI extends Template {
 		}
 		else {
 			return [
-				{ role: "system", content: DEFAULT_SYSTEM_MESSAGE },
 				...promptHistory,
-				{ role: "user", content: query }
+				{ role: "user", content: `${DEFAULT_SYSTEM_MESSAGE} ${query}` }
 			];
 		}
 	}
@@ -100,12 +98,15 @@ export default class GptOpenAI extends Template {
 		const json = {
 			model: modelData.url,
 			messages,
-			temperature,
-			top_p: 1,
-			frequency_penalty: 0,
-			presence_penalty: 0,
 			user: super.getUserHash(context)
 		};
+
+		if (modelData.search !== true) {
+			json.temperature = temperature;
+			json.top_p = 1;
+			json.frequency_penalty = 0;
+			json.presence_penalty = 0;
+		}
 
 		if (modelData.usesCompletionTokens === true) {
 			json.max_completion_tokens = 10_000;

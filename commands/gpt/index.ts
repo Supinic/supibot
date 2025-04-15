@@ -1,5 +1,5 @@
-import GptCache from "./cache-control.js";
 import GptConfig from "./config.json" with { type: "json" };
+import GptCache from "./cache-control.js";
 import GptMetrics from "./metrics.js";
 import GptModeration from "./moderation.js";
 
@@ -9,6 +9,39 @@ import GptNexra from "./gpt-nexra.js";
 import GptNexraComplements from "./gpt-nexra-complements.js";
 import GptDeepInfra from "./gpt-deepinfra.js";
 
+import { type Context, type CommandDefinition } from "../../classes/command.js";
+import { SupiError } from "supi-core";
+import { typedEntries } from "../../utils/ts-helpers.js";
+
+type ModelName = keyof typeof GptConfig.models;
+type ModelData = {
+	url: string;
+	type: "openai" | "deepinfra" | "nexra" | "nexra-complements";
+	default: boolean;
+	disabled?: boolean;
+	disableReason?: string;
+	inputLimit: number;
+	outputLimit: {
+		default: number;
+		maximum: number;
+	};
+	pricePerMtoken: number;
+	subscriberOnly?: boolean;
+	noSystemRole?: boolean;
+	usesCompletionTokens?: boolean;
+};
+
+const models = GptConfig.models as Record<ModelName, ModelData>;
+const defaultModelEntry = typedEntries(models).find(i => i[1].default);
+if (!defaultModelEntry) {
+	throw new SupiError({
+		message: "Assert error: $gpt has no default model"
+	});
+}
+
+const [defaultModelName, defaultModel] = defaultModelEntry;
+const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
+
 const handlerMap = {
 	openai: GptOpenAI,
 	nexra: GptNexra,
@@ -16,28 +49,29 @@ const handlerMap = {
 	deepinfra: GptDeepInfra
 };
 
-let isLogTablePresent = null;
+let isLogTablePresent: boolean | null = null;
+const params = [
+	{ name: "context", type: "string" },
+	{ name: "history", type: "string" },
+	{ name: "image", type: "string" },
+	{ name: "limit", type: "number" },
+	{ name: "model", type: "string" },
+	{ name: "temperature", type: "number" }
+] as const;
+export type GptContext = Context<typeof params>;
 
 export default {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
-	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: [
-		{ name: "context", type: "string" },
-		{ name: "history", type: "string" },
-		{ name: "image", type: "string" },
-		{ name: "limit", type: "number" },
-		{ name: "model", type: "string" },
-		{ name: "temperature", type: "number" }
-	],
+	Params: params,
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	initialize: async function () {
-		isLogTablePresent = await sb.Query.isTablePresent("data", "ChatGPT_Log");
+		isLogTablePresent = await core.Query.isTablePresent("data", "ChatGPT_Log");
 	},
-	Code: (async function chatGPT (context, ...args) {
+	Code: (async function chatGPT (context: GptContext, ...args) {
 		const query = args.join(" ").trim();
 		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
 		if (historyCommandResult) {
@@ -55,21 +89,29 @@ export default {
 			};
 		}
 
-		const [defaultModelName] = Object.entries(GptConfig.models).find(i => i[1].default === true);
-		const modelName = (context.params.model)
-			? context.params.model.toLowerCase()
-			: defaultModelName;
+		let modelName: ModelName;
+		if (context.params.model) {
+			const paramsModelName = context.params.model.toLowerCase();
+			if (!isModelName(paramsModelName)) {
+				const names = Object.keys(GptConfig.models).sort().join(", ");
+				return {
+					success: false,
+					cooldown: 2500,
+					reply: `Invalid ChatGPT model supported! Use one of: ${names}`
+				};
+			}
 
-		const modelData = GptConfig.models[modelName];
-		if (!modelData) {
-			const names = Object.keys(GptConfig.models).sort().join(", ");
-			return {
-				success: false,
-				cooldown: 2500,
-				reply: `Invalid ChatGPT model supported! Use one of: ${names}`
-			};
+			modelName = paramsModelName;
 		}
-		else if (modelData.disabled) {
+		else {
+			modelName = defaultModelName;
+		}
+
+		const modelData: ModelData = (context.params.model)
+			? models[modelName]
+			: defaultModel;
+
+		if (modelData.disabled) {
 			return {
 				success: false,
 				reply: `That model is currently disabled! Reason: ${modelData.disableReason ?? "(N/A)"}`
@@ -238,6 +280,7 @@ export default {
 			}
 
 			const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
+			const searchableEmoji = (modelData.search === true) ? "✔" : "❌";
 
 			return sb.Utils.tag.trim `
 				<tr>
@@ -246,6 +289,7 @@ export default {
 					<td>${modelData.pricePerMtoken}</td>
 					<td>${isDefaultEmoji}</td>
 					<td>${isSubscriberOnlyEmoji}</td>
+					<td>${searchableEmoji}</td>
 				</tr>
 			`;
 		}).join("");
@@ -258,6 +302,7 @@ export default {
 					<th>Pricing</th>
 					<th>Default</th>
 					<th>Sub only</th>
+					<th>Online search</th>
 				</thead>
 				<tbody>
 					${modelListHTML}
@@ -355,4 +400,4 @@ export default {
 			"<b>Warning!</b> This limit only applies to ChatGPT's <b>output</b>! You must control the length of your input query yourself."
 		];
 	})
-};
+} satisfies CommandDefinition;
