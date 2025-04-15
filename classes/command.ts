@@ -6,7 +6,9 @@ import {
 	type Counter,
 	type Query,
 	type MetricConfiguration,
-	type MetricType
+	type MetricType,
+	type Histogram,
+	type Gauge
 } from "supi-core";
 import type { BaseMessageOptions } from "discord.js";
 
@@ -415,7 +417,10 @@ export class Command extends TemplateWithoutId {
 		return `sb-command-${this.Name}`;
 	}
 
-	registerMetric (type: MetricType, label: string, options: Partial<MetricConfiguration<string>>) {
+	registerMetric <T extends string> (type: "Counter", label: string, options: Partial<MetricConfiguration<T>>): Counter<T>;
+	registerMetric <T extends string> (type: "Gauge", label: string, options: Partial<MetricConfiguration<T>>): Gauge<T>;
+	registerMetric <T extends string> (type: "Histogram", label: string, options: Partial<MetricConfiguration<T>>): Histogram<T>;
+	registerMetric <T extends string> (type: MetricType, label: string, options: Partial<MetricConfiguration<T>>) {
 		const metricLabel = `supibot_command_${this.Name}_${label}`;
 		const metricOptions = {
 			...options,

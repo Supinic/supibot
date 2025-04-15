@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
+
 import config from "./config.json" with { type: "json" };
 import History from "./history-control.js";
+import { GptContext, ModelData } from "./index.js";
 
 export default class GptTemplate {
-	static checkInputLimits (modelData, queryLength) {
+	static checkInputLimits (modelData: ModelData, queryLength: number) {
 		if (modelData.inputLimit && queryLength > modelData.inputLimit) {
 			const errorMessages = config.lengthLimitExceededMessage;
 			return {
@@ -25,12 +27,12 @@ export default class GptTemplate {
 		};
 	}
 
-	static determineOutputLimit (context, modelData) {
+	static determineOutputLimit (context: GptContext, modelData: ModelData) {
 		const { limit } = context.params;
 		let outputLimit = modelData.outputLimit.default;
 
 		if (typeof limit === "number") {
-			if (!sb.Utils.isValidInteger(limit)) {
+			if (!core.Utils.isValidInteger(limit)) {
 				return {
 					success: false,
 					reply: `Your provided output limit must be a positive integer!`,
@@ -57,7 +59,7 @@ export default class GptTemplate {
 		return { outputLimit };
 	}
 
-	static getTemperature (context) {
+	static getTemperature (context: GptContext) {
 		const { temperature } = context.params;
 		if (typeof temperature === "number" && (temperature < 0 || temperature > 2)) {
 			return {
@@ -70,20 +72,10 @@ export default class GptTemplate {
 		return { temperature };
 	}
 
-	static getUserHash (context) {
-		// @todo remove this try-catch and make the method return `null` with some param
-		let userPlatformID;
-		try {
-			userPlatformID = context.platform.fetchInternalPlatformIDByUsername(context.user);
-		}
-		catch {
-			userPlatformID = "N/A";
-		}
-
+	static getUserHash (context: GptContext) {
 		return createHash("sha1")
 			.update(context.user.Name)
 			.update(context.platform.Name)
-			.update(userPlatformID)
 			.digest()
 			.toString("hex");
 	}
@@ -110,7 +102,7 @@ export default class GptTemplate {
 
 	static isAvailable () {}
 
-	static async handleHistoryCommand (context, query) {
+	static async handleHistoryCommand (context: GptContext, query: string) {
 		if (!context.params.history) {
 			return;
 		}

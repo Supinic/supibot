@@ -1,13 +1,33 @@
-const check = async (context, text) => {
+import { SupiError } from "supi-core";
+import type { GptContext } from "./index.js";
+
+type ModerationCategory =
+	| "harrassment" | "harrassment/threatening"
+	| "hate" | "hate/threatening"
+	| "self-harm" | "self-harm/instructions" | "self-harm/intent"
+	| "sexual" | "sexual/minors"
+	| "violence" | "violence/graphic";
+
+type ModerationResult = {
+	categories: Record<ModerationCategory, boolean>;
+	category_scores: Record<ModerationCategory, number>;
+};
+type ModerationResponse = {
+	id: string;
+	model: string;
+	results: ModerationResult[];
+};
+
+export const check = async (context: GptContext, text: string) => {
 	if (!process.env.API_OPENAI_KEY) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No OpenAI key configured (API_OPENAI_KEY)"
 		});
 	}
 
 	text = text.trim();
 
-	const moderationCheck = await sb.Got.get("GenericAPI")({
+	const moderationCheck = await core.Got.get("GenericAPI")<ModerationResponse>({
 		method: "POST",
 		throwHttpErrors: false,
 		url: `https://api.openai.com/v1/moderations`,
@@ -52,8 +72,4 @@ const check = async (context, text) => {
 	return {
 		success: true
 	};
-};
-
-export default {
-	check
 };
