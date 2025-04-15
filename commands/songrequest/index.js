@@ -54,7 +54,7 @@ const checkLimits = (userData, playlist) => {
 
 	let totalTime = 0;
 	for (const request of userRequests) {
-		totalTime += (request.End_Time ?? request.Length) - (request.Start_Time ?? 0);
+		totalTime += (request.End_Time ?? request.Length ?? 0) - (request.Start_Time ?? 0);
 	}
 
 	totalTime = Math.ceil(totalTime);
