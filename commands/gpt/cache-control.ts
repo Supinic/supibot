@@ -38,8 +38,8 @@ type TokenUsage = {
 	summary: Record<string, number>;
 	dailyTokens: number;
 	hourlyTokens: number;
-	dailyReset: number;
-	hourlyReset: number;
+	dailyReset: number | null;
+	hourlyReset: number | null;
 	userLimits: {
 		daily: number;
 		hourly: number;
@@ -109,13 +109,6 @@ export const getTokenUsage = async (userData: User): Promise<TokenUsage> => {
 		dailyReset ??= finalCache.timestamp;
 	}
 
-	if (hourlyReset === null || dailyReset === null) {
-		throw new SupiError({
-			message: "Assert error: Hourly or daily reset is null",
-			args: { hourlyReset, dailyReset }
-		});
-	}
-
 	return {
 		hourlyTokens,
 		dailyTokens,
@@ -136,6 +129,13 @@ export const checkLimits = async (userData: User) => {
 	} = await getTokenUsage(userData);
 
 	if (dailyTokens >= userLimits.daily) {
+		if (dailyReset === null) {
+			throw new SupiError({
+				message: "Assert error: Daily reset is null while token usage exists",
+				args: { dailyReset, dailyTokens }
+			});
+		}
+
 		const nextDailyReset = new SupiDate(dailyReset).addDays(1);
 		const delta = core.Utils.timeDelta(nextDailyReset);
 		return {
@@ -144,6 +144,13 @@ export const checkLimits = async (userData: User) => {
 		};
 	}
 	else if (hourlyTokens >= userLimits.hourly) {
+		if (hourlyReset === null) {
+			throw new SupiError({
+				message: "Assert error: Hourly reset is null while token usage exists",
+				args: { hourlyReset, hourlyTokens }
+			});
+		}
+
 		const nextHourlyReset = new SupiDate(hourlyReset).addHours(1);
 		const delta = core.Utils.timeDelta(nextHourlyReset);
 		return {
