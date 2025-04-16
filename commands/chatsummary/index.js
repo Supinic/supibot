@@ -1,5 +1,5 @@
-import GptNexra from "../gpt/gpt-nexra.js";
-import GptModeration from "../gpt/moderation.js";
+import { GptNexra } from "../gpt/gpt-nexra.js";
+import { check as checkModeration } from "../gpt/moderation.js";
 
 const RAW_TEXT_REGEX = /^\[(?<date>[\d-\s:]+)]\s+#\w+\s+(?<username>\w+):\s+(?<message>.+?)$/;
 
@@ -177,7 +177,7 @@ export default {
 		}
 
 		const message = GptNexra.extractMessage(response);
-		const modCheck = await GptModeration.check(context, message);
+		const modCheck = await checkModeration(context, message);
 		if (!modCheck.success) {
 			return modCheck;
 		}
