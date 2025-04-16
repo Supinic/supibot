@@ -446,7 +446,13 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		return `#${name}_private_messages`;
 	}
 
-	public static get (identifier: Like, host?: string | null) {
+	public static get <T extends Platform> (identifier: T, host?: string): T;
+	public static get (identifier: "twitch"): TwitchPlatform | null;
+	public static get (identifier: "discord"): DiscordPlatform | null;
+	public static get (identifier: "cytube"): CytubePlatform | null;
+	public static get (identifier: "irc", host: string): IrcPlatform | null;
+	public static get (identifier: Like, host?: string): Platform | null;
+	public static get (identifier: Like, host?: string | null): Platform | null {
 		if (identifier instanceof Platform) {
 			return identifier;
 		}
@@ -472,6 +478,21 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 				return eligible[0];
 			}
 		}
+	}
+
+	public static getAsserted (identifier: "twitch"): TwitchPlatform;
+	public static getAsserted (identifier: "discord"): DiscordPlatform;
+	public static getAsserted (identifier: "cytube"): CytubePlatform;
+	public static getAsserted (identifier: "irc", host: string): IrcPlatform;
+	public static getAsserted (identifier: string | number) {
+		const platform = Platform.get(identifier);
+		if (!platform) {
+			throw new SupiError({
+				message: `Assert error: asserted Platform ${identifier} is not available`
+			});
+		}
+
+		return platform;
 	}
 
 	public static getList (): Platform[] {

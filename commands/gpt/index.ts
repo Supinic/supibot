@@ -11,8 +11,6 @@ import { GptDeepInfra } from "./gpt-deepinfra.js";
 import { type Context, type CommandDefinition } from "../../classes/command.js";
 import { SupiError } from "supi-core";
 import { typedEntries } from "../../utils/ts-helpers.js";
-import type { TwitchPlatform } from "../../platforms/twitch.js";
-import type { Platform } from "../../platforms/template.js";
 
 export type ModelName = keyof typeof GptConfig.models;
 export type ModelData = {
@@ -46,13 +44,6 @@ if (!defaultModelEntry) {
 
 const [defaultModelName, defaultModel] = defaultModelEntry;
 const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
-const isTwitchPlatform = (input: Platform | null): input is TwitchPlatform => {
-	if (input === null) {
-		return false;
-	}
-
-	return (input.name === "twitch");
-};
 
 const handlerMap = {
 	openai: GptOpenAI,
@@ -130,13 +121,7 @@ export default {
 			};
 		}
 		else if (modelData.subscriberOnly === true) {
-			const platform = sb.Platform.get("twitch");
-			if (!isTwitchPlatform(platform)) {
-				throw new SupiError({
-					message: "Assert error: Input platform is not TwitchPlatform"
-				});
-			}
-
+			const platform = sb.Platform.getAsserted("twitch");
 			const isSubscribed = await platform.fetchUserAdminSubscription(context.user);
 			if (!isSubscribed) {
 				return {

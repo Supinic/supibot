@@ -459,14 +459,7 @@ export class Channel extends TemplateWithId {
 		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs, ...filterChannelIDs]);
 		let channelsData = [...channelIDs].map(i => Channel.get(i)).filter(Boolean) as Channel[];
 		if (platform) {
-			const platformData = Platform.get(platform);
-			if (!platformData) {
-				throw new SupiError({
-					message: "Invalid platform provided"
-				});
-			}
-
-			channelsData = channelsData.filter(i => i.Platform === platformData);
+			channelsData = channelsData.filter(i => i.Platform === platform);
 		}
 
 		return channelsData;

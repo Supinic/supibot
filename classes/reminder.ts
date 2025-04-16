@@ -493,12 +493,6 @@ export class Reminder extends TemplateWithId {
 					reminderPlatform = Platform.get(reminder.Platform);
 				}
 
-				if (!reminderPlatform) {
-					throw new SupiError({
-						message: "Unknown Platform in Reminder"
-					});
-				}
-
 				const uncheckedAuthorMention = await reminderPlatform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
 				const authorMention = (authorBanphraseCheck.passed) ? uncheckedAuthorMention : "[Banphrased username]";
