@@ -1,10 +1,11 @@
+import type { GotResponse } from "supi-core";
 import type { Command } from "../../classes/command.js";
-import type GptHandler from "./gpt-template.js";
+import type { GptTemplate } from "./gpt-template.js";
 import type { GptContext, ModelName } from "./index.js";
 
 type GptMetricsData = {
-	Handler: GptHandler;
-	response: unknown;
+	Handler: GptTemplate;
+	response: GotResponse;
 	command: Command;
 	context: GptContext;
 	modelName: ModelName;
@@ -42,9 +43,14 @@ export const process = (data: GptMetricsData) => {
 		labelNames: ["model"]
 	});
 
-	promptTokensCounter.inc(labels, inputTokens);
-	outputTokensCounter.inc(labels, outputTokens);
-	usageCounter.inc({ ...labels, success }, 1);
+	if (inputTokens !== null) {
+		promptTokensCounter.inc(labels, inputTokens);
+	}
+	if (outputTokens !== null) {
+		outputTokensCounter.inc(labels, outputTokens);
+	}
+
+	usageCounter.inc({ ...labels, success: String(success) }, 1);
 
 	const processingTime = Handler.getProcessingTime(response);
 	if (processingTime !== null) {

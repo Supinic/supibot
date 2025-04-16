@@ -3,14 +3,13 @@ import GptCache from "./cache-control.js";
 import { process as processMetrics } from "./metrics.js";
 import { check as checkModeration } from "./moderation.js";
 
-import GptTemplate from "./gpt-template.js";
-import GptOpenAI from "./gpt-openai.js";
-import GptNexra from "./gpt-nexra.js";
-import GptNexraComplements from "./gpt-nexra-complements.js";
-import GptDeepInfra from "./gpt-deepinfra.js";
+import { determineOutputLimit, handleHistoryCommand } from "./gpt-template.js";
+import { GptOpenAI } from "./gpt-openai.js";
+import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
+import { GptDeepInfra } from "./gpt-deepinfra.js";
 
 import { type Context, type CommandDefinition } from "../../classes/command.js";
-import { SupiDate, SupiError } from "supi-core";
+import { SupiError } from "supi-core";
 import { typedEntries } from "../../utils/ts-helpers.js";
 import type { TwitchPlatform } from "../../platforms/twitch.js";
 import type { Platform } from "../../platforms/template.js";
@@ -32,6 +31,9 @@ export type ModelData = {
 	noSystemRole?: boolean;
 	usesCompletionTokens?: boolean;
 	search?: boolean;
+	flags?: {
+		yapping?: boolean;
+	}
 };
 
 const models = GptConfig.models as Record<ModelName, ModelData>;
@@ -83,7 +85,7 @@ export default {
 	},
 	Code: (async function chatGPT (context: GptContext, ...args) {
 		const query = args.join(" ").trim();
-		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
+		const historyCommandResult = await handleHistoryCommand(context, query);
 		if (historyCommandResult) {
 			return {
 				...historyCommandResult,
@@ -172,7 +174,7 @@ export default {
 			throw e;
 		}
 
-		if (executionResult.success === false) {
+		if (!executionResult.success) {
 			return executionResult;
 		}
 
@@ -185,20 +187,7 @@ export default {
 				context.user
 			);
 
-			if (response.statusCode === 429 && response.body.error?.type === "insufficient_quota") {
-				const { year, month } = new SupiDate(SupiDate.getTodayUTC());
-				const nextMonthName = new SupiDate(year, month + 1, 1).format("F Y");
-				const nextMonthDelta = core.Utils.timeDelta(SupiDate.UTC(year, month + 1, 1));
-
-				return {
-					success: false,
-					reply: core.Utils.tag.trim `
-						I have ran out of credits for the ChatGPT service for this month!
-						Please try again in ${nextMonthName}, which will begin ${nextMonthDelta}
-					`
-				};
-			}
-			else if (response.statusCode === 429 || response.statusCode >= 500) {
+			if (response.statusCode === 429 || response.statusCode >= 500) {
 				return {
 					success: false,
 					reply: `The ChatGPT service is likely overloaded at the moment! Please try again later.`
@@ -208,12 +197,15 @@ export default {
 				const idString = (logID) ? `Mention this ID: Log-${logID}` : "";
 				return {
 					success: false,
-					reply: `Something went wrong with the ChatGPT service! Please let @Supinic know. ${idString}`
+					reply: `Something unexpected wrong with the ChatGPT service! Please let @Supinic know. ${idString}`
 				};
 			}
 		}
 
-		await GptCache.addUsageRecord(context.user, Handler.getUsageRecord(response), modelData);
+		const usageRecord = Handler.getUsageRecord(response);
+		if (usageRecord !== null) {
+			await GptCache.addUsageRecord(context.user, usageRecord, modelData);
+		}
 
 		const reply = Handler.extractMessage(response);
 		if (typeof reply !== "string") {
@@ -232,12 +224,13 @@ export default {
 		else {
 			await Handler.setHistory(context, query, reply);
 
-			const { outputLimit } = Handler.determineOutputLimit(context, modelData);
+			const outputLimitCheck = determineOutputLimit(context, modelData);
 			const completionTokens = Handler.getCompletionTokens(response);
 
-			const emoji = (completionTokens >= outputLimit)
-				? "⏳"
-				: "🤖";
+			let emoji = "🤖";
+			if (outputLimitCheck.success && completionTokens !== null && completionTokens >= outputLimitCheck.outputLimit) {
+				emoji = "⏳";
+			}
 
 			result = {
 				reply: `${emoji} ${reply}`
