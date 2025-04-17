@@ -1,12 +1,26 @@
-const process = (data) => {
-	const { Handler, response, command, context, modelData, success } = data;
+import type { GotResponse } from "supi-core";
+import type { Command } from "../../classes/command.js";
+import type { GptTemplate } from "./gpt-template.js";
+import type { GptContext, ModelName } from "./index.js";
+
+type GptMetricsData = {
+	Handler: GptTemplate;
+	response: GotResponse;
+	command: Command;
+	context: GptContext;
+	modelName: ModelName;
+	success: boolean;
+};
+
+export const process = (data: GptMetricsData) => {
+	const { Handler, response, command, context, modelName, success } = data;
 	const inputTokens = Handler.getPromptTokens(response);
 	const outputTokens = Handler.getCompletionTokens(response);
 
 	const labels = {
 		channel: context.channel?.Name ?? "(private)",
 		platform: context.platform.Name,
-		model: modelData.url
+		model: modelName
 	};
 
 	const promptTokensCounter = command.registerMetric("Counter", "input_tokens_total", {
@@ -29,16 +43,17 @@ const process = (data) => {
 		labelNames: ["model"]
 	});
 
-	promptTokensCounter.inc(labels, inputTokens);
-	outputTokensCounter.inc(labels, outputTokens);
-	usageCounter.inc({ ...labels, success }, 1);
+	if (inputTokens !== null) {
+		promptTokensCounter.inc(labels, inputTokens);
+	}
+	if (outputTokens !== null) {
+		outputTokensCounter.inc(labels, outputTokens);
+	}
+
+	usageCounter.inc({ ...labels, success: String(success) }, 1);
 
 	const processingTime = Handler.getProcessingTime(response);
 	if (processingTime !== null) {
-		generationHistogram.observe({ model: modelData.name }, processingTime);
+		generationHistogram.observe({ model: modelName }, processingTime);
 	}
-};
-
-export default {
-	process
 };

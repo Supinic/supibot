@@ -215,6 +215,7 @@ export default tseslint.config(
 			"@typescript-eslint/no-confusing-void-expression": ["warn", { // Ignore arrow functions implicitly "returning" another void function's result
 				ignoreVoidReturningFunctions: true
 			}],
+			"@typescript-eslint/no-unused-vars": "warn", // Only warn for unused vars instead of resulting in an error
 
 			"unicorn/prevent-abbreviations": "off",
 			"unicorn/no-null": "off",

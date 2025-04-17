@@ -1,45 +1,82 @@
-import GptCache from "./cache-control.js";
 import GptConfig from "./config.json" with { type: "json" };
-import GptMetrics from "./metrics.js";
-import GptModeration from "./moderation.js";
+import GptCache from "./cache-control.js";
+import { process as processMetrics } from "./metrics.js";
+import { check as checkModeration } from "./moderation.js";
 
-import GptTemplate from "./gpt-template.js";
-import GptOpenAI from "./gpt-openai.js";
-import GptNexra from "./gpt-nexra.js";
-import GptNexraComplements from "./gpt-nexra-complements.js";
-import GptDeepInfra from "./gpt-deepinfra.js";
+import { determineOutputLimit, handleHistoryCommand } from "./gpt-template.js";
+import { GptOpenAI } from "./gpt-openai.js";
+import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
+import { GptDeepInfra } from "./gpt-deepinfra.js";
+
+import { type Context, type CommandDefinition } from "../../classes/command.js";
+import { SupiError } from "supi-core";
+import { typedEntries } from "../../utils/ts-helpers.js";
+
+export type ModelName = keyof typeof GptConfig.models;
+export type ModelData = {
+	url: string;
+	type: "openai" | "deepinfra" | "nexra" | "nexra-complements";
+	default: boolean;
+	disabled?: boolean;
+	disableReason?: string;
+	inputLimit: number;
+	outputLimit: {
+		default: number;
+		maximum: number;
+	};
+	pricePerMtoken: number;
+	subscriberOnly?: boolean;
+	noSystemRole?: boolean;
+	usesCompletionTokens?: boolean;
+	search?: boolean;
+	flags?: {
+		yapping?: boolean;
+	}
+};
+
+const models = GptConfig.models as Record<ModelName, ModelData>;
+const defaultModelEntry = typedEntries(models).find(i => i[1].default);
+if (!defaultModelEntry) {
+	throw new SupiError({
+		message: "Assert error: $gpt has no default model"
+	});
+}
+
+const [defaultModelName, defaultModel] = defaultModelEntry;
+const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
 
 const handlerMap = {
 	openai: GptOpenAI,
 	nexra: GptNexra,
 	"nexra-complements": GptNexraComplements,
 	deepinfra: GptDeepInfra
-};
+} as const;
 
-let isLogTablePresent = null;
+let isLogTablePresent: boolean | null = null;
+const params = [
+	{ name: "context", type: "string" },
+	{ name: "history", type: "string" },
+	{ name: "image", type: "string" },
+	{ name: "limit", type: "number" },
+	{ name: "model", type: "string" },
+	{ name: "temperature", type: "number" }
+] as const;
+export type GptContext = Context<typeof params>;
 
 export default {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
-	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: [
-		{ name: "context", type: "string" },
-		{ name: "history", type: "string" },
-		{ name: "image", type: "string" },
-		{ name: "limit", type: "number" },
-		{ name: "model", type: "string" },
-		{ name: "temperature", type: "number" }
-	],
+	Params: params,
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	initialize: async function () {
-		isLogTablePresent = await sb.Query.isTablePresent("data", "ChatGPT_Log");
+		isLogTablePresent = await core.Query.isTablePresent("data", "ChatGPT_Log");
 	},
-	Code: (async function chatGPT (context, ...args) {
+	Code: (async function chatGPT (context: GptContext, ...args) {
 		const query = args.join(" ").trim();
-		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
+		const historyCommandResult = await handleHistoryCommand(context, query);
 		if (historyCommandResult) {
 			return {
 				...historyCommandResult,
@@ -55,28 +92,36 @@ export default {
 			};
 		}
 
-		const [defaultModelName] = Object.entries(GptConfig.models).find(i => i[1].default === true);
-		const modelName = (context.params.model)
-			? context.params.model.toLowerCase()
-			: defaultModelName;
+		let modelName: ModelName;
+		if (context.params.model) {
+			const paramsModelName = context.params.model.toLowerCase();
+			if (!isModelName(paramsModelName)) {
+				const names = Object.keys(GptConfig.models).sort().join(", ");
+				return {
+					success: false,
+					cooldown: 2500,
+					reply: `Invalid ChatGPT model supported! Use one of: ${names}`
+				};
+			}
 
-		const modelData = GptConfig.models[modelName];
-		if (!modelData) {
-			const names = Object.keys(GptConfig.models).sort().join(", ");
-			return {
-				success: false,
-				cooldown: 2500,
-				reply: `Invalid ChatGPT model supported! Use one of: ${names}`
-			};
+			modelName = paramsModelName;
 		}
-		else if (modelData.disabled) {
+		else {
+			modelName = defaultModelName;
+		}
+
+		const modelData: ModelData = (context.params.model)
+			? models[modelName]
+			: defaultModel;
+
+		if (modelData.disabled) {
 			return {
 				success: false,
 				reply: `That model is currently disabled! Reason: ${modelData.disableReason ?? "(N/A)"}`
 			};
 		}
 		else if (modelData.subscriberOnly === true) {
-			const platform = sb.Platform.get("twitch");
+			const platform = sb.Platform.getAsserted("twitch");
 			const isSubscribed = await platform.fetchUserAdminSubscription(context.user);
 			if (!isSubscribed) {
 				return {
@@ -87,18 +132,12 @@ export default {
 		}
 
 		const limitCheckResult = await GptCache.checkLimits(context.user);
-		if (limitCheckResult.success !== true) {
+		if (!limitCheckResult.success) {
 			return limitCheckResult;
 		}
 
 		const Handler = handlerMap[modelData.type];
-		if (!Handler) {
-			return {
-				success: false,
-				reply: `No GPT handler found for type ${modelData.type}! Ensure the configuration is correct.`
-			};
-		}
-		else if (!Handler.isAvailable()) {
+		if (!Handler.isAvailable()) {
 			return {
 				success: false,
 				reply: `This model is not currently available! This is most likely due to incorrect configuration.`
@@ -110,7 +149,7 @@ export default {
 			executionResult = await Handler.execute(context, query, modelData);
 		}
 		catch (e) {
-			if (sb.Got.isRequestError(e)) {
+			if (core.Got.isRequestError(e)) {
 				return {
 					success: false,
 					reply: Handler.getRequestErrorMessage()
@@ -120,7 +159,7 @@ export default {
 			throw e;
 		}
 
-		if (executionResult.success === false) {
+		if (!executionResult.success) {
 			return executionResult;
 		}
 
@@ -133,20 +172,7 @@ export default {
 				context.user
 			);
 
-			if (response.statusCode === 429 && response.body.error?.type === "insufficient_quota") {
-				const { year, month } = new sb.Date(sb.Date.getTodayUTC());
-				const nextMonthName = new sb.Date(year, month + 1, 1).format("F Y");
-				const nextMonthDelta = sb.Utils.timeDelta(sb.Date.UTC(year, month + 1, 1));
-
-				return {
-					success: false,
-					reply: sb.Utils.tag.trim `
-						I have ran out of credits for the ChatGPT service for this month!
-						Please try again in ${nextMonthName}, which will begin ${nextMonthDelta}
-					`
-				};
-			}
-			else if (response.statusCode === 429 || response.statusCode >= 500) {
+			if (response.statusCode === 429 || response.statusCode >= 500) {
 				return {
 					success: false,
 					reply: `The ChatGPT service is likely overloaded at the moment! Please try again later.`
@@ -156,12 +182,15 @@ export default {
 				const idString = (logID) ? `Mention this ID: Log-${logID}` : "";
 				return {
 					success: false,
-					reply: `Something went wrong with the ChatGPT service! Please let @Supinic know. ${idString}`
+					reply: `Something unexpected wrong with the ChatGPT service! Please let @Supinic know. ${idString}`
 				};
 			}
 		}
 
-		await GptCache.addUsageRecord(context.user, Handler.getUsageRecord(response), modelName);
+		const usageRecord = Handler.getUsageRecord(response);
+		if (usageRecord !== null) {
+			await GptCache.addUsageRecord(context.user, usageRecord, modelData);
+		}
 
 		const reply = Handler.extractMessage(response);
 		if (typeof reply !== "string") {
@@ -171,21 +200,22 @@ export default {
 			};
 		}
 
-		const moderationResult = await GptModeration.check(context, reply);
+		const moderationResult = await checkModeration(context, reply);
 
 		let result;
-		if (moderationResult.success === false) {
+		if (!moderationResult.success) {
 			result = moderationResult;
 		}
 		else {
 			await Handler.setHistory(context, query, reply);
 
-			const { outputLimit } = Handler.determineOutputLimit(context, modelData);
+			const outputLimitCheck = determineOutputLimit(context, modelData);
 			const completionTokens = Handler.getCompletionTokens(response);
 
-			const emoji = (completionTokens >= outputLimit)
-				? "⏳"
-				: "🤖";
+			let emoji = "🤖";
+			if (outputLimitCheck.success && completionTokens !== null && completionTokens >= outputLimitCheck.outputLimit) {
+				emoji = "⏳";
+			}
 
 			result = {
 				reply: `${emoji} ${reply}`
@@ -193,7 +223,7 @@ export default {
 		}
 
 		if (isLogTablePresent) {
-			const row = await sb.Query.getRow("data", "ChatGPT_Log");
+			const row = await core.Query.getRow("data", "ChatGPT_Log");
 			const inputTokens = Handler.getPromptTokens(response);
 			const completionTokens = Handler.getCompletionTokens(response);
 
@@ -214,43 +244,39 @@ export default {
 			await row.save({ skipLoad: true });
 		}
 
-		GptMetrics.process({
+		processMetrics({
 			command: this,
 			context,
 			Handler,
 			response,
-			modelData,
+			modelName,
 			success: moderationResult.success
 		});
 
 		return result;
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (prefix) => {
 		const { regular, subscriber } = GptConfig.userTokenLimits;
 		const { outputLimit } = GptConfig;
 
-		let defaultModelName = "N/A";
-		const modelListHTML = Object.entries(GptConfig.models).map(([name, modelData]) => {
-			let isDefaultEmoji = "❌";
-			if (modelData.default) {
-				defaultModelName = name;
-				isDefaultEmoji = "✔";
-			}
-
+		const modelListHTML = typedEntries(models).map(([name, modelData]) => {
+			const isDefaultEmoji = (modelData.default) ? "✔" : "❌";
 			const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
+			const searchableEmoji = (modelData.search === true) ? "✔" : "❌";
 
-			return sb.Utils.tag.trim `
+			return core.Utils.tag.trim `
 				<tr>
 					<td>${name}</td>
 					<td>${modelData.type}</td>
 					<td>${modelData.pricePerMtoken}</td>
 					<td>${isDefaultEmoji}</td>
 					<td>${isSubscriberOnlyEmoji}</td>
+					<td>${searchableEmoji}</td>
 				</tr>
 			`;
 		}).join("");
 
-		const modelsTableHTML = sb.Utils.tag.trim `
+		const modelsTableHTML = core.Utils.tag.trim `
 			<table>
 				<thead>
 					<th>Name</th>
@@ -258,6 +284,7 @@ export default {
 					<th>Pricing</th>
 					<th>Default</th>
 					<th>Sub only</th>
+					<th>Online search</th>
 				</thead>
 				<tbody>
 					${modelListHTML}
@@ -288,13 +315,13 @@ export default {
 
 			"<h5>Models</h5>",
 			"Models you can choose from:",
-			`${modelsTableHTML}`,
+			modelsTableHTML,
 
 			"<h5>Basic usage</h5>",
 			`<code>${prefix}gpt (your query)</code>`,
 			`<code>${prefix}gpt What should I eat today?</code>`,
 			"Queries ChatGPT for whatever you ask or tell it.",
-			`This uses the <code>${sb.Utils.capitalize(defaultModelName)}</code> model by default.`,
+			`This uses the <code>${core.Utils.capitalize(defaultModelName)}</code> model by default.`,
 			"",
 
 			`<code>${prefix}gpt model:(name) (your query)</code>`,
@@ -354,5 +381,5 @@ export default {
 
 			"<b>Warning!</b> This limit only applies to ChatGPT's <b>output</b>! You must control the length of your input query yourself."
 		];
-	})
-};
+	}
+} satisfies CommandDefinition;
