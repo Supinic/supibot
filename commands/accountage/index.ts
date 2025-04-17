@@ -1,3 +1,7 @@
+import { SupiDate } from "supi-core";
+import type { CommandDefinition } from "../../classes/command.js";
+import type { IvrUserData } from "../../@types/globals.js";
+
 export default {
 	Name: "accountage",
 	Aliases: ["accage"],
@@ -7,9 +11,9 @@ export default {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Code: (async function accountAge (context, user) {
+	Code: (async function accountAge (context, user?: string) {
 		const login = sb.User.normalizeUsername(user ?? context.user.Name).toLowerCase();
-		const response = await sb.Got.get("IVR")({
+		const response = await core.Got.get("IVR")<IvrUserData[]>({
 			url: "v2/twitch/user",
 			searchParams: { login }
 		});
@@ -21,21 +25,21 @@ export default {
 		}
 
 		const creationDate = response.body[0].createdAt;
-		const created = new sb.Date(creationDate);
-		const delta = sb.Utils.timeDelta(created, false, true);
-		const pronoun = (login.toLowerCase() === context.user.Name) ? "Your" : "Their";
+		const created = new SupiDate(creationDate);
 
 		let anniversary = "";
-		const now = new sb.Date();
+		const now = new SupiDate();
+		const pronoun = (login.toLowerCase() === context.user.Name) ? "Your" : "Their";
 		if (now.year > created.year && now.month === created.month && now.day === created.day) {
 			const who = (login === context.platform.Self_Name) ? "my" : pronoun.toLowerCase();
 
 			anniversary = `It's ${who} ${now.year - created.year}. Twitch anniversary! FeelsBirthdayMan Clap`;
 		}
 
+		const delta = core.Utils.timeDelta(created, false, true);
 		return {
 			reply: `${pronoun} Twitch account was created ${delta}. ${anniversary}`
 		};
 	}),
 	Dynamic_Description: null
-};
+} satisfies CommandDefinition;
