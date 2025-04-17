@@ -10,6 +10,7 @@ type HelixResponse = {
 };
 type EmoteJsonObject = {
 	timestamp: number;
+	changed: string[];
 	added: HelixResponse["data"];
 	deleted: HelixResponse["data"];
 };
@@ -80,11 +81,12 @@ const definition: CronDefinition = {
 		const json: EmoteJsonObject = {
 			timestamp: now.valueOf(),
 			added: [],
-			deleted: []
+			deleted: [],
+			changed: [...differentEmoteIds]
 		};
 
 		for (const emoteId of differentEmoteIds) {
-			const emote = previousEmotes.find(i => i.id === emoteId);
+			const emote = previousEmotes.find(i => i.id === emoteId) ?? newEmotes.find(i => i.id === emoteId);
 			if (!emote) {
 				continue;
 			}
