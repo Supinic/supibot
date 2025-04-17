@@ -21,7 +21,7 @@ export default {
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Code: (async function gag (context, ...args) {
+	Code: async function nineGag (context, ...args) {
 		const options = (args.length === 0)
 			? { url: "https://9gag.com/v1/group-posts/group/default/type/hot" }
 			: {
@@ -51,8 +51,8 @@ export default {
 		return {
 			reply: `${title} - https://9gag.com/gag/${post.id} - Score: ${post.upVoteCount}, posted ${delta}.`
 		};
-	}),
-	Dynamic_Description: ((prefix) => [
+	},
+	Dynamic_Description: (prefix) => [
 		"Either searches 9gag for a post that matches your query, or posts a random one if you don't provide anything to search.",
 		"",
 
@@ -62,5 +62,5 @@ export default {
 
 		`<code>${prefix}9gag (query)</code>`,
 		"Fetches a recent random 9gag post that matches your query."
-	])
+	]
 } satisfies CommandDefinition;
