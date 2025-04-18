@@ -14,7 +14,7 @@ export default {
 			};
 		}
 
-		const searchHTML = await sb.Got.get("FakeAgent")({
+		const searchHTML = await core.Got.get("FakeAgent")({
 			url: "https://knowyourmeme.com/search",
 			searchParams: {
 				q: args.join(" ")
@@ -22,7 +22,7 @@ export default {
 			responseType: "text"
 		}).text();
 
-		const $search = sb.Utils.cheerio(searchHTML);
+		const $search = core.Utils.cheerio(searchHTML);
 		const firstLink = $search(".entry_list a").first().attr("href");
 		if (!firstLink) {
 			return {
@@ -30,13 +30,13 @@ export default {
 			};
 		}
 
-		const detailHTML = await sb.Got.get("FakeAgent")({
+		const detailHTML = await core.Got.get("FakeAgent")({
 			prefixUrl: "https://knowyourmeme.com",
 			url: firstLink.replace(/^\//, ""),
 			responseType: "text"
 		}).text();
 
-		const $detail = sb.Utils.cheerio(detailHTML);
+		const $detail = core.Utils.cheerio(detailHTML);
 		const summary = $detail("#entry_body h2#about")
 			.first()
 			.next()

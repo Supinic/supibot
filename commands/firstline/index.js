@@ -55,7 +55,7 @@ export default {
 			? "You have"
 			: "That user has";
 
-		let metaData = await sb.Query.getRecordset(rs => rs
+		let metaData = await core.Query.getRecordset(rs => rs
 			.select("First_Message_Posted", "First_Message_Text")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", targetUser.ID)
@@ -72,14 +72,14 @@ export default {
 		}
 		else if (!metaData.First_Message_Posted) {
 			const dbChannelName = targetChannel.getDatabaseName();
-			if (!await sb.Query.isTablePresent("chat_line", dbChannelName)) {
+			if (!await core.Query.isTablePresent("chat_line", dbChannelName)) {
 				return {
 					success: false,
 					reply: `${userArticle} no first line data available in ${channelArticle} channel!`
 				};
 			}
 
-			const lineData = await sb.Query.getRecordset(rs => rs
+			const lineData = await core.Query.getRecordset(rs => rs
 				.select("Text", "Posted")
 				.from("chat_line", dbChannelName)
 				.where("User_Alias = %n", targetUser.ID)
@@ -88,7 +88,7 @@ export default {
 				.single()
 			);
 
-			const row = await sb.Query.getRow("chat_data", "Message_Meta_User_Alias");
+			const row = await core.Query.getRow("chat_data", "Message_Meta_User_Alias");
 			await row.load({
 				User_Alias: targetUser.ID,
 				Channel: targetChannel.ID
@@ -118,7 +118,7 @@ export default {
 			partialReplies: [
 				{
 					bancheck: false,
-					message: `${prefix} first message in ${channelArticle} channel was (${sb.Utils.timeDelta(metaData.First_Message_Posted)}):`
+					message: `${prefix} first message in ${channelArticle} channel was (${core.Utils.timeDelta(metaData.First_Message_Posted)}):`
 				},
 				{
 					bancheck: true,

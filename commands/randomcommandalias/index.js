@@ -27,7 +27,7 @@ export default {
 			};
 		}
 
-		const randomAlias = await sb.Query.getRecordset(rs => rs
+		const randomAlias = await core.Query.getRecordset(rs => rs
 			.select("ID", "User_Alias", "Name")
 			.from("data", "Custom_Command_Alias")
 			.where({ condition: Boolean(context.params.body) }, "Arguments %*like*", context.params.body)

@@ -65,7 +65,7 @@ export default {
 		}
 
 		/** @type {{ ID: number, Active: boolean }} */
-		const subData = await sb.Query.getRecordset(rs => rs
+		const subData = await core.Query.getRecordset(rs => rs
 			.select("ID", "Active", "Channel", "Platform", "Flags")
 			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
@@ -75,7 +75,7 @@ export default {
 		);
 
 		if (typeof event.handler === "function") {
-			const subscription = await sb.Query.getRow("data", "Event_Subscription");
+			const subscription = await core.Query.getRow("data", "Event_Subscription");
 			if (subData?.ID) {
 				await subscription.load(subData.ID);
 			}
@@ -114,7 +114,7 @@ export default {
 				&& subData.Active
 				&& (subData.Channel !== currentChannelID || subData.Platform !== context.platform.ID)
 			) {
-				await sb.Query.getRecordUpdater(rs => rs
+				await core.Query.getRecordUpdater(rs => rs
 					.update("data", "Event_Subscription")
 					.set("Channel", currentChannelID)
 					.set("Platform", context.platform.ID)
@@ -162,7 +162,7 @@ export default {
 				}
 			}
 
-			await sb.Query.getRecordUpdater(rs => rs
+			await core.Query.getRecordUpdater(rs => rs
 				.update("data", "Event_Subscription")
 				.set("Active", !subData.Active)
 				.set("Flags", JSON.stringify(flags))
@@ -181,7 +181,7 @@ export default {
 				};
 			}
 
-			const row = await sb.Query.getRow("data", "Event_Subscription");
+			const row = await core.Query.getRow("data", "Event_Subscription");
 			row.setValues({
 				User_Alias: context.user.ID,
 				Platform: context.platform.ID,
@@ -198,7 +198,7 @@ export default {
 		}
 	},
 	Dynamic_Description: async function (prefix) {
-		const typesList = subscriptions.map(i => sb.Utils.tag.trim `
+		const typesList = subscriptions.map(i => core.Utils.tag.trim `
 			<li>
 				<code>${i.name}</code>
 				<br>Aliases: ${i.aliases.map(j => `<code>${j}</code>`).join(", ") || "(none)"}

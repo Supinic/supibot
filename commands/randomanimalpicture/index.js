@@ -44,7 +44,7 @@ export default {
 		let result = null;
 		switch (type) {
 			case "bird": {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: "https://some-random-api.ml/img/birb"
 				});
 
@@ -53,7 +53,7 @@ export default {
 			}
 
 			case "cat": {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: "https://api.thecatapi.com/v1/images/search"
 				});
 
@@ -62,7 +62,7 @@ export default {
 			}
 
 			case "dog": {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: "https://dog.ceo/api/breeds/image/random"
 				});
 
@@ -71,7 +71,7 @@ export default {
 			}
 
 			case "fox": {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: "https://some-random-api.ml/img/fox"
 				});
 

@@ -33,7 +33,7 @@ export default class RedditPost {
 		this.#url = data.url;
 		this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
-		this.#flairs = data.link_flair_richtext.filter(i => i.t && i.e === "text").map(i => sb.Utils.fixHTML(i.t.trim()));
+		this.#flairs = data.link_flair_richtext.filter(i => i.t && i.e === "text").map(i => core.Utils.fixHTML(i.t.trim()));
 		// if (data.link_flair_text) {
 		// 	this.#flairs.push(data.link_flair_text.toLowerCase().trim());
 		// }
@@ -74,7 +74,7 @@ export default class RedditPost {
 	get flairs () { return this.#flairs; }
 
 	get posted () {
-		return sb.Utils.timeDelta(this.#created);
+		return core.Utils.timeDelta(this.#created);
 	}
 
 	hasFlair (input, caseSensitive = false) {

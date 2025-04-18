@@ -10,7 +10,7 @@ const findPopularSymbol = (from) => {
 			continue;
 		}
 
-		const score = sb.Utils.jaroWinklerSimilarity(from, currentName);
+		const score = core.Utils.jaroWinklerSimilarity(from, currentName);
 		if (score > 0 && score > bestScore) {
 			bestScore = score;
 			index = i;

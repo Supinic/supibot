@@ -41,7 +41,7 @@ export default {
 					};
 				}
 
-				const data = await sb.Query.getRecordset(rs => rs
+				const data = await core.Query.getRecordset(rs => rs
 					.select("Ended")
 					.select("(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Seconds")
 					.from("chat_data", "AFK")
@@ -58,15 +58,15 @@ export default {
 					};
 				}
 
-				const formatted = sb.Utils.formatTime(sb.Utils.round(data.Seconds, 0), false);
-				const delta = sb.Utils.timeDelta(data.Ended);
+				const formatted = core.Utils.formatTime(core.Utils.round(data.Seconds, 0), false);
+				const delta = core.Utils.timeDelta(data.Ended);
 				return {
 					reply: `Your longest AFK period lasted for ${formatted} - this was ${delta}.`
 				};
 			}
 
 			case "cookie": {
-				const data = await sb.Query.getRecordset(rs => rs
+				const data = await core.Query.getRecordset(rs => rs
 					.select("CONVERT(JSON_EXTRACT(Value, '$.total.eaten.daily'), INT) AS Daily")
 					.select("CONVERT(JSON_EXTRACT(Value, '$.legacy.daily'), INT) AS Legacy")
 					.select("User_Alias")

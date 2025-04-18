@@ -47,14 +47,14 @@ export default {
 					};
 				}
 
-				const portfolioRow = await sb.Query.getRow("crypto_game", "Portfolio");
+				const portfolioRow = await core.Query.getRow("crypto_game", "Portfolio");
 				portfolioRow.values.Owner = context.user.ID;
 
 				// @todo with proper row-loading in Query.Row with MariaDB 10.5+ - remove skipLoad,
 				// and then re-fetch of new Portfolio ID
 				await portfolioRow.save({ skipLoad: true });
 
-				const portfolioID = await sb.Query.getRecordset(rs => rs
+				const portfolioID = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("crypto_game", "Portfolio")
 					.where("Owner = %n", context.user.ID)
@@ -71,7 +71,7 @@ export default {
 			}
 
 			case "average": {
-				const average = await sb.Query.getRecordset(rs => rs
+				const average = await core.Query.getRecordset(rs => rs
 					.select("AVG(crypto_game.GET_PORTFOLIO_TOTAL_PRICE(Portfolio.ID)) AS Average")
 					.from("crypto_game", "Portfolio")
 					.where("Active = %b", true)
@@ -80,7 +80,7 @@ export default {
 				);
 
 				return {
-					reply: `The current average portfolio value is €${sb.Utils.round(average, 3)}`
+					reply: `The current average portfolio value is €${core.Utils.round(average, 3)}`
 				};
 			}
 
@@ -145,7 +145,7 @@ export default {
 						};
 					}
 
-					const multiplier = sb.Utils.round(percent * 0.01, 4);
+					const multiplier = core.Utils.round(percent * 0.01, 4);
 					sourceAmount = ((asset.Amount ?? 0) * multiplier);
 				}
 
@@ -172,7 +172,7 @@ export default {
 
 				const result = await createConvertTransaction(portfolioData, sourceAsset, targetAsset, sourceAmount);
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						You successfully traded
 						${result.sourceAmount} ${sourceAsset.Code}
 						for
@@ -221,13 +221,13 @@ export default {
 					.filter(i => i.Amount > 0)
 					.map(i => `${i.Code}: ${i.Amount}`).join("; ");
 
-				const escaped = sb.Query.escapeString(targetPortfolio.ID);
-				const [data] = await sb.Query.raw(
+				const escaped = core.Query.escapeString(targetPortfolio.ID);
+				const [data] = await core.Query.raw(
 					`SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
 				);
 
 				const [rank, total] = await Promise.all([
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("(COUNT(*) + 1) AS Rank")
 						.from("crypto_game", "Portfolio")
 						.where("Active = %b", true)
@@ -235,7 +235,7 @@ export default {
 						.single()
 						.flat("Rank")
 					),
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("COUNT(*) AS Total")
 						.from("crypto_game", "Portfolio")
 						.where("Active = %b", true)

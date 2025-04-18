@@ -50,7 +50,7 @@ export default {
 			};
 		}
 
-		const authorData = await sb.Got.get("GenericAPI")({
+		const authorData = await core.Got.get("GenericAPI")({
 			throwHttpErrors: false,
 			responseType: "json",
 			url: "https://www.googleapis.com/youtube/v3/channels",
@@ -84,7 +84,7 @@ export default {
 			};
 		}
 
-		const { ID } = sb.Utils.randArray(playlistData);
+		const { ID } = core.Utils.randArray(playlistData);
 		if (context.params.linkOnly) {
 			return {
 				reply: `https://youtu.be/${ID}`

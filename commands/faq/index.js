@@ -11,7 +11,7 @@ export default {
 		if (args.length > 0) {
 			const query = args.join(" ");
 			for (const column of ["Question", "Answer"]) {
-				const data = await sb.Query.getRecordset(rs => rs
+				const data = await core.Query.getRecordset(rs => rs
 					.select("Question", "Answer")
 					.from("data", "FAQ")
 					.where(`${column} %*like*`, query)
@@ -19,8 +19,8 @@ export default {
 
 				if (data.length === 1) {
 					const row = data[0];
-					const answer = sb.Utils.removeHTML(row.Answer);
-					const question = sb.Utils.removeHTML(row.Question);
+					const answer = core.Utils.removeHTML(row.Answer);
+					const question = core.Utils.removeHTML(row.Question);
 
 					return {
 						reply: `Q: ${question} A: ${answer}`
@@ -30,7 +30,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Check the FAQ here: https://supinic.com/data/faq/list
 			 	If you didn't find an answer, make a suggestion with the $suggest command.
 			`

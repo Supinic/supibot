@@ -5,7 +5,7 @@ export default {
 	expression: "0 */5 * * * *",
 	description: "Logs the amount of currently active chatters.",
 	code: (async function activeChattersLog (cron) {
-		isTableAvailable ??= await sb.Query.isTablePresent("data", "Active_Chatter_Log");
+		isTableAvailable ??= await core.Query.isTablePresent("data", "Active_Chatter_Log");
 		if (isTableAvailable === false) {
 			cron.job.stop();
 			return;
@@ -15,7 +15,7 @@ export default {
 			return;
 		}
 
-		const row = await sb.Query.getRow("data", "Active_Chatter_Log");
+		const row = await core.Query.getRow("data", "Active_Chatter_Log");
 		row.setValues({
 			Amount: sb.User.data.size,
 			Timestamp: new sb.Date().discardTimeUnits("s", "ms")

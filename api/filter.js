@@ -11,7 +11,7 @@ export default {
 		const IDs = url.searchParams.getAll("ID").map(Number).filter(Boolean);
 		const result = await sb.Filter.reloadSpecific(...IDs);
 
-		const [active, inactive] = sb.Utils.splitByCondition(IDs, i => sb.Filter.get(i));
+		const [active, inactive] = core.Utils.splitByCondition(IDs, i => sb.Filter.get(i));
 		return {
 			statusCode: 200,
 			data: {
@@ -40,7 +40,7 @@ export default {
 			};
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select(
 				"Filter.ID AS ID",
 				"Type AS type",
@@ -97,7 +97,7 @@ export default {
 		}
 
 		const userID = Number(rawUserID);
-		if (!sb.Utils.isValidInteger(userID)) {
+		if (!core.Utils.isValidInteger(userID)) {
 			return {
 				statusCode: 400,
 				error: { message: `Malformed user ID provided` }
@@ -120,7 +120,7 @@ export default {
 			};
 		}
 
-		const optout = await sb.Query.getRecordset(rs => rs
+		const optout = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("chat_data", "Filter")
 			.where("Command = %s", commandData.Name)
@@ -131,7 +131,7 @@ export default {
 			.flat("ID")
 		);
 
-		const blocks = await sb.Query.getRecordset(rs => rs
+		const blocks = await core.Query.getRecordset(rs => rs
 			.select("Filter.ID AS ID", "Blocked_User.Name AS blockedUsername")
 			.from("chat_data", "Filter")
 			.join({

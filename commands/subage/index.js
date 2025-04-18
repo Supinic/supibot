@@ -55,7 +55,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("TwitchGQL")({
+		const response = await core.Got.get("TwitchGQL")({
 			responseType: "json",
 			headers: {
 				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${userName}`
@@ -95,7 +95,7 @@ export default {
 
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
-			const response = await sb.Got.get("IVR")({
+			const response = await core.Got.get("IVR")({
 				url: "v2/twitch/user",
 				searchParams: {
 					login: channelName
@@ -170,7 +170,7 @@ export default {
 				: `${daysRemaining} days`;
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${userString} subscribed to ${channelString}
 					for ${months} months in total
 					with a Tier ${tier} ${giftString} ${primeString} subscription.

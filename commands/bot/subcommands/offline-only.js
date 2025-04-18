@@ -19,7 +19,7 @@ export default {
 		}
 
 		const moduleData = sb.ChatModule.get("offline-only-mode");
-		const existingModuleCheck = await sb.Query.getRecordset(rs => rs
+		const existingModuleCheck = await core.Query.getRecordset(rs => rs
 			.select("1")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Channel = %n", channelData.ID)
@@ -36,7 +36,7 @@ export default {
 				};
 			}
 
-			const row = await sb.Query.getRow("chat_data", "Channel_Chat_Module");
+			const row = await core.Query.getRow("chat_data", "Channel_Chat_Module");
 			row.setValues({
 				Channel: channelData.ID,
 				Chat_Module: moduleData.Name
@@ -57,7 +57,7 @@ export default {
 				};
 			}
 
-			await sb.Query.getRecordDeleter(rd => rd
+			await core.Query.getRecordDeleter(rd => rd
 				.delete()
 				.from("chat_data", "Channel_Chat_Module")
 				.where("Channel = %n", channelData.ID)

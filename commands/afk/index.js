@@ -33,12 +33,12 @@ export default {
 		}
 		else if (target.specialSuffix) {
 			const suffixes = specialSuffixes[target.specialSuffix] ?? [];
-			const suffix = sb.Utils.randArray(suffixes) ?? "";
+			const suffix = core.Utils.randArray(suffixes) ?? "";
 			text = `${text} ${suffix}`;
 		}
 
 		await sb.AwayFromKeyboard.set(context.user, {
-			Text: sb.Utils.wrapString(text, STATUS_LENGTH_CHARACTER_LIMIT, { keepWhitespace: false }),
+			Text: core.Utils.wrapString(text, STATUS_LENGTH_CHARACTER_LIMIT, { keepWhitespace: false }),
 			Status: target.name ?? invocation,
 			Silent: false,
 			Interrupted_ID: null

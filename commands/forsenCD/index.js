@@ -14,7 +14,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function forsenCD (context) {
 		const eligibleTweets = beahmData.tweets.filter(i => !previousPosts.includes(i));
-		const post = sb.Utils.randArray(eligibleTweets);
+		const post = core.Utils.randArray(eligibleTweets);
 
 		previousPosts.unshift(post);
 		previousPosts.splice(MAXIMUM_REPEATS);

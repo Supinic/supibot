@@ -39,7 +39,7 @@ export default [
 				};
 			}
 
-			const afkData = await sb.Query.getRecordset(rs => rs
+			const afkData = await core.Query.getRecordset(rs => rs
 				.select("Text", "Started", "Silent", "Status")
 				.from("chat_data", "AFK")
 				.where("User_Alias = %n", targetUser.ID)
@@ -56,7 +56,7 @@ export default [
 			else {
 				const type = (afkData.Status === "afk") ? "" : ` (${afkData.Status})`;
 				const foreign = (afkData.Silent) ? "(set via different bot)" : "";
-				const delta = sb.Utils.timeDelta(afkData.Started);
+				const delta = core.Utils.timeDelta(afkData.Started);
 				return {
 					reply: `${pronoun} currently AFK${type}: ${afkData.Text || "(no message)"} ${foreign} (since ${delta})`
 				};
@@ -126,14 +126,14 @@ export default [
 			}
 
 			const ID = Number(identifier);
-			if (!sb.Utils.isValidInteger(ID)) {
+			if (!core.Utils.isValidInteger(ID)) {
 				return {
 					success: false,
 					reply: `Invalid changelog ID provided!`
 				};
 			}
 
-			const row = await sb.Query.getRow("data", "Changelog");
+			const row = await core.Query.getRow("data", "Changelog");
 			await row.load(ID, true);
 			if (!row.loaded) {
 				return {
@@ -153,7 +153,7 @@ export default [
 		description: "Posts either: how many tokens you (or someone else) have used recently in the $gpt command; if used with \"total\", shows your total token amount overall.",
 		execute: async (context, target) => {
 			if (target === "total") {
-				const total = await sb.Query.getRecordset(rs => rs
+				const total = await core.Query.getRecordset(rs => rs
 					.select("(SUM(Input_Tokens) + SUM(Output_Tokens)) AS Total")
 					.from("data", "ChatGPT_Log")
 					.where("User_Alias = %n", context.user.ID)
@@ -167,7 +167,7 @@ export default [
 					};
 				}
 				else {
-					const formatted = sb.Utils.groupDigits(total);
+					const formatted = core.Utils.groupDigits(total);
 					return {
 						reply: `You have used ${formatted} ChatGPT tokens since April 2023.`
 					};
@@ -202,16 +202,16 @@ export default [
 					name: `${targetUser.Name}'s usage of Supibot $gpt command`
 				});
 
-				const dailyDigitString = sb.Utils.groupDigits(sb.Utils.round(usage.dailyTokens, 2));
+				const dailyDigitString = core.Utils.groupDigits(core.Utils.round(usage.dailyTokens, 2));
 				const dailyTokenString = (usage.dailyTokens !== usage.hourlyTokens)
 					? `and ${dailyDigitString}/${limits.daily} tokens in the last 24 hours`
 					: "";
 
 				const externalString = (paste.ok) ? `- full usage details: ${paste.link}` : "";
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						${pronoun} have used up
-						${sb.Utils.round(usage.hourlyTokens, 2)}/${limits.hourly} tokens in the last hour
+						${core.Utils.round(usage.hourlyTokens, 2)}/${limits.hourly} tokens in the last hour
 						${dailyTokenString}
 						${externalString}
 					`
@@ -278,7 +278,7 @@ export default [
 			}
 
 			const nextMidnight = new sb.Date(sb.Date.getTodayUTC()).addHours(24);
-			const delta = sb.Utils.timeDelta(nextMidnight);
+			const delta = core.Utils.timeDelta(nextMidnight);
 			return {
 				reply: `${string} Next reset of daily cookies will occur in ${delta}.`
 			};
@@ -295,7 +295,7 @@ export default [
 				});
 			}
 
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://api-free.deepl.com/v2/usage",
 				headers: {
 					Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
@@ -303,9 +303,9 @@ export default [
 			});
 
 			const data = response.body;
-			const current = sb.Utils.groupDigits(data.character_count);
-			const max = sb.Utils.groupDigits(data.character_limit);
-			const percentage = sb.Utils.round((data.character_count / data.character_limit) * 100, 2);
+			const current = core.Utils.groupDigits(data.character_count);
+			const max = core.Utils.groupDigits(data.character_limit);
+			const percentage = core.Utils.round((data.character_count / data.character_limit) * 100, 2);
 
 			return {
 				reply: `Current usage of DeepL engine API: ${current} characters used out of ${max}, which is ${percentage}%`
@@ -422,7 +422,7 @@ export default [
 		aliases: ["maria"],
 		description: "Checks for the current memory usage of the MariaDB database process, running on Supinic's Raspberry Pi 4.",
 		execute: async () => {
-			const response = await sb.Got.get("RaspberryPi4")({
+			const response = await core.Got.get("RaspberryPi4")({
 				url: "maria/memoryUsage",
 				throwHttpErrors: false
 			});
@@ -434,7 +434,7 @@ export default [
 				};
 			}
 
-			const uptimeVariable = await sb.Query.getRecordset(rs => rs
+			const uptimeVariable = await core.Query.getRecordset(rs => rs
 				.select("VARIABLE_VALUE AS Uptime")
 				.from("INFORMATION_SCHEMA", "GLOBAL_STATUS")
 				.where("VARIABLE_NAME = %s", "Uptime")
@@ -443,9 +443,9 @@ export default [
 				.flat("Uptime")
 			);
 
-			const uptime = sb.Utils.timeDelta(new sb.Date().addSeconds(Number(uptimeVariable)), true);
-			const residental = sb.Utils.formatByteSize(response.body.data.VmRSS, 2);
-			const swap = sb.Utils.formatByteSize(response.body.data.VmSwap, 2);
+			const uptime = core.Utils.timeDelta(new sb.Date().addSeconds(Number(uptimeVariable)), true);
+			const residental = core.Utils.formatByteSize(response.body.data.VmRSS, 2);
+			const swap = core.Utils.formatByteSize(response.body.data.VmSwap, 2);
 
 			return {
 				reply: `The MariaDB process is running for ${uptime}, and it is currently using ${residental} of memory + ${swap} in swap.`
@@ -501,7 +501,7 @@ export default [
 		description: "Check the status and info of a reminder created by you or for you. You can use \"last\" instead of an ID to check the last one you made.",
 		execute: async (context, identifier) => {
 			if (identifier === "last") {
-				identifier = await sb.Query.getRecordset(rs => rs
+				identifier = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("chat_data", "Reminder")
 					.where("User_From = %n", context.user.ID)
@@ -512,7 +512,7 @@ export default [
 				);
 
 				// If no active reminder found, check the historic table
-				identifier ??= await sb.Query.getRecordset(rs => rs
+				identifier ??= await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("chat_data", "Reminder_History")
 					.where("User_From = %n", context.user.ID)
@@ -524,9 +524,9 @@ export default [
 			}
 
 			const ID = Number(identifier);
-			if (!ID || !sb.Utils.isValidInteger(ID)) {
+			if (!ID || !core.Utils.isValidInteger(ID)) {
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Check all of your reminders here (requires login):
 						Active - https://supinic.com/bot/reminder/list
 						History - https://supinic.com/bot/reminder/history
@@ -536,13 +536,13 @@ export default [
 
 			// Load active reminder
 			let active = true;
-			let row = await sb.Query.getRow("chat_data", "Reminder");
+			let row = await core.Query.getRow("chat_data", "Reminder");
 			await row.load(ID, true);
 
 			// If active reminder does not exist, fall back to historic table
 			if (!row.loaded) {
 				active = false;
-				row = await sb.Query.getRow("chat_data", "Reminder_History");
+				row = await core.Query.getRow("chat_data", "Reminder_History");
 				await row.load(ID, true);
 			}
 
@@ -576,7 +576,7 @@ export default [
 
 			const schedule = reminder.Schedule;
 			const delta = (reminder.Schedule)
-				? ` (${sb.Utils.timeDelta(schedule)})`
+				? ` (${core.Utils.timeDelta(schedule)})`
 				: "";
 
 			return {
@@ -589,7 +589,7 @@ export default [
 		aliases: [],
 		description: `Checks your last "reset".`,
 		execute: async (context) => {
-			const last = await sb.Query.getRecordset(rs => rs
+			const last = await core.Query.getRecordset(rs => rs
 				.select("Timestamp")
 				.from("data", "Reset")
 				.where("User_Alias = %n", context.user.ID)
@@ -600,7 +600,7 @@ export default [
 
 			return {
 				reply: (last)
-					? `Your last "reset" was ${sb.Utils.timeDelta(last.Timestamp)}.`
+					? `Your last "reset" was ${core.Utils.timeDelta(last.Timestamp)}.`
 					: `You have never noted down a "reset" before.`
 			};
 		}
@@ -625,8 +625,8 @@ export default [
 				};
 			}
 
-			const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
-			const pauseState = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+			const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
+			const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
 			const pauseString = (state === "vlc" && pauseState === true)
 				? "Song requests are paused at the moment."
 				: "";
@@ -641,7 +641,7 @@ export default [
 		aliases: ["subscriptions", "sub", "subs"],
 		description: "Fetches the list of your active event subscriptions within Supibot.",
 		execute: async (context) => {
-			const types = await sb.Query.getRecordset(rs => rs
+			const types = await core.Query.getRecordset(rs => rs
 				.select("Type")
 				.from("data", "Event_Subscription")
 				.where("User_Alias = %n", context.user.ID)
@@ -669,7 +669,7 @@ export default [
 		execute: async (context, identifier) => {
 			if (!identifier) {
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						All suggestions: https://supinic.com/data/suggestion/list
 						Your active suggestions: https://supinic.com/data/suggestion/list/active?columnAuthor=${context.user.Name}
 						Your previous suggestions: https://supinic.com/data/suggestion/list/resolved?columnAuthor=${context.user.Name}
@@ -678,7 +678,7 @@ export default [
 			}
 
 			if (identifier === "last") {
-				identifier = await sb.Query.getRecordset(rs => rs
+				identifier = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Suggestion")
 					.where("User_Alias = %n", context.user.ID)
@@ -697,14 +697,14 @@ export default [
 			}
 
 			const inputID = Number(identifier);
-			if (!sb.Utils.isValidInteger(inputID, 0)) {
+			if (!core.Utils.isValidInteger(inputID, 0)) {
 				return {
 					success: false,
 					reply: `Malformed suggestion ID provided - must be a positive integer!`
 				};
 			}
 
-			const row = await sb.Query.getRow("data", "Suggestion");
+			const row = await core.Query.getRow("data", "Suggestion");
 			await row.load(inputID, true);
 			if (!row.loaded) {
 				return {
@@ -729,16 +729,16 @@ export default [
 			}
 
 			const updated = (update)
-				? `, last updated ${sb.Utils.timeDelta(update)}`
+				? `, last updated ${core.Utils.timeDelta(update)}`
 				: "";
 
 			const userData = await sb.User.get(user, true);
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 							Suggestion ID ${ID}
 							from ${userData.Name}:
 							status ${status ?? "Pending review"}
-							(posted ${sb.Utils.timeDelta(date)}${updated}):
+							(posted ${core.Utils.timeDelta(date)}${updated}):
 							${text}
 							Detail: https://supinic.com/data/suggestion/${ID}
 						`
@@ -773,7 +773,7 @@ export default [
 
 			const now = sb.Date.now();
 			const date = new sb.Date(timers[identifier].date);
-			const delta = sb.Utils.timeDelta(date);
+			const delta = core.Utils.timeDelta(date);
 			const verb = (now > date) ? "occured" : "occurs";
 
 			return {
@@ -841,7 +841,7 @@ export default [
 				};
 			}
 
-			const descriptions = await sb.Query.getRecordset(rs => rs
+			const descriptions = await core.Query.getRecordset(rs => rs
 				.select("User_Alias", "Text")
 				.from("data", "Twitch_Lotto_Description")
 				.where("Link = %s", match[4])
@@ -849,7 +849,7 @@ export default [
 			);
 
 			if (descriptions.length === 0) {
-				const exists = await sb.Query.getRecordset(rs => rs
+				const exists = await core.Query.getRecordset(rs => rs
 					.select("Link")
 					.from("data", "Twitch_Lotto")
 					.where("Link = %s", match[4])

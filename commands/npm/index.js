@@ -15,7 +15,7 @@ export default {
 			};
 		}
 
-		const data = await sb.Got.get("FakeAgent")({
+		const data = await core.Got.get("FakeAgent")({
 			url: "https://www.npmjs.com/search",
 			method: "GET",
 			headers: {
@@ -31,7 +31,7 @@ export default {
 		if (data.package) {
 			const lastPublish = data.upsell?.createdAt ?? data.capsule?.lastPublish?.time;
 			const delta = (lastPublish)
-				? sb.Utils.timeDelta(new sb.Date(lastPublish))
+				? core.Utils.timeDelta(new sb.Date(lastPublish))
 				: "N/A";
 
 			const { version, description, repository } = data.packument;

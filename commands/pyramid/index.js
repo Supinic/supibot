@@ -30,7 +30,7 @@ export default {
 		}
 
 		size = Number(size);
-		if (!sb.Utils.isValidInteger(size)) {
+		if (!core.Utils.isValidInteger(size)) {
 			return {
 				success: false,
 				reply: `The size of the pyramid must be a positive integer!`

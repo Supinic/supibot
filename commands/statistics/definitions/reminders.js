@@ -4,14 +4,14 @@ export default {
 	description: "Shows how many times you or someone else have used reminders.",
 	execute: async (context) => {
 		const [liveData, historyData] = await Promise.all([
-			sb.Query.getRecordset(rs => rs
+			core.Query.getRecordset(rs => rs
 				.select("SUM(Schedule IS NULL) AS Unscheduled")
 				.select("SUM(Schedule IS NOT NULL) AS Scheduled")
 				.from("chat_data", "Reminder")
 				.where("User_From = %n", context.user.ID)
 				.single()
 			),
-			sb.Query.getRecordset(rs => rs
+			core.Query.getRecordset(rs => rs
 				.select("SUM(Schedule IS NULL) AS Unscheduled")
 				.select("SUM(Schedule IS NOT NULL) AS Scheduled")
 				.from("chat_data", "Reminder_History")
@@ -25,7 +25,7 @@ export default {
 		const total = unscheduled + scheduled;
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				So far, you have created ${unscheduled} direct reminders
 				and ${scheduled} timed reminders,
 				for a total of ${total}.

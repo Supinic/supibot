@@ -41,7 +41,7 @@ export default {
 
 		let date = sb.Logger.getUserLastSeen(targetUser.ID);
 		if (!date) {
-			date = await sb.Query.getRecordset(rs => rs
+			date = await core.Query.getRecordset(rs => rs
 				.select("Last_Message_Posted AS Date")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", targetUser.ID)
@@ -53,9 +53,9 @@ export default {
 		}
 		if (!date) {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					That user is in the database, but never showed up in chat.
-					They were first spotted ${sb.Utils.timeDelta(targetUser.Started_Using)}.
+					They were first spotted ${core.Utils.timeDelta(targetUser.Started_Using)}.
 				`
 			};
 		}
@@ -65,7 +65,7 @@ export default {
 			: "That user was";
 
 		return {
-			reply: `${who} last seen in chat ${sb.Utils.timeDelta(date)}.`
+			reply: `${who} last seen in chat ${core.Utils.timeDelta(date)}.`
 		};
 	}),
 	Dynamic_Description: null

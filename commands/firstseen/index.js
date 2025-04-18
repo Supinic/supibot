@@ -16,7 +16,7 @@ export default {
 			};
 		}
 
-		const missingFirstLineChannels = await sb.Query.getRecordset(rs => rs
+		const missingFirstLineChannels = await core.Query.getRecordset(rs => rs
 			.select("Channel")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
@@ -33,7 +33,7 @@ export default {
 				}
 
 				const promise = (async () => {
-					const message = await sb.Query.getRecordset(rs => rs
+					const message = await core.Query.getRecordset(rs => rs
 						.select("Text", "Posted")
 						.from("chat_line", channelData.getDatabaseName())
 						.where("User_Alias = %n", userData.ID)
@@ -46,7 +46,7 @@ export default {
 						return;
 					}
 
-					const row = await sb.Query.getRow("chat_data", "Message_Meta_User_Alias");
+					const row = await core.Query.getRow("chat_data", "Message_Meta_User_Alias");
 					await row.load({
 						User_Alias: userData.ID,
 						Channel: channelData.ID
@@ -70,7 +70,7 @@ export default {
 			await Promise.all(promises);
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("Channel", "First_Message_Posted AS Date", "First_Message_Text AS Message")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
@@ -82,9 +82,9 @@ export default {
 
 		if (!data) {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					That user is in the database, but never showed up in chat.
-					They were first spotted ${sb.Utils.timeDelta(userData.Started_Using)}.
+					They were first spotted ${core.Utils.timeDelta(userData.Started_Using)}.
 				`
 			};
 		}
@@ -94,9 +94,9 @@ export default {
 		const belongsTo = (userData === context.user) ? "your" : "their";
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${who}
-				first seen in chat ${sb.Utils.timeDelta(data.Date)},
+				first seen in chat ${core.Utils.timeDelta(data.Date)},
 				(${channelData.getFullName()})
 				${belongsTo} message: ${data.Message}
 			`

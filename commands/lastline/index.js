@@ -47,7 +47,7 @@ export default {
 
 		let data = null;
 		if ([7, 8, 46].includes(context.channel.ID)) {
-			data = await sb.Query.getRecordset(rs => rs
+			data = await core.Query.getRecordset(rs => rs
 				.select("Last_Message_Text AS Message", "Last_Message_Posted AS Posted")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", userID)
@@ -57,7 +57,7 @@ export default {
 			);
 		}
 		else {
-			data = await sb.Query.getRecordset(rs => rs
+			data = await core.Query.getRecordset(rs => rs
 				.select("Last_Message_Text AS Message", "Last_Message_Posted AS Posted")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", userID)
@@ -84,7 +84,7 @@ export default {
 			partialReplies: [
 				{
 					bancheck: false,
-					message: `${prefix} last message in this channel was (${sb.Utils.timeDelta(data.Posted)}):`
+					message: `${prefix} last message in this channel was (${core.Utils.timeDelta(data.Posted)}):`
 				},
 				{
 					bancheck: true,

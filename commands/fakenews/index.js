@@ -17,13 +17,13 @@ export default {
 	Code: (async function fakeNews () {
 		const eligibleHeadlines = headlines.filter(i => !headlinesRepeatArray.includes(i));
 
-		let headline = sb.Utils.randArray(eligibleHeadlines);
+		let headline = core.Utils.randArray(eligibleHeadlines);
 		headlinesRepeatArray.push(headline);
 		headlinesRepeatArray.splice(REPEATS);
 
 		let fallback = MAXIMUM_REPLACEMENTS;
 		while (headline.includes("[") && fallback-- >= 0) {
-			headline = headline.replaceAll(/\[(\w+)]/g, (_total, type) => sb.Utils.randArray(parts[type]));
+			headline = headline.replaceAll(/\[(\w+)]/g, (_total, type) => core.Utils.randArray(parts[type]));
 		}
 
 		return {

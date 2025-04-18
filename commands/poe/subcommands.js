@@ -74,7 +74,7 @@ export default [
 			}
 
 			if (!lab.images[type]) {
-				const response = await sb.Got.get("FakeAgent")({
+				const response = await core.Got.get("FakeAgent")({
 					url: `https://www.poelab.com/${urlSlug}`,
 					responseType: "text"
 				});
@@ -87,7 +87,7 @@ export default [
 					};
 				}
 
-				const $ = sb.Utils.cheerio(response.body);
+				const $ = core.Utils.cheerio(response.body);
 				let imageLink = $("img#notesImg")[0].attribs.src;
 
 				if (type === "merciless" || type === "uber") {
@@ -168,9 +168,9 @@ export default [
 		aliases: ["randombuild", "rb"],
 		description: "Generates a build by taking a random skill gem and a random ascendancy and putting them together.",
 		execute: async () => {
-			const additional = sb.Utils.randArray(additionalGems);
-			const skill = sb.Utils.randArray(skillGems);
-			const ascendancy = sb.Utils.randArray(ascendancies);
+			const additional = core.Utils.randArray(additionalGems);
+			const skill = core.Utils.randArray(skillGems);
+			const ascendancy = core.Utils.randArray(ascendancies);
 
 			return {
 				reply: `${skill.name} + ${additional.name} ${ascendancy}`
@@ -193,7 +193,7 @@ export default [
 			if (context.invocation === "poe2") {
 				const releaseDate = new sb.Date(POE2_RELEASE_DATE);
 				const now = new sb.Date();
-				const delta = sb.Utils.timeDelta(releaseDate);
+				const delta = core.Utils.timeDelta(releaseDate);
 				const verb = (now >= releaseDate) ? "released" : "releases";
 
 				return {
@@ -208,7 +208,7 @@ export default [
 			const currentLeague = leagues.find(i => i.end && new sb.Date(i.end) > now);
 			if (currentLeague) {
 				const endDate = new sb.Date(currentLeague.end);
-				result.push(`The ${currentLeague.patch} ${currentLeague.name} league will end ${sb.Utils.timeDelta(endDate)}.`);
+				result.push(`The ${currentLeague.patch} ${currentLeague.name} league will end ${core.Utils.timeDelta(endDate)}.`);
 			}
 
 			const nextLeague = (currentLeague)
@@ -221,15 +221,15 @@ export default [
 				const launchDate = new sb.Date(launch);
 
 				if (revealDate > now) {
-					result.push(`The ${patch} ${name ?? ""} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`);
+					result.push(`The ${patch} ${name ?? ""} league will be revealed ${core.Utils.timeDelta(revealDate)}.`);
 				}
 				else if (launchDate > now) {
-					result.push(`The ${patch} ${name ?? ""} league will start ${sb.Utils.timeDelta(launchDate)}.`);
+					result.push(`The ${patch} ${name ?? ""} league will start ${core.Utils.timeDelta(launchDate)}.`);
 				}
 				else {
 					const possibleEnd = revealDate.clone().addMonths(4).addDays(7);
 					if (possibleEnd > now) {
-						const delta = sb.Utils.timeDelta(possibleEnd, true);
+						const delta = core.Utils.timeDelta(possibleEnd, true);
 						result.push(`The ${patch} ${name} league has launched - go and play. It will last approximately for ${delta}.`);
 					}
 					else {
@@ -259,7 +259,7 @@ export default [
 			}
 
 			if (deathData.videoCache.length === 0) {
-				const playlist = sb.Utils.randArray(deathData.playlists);
+				const playlist = core.Utils.randArray(deathData.playlists);
 				const { result, reason, success } = await fetchYoutubePlaylist({
 					playlistID: playlist
 				});
@@ -275,7 +275,7 @@ export default [
 				}
 			}
 
-			const video = sb.Utils.randArray(deathData.videoCache);
+			const video = core.Utils.randArray(deathData.videoCache);
 			const emote = await context.getBestAvailableEmote(
 				["PepeLaugh", "pepeLaugh", "LULW", "LULE", "LuL"],
 				"😂"

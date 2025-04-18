@@ -15,7 +15,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			prefixUrl: "https://app.kanjialive.com/api",
 			url: `kanji/${encodeURIComponent(character)}`,
 			throwHttpErrors: false

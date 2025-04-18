@@ -8,7 +8,7 @@ const checkLatency = async (callback, ...args) => {
 		const start = process.hrtime.bigint();
 		await callback(...args);
 
-		return sb.Utils.round(Number(process.hrtime.bigint() - start) / 1_000_000, 3);
+		return core.Utils.round(Number(process.hrtime.bigint() - start) / 1_000_000, 3);
 	}
 	catch {
 		return null;
@@ -39,14 +39,14 @@ export default {
 
 		const uptime = new sb.Date().addSeconds(-process.uptime());
 		const data = {
-			Uptime: sb.Utils.timeDelta(uptime, true),
+			Uptime: core.Utils.timeDelta(uptime, true),
 			Temperature: temperature,
-			"Used memory": sb.Utils.formatByteSize(process.memoryUsage().rss, 0)
+			"Used memory": core.Utils.formatByteSize(process.memoryUsage().rss, 0)
 		};
 
-		if (sb.Cache) {
-			data.Redis = (sb.Cache.ready)
-				? `${String(await sb.Cache.server.dbsize())} keys`
+		if (core.Cache) {
+			data.Redis = (core.Cache.ready)
+				? `${String(await core.Cache.server.dbsize())} keys`
 				: "not online";
 		}
 

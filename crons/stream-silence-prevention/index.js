@@ -32,7 +32,7 @@ export default {
 		}
 
 		// Don't auto-request in an unsupported song-request state
-		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
 		if (state !== "vlc" && state !== "cytube") {
 			return;
 		}
@@ -43,7 +43,7 @@ export default {
 			const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
 			isQueueEmpty = (queue.length === 0);
 
-			repeatsArray = await sb.Query.getRecordset(rs => rs
+			repeatsArray = await core.Query.getRecordset(rs => rs
 				.select("Link")
 				.from("chat_data", "Song_Request")
 				.orderBy("ID DESC")
@@ -62,7 +62,7 @@ export default {
 		}
 
 		// let link;
-		const videoData = await sb.Query.getRecordset(rs => rs
+		const videoData = await core.Query.getRecordset(rs => rs
 			.select("Link", "Notes")
 			.from("personal", "Favourite_Track")
 			.where("Video_Type = %n", 15)
@@ -81,7 +81,7 @@ export default {
 		const vlcId = await sb.VideoLANConnector.add(vlcEligibleLink);
 
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
-		const row = await sb.Query.getRow("chat_data", "Song_Request");
+		const row = await core.Query.getRow("chat_data", "Song_Request");
 		row.setValues({
 			VLC_ID: vlcId,
 			Link: videoData.Link,
@@ -100,7 +100,7 @@ export default {
 		let videoID;
 		const roll = randomInt(1, 100);
 		if (roll < 100) {
-			const videoData = await sb.Query.getRecordset(rs => rs
+			const videoData = await core.Query.getRecordset(rs => rs
 				.select("Link", "Video_Type")
 				.from("personal", "Favourite_Track")
 				.where(
@@ -115,7 +115,7 @@ export default {
 				.single()
 			);
 
-			const prefix = await sb.Query.getRecordset(rs => rs
+			const prefix = await core.Query.getRecordset(rs => rs
 				.select("Link_Prefix")
 				.from("data", "Video_Type")
 				.where("ID = %n", videoData.Video_Type)
@@ -128,7 +128,7 @@ export default {
 			link = prefix.replace("$", videoData.Link);
 		}
 		else {
-			videoID = await sb.Query.getRecordset(rs => rs
+			videoID = await core.Query.getRecordset(rs => rs
 				.select("Link")
 				.from("music", "Track")
 				.join({

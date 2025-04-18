@@ -37,7 +37,7 @@ export default {
 			};
 		}
 
-		const isConfigEnabled = await sb.Cache.getByPrefix(PLAYSOUNDS_ENABLED);
+		const isConfigEnabled = await core.Cache.getByPrefix(PLAYSOUNDS_ENABLED);
 		if (!isConfigEnabled) {
 			return {
 				reply: "Playsounds are currently disabled!"
@@ -50,7 +50,7 @@ export default {
 		}
 
 		if (playsound === "random") {
-			playsound = await sb.Query.getRecordset(rs => rs
+			playsound = await core.Query.getRecordset(rs => rs
 				.select("Name")
 				.from("data", "Playsound")
 				.orderBy("RAND()")
@@ -60,7 +60,7 @@ export default {
 			);
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("*")
 			.from("data", "Playsound")
 			.where("Name = %s", playsound)
@@ -76,11 +76,11 @@ export default {
 		}
 
 		const cacheKey = getPlaysoundCacheKey(playsound);
-		const existingCooldown = await sb.Cache.getByPrefix(cacheKey) ?? 0;
+		const existingCooldown = await core.Cache.getByPrefix(cacheKey) ?? 0;
 		const now = sb.Date.now();
 
 		if (existingCooldown >= now) {
-			const delta = sb.Utils.timeDelta(existingCooldown);
+			const delta = core.Utils.timeDelta(existingCooldown);
 			return {
 				reply: `The playsound's cooldown has not passed yet! Try again in ${delta}.`
 			};
@@ -88,7 +88,7 @@ export default {
 
 		let success = null;
 		try {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}/?audio=${data.Filename}`,
 				responseType: "text"
 			});
@@ -96,20 +96,20 @@ export default {
 			success = (response.ok);
 		}
 		catch {
-			await sb.Cache.setByPrefix(PLAYSOUNDS_ENABLED, false);
+			await core.Cache.setByPrefix(PLAYSOUNDS_ENABLED, false);
 			return {
 				reply: "The desktop listener is not currently running! Turning off playsounds."
 			};
 		}
 
-		await sb.Query.getRecordUpdater(ru => ru
+		await core.Query.getRecordUpdater(ru => ru
 			.update("data", "Playsound")
 			.set("Use_Count", data.Use_Count + 1)
 			.where("Name = %s", data.Name)
 		);
 
 		const cooldownTimestamp = now + data.Cooldown;
-		await sb.Cache.setByPrefix(cacheKey, cooldownTimestamp, {
+		await core.Cache.setByPrefix(cacheKey, cooldownTimestamp, {
 			expiry: data.Cooldown
 		});
 

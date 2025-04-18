@@ -14,7 +14,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function randomSadCat (context) {
 		const eligibleLinks = sadCats.filter(i => !previousPosts.includes(i));
-		const link = sb.Utils.randArray(eligibleLinks);
+		const link = core.Utils.randArray(eligibleLinks);
 
 		previousPosts.unshift(link);
 		previousPosts.splice(MAXIMUM_REPEATS);

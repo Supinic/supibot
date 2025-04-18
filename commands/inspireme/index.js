@@ -8,7 +8,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function inspireMe () {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://inspirobot.me/api?generate=true",
 			responseType: "text"
 		});

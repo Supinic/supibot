@@ -1,6 +1,6 @@
 let channelList;
 const getKey = (id) => `twitch-bot-scope-reminder-notified-${id}`;
-const createMessage = (name) => sb.Utils.tag.trim `
+const createMessage = (name) => core.Utils.tag.trim `
 	Hey @${name}, it seems like you used to have me in your channel.
 	However, since June 26th 2024, I need to either have your permission or be a moderator to stay in your channel (or both).
 	You can permit me here: https://supinic.com/bot/twitch-auth/
@@ -22,12 +22,12 @@ export default {
 
 		const userId = user.Twitch_ID;
 		const cacheKey = getKey(userId);
-		const alreadyNotified = await sb.Cache.getByPrefix(cacheKey);
+		const alreadyNotified = await core.Cache.getByPrefix(cacheKey);
 		if (alreadyNotified) {
 			return;
 		}
 
-		// channelList ??= await sb.Query.getRecordset(rs => rs
+		// channelList ??= await core.Query.getRecordset(rs => rs
 		// 	.select("Channel.Specific_ID")
 		// 	.from("chat_data", "Channel_Data")
 		// 	.join("chat_data", "Channel")
@@ -44,7 +44,7 @@ export default {
 			return;
 		}
 
-		await sb.Cache.setByPrefix(cacheKey, true, {
+		await core.Cache.setByPrefix(cacheKey, true, {
 			expiry: 7 * 864e5 // 7 days
 		});
 

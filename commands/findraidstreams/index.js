@@ -23,7 +23,7 @@ export default {
 				.join("&");
 
 			promises.push(
-				sb.Got.get("Helix")({
+				core.Got.get("Helix")({
 					url: `streams?${sliceString}`,
 					responseType: "json"
 				})
@@ -41,7 +41,7 @@ export default {
 				viewers: i.viewer_count,
 				game: i.game_name,
 				title: i.title,
-				liveFor: sb.Utils.timeDelta(new sb.Date(i.started_at), true)
+				liveFor: core.Utils.timeDelta(new sb.Date(i.started_at), true)
 			}));
 
 			raidData.push(...formatted);
@@ -52,7 +52,7 @@ export default {
 			.sort((a, b) => b.viewers - a.viewers);
 
 		const data = JSON.stringify(filteredRaidData, null, 4);
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			method: "POST",
 			url: `https://haste.zneix.eu/documents`,
 			throwHttpErrors: false,

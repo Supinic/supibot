@@ -115,7 +115,7 @@ export default {
 		}
 
 		const limit = context.params.limit ?? 100;
-		if (!sb.Utils.isValidInteger(limit, 1)) {
+		if (!core.Utils.isValidInteger(limit, 1)) {
 			return {
 				success: false,
 				reply: `Invalid limit provided!`
@@ -128,7 +128,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("Helix")({
+		const response = await core.Got.get("Helix")({
 			url: "clips",
 			searchParams: {
 				started_at: dateRange[0].toISOString(),
@@ -181,14 +181,14 @@ export default {
 			}
 		}
 
-		const clip = sb.Utils.randArray(clips);
+		const clip = core.Utils.randArray(clips);
 		if (context.params.linkOnly) {
 			return {
 				reply: clip.url
 			};
 		}
 
-		const delta = sb.Utils.timeDelta(new sb.Date(clip.created_at));
+		const delta = core.Utils.timeDelta(new sb.Date(clip.created_at));
 		return {
 			reply: `"${clip.title}" - ${clip.duration} sec, clipped by ${clip.creator_name}, ${delta}: ${clip.url}`
 		};

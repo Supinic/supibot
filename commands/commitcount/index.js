@@ -58,7 +58,7 @@ export default {
 		if (context.params.since) {
 			since = (result.intervalEnd && result.intervalEnd >= new sb.Date())
 				? `between ${context.params.since.format("Y-m-d")} and ${result.intervalEnd.format("Y-m-d")}`
-				: `since ${sb.Utils.timeDelta(context.params.since)}`;
+				: `since ${core.Utils.timeDelta(context.params.since)}`;
 		}
 		else {
 			since = "in the past 24 hours";

@@ -92,7 +92,7 @@ export default class VLCSingleton {
 				if (this.seekValues.start !== null && Object.keys(status.information.category).length > 1) {
 					// Since the VLC API does not support seeking to milliseconds parts when using ISO8601 or seconds,
 					// a percentage needs to be calculated, since that (for whatever reason) works using decimals.
-					const percentage = sb.Utils.round(this.seekValues.start / status.length, 5) * 100;
+					const percentage = core.Utils.round(this.seekValues.start / status.length, 5) * 100;
 					await client.seek(`${percentage}%`);
 
 					this.seekValues.start = null;
@@ -113,12 +113,12 @@ export default class VLCSingleton {
 		});
 
 		client.on("statuschange", async (before, after) => {
-			const currentPauseStatus = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+			const currentPauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
 			if (currentPauseStatus && after.state === "playing") {
-				await sb.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, false);
+				await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, false);
 			}
 			else if (!currentPauseStatus && after.state === "paused") {
-				await sb.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, true);
+				await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, true);
 			}
 
 			const previous = before.currentplid;
@@ -140,7 +140,7 @@ export default class VLCSingleton {
 			if (previousTrack) {
 				// Finalize the previous video, if it exists (might not exist because of playlist being started)
 				const ID = Number(previousTrack.id);
-				await sb.Query.getRecordUpdater(rs => rs
+				await core.Query.getRecordUpdater(rs => rs
 					.update("chat_data", "Song_Request")
 					.set("Status", "Inactive")
 					.set("Ended", new sb.Date())
@@ -151,7 +151,7 @@ export default class VLCSingleton {
 				await client.playlistDelete(ID);
 			}
 			if (nextTrack) {
-				const ID = await sb.Query.getRecordset(rs => rs
+				const ID = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("chat_data", "Song_Request")
 					.where("VLC_ID = %n", Number(nextTrack.id))
@@ -166,7 +166,7 @@ export default class VLCSingleton {
 					return;
 				}
 
-				const row = await sb.Query.getRow("chat_data", "Song_Request");
+				const row = await core.Query.getRow("chat_data", "Song_Request");
 				await row.load(ID);
 
 				row.setValues({
@@ -199,7 +199,7 @@ export default class VLCSingleton {
 					// VLC creating a new request after loading a YouTube video.
 					// E.g. YouTube video is added as ID 30, and when it plays, VLC fetches the actual video data,
 					// creating a new request with ID 31, causing the ID 30 (the real video) to be deleted.
-					await sb.Query.getRecordUpdater(ru => ru
+					await core.Query.getRecordUpdater(ru => ru
 						.update("chat_data", "Song_Request")
 						.set("VLC_ID", Number(item.id) + 1)
 						.where("VLC_ID = %n", Number(item.id))
@@ -209,7 +209,7 @@ export default class VLCSingleton {
 				}
 
 				const filteredMissingIDs = missingIDs.filter(i => !noUpdateIDs.includes(i));
-				await sb.Query.getRecordUpdater(rs => rs
+				await core.Query.getRecordUpdater(rs => rs
 					.update("chat_data", "Song_Request")
 					.set("Status", "Inactive")
 					.where("VLC_ID IN %n+", filteredMissingIDs)
@@ -240,7 +240,7 @@ export default class VLCSingleton {
 			searchParams.command = command;
 		}
 
-		return await sb.Got.get("GenericAPI")({
+		return await core.Got.get("GenericAPI")({
 			prefixUrl: this.baseURL,
 			url: parent ?? "",
 			searchParams,
@@ -350,7 +350,7 @@ export default class VLCSingleton {
 	}
 
 	getNormalizedPlaylist () {
-		return sb.Query.getRecordset(rs => rs
+		return core.Query.getRecordset(rs => rs
 			.select("*")
 			.select(`
 				(CASE 

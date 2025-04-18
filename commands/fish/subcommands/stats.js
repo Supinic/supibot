@@ -40,7 +40,7 @@ export default {
 			}
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.attempts'), INT)) AS Attempts`)
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.baitUsed'), INT)) AS BaitUsed`)
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.fish'), INT)) AS FishCaught`)
@@ -77,7 +77,7 @@ export default {
 			}
 		}
 		else {
-			const usersAmount = await sb.Query.getRecordset(rs => rs
+			const usersAmount = await core.Query.getRecordset(rs => rs
 				.select("COUNT(User_Alias) AS Amount")
 				.from("chat_data", "User_Alias_Data")
 				.where("Property = %s", "fishData")
@@ -86,20 +86,20 @@ export default {
 				.single()
 			);
 
-			userAmountString = `anglers: ${sb.Utils.groupDigits(usersAmount)};`;
+			userAmountString = `anglers: ${core.Utils.groupDigits(usersAmount)};`;
 		}
 
-		const result = sb.Utils.tag.trim `
-			attempts: ${sb.Utils.groupDigits(data.Attempts)};
+		const result = core.Utils.tag.trim `
+			attempts: ${core.Utils.groupDigits(data.Attempts)};
 			${userAmountString}
-			caught fish: ${sb.Utils.groupDigits(data.FishCaught)};
-			caught junk: ${sb.Utils.groupDigits(data.JunkCaught)};
-			traps set up: ${sb.Utils.groupDigits(data.TrapsSet)};
-			bait used: ${sb.Utils.groupDigits(data.BaitUsed)};
-			fish sold: ${sb.Utils.groupDigits(data.FishSold)};
-			junk scrapped: ${sb.Utils.groupDigits(data.JunkSold)};
-			worst dry streak: ${sb.Utils.groupDigits(data.WorstDryStreak)};
-			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)}.
+			caught fish: ${core.Utils.groupDigits(data.FishCaught)};
+			caught junk: ${core.Utils.groupDigits(data.JunkCaught)};
+			traps set up: ${core.Utils.groupDigits(data.TrapsSet)};
+			bait used: ${core.Utils.groupDigits(data.BaitUsed)};
+			fish sold: ${core.Utils.groupDigits(data.FishSold)};
+			junk scrapped: ${core.Utils.groupDigits(data.JunkSold)};
+			worst dry streak: ${core.Utils.groupDigits(data.WorstDryStreak)};
+			best lucky streak: ${core.Utils.groupDigits(data.BestLuckyStreak)}.
 			${appendix}
 		`;
 

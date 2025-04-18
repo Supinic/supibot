@@ -10,11 +10,11 @@ export default {
 		}
 
 		const ID = Number(match[1]);
-		if (!sb.Utils.isValidInteger(ID)) {
+		if (!core.Utils.isValidInteger(ID)) {
 			return;
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("ID", "Github_Link")
 			.from("data", "Suggestion")
 			.where("ID = %n", ID)

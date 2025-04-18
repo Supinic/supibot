@@ -8,12 +8,12 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function randomFilm () {
-		const html = await sb.Got.get("FakeAgent")({
+		const html = await core.Got.get("FakeAgent")({
 			url: "https://www.bestrandoms.com/random-movie-generator",
 			responseType: "text"
 		}).text();
 
-		const $ = sb.Utils.cheerio(html);
+		const $ = core.Utils.cheerio(html);
 		const movies = $(".content .list-unstyled li").map((ind, i) => {
 			const name = $($(i).children()[2]);
 			return name.text()
@@ -22,7 +22,7 @@ export default {
 		});
 
 		return {
-			reply: `Your random movie is: ${sb.Utils.randArray(movies)}.`
+			reply: `Your random movie is: ${core.Utils.randArray(movies)}.`
 		};
 	}),
 	Dynamic_Description: null

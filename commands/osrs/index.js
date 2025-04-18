@@ -61,7 +61,7 @@ export default {
 
 		const skillList = [...skills]
 			.sort((a, b) => a.name.localeCompare(b.name))
-			.map(i => `<li>${sb.Utils.capitalize(i.name)} - ${i.emoji}</li>`)
+			.map(i => `<li>${core.Utils.capitalize(i.name)} - ${i.emoji}</li>`)
 			.join("");
 
 		return [

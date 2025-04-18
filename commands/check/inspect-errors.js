@@ -1,8 +1,8 @@
 import { postToHastebin } from "../../utils/command-utils.js";
 
 const getRow = {
-	error: () => sb.Query.getRow("chat_data", "Error"),
-	webError: () => sb.Query.getRow("supinic.com", "Error")
+	error: () => core.Query.getRow("chat_data", "Error"),
+	webError: () => core.Query.getRow("supinic.com", "Error")
 };
 const name = {
 	error: "Supibot error",
@@ -21,7 +21,7 @@ export default async (context, type, rawIdentifier) => {
 	}
 
 	const identifier = Number(rawIdentifier);
-	if (!sb.Utils.isValidInteger(identifier)) {
+	if (!core.Utils.isValidInteger(identifier)) {
 		return {
 			success: false,
 			reply: "Invalid ID provided!"
@@ -41,7 +41,7 @@ export default async (context, type, rawIdentifier) => {
 	const { ID, Stack: stack } = row.values;
 	const cacheKey = createCacheKey(type, ID);
 
-	let link = await sb.Cache.getByPrefix(cacheKey);
+	let link = await core.Cache.getByPrefix(cacheKey);
 	if (!link) {
 		const paste = await postToHastebin(stack, {
 			name: `Stack of ${name[type]} ID ${ID}`,
@@ -56,7 +56,7 @@ export default async (context, type, rawIdentifier) => {
 		}
 
 		link = paste.link;
-		await sb.Cache.setByPrefix(cacheKey, link, {
+		await core.Cache.setByPrefix(cacheKey, link, {
 			expiry: 36e5
 		});
 	}

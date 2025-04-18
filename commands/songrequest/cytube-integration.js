@@ -53,7 +53,7 @@ export default {
 			};
 		}
 
-		const cytubeType = await sb.Query.getRecordset(rs => rs
+		const cytubeType = await core.Query.getRecordset(rs => rs
 			.select("Type")
 			.from("data", "Video_Type")
 			.where("Parser_Name = %s", linkData.type)

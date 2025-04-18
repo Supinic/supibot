@@ -74,7 +74,7 @@ export default {
 
 		let boardList = await this.getCacheData({ type: "board-list" });
 		if (!boardList) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://api.4chan.org/boards.json",
 				responseType: "json"
 			});
@@ -121,7 +121,7 @@ export default {
 		const threadKey = { type: "thread-list", board: identifier };
 		let threadList = await this.getCacheData(threadKey);
 		if (!threadList) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: `https://api.4chan.org/${board.name}/catalog.json`,
 				responseType: "json"
 			});
@@ -130,8 +130,8 @@ export default {
 				.flatMap(i => i.threads)
 				.filter(i => !i.sticky && !i.closed && i.replies >= 5)
 				.map(i => {
-					const title = sb.Utils.fixHTML(sb.Utils.removeHTML(i.sub ?? ""));
-					const subtitle = sb.Utils.fixHTML(sb.Utils.removeHTML(i.com ?? ""));
+					const title = core.Utils.fixHTML(core.Utils.removeHTML(i.sub ?? ""));
+					const subtitle = core.Utils.fixHTML(core.Utils.removeHTML(i.com ?? ""));
 
 					return {
 						ID: i.no,
@@ -174,7 +174,7 @@ export default {
 				}
 			});
 
-			const thread = sb.Utils.randArray(filteredThreads);
+			const thread = core.Utils.randArray(filteredThreads);
 			if (!thread) {
 				return {
 					success: false,
@@ -185,14 +185,14 @@ export default {
 			threadID = thread.ID;
 		}
 		else {
-			const thread = sb.Utils.randArray(threadList);
+			const thread = core.Utils.randArray(threadList);
 			threadID = thread.ID;
 		}
 
 		const postKey = { type: "post-list", board: identifier, threadID };
 		let postList = await this.getCacheData(postKey);
 		if (!postList) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: `https://a.4cdn.org/${board.name}/thread/${threadID}.json`,
 				throwHttpErrors: false,
 				responseType: "json"
@@ -219,7 +219,7 @@ export default {
 					author: i.name,
 					created: new sb.Date(i.time * 1000),
 					content: (i.com)
-						? sb.Utils.fixHTML(sb.Utils.removeHTML(i.com ?? ""))
+						? core.Utils.fixHTML(core.Utils.removeHTML(i.com ?? ""))
 						: null,
 					file: (typeof i.filename !== "undefined")
 						? `https://i.4cdn.org/${board.name}/${i.tim}${i.ext}`
@@ -240,8 +240,8 @@ export default {
 			};
 		}
 
-		const post = sb.Utils.randArray(eligiblePosts);
-		const delta = sb.Utils.timeDelta(new sb.Date(post.created));
+		const post = core.Utils.randArray(eligiblePosts);
+		const delta = core.Utils.timeDelta(new sb.Date(post.created));
 
 		if (post.content) {
 			post.content = post.content.replaceAll(/>>\d+/g, "");

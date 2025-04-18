@@ -9,7 +9,7 @@ export default {
 				return;
 			}
 
-			await channelData.send(sb.Utils.tag.trim `
+			await channelData.send(core.Utils.tag.trim `
 				Chatterino users supiniOkay 👉
 				To get binged 🔔 when Supi goes live, use !notifyme live
 				or use !events to get a list of things to get binged 🔔 about

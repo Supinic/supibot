@@ -64,7 +64,7 @@ export default {
 		}
 
 		// Try and find node-info response
-		const nodeInfoResponse = await sb.Got.get("GenericAPI")({
+		const nodeInfoResponse = await core.Got.get("GenericAPI")({
 			url: nodeInfoUrl
 		});
 
@@ -93,7 +93,7 @@ export default {
 		const key = `${instance}-${fixedUser}`;
 		let data = await this.getCacheData(key);
 		if (!data) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url,
 				responseType: "text",
 				throwHttpErrors: false
@@ -130,7 +130,7 @@ export default {
 				title: rss.title,
 				created: rss.lastBuildDate,
 				posts: rss.items.map(i => ({
-					content: sb.Utils.removeHTML(i.contentSnippet ?? i.content).replace(/\s+/, " "),
+					content: core.Utils.removeHTML(i.contentSnippet ?? i.content).replace(/\s+/, " "),
 					link: i.link,
 					date: i.isoDate
 				}))
@@ -150,7 +150,7 @@ export default {
 
 		let post;
 		if (context.params.random) {
-			post = sb.Utils.randArray(data.posts);
+			post = core.Utils.randArray(data.posts);
 		}
 		else {
 			post = data.posts[0];
@@ -162,7 +162,7 @@ export default {
 			};
 		}
 
-		const delta = sb.Utils.timeDelta(new sb.Date(post.date));
+		const delta = core.Utils.timeDelta(new sb.Date(post.date));
 		return {
 			reply: `${post.content} ${post.link} (posted ${delta})`
 		};

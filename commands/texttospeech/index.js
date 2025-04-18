@@ -51,14 +51,14 @@ export default {
 			};
 		}
 
-		const state = await sb.Cache.getByPrefix(TTS_ENABLED);
+		const state = await core.Cache.getByPrefix(TTS_ENABLED);
 		if (!state) {
 			return {
 				reply: "Text-to-speech is currently disabled!"
 			};
 		}
 
-		const multiState = await sb.Cache.getByPrefix(TTS_MULTIPLE_ENABLED);
+		const multiState = await core.Cache.getByPrefix(TTS_MULTIPLE_ENABLED);
 		if (!multiState) {
 			if (this.data.pending) {
 				return {
@@ -83,7 +83,7 @@ export default {
 		let code;
 		let input = context.params.lang ?? "en-us";
 		if (input === "random") {
-			const randomItem = sb.Utils.randArray(locales);
+			const randomItem = core.Utils.randArray(locales);
 			input = randomItem.locale;
 		}
 		else {
@@ -103,7 +103,7 @@ export default {
 		try {
 			messageTime = process.hrtime.bigint();
 
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",
 				searchParams: new URLSearchParams({
@@ -121,7 +121,7 @@ export default {
 			result = (response.body === "true");
 		}
 		catch {
-			await sb.Cache.setByPrefix(TTS_ENABLED, false);
+			await core.Cache.setByPrefix(TTS_ENABLED, false);
 			return {
 				reply: "TTS Listener encountered an error or is turned on! Turning off text to speech."
 			};
@@ -137,7 +137,7 @@ export default {
 			};
 		}
 
-		const duration = sb.Utils.round(Number(messageTime) / 1_000_000, 0);
+		const duration = core.Utils.round(Number(messageTime) / 1_000_000, 0);
 		let cooldown = (duration > 10000)
 			? (this.Cooldown + (duration - 10000) * 10)
 			: this.Cooldown;
@@ -147,7 +147,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Your message has been successfully played on TTS! 
 				It took ${duration / 1000} seconds to read out,
 				and your cooldown is ${cooldown / 1000} seconds.

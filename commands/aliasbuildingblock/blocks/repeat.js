@@ -14,7 +14,7 @@ export default {
 				reply: `No repeat amount provided!`
 			};
 		}
-		else if (!sb.Utils.isValidInteger(amount)) {
+		else if (!core.Utils.isValidInteger(amount)) {
 			return {
 				success: false,
 				reply: `The provided amount must be a positive integer!`

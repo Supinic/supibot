@@ -14,7 +14,7 @@ export default {
 			};
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("Started", "Ended")
 			.from("chat_data", "AFK")
 			.where("User_Alias = %n", targetUser.ID)
@@ -32,12 +32,12 @@ export default {
 			};
 		}
 
-		const delta = sb.Utils.timeDelta(data.Started, true, true, data.Ended);
-		const started = sb.Utils.timeDelta(data.Started);
-		const ended = sb.Utils.timeDelta(data.Ended);
+		const delta = core.Utils.timeDelta(data.Started, true, true, data.Ended);
+		const started = core.Utils.timeDelta(data.Started);
+		const ended = core.Utils.timeDelta(data.Ended);
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				The longest time ${who.toLowerCase()} been AFK for
 				is ${delta}, 
 				which started ${started}

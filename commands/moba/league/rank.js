@@ -43,11 +43,11 @@ export default {
 			};
 		}
 
-		const tier = sb.Utils.capitalize(data.tier.toLowerCase());
-		const winRate = sb.Utils.round(data.wins / (data.wins + data.losses) * 100, 0);
+		const tier = core.Utils.capitalize(data.tier.toLowerCase());
+		const winRate = core.Utils.round(data.wins / (data.wins + data.losses) * 100, 0);
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${gameName} is currently ${tier} ${data.rank} (${data.leaguePoints} LP),
 				with a win/loss of ${data.wins}:${data.losses} (${winRate}% winrate).
 			`

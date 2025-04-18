@@ -17,7 +17,7 @@ export default async () => {
 			return { rates: {} };
 		}
 
-		return sb.Got.get("GenericAPI")({
+		return core.Got.get("GenericAPI")({
 			prefixUrl: "https://data.fixer.io/api",
 			url: "latest",
 			throwHttpErrors: false,
@@ -29,7 +29,7 @@ export default async () => {
 	});
 
 	const [cryptoData, currencyData, goldData, silverData] = await Promise.allSettled([
-		sb.Got.get("GenericAPI")({
+		core.Got.get("GenericAPI")({
 			url: "https://min-api.cryptocompare.com/data/price",
 			searchParams: {
 				fsym: "EUR",
@@ -42,11 +42,11 @@ export default async () => {
 
 		conditionalFixerIo(),
 
-		sb.Got.get("GenericAPI")({
+		core.Got.get("GenericAPI")({
 			url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/EUR"
 		}).json(),
 
-		sb.Got.get("GenericAPI")({
+		core.Got.get("GenericAPI")({
 			url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAG/EUR"
 		}).json()
 	]);
@@ -73,7 +73,7 @@ export default async () => {
 			return;
 		}
 
-		const row = await sb.Query.getRow("crypto_game", "Asset");
+		const row = await core.Query.getRow("crypto_game", "Asset");
 		await row.load(code, true);
 		if (!row.loaded) {
 			row.values.Code = code;
@@ -83,7 +83,7 @@ export default async () => {
 			? value
 			: (1 / value);
 
-		row.values.Price = sb.Utils.round(adjustedValue, 9, { direction: "round" });
+		row.values.Price = core.Utils.round(adjustedValue, 9, { direction: "round" });
 		row.values.Last_Update = now;
 		await row.save({ skipLoad: true });
 	});

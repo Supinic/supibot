@@ -94,7 +94,7 @@ export default {
 			}
 
 			for (let i = 0; i < limit; i++) {
-				rolledItems.push(sb.Utils.randArray(emotes));
+				rolledItems.push(core.Utils.randArray(emotes));
 			}
 
 			uniqueItems = emotes.filter((i, ind, arr) => arr.indexOf(i) === ind).length;
@@ -104,7 +104,7 @@ export default {
 			if (uniqueItems === 1) {
 				const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan", "FeelsDonkMan"], "🤡");
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						[ ${rolledItems.join(" ")} ] 
 						${dankEmote} 
 						You won and beat the odds of 100%.
@@ -124,8 +124,8 @@ export default {
 				chance = (1 / uniqueItems) ** (limit - 1);
 			}
 
-			const reverseChance = sb.Utils.round((1 / chance), 3);
-			const row = await sb.Query.getRow("data", "Slots_Winner");
+			const reverseChance = core.Utils.round((1 / chance), 3);
+			const row = await core.Query.getRow("data", "Slots_Winner");
 			row.setValues({
 				User_Alias: context.user.ID,
 				Source: (Array.isArray(emotes)) ? emotes.join(" ") : (`Number roll: 1 to ${uniqueItems}`),
@@ -141,11 +141,11 @@ export default {
 			]);
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					[ ${rolledItems.join(" ")} ] 
 					${pogEmote} A flush! 
 					Congratulations, you beat the odds of
-					${sb.Utils.round(chance * 100, 3)}%
+					${core.Utils.round(chance * 100, 3)}%
 					(that is 1 in ${reverseChance})
 					${deprecationWarning}
 				`

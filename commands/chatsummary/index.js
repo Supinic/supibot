@@ -15,7 +15,7 @@ const getLocalLogs = async (channel, limit = 50) => {
 	const channelData = sb.Channel.get(channel, twitch);
 
 	const tableName = channelData.getDatabaseName();
-	const data = await sb.Query.getRecordset(rs => rs
+	const data = await core.Query.getRecordset(rs => rs
 		.select("Platform_ID", "Text")
 		.from("chat_line", tableName)
 		.orderBy("ID DESC")
@@ -59,7 +59,7 @@ const getRustlogLogs = async (channel, limit = 50) => {
 	}
 
 	const { year, month, day } = new sb.Date(sb.Date.getTodayUTC());
-	let logsResponse = await sb.Got.get("GenericAPI")({
+	let logsResponse = await core.Got.get("GenericAPI")({
 		url: `https://logs.ivr.fi/channelid/${channelId}/${year}/${month}/${day}`,
 		throwHttpErrors: false,
 		responseType: "text",
@@ -70,7 +70,7 @@ const getRustlogLogs = async (channel, limit = 50) => {
 	});
 
 	if (!logsResponse.ok) {
-		logsResponse = await sb.Got.get("GenericAPI")({
+		logsResponse = await core.Got.get("GenericAPI")({
 			url: `https://logs.zonian.dev/channelid/${channelId}/${year}/${month}/${day}`,
 			throwHttpErrors: false,
 			responseType: "text",
@@ -114,7 +114,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	initialize: function () {
-		const BASE_QUERY = sb.Utils.tag.trim `
+		const BASE_QUERY = core.Utils.tag.trim `
 			Reply only in English.
 			Concisely summarize the following messages from an online chatroom %CHANNEL_NAME%
 			(ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)
@@ -211,7 +211,7 @@ export default {
 
 		"<code>$chatsummary type:(query type)</code>",
 		"Summarizes the latest messages, but in a different manner:",
-		sb.Utils.tag.trim `
+		core.Utils.tag.trim `
 			<li>
 				<ul><code>base</code> baseline summary (this one is used by default if no type is provided)</ul>
 				<ul><code>single</code> focuses on a single most important topic</ul>

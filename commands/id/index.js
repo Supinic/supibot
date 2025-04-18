@@ -39,7 +39,7 @@ export default {
 			temporalReply = "first mentioned in logs (predating Supibot)";
 		}
 
-		const delta = sb.Utils.timeDelta(targetUser.Started_Using);
+		const delta = core.Utils.timeDelta(targetUser.Started_Using);
 		const now = new sb.Date();
 		const { year, month, day } = new sb.Date(targetUser.Started_Using);
 

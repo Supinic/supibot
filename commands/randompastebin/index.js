@@ -13,9 +13,9 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function randomPastebin (context, syntax) {
-		let data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
+		let data = await core.Cache.getByPrefix("random-pastebin-paste-list");
 		if (!data) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://scrape.pastebin.com/api_scraping.php",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -41,7 +41,7 @@ export default {
 				size: Number(i.size)
 			}));
 
-			await sb.Cache.setByPrefix("random-pastebin-paste-list", data, {
+			await core.Cache.setByPrefix("random-pastebin-paste-list", data, {
 				expiry: 300_000
 			});
 		}
@@ -63,7 +63,7 @@ export default {
 			filteredData = data.filter(i => i.syntax.toLowerCase() === syntax.toLowerCase());
 		}
 
-		const paste = sb.Utils.randArray(filteredData);
+		const paste = core.Utils.randArray(filteredData);
 		if (!paste) {
 			const list = [...new Set(data.map(i => i.syntax))].sort();
 			return {
@@ -79,10 +79,10 @@ export default {
 			};
 		}
 
-		const delta = sb.Utils.timeDelta(new sb.Date(paste.posted));
-		const expiryString = (paste.expires) ? `Expires ${sb.Utils.timeDelta(new sb.Date(paste.expires))}.` : "";
+		const delta = core.Utils.timeDelta(new sb.Date(paste.posted));
+		const expiryString = (paste.expires) ? `Expires ${core.Utils.timeDelta(new sb.Date(paste.expires))}.` : "";
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Random ${paste.syntax} paste
 				from ${paste.user ?? "anonymous"}
 				(posted ${delta}): 
@@ -93,7 +93,7 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
+		const data = await core.Cache.getByPrefix("random-pastebin-paste-list");
 
 		let list;
 		let listDescription;

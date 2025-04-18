@@ -8,7 +8,7 @@ export default {
 	],
 	execute: async (context, ...args) => {
 		const limit = context.params.limit ?? context.channel?.Message_Limit ?? context.platform.Message_Limit;
-		if (!sb.Utils.isValidInteger(limit, 0)) {
+		if (!core.Utils.isValidInteger(limit, 0)) {
 			return {
 				success: false,
 				reply: `Your provided limit must be a positive integer or exactly zero!`
@@ -22,7 +22,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			method: "POST",
 			url: `https://haste.zneix.eu/documents`,
 			throwHttpErrors: false,

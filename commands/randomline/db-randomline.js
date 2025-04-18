@@ -19,7 +19,7 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 	const channelName = channelData.getDatabaseName();
 
 	/** @type {number|null} */
-	const userMessageCount = await sb.Query.getRecordset(rs => rs
+	const userMessageCount = await core.Query.getRecordset(rs => rs
 		.select("Message_Count AS Count")
 		.from("chat_data", "Message_Meta_User_Alias")
 		.where("User_Alias = %n", userData.ID)
@@ -33,7 +33,7 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 	}
 
 	let randomID;
-	const tableHasPlatformID = await sb.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
+	const tableHasPlatformID = await core.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
 	if (tableHasPlatformID) {
 		let userIdentifier;
 		const platformData = channelData.Platform;
@@ -44,7 +44,7 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 
 		userIdentifier ??= userData.Name;
 
-		randomID = await sb.Query.getRecordset(rs => rs
+		randomID = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("chat_line", channelName)
 			.where("Platform_ID = %s", userIdentifier)
@@ -55,7 +55,7 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 		);
 	}
 	else {
-		randomID = await sb.Query.getRecordset(rs => rs
+		randomID = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("chat_line", channelName)
 			.where("User_Alias = %n", userData.ID)
@@ -70,7 +70,7 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 		return throwOrReturn(throwOnFailure, "No chat lines found for this user!");
 	}
 
-	const randomLine = await sb.Query.getRecordset(rs => rs
+	const randomLine = await core.Query.getRecordset(rs => rs
 		.select("Text", "Posted")
 		.from("chat_line", channelName)
 		.where("ID >= %n", randomID)
@@ -92,7 +92,7 @@ const fetchChannelRandomLine = async function (channelData, options = {}) {
 	const channelName = channelData.getDatabaseName();
 
 	/** @type {number|null} */
-	const channelMessageCount = await sb.Query.getRecordset(rs => rs
+	const channelMessageCount = await core.Query.getRecordset(rs => rs
 		.select("MAX(ID) AS Total")
 		.from("chat_line", channelName)
 		.single()
@@ -103,11 +103,11 @@ const fetchChannelRandomLine = async function (channelData, options = {}) {
 		return throwOrReturn(throwOnFailure, "This channel does not have enough chat lines saved just yet!");
 	}
 
-	const tableHasPlatformID = await sb.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
+	const tableHasPlatformID = await core.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
 	const specificColumns = (tableHasPlatformID) ? ["Platform_ID"] : ["User_Alias"];
 
 	if (!tableHistoricColumns.has(channelName)) {
-		const hasHistoric = await sb.Query.isTableColumnPresent("chat_line", channelName, "Historic");
+		const hasHistoric = await core.Query.isTableColumnPresent("chat_line", channelName, "Historic");
 		tableHistoricColumns.set(channelName, hasHistoric);
 	}
 
@@ -115,7 +115,7 @@ const fetchChannelRandomLine = async function (channelData, options = {}) {
 		specificColumns.push("Historic");
 	}
 
-	const randomLine = await sb.Query.getRecordset(rs => rs
+	const randomLine = await core.Query.getRecordset(rs => rs
 		.select("Text", "Posted", ...specificColumns)
 		.from("chat_line", channelName)
 		.where("ID >= %n", randomInt(1, channelMessageCount))

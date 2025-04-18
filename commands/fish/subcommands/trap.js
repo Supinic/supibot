@@ -25,7 +25,7 @@ const execute = async (context, operation) => {
 		return {
 			replyWithPrivateMessage: whisperOnFailure,
 			success: false,
-			reply: `Hol' up partner! You can go set up your fishing traps ${sb.Utils.timeDelta(fishData.readyTimestamp)}!`
+			reply: `Hol' up partner! You can go set up your fishing traps ${core.Utils.timeDelta(fishData.readyTimestamp)}!`
 		};
 	}
 
@@ -81,7 +81,7 @@ const execute = async (context, operation) => {
 
 		await saveData(context, fishData);
 
-		const end = sb.Utils.timeDelta(trap.end, true);
+		const end = core.Utils.timeDelta(trap.end, true);
 		const emote = await context.getBestAvailableEmote(["PauseChamp"], "⌛");
 		return {
 			reply: `You have laid your fishing traps. Now we wait... ${emote} You can check them in about ${end}.`
@@ -142,11 +142,11 @@ const execute = async (context, operation) => {
 		}
 	}
 	else {
-		const delta = sb.Utils.timeDelta(trap.end);
+		const delta = core.Utils.timeDelta(trap.end);
 		return {
 			replyWithPrivateMessage: whisperOnFailure,
 			success: false,
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Your traps are not fully loaded yet! They will be ready to harvest ${delta}.
 				If you wish to get rid of them immediately, use "$fish trap cancel",
 				but you will not get any catch from your traps.

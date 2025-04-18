@@ -77,7 +77,7 @@ const execute = async function (context, query) {
 	let targetLanguageCode;
 	if (context.params.to) {
 		if (context.params.to === "random") {
-			searchParams.target_lang = sb.Utils.randArray(supportedLanguages);
+			searchParams.target_lang = core.Utils.randArray(supportedLanguages);
 		}
 		else {
 			targetLanguageCode = getCode(context.params.to);
@@ -97,7 +97,7 @@ const execute = async function (context, query) {
 		};
 	}
 	else if (!supportedLanguages.includes(targetLanguageCode.toLowerCase())) {
-		const languageName = sb.Utils.capitalize(getName(targetLanguageCode));
+		const languageName = core.Utils.capitalize(getName(targetLanguageCode));
 		return {
 			success: false,
 			reply: `Target language (${languageName}) is not supported by DeepL!`
@@ -116,7 +116,7 @@ const execute = async function (context, query) {
 		}
 		else if (!formalitySupportedLanguages.includes(targetLanguageCode.toLowerCase())) {
 			const languageNames = formalitySupportedLanguages
-				.map(i => sb.Utils.capitalize(getName(i)))
+				.map(i => core.Utils.capitalize(getName(i)))
 				.sort();
 
 			return {
@@ -128,7 +128,7 @@ const execute = async function (context, query) {
 		searchParams.formality = context.params.formality;
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: "https://api-free.deepl.com/v2/translate",
 		headers: {
 			Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
@@ -158,8 +158,8 @@ const execute = async function (context, query) {
 	}
 
 	const [data] = response.body.translations;
-	const fromLanguageName = sb.Utils.capitalize(getName(data.detected_source_language));
-	const toLanguageName = sb.Utils.capitalize(getName(searchParams.target_lang));
+	const fromLanguageName = core.Utils.capitalize(getName(data.detected_source_language));
+	const toLanguageName = core.Utils.capitalize(getName(searchParams.target_lang));
 
 	return {
 		success: true,

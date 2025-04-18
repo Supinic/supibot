@@ -6,14 +6,14 @@ export default {
 	expression: "0 */30 * * * *",
 	description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",
 	code: (async function changelogAnnouncer (cron) {
-		isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
+		isTableAvailable ??= await core.Query.isTablePresent("data", "Event_Subscription");
 		if (isTableAvailable === false) {
 			cron.job.stop();
 			return;
 		}
 
 		if (typeof latestID !== "number") {
-			latestID = await sb.Query.getRecordset(rs => rs
+			latestID = await core.Query.getRecordset(rs => rs
 				.select("MAX(ID) AS Max")
 				.from("data", "Changelog")
 				.single()
@@ -23,7 +23,7 @@ export default {
 			return;
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("ID", "Created", "Title", "Type", "Description")
 			.from("data", "Changelog")
 			.where("ID > %n", latestID)
@@ -35,7 +35,7 @@ export default {
 
 		latestID = Math.max(...data.map(i => i.ID));
 
-		const subscriptions = await sb.Query.getRecordset(rs => rs
+		const subscriptions = await core.Query.getRecordset(rs => rs
 			.select("User_Alias", "Platform", "Flags")
 			.from("data", "Event_Subscription")
 			.where("Type = %s", "Changelog")
@@ -50,7 +50,7 @@ export default {
 			}
 			else {
 				const params = data.map(i => `ID=${i.ID}`).join("&");
-				const relay = await sb.Got.get("Supinic")({
+				const relay = await core.Got.get("Supinic")({
 					method: "POST",
 					url: "relay",
 					throwHttpErrors: false,

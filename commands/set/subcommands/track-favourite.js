@@ -15,7 +15,7 @@ const fetchTrackIDs = async (tracks) => {
 		return [];
 	}
 
-	return await sb.Query.getRecordset(rs => rs
+	return await core.Query.getRecordset(rs => rs
 		.select("ID")
 		.from("music", "Track")
 		.where("Link IN %s+", stringIDs)
@@ -25,7 +25,7 @@ const fetchTrackIDs = async (tracks) => {
 
 const updateTrackFavouriteStatus = async (context, IDs, status) => {
 	for (const ID of IDs) {
-		const row = await sb.Query.getRow("music", "User_Favourite");
+		const row = await core.Query.getRow("music", "User_Favourite");
 		await row.load({
 			User_Alias: context.user.ID,
 			Track: ID

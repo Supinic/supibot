@@ -26,7 +26,7 @@ export default {
 
 		this.data.checkedUsernames.add(raw.user);
 
-		const assumedUserID = await sb.Query.getRecordset(rs => rs
+		const assumedUserID = await core.Query.getRecordset(rs => rs
 			.select("Twitch_ID")
 			.from("chat_data", "User_Alias")
 			.where("Name = %s", raw.user)
@@ -35,7 +35,7 @@ export default {
 			.limit(1)
 		);
 
-		const response = await sb.Got.get("IVR")({
+		const response = await core.Got.get("IVR")({
 			url: "v2/twitch/user",
 			searchParams: {
 				id: assumedUserID
@@ -60,7 +60,7 @@ export default {
 
 		const now = new sb.Date();
 		const logsUrl = `https://logs.ivr.fi/channel/supinic/${now.year}/${now.month}/${now.day}`;
-		const row = await sb.Query.getRow("data", "Suggestion");
+		const row = await core.Query.getRow("data", "Suggestion");
 		row.setValues({
 			Text: `Automatic suspicious user suggestion!\nNew: @${raw.user} - Old: @${data.login}\nTimestamp - ${now.sqlTime()} - Logs: ${logsUrl}`,
 			User_Alias: 1127,
@@ -70,7 +70,7 @@ export default {
 
 		await row.save({ skipLoad: true });
 
-		const resultMessage = sb.Utils.tag.trim `
+		const resultMessage = core.Utils.tag.trim `
 			Hey @${raw.user},
 			I'd like to verify whether @${data.login} is 
 			a different account/name that you used in the past,

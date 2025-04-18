@@ -8,7 +8,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function countLineTotal (context) {
-		const chatLineAmount = await sb.Query.getRecordset(rs => rs
+		const chatLineAmount = await core.Query.getRecordset(rs => rs
 			.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
 			.from("INFORMATION_SCHEMA", "TABLES")
 			.where("TABLE_SCHEMA = %s", "chat_line")
@@ -18,12 +18,12 @@ export default {
 
 		let historyText = "";
 		const cacheKey = "count-line-total-previous";
-		const history = await sb.Cache.getByPrefix(cacheKey);
+		const history = await core.Cache.getByPrefix(cacheKey);
 		if (history) {
 			const days = (sb.Date.now() - history.timestamp) / 864e5;
-			const linesPerHour = sb.Utils.round((chatLineAmount - history.amount) / (days * 24), 0);
+			const linesPerHour = core.Utils.round((chatLineAmount - history.amount) / (days * 24), 0);
 
-			historyText = `Lines are added at a rate of ${sb.Utils.groupDigits(linesPerHour)} lines/hr.`;
+			historyText = `Lines are added at a rate of ${core.Utils.groupDigits(linesPerHour)} lines/hr.`;
 		}
 		else {
 			const value = {
@@ -31,7 +31,7 @@ export default {
 				amount: chatLineAmount
 			};
 
-			await sb.Cache.setByPrefix(cacheKey, value, {
+			await core.Cache.setByPrefix(cacheKey, value, {
 				expiry: 365 * 864e5 // 1 year (365 days)
 			});
 		}
@@ -50,8 +50,8 @@ export default {
 
 		return {
 			cooldown,
-			reply: sb.Utils.tag.trim `
-				Currently logging ${sb.Utils.groupDigits(chatLineAmount)} lines in total across all channels.
+			reply: core.Utils.tag.trim `
+				Currently logging ${core.Utils.groupDigits(chatLineAmount)} lines in total across all channels.
 				${historyText}
 			`
 		};

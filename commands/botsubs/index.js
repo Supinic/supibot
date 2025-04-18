@@ -1,5 +1,5 @@
 /**
- * await sb.Got.get("Helix")({
+ * await core.Got.get("Helix")({
  * 	url: "subscriptions/user",
  * 	searchParams: {
  * 		broadcaster_id: "31400525",
@@ -31,7 +31,7 @@ export default {
 		const result = [];
 		for (const channel of subChannels) {
 			const channelEmotes = subEmotes.filter(i => i.channel === channel);
-			result.push(sb.Utils.randArray(channelEmotes));
+			result.push(core.Utils.randArray(channelEmotes));
 		}
 
 		result.sort((a, b) => a.channel.localeCompare(b.channel));

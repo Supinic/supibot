@@ -1,4 +1,4 @@
-const createRelay = async (IDs) => await sb.Got.get("Supinic")({
+const createRelay = async (IDs) => await core.Got.get("Supinic")({
 	method: "POST",
 	url: "relay",
 	throwHttpErrors: false,
@@ -27,12 +27,12 @@ export default {
 
 		const contextEmote = await context.getBestAvailableEmote([emote], null, { returnEmoteObject: true });
 		const contextEmoteID = (contextEmote?.id) ? String(contextEmote.id) : "";
-		let emoteData = await sb.Query.getRecordset(rs => rs
+		let emoteData = await core.Query.getRecordset(rs => rs
 			.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Emote_Deleted", "Author")
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
 			.where("Replaced = %b", false)
-			.orderBy(`CASE WHEN Emote_ID = '${sb.Query.escapeString(contextEmoteID)}' THEN -1 ELSE 1 END`)
+			.orderBy(`CASE WHEN Emote_ID = '${core.Query.escapeString(contextEmoteID)}' THEN -1 ELSE 1 END`)
 		);
 
 		const customIndex = context.params.index ?? null;
@@ -44,7 +44,7 @@ export default {
 				};
 			}
 
-			const fallbackEmoteData = await sb.Query.getRecordset(rs => rs
+			const fallbackEmoteData = await core.Query.getRecordset(rs => rs
 				.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
 				.from("data", "Origin")
 				.where("Name COLLATE utf8mb4_bin %*like*", emote)
@@ -148,7 +148,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${extras}
 				${link}					
 				${type} emote:

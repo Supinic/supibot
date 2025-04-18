@@ -23,7 +23,7 @@ export default {
 		else {
 			const string = (emote)
 				? `${emote} 💋`
-				: sb.Utils.randArray(KISS_EMOJIS);
+				: core.Utils.randArray(KISS_EMOJIS);
 
 			return {
 				reply: `${context.user.Name} kisses ${user} ${string}`

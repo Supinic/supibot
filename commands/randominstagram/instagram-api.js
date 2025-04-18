@@ -6,9 +6,9 @@ const cacheKey = "instagram-web-desktop-fb-app-id";
  * @returns {string|null}
  */
 export const getFacebookAppID = async () => {
-	let key = await sb.Cache.getByPrefix(cacheKey);
+	let key = await core.Cache.getByPrefix(cacheKey);
 	if (!key) {
-		const response = await sb.Got.get("FakeAgent")({
+		const response = await core.Got.get("FakeAgent")({
 			url,
 			throwHttpErrors: false,
 			responseType: "text"
@@ -24,7 +24,7 @@ export const getFacebookAppID = async () => {
 		}
 
 		key = match[1];
-		await sb.Cache.setByPrefix(cacheKey, key, {
+		await core.Cache.setByPrefix(cacheKey, key, {
 			expiry: 36e5 // 1 hour
 		});
 	}
@@ -33,5 +33,5 @@ export const getFacebookAppID = async () => {
 };
 
 export const resetFacebookAppID = async () => {
-	await sb.Cache.setByPrefix(cacheKey, null);
+	await core.Cache.setByPrefix(cacheKey, null);
 };

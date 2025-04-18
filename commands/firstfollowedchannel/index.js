@@ -37,7 +37,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.gql({
+		const response = await core.Got.gql({
 			url: "https://gql.twitch.tv/gql",
 			responseType: "json",
 			headers: this.data.requestHeaders,
@@ -73,7 +73,7 @@ export default {
 		const { edges } = response.body.data.user.follows;
 		if (!edges || edges.length === 0) {
 			return {
-				reply: `${sb.Utils.capitalize(who)} don't follow anyone.`
+				reply: `${core.Utils.capitalize(who)} don't follow anyone.`
 			};
 		}
 
@@ -91,7 +91,7 @@ export default {
 			? "you!"
 			: `@${followUsername}`;
 
-		const delta = sb.Utils.timeDelta(new sb.Date(date), false, true);
+		const delta = core.Utils.timeDelta(new sb.Date(date), false, true);
 		return {
 			reply: `The channel ${who} have followed the longest is ${followUser}, since ${delta}.`
 		};

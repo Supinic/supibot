@@ -8,7 +8,7 @@
  */
 export default function createDiscordEmbed (id, options = {}) {
 	const dateString = options.created.format("Y-m-d H:i:s");
-	const time = sb.Utils.round(options.creationTime);
+	const time = core.Utils.round(options.creationTime);
 
 	const result = [];
 	for (let i = 0; i < 9; i++) {

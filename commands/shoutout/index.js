@@ -16,7 +16,7 @@ export default {
 		}
 
 		const twitchPlatform = sb.Platform.get("twitch");
-		const userLookupResponse = await sb.Got.get("Helix")({
+		const userLookupResponse = await core.Got.get("Helix")({
 			url: "users",
 			searchParams: {
 				login: sb.User.normalizeUsername(target.trim())
@@ -65,7 +65,7 @@ export default {
 			game_id and game_name and title is "" when never streamed before
 			if delay is `null` the streamer is banned (?)
 		 */
-		const response = await sb.Got.get("Helix")({
+		const response = await core.Got.get("Helix")({
 			url: "channels",
 			searchParams: {
 				broadcaster_id: targetUserID
@@ -99,7 +99,7 @@ export default {
 			: "";
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Shout out to ${nameString}!
 				${gameString} 
 				${bannedString}

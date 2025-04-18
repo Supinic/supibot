@@ -75,7 +75,7 @@ export default {
 		}
 
 		if (params.mode) {
-			params.mode = sb.Utils.capitalize(params.mode.toLowerCase());
+			params.mode = core.Utils.capitalize(params.mode.toLowerCase());
 			const found = ALLOWED_MODES.find(i => i.name === params.mode);
 			if (!found) {
 				const allowedTypes = ALLOWED_MODES.map(i => i.name).join(", ");

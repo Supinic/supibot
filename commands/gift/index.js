@@ -44,7 +44,7 @@ export default {
 					};
 				}
 
-				const sourceUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
+				const sourceUser = await core.Query.getRow("chat_data", "Extra_User_Data");
 				await sourceUser.load(context.user.ID, true);
 				if (!sourceUser.loaded) {
 					sourceUser.values.User_Alias = context.user.ID;
@@ -59,7 +59,7 @@ export default {
 					};
 				}
 
-				const targetUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
+				const targetUser = await core.Query.getRow("chat_data", "Extra_User_Data");
 				await targetUser.load(targetUserData.ID, true);
 				if (!targetUser.loaded) {
 					targetUser.values.User_Alias = targetUserData.ID;

@@ -22,7 +22,7 @@ export default {
 			return;
 		}
 
-		await sb.Got.get("Supinic")({
+		await core.Got.get("Supinic")({
 			method: "PUT",
 			url: "bot-program/bot/active",
 			headers: {

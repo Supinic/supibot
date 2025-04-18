@@ -1,5 +1,5 @@
 import fetchData from "./worldinfo.js";
-const group = (num) => sb.Utils.groupDigits(num, " ");
+const group = (num) => core.Utils.groupDigits(num, " ");
 
 export default {
 	Name: "corona",
@@ -28,7 +28,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Global statistics:
 				${group(data.total)} total cases,
 				${group(data.deaths)} total deaths,

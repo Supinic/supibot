@@ -63,7 +63,7 @@ export default {
 						channel: context.channel.ID,
 						cooldown: 30_000
 					},
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Random lines are not available in this channel!
 						You can add them by enabling the IVR Rustlog service in this channel, 
 						which can be done via the "$bot enable-rustlog" command.
@@ -142,7 +142,7 @@ export default {
 			partialReplies.unshift(
 				{
 					bancheck: false,
-					message: `(${sb.Utils.timeDelta(result.date)})`
+					message: `(${core.Utils.timeDelta(result.date)})`
 				},
 				{
 					bancheck: true,

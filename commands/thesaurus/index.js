@@ -18,7 +18,7 @@ export default {
 			};
 		}
 
-		const wordsData = await sb.Query.getRecordset(rs => rs
+		const wordsData = await core.Query.getRecordset(rs => rs
 			.select("Word", "Result")
 			.from("data", "Thesaurus")
 			.where("Word IN %s+", words)
@@ -51,7 +51,7 @@ export default {
 
 			// With a chance of 2 in 3, transmute the word into a synonym
 			if (thesaurus[word] && roll > 1) {
-				result.push(sb.Utils.randArray(thesaurus[word]));
+				result.push(core.Utils.randArray(thesaurus[word]));
 			}
 			else {
 				result.push(rawWord);

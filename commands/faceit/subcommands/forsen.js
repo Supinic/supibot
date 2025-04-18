@@ -18,7 +18,7 @@ export default {
 		"Checks how many matches Forsen has won (surely) or lost (PepeLaugh) in a row."
 	],
 	execute: async (context) => {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://open.faceit.com/data/v4/players/${forsenUserID}/history`,
 			searchParams: {
 				limit: "20"

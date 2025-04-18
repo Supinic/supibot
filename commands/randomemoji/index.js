@@ -10,7 +10,7 @@ const EMOJI_RANGES = [
 
 const isEmojiRegex = /\p{Emoji}/u;
 const generateEmoji = () => {
-	const range = sb.Utils.randArray(EMOJI_RANGES);
+	const range = core.Utils.randArray(EMOJI_RANGES);
 
 	let string = "";
 	let attempts = 5;
@@ -38,7 +38,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function randomEmoji (context, number = 1) {
 		let repeats = Number(number);
-		if (!sb.Utils.isValidInteger(repeats) || repeats > MAXIMUM_EMOJI_LIMIT) {
+		if (!core.Utils.isValidInteger(repeats) || repeats > MAXIMUM_EMOJI_LIMIT) {
 			repeats = 1;
 		}
 

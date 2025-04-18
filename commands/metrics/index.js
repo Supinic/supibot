@@ -32,7 +32,7 @@ export default {
 
 		let reply;
 		if (definition.type === "basic") {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: `${baseUrl}/query`,
 				searchParams: {
 					query: definition.query
