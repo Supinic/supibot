@@ -2,7 +2,6 @@ import EventEmitter from "node:events";
 import { SupiError, SupiDate } from "supi-core";
 
 import {
-	type GetEmoteOptions,
 	Platform,
 	Like as PlatformLike,
 	GenericSendOptions,
@@ -67,9 +66,9 @@ export class Channel extends TemplateWithId {
 	Mode: Mode;
 	readonly Mention: boolean;
 	readonly Links_Allowed: boolean;
-	readonly Banphrase_API_Type: "Pajbot";
-	readonly Banphrase_API_URL: string;
-	readonly Banphrase_API_Downtime: BanphraseDowntimeBehaviour;
+	readonly Banphrase_API_Type: "Pajbot" | null;
+	readonly Banphrase_API_URL: string | null;
+	readonly Banphrase_API_Downtime: BanphraseDowntimeBehaviour | null;
 	readonly Message_Limit: number | null;
 	readonly NSFW: boolean;
 	readonly Logging: Set<LogType>;
@@ -224,32 +223,6 @@ export class Channel extends TemplateWithId {
 
 	async invalidateEmotesCache (): Promise<void> {
 		await this.setCacheData("emotes", null);
-	}
-
-	// async getBestAvailableEmote (emotes: string[], fallbackEmote: string, options: GetStringEmoteOptions): Promise<string>;
-	// async getBestAvailableEmote (emotes: string[], fallbackEmote: string, options: GetObjectEmoteOptions): Promise<Emote>;
-	async getBestAvailableEmote <T extends string> (emotes: T[], fallbackEmote: T, options: GetEmoteOptions = {}): Promise<Emote | T> {
-		const availableEmotes = await this.fetchEmotes();
-		const emoteArray = (options.shuffle)
-			? core.Utils.shuffleArray(emotes)
-			: emotes;
-
-		const caseSensitive = options.caseSensitivity ?? true;
-		for (const emote of emoteArray) {
-			const lowerEmote = emote.toLowerCase();
-			const available = availableEmotes.find(i => (caseSensitive)
-				? (i.name === emote)
-				: (i.name.toLowerCase() === lowerEmote)
-			);
-
-			if (available && (typeof options.filter !== "function" || options.filter(available))) {
-				return (options.returnEmoteObject)
-					? available
-					: available.name as T;
-			}
-		}
-
-		return fallbackEmote;
 	}
 
 	async prepareMessage (message: string, options: PrepareMessageOptions = {}): Promise<string | false> {

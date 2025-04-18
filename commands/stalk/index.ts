@@ -14,7 +14,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function stalk (context: Context<[]>, user) {
 		if (!user) {
-			const emote = await context.getBestAvailableEmote(["forsen1"], "👀") as string; // @todo fix emote fetching method types
+			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
 			return {
 				success: false,
 				reply: `${emote} I'm watching you... (no user provided!)`
@@ -30,14 +30,14 @@ export default {
 		}
 		else if (targetUser.ID === context.user.ID && context.channel) {
 			// Only post the "Easter egg" message if used on the executing user in a channel chat
-			const emote = await context.getBestAvailableEmote(["forsen1"], "👀") as string; // @todo fix emote fetching method types
+			const emote = await context.randomEmote("forsen1", "👀");
 			return {
 				success: false,
 				reply: `${emote} You're right here ${emote}`
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
-			const emote = await context.getBestAvailableEmote(["MrDestructoid"], "🤖") as string; // @todo fix emote fetching method types
+			const emote = await context.randomEmote("MrDestructoid", "🤖");
 			return {
 				success: false,
 				reply: `${emote} I'm right here ${emote}`

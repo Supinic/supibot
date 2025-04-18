@@ -318,17 +318,37 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		await core.Cache.setByPrefix(key, null);
 	}
 
-	public async getBestAvailableEmote<T extends string> (
+	public async getBestAvailableEmote (
 		channelData: Channel | null,
-		emotes: T[],
-		fallbackEmote: T,
-		options: GetEmoteOptions = {}
-	): Promise<T | Emote> {
-		if (channelData) {
-			return channelData.getBestAvailableEmote(emotes, fallbackEmote, options);
-		}
+		emotes: readonly string[],
+		fallback: string,
+		options?: GetEmoteOptions & { returnEmoteObject?: false; }
+	): Promise<string>;
 
-		const availableEmotes = await this.fetchGlobalEmotes();
+	public async getBestAvailableEmote (
+		channelData: Channel | null,
+		emotes: readonly string[],
+		fallback: string,
+		options?: GetEmoteOptions & { returnEmoteObject: true }
+	): Promise<Emote | undefined>;
+
+	public async getBestAvailableEmote (
+		channelData: Channel | null,
+		emotes: readonly string[],
+		fallback: string,
+		options?: GetEmoteOptions
+	): Promise<string | Emote | undefined>;
+
+	public async getBestAvailableEmote (
+		channelData: Channel | null,
+		emotes: readonly string[],
+		fallback: string,
+		options: GetEmoteOptions = {}
+	): Promise<string | Emote | undefined> {
+		const availableEmotes = (channelData)
+			? await channelData.fetchEmotes()
+			: await this.fetchGlobalEmotes();
+
 		const emoteArray = (options.shuffle)
 			? core.Utils.shuffleArray(emotes)
 			: emotes;
@@ -344,11 +364,11 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			if (available && (typeof options.filter !== "function" || options.filter(available))) {
 				return (options.returnEmoteObject)
 					? available
-					: available.name as T;
+					: available.name;
 			}
 		}
 
-		return fallbackEmote;
+		return fallback;
 	}
 
 	/**

@@ -228,18 +228,21 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		};
 	}
 
-	async getBestAvailableEmote <T extends string> (emotes: T[], fallback: T, options: BestEmoteOptions = {}): Promise<Emote | T> {
-		const channelData = options.channel ?? this.channel;
+	async getBestAvailableEmote (emotes: readonly string[], fallback: string, options?: BestEmoteOptions & { returnEmoteObject?: false; }): Promise<string>;
+	async getBestAvailableEmote (emotes: readonly string[], fallback: string, options: BestEmoteOptions & { returnEmoteObject: true; }): Promise<Emote | undefined>;
+	async getBestAvailableEmote (emotes: readonly string[], fallback: string, options?: BestEmoteOptions): Promise<string | Emote | undefined>;
+	async getBestAvailableEmote (
+		emotes: readonly string[],
+		fallback: string,
+		options: BestEmoteOptions = {}
+	): Promise<string | Emote | undefined> {
+		const channelData = options.channel ?? this.channel ?? null;
 		const platformData = options.platform ?? this.platform;
-		if (channelData) {
-			return await channelData.getBestAvailableEmote(emotes, fallback, options);
-		}
-		else {
-			return await platformData.getBestAvailableEmote(null, emotes, fallback, options);
-		}
+
+		return await platformData.getBestAvailableEmote(channelData, emotes, fallback, options);
 	}
 
-	async randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
+	async randomEmote <const T extends string[]> (...inputEmotes: T): Promise<T[number]> {
 		if (inputEmotes.length < 2) {
 			throw new SupiError({
 				message: "At least two emotes are required"
@@ -247,12 +250,12 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		}
 
 		const emotes = inputEmotes.slice(0, -1);
-		const fallback = inputEmotes.at(-1) as T; // Guaranteed because of the above condition checking for length >= 2
+		const fallback = inputEmotes.at(-1) as T[number];
 
 		return await this.getBestAvailableEmote(emotes, fallback, {
 			shuffle: true,
 			returnEmoteObject: false
-		}) as T;
+		});
 	}
 
 	get tee () { return this.append.tee; }

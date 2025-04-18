@@ -91,8 +91,7 @@ export default {
 				};
 			}
 			else if (commandData === this) {
-				// @todo remove type cast by properly overloading the getEmote method
-				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅") as string;
+				const emote = await context.randomEmote("PepeLaugh", "pepeLaugh", "4Head", "😅");
 				return {
 					success: false,
 					reply: `You can't ${invocation} the ${commandData.Name} command! ${emote}`
@@ -110,8 +109,7 @@ export default {
 				};
 			}
 			else if (commandData === this) {
-				// @todo remove type cast by properly overloading the getEmote method
-				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅") as string;
+				const emote = await context.randomEmote("PepeLaugh", "pepeLaugh", "4Head", "😅");
 				return {
 					success: false,
 					reply: `You can't ${invocation} the ${commandData.Name} command's invocation! ${emote}`

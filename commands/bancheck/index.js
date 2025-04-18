@@ -32,7 +32,7 @@ export default {
 			};
 		}
 		else if (context.channel && context.channel.ID === targetChannel.ID) {
-			const emote = await context.channel.getBestAvailableEmote(
+			const emote = await context.getBestAvailableEmote(
 				["PepeLaugh", "pepeLaugh", "LULW", "LuL", "LUL", "4HEad", "4Head"],
 				"😀"
 			);

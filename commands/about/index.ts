@@ -36,9 +36,8 @@ export default {
 			}
 		}
 
-		// @todo remove type casts by properly overloading the getEmote method
-		const emote = await context.getBestAvailableEmote(["supiniL", "supiniOkay", "ppL"], "🙂") as string;
-		const hackEmote = await context.getBestAvailableEmote(["supiniHack"], "🤓") as string;
+		const emote = await context.randomEmote("supiniL", "supiniOkay", "ppL", "🙂");
+		const hackEmote = await context.randomEmote("supiniHack", "🤓");
 		return {
 			reply: core.Utils.tag.trim `
 				I am a smol variety and utility bot ${emote}
