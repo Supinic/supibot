@@ -1,3 +1,7 @@
+import type { Context, CommandDefinition } from "../../classes/command.js";
+
+const params = [{ name: "sentences", type: "boolean" }] as const;
+
 export default {
 	Name: "addbetween",
 	Aliases: ["ab"],
@@ -5,11 +9,9 @@ export default {
 	Cooldown: 30000,
 	Description: "Fills the message provided with the word (usually an emote) provided as the first argument.",
 	Flags: ["external-input","mention","pipe"],
-	Params: [
-		{ name: "sentences", type: "boolean" }
-	],
+	Params: params,
 	Whitelist_Response: null,
-	Code: (async function addBetween (context, word, ...args) {
+	Code: function addBetween (context: Context<typeof params>, word, ...args) {
 		if (!word || args.length === 0) {
 			return {
 				success: false,
@@ -22,6 +24,7 @@ export default {
 			nodes = args.join(" ").split(/[?!.]/);
 		}
 		else if (args.length === 1) {
+			// eslint-disable-next-line @typescript-eslint/no-misused-spread
 			nodes = [...args[0]];
 		}
 
@@ -38,6 +41,6 @@ export default {
 				length: (context.append.pipe) ? null : this.Cooldown
 			}
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+} satisfies CommandDefinition;
