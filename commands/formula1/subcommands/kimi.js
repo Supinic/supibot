@@ -16,7 +16,7 @@ export default {
 
 		const availableQuotes = quoteList.filter(i => !repeatedQuotes[channelID].includes(i));
 
-		const quote = sb.Utils.randArray(availableQuotes);
+		const quote = core.Utils.randArray(availableQuotes);
 		repeatedQuotes[channelID].unshift(quote);
 		repeatedQuotes[channelID].splice(MAXIMUM_QUOTE_REPEATS);
 

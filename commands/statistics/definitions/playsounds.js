@@ -3,7 +3,7 @@ export default {
 	aliases: ["ps"],
 	description: "Checks the amount of times a given playsound has been used.",
 	execute: async (context, type, name) => {
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("Name", "Use_Count")
 			.from("data", "Playsound")
 		);

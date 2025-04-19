@@ -21,7 +21,7 @@ const staticNumberedLinkMap = {
 	},
 	fursona: () => {
 		const number = randomInt(1, 99999);
-		const padded = sb.Utils.zf(number, 5);
+		const padded = core.Utils.zf(number, 5);
 
 		return `https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed${padded}.jpg`;
 	},
@@ -52,7 +52,7 @@ export default [
 		)),
 		types: ["person"],
 		execute: async (context, type) => {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://this-person-does-not-exist.com/new",
 				searchParams: {
 					new: sb.Date.now(),
@@ -70,7 +70,7 @@ export default [
 			}
 
 			const { src } = response.body;
-			const imageResponse = await sb.Got.get("FakeAgent")({
+			const imageResponse = await core.Got.get("FakeAgent")({
 				url: `https://this-person-does-not-exist.com${src}`,
 				responseType: "buffer"
 			});
@@ -104,7 +104,7 @@ export default [
 		)),
 		types: ["artwork"/* , "cat"*/],
 		execute: async (context, type) => {
-			const imageData = await sb.Got.get("GenericAPI")({
+			const imageData = await core.Got.get("GenericAPI")({
 				url: buildURL(type),
 				responseType: "buffer",
 				throwHttpErrors: false
@@ -172,7 +172,7 @@ export default [
 		types: ["word"],
 		descriptions: [`<code>word</code> - <a href="https://www.thisworddoesnotexist.com/">This word does not exist</a>`],
 		execute: async (context, type) => {
-			const response = await sb.Got.get("FakeAgent")({
+			const response = await core.Got.get("FakeAgent")({
 				url: "https://www.thisworddoesnotexist.com/",
 				responseType: "text",
 				throwHttpErrors: false
@@ -185,7 +185,7 @@ export default [
 				};
 			}
 
-			const $ = sb.Utils.cheerio(response.body);
+			const $ = core.Utils.cheerio(response.body);
 			const wordClass = $("div#definition-pos")
 				.text()
 				.replaceAll(".", "")
@@ -204,7 +204,7 @@ export default [
 
 			return {
 				link: "No link available for this type!",
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					This ${type} does not exist:
 					${word} (${wordClass}) -
 					${definition}.
@@ -218,12 +218,12 @@ export default [
 		types: "automobile",
 		descriptions: [`<code>automobile</code> - <a href="https://www.thisautomobiledoesnotexist.com/">This automobile does not exist</a>`],
 		execute: async (context, type) => {
-			const response = await sb.Got.get("FakeAgent")({
+			const response = await core.Got.get("FakeAgent")({
 				url: "https://www.thisautomobiledoesnotexist.com",
 				responseType: "text"
 			});
 
-			const $ = sb.Utils.cheerio(response.body);
+			const $ = core.Utils.cheerio(response.body);
 			const imageSource = $("#vehicle").attr("src").replace("data:image/png;base64,", "");
 			const imageBuffer = Buffer.from(imageSource, "base64");
 
@@ -248,12 +248,12 @@ export default [
 		types: "fuckeduphomer",
 		descriptions: [`<code>fuckeduphomer</code> - <a href="https://www.thisfuckeduphomerdoesnotexist.com/">This fucked up Homer does not exist</a>`],
 		execute: async () => {
-			const response = await sb.Got.get("FakeAgent")({
+			const response = await core.Got.get("FakeAgent")({
 				url: "https://www.thisfuckeduphomerdoesnotexist.com",
 				responseType: "text"
 			});
 
-			const $ = sb.Utils.cheerio(response.body);
+			const $ = core.Utils.cheerio(response.body);
 			const image = $("#image-payload").attr("src");
 
 			return {
@@ -266,14 +266,14 @@ export default [
 		types: "mp",
 		descriptions: [`<code>mp</code> - <a href="https://vole.wtf/this-mp-does-not-exist/">This MP does not exist</a>`],
 		execute: async () => {
-			let data = await sb.Cache.getByPrefix(MP_CACHE_KEY);
+			let data = await core.Cache.getByPrefix(MP_CACHE_KEY);
 			if (!data) {
-				const response = await sb.Got.get("FakeAgent")({
+				const response = await core.Got.get("FakeAgent")({
 					url: "https://vole.wtf/this-mp-does-not-exist",
 					responseType: "text"
 				});
 
-				const $ = sb.Utils.cheerio(response.body);
+				const $ = core.Utils.cheerio(response.body);
 				const list = $("section ul");
 
 				data = [...list.children()].map(item => {
@@ -284,13 +284,13 @@ export default [
 					return { id, name, location };
 				});
 
-				await sb.Cache.setByPrefix(MP_CACHE_KEY, data, {
+				await core.Cache.setByPrefix(MP_CACHE_KEY, data, {
 					expiry: 30 * 864e5 // 30 days
 				});
 			}
 
-			const member = sb.Utils.randArray(data);
-			const id = sb.Utils.zf(member.id, 5);
+			const member = core.Utils.randArray(data);
+			const id = core.Utils.zf(member.id, 5);
 			const link = `https://vole.wtf/this-mp-does-not-exist/mp/mp${id}.jpg`;
 
 			return {

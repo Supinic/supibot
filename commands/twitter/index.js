@@ -42,7 +42,7 @@ export default {
 			? { includeReplies: true }
 			: {};
 
-		const response = await sb.Got.get("Supinic")({
+		const response = await core.Got.get("Supinic")({
 			url: `twitter/syndication/${encodeURI(input)}`,
 			searchParams
 		});
@@ -120,7 +120,7 @@ export default {
 
 		let tweet;
 		if (context.params.random) {
-			tweet = sb.Utils.randArray(eligibleTweets);
+			tweet = core.Utils.randArray(eligibleTweets);
 		}
 		else {
 			tweet = eligibleTweets[0];
@@ -133,8 +133,8 @@ export default {
 		}
 
 		const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${input}/status/${tweet.id_str}` : "";
-		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
-		const fullText = sb.Utils.fixHTML(tweet.full_text ?? "");
+		const delta = core.Utils.timeDelta(new sb.Date(tweet.created_at));
+		const fullText = core.Utils.fixHTML(tweet.full_text ?? "");
 		const fixedText = `${fullText} ${replyUrl}`;
 
 		if (context.params.mediaOnly) {

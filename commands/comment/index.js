@@ -8,12 +8,12 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function comment () {
-		const response = await sb.Got.get("FakeAgent")({
+		const response = await core.Got.get("FakeAgent")({
 			url: "http://www.randomyoutubecomment.com",
 			responseType: "text"
 		});
 
-		const $ = sb.Utils.cheerio(response.body);
+		const $ = core.Utils.cheerio(response.body);
 		const comment = $("#comment").text();
 
 		return {

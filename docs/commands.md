@@ -201,14 +201,14 @@ Since all command code functions are `await`ed, it doesn't really make a differe
         };
     }
 
-    const response = await sb.Got.get("GenericAPI")(options);
+    const response = await core.Got.get("GenericAPI")(options);
 
     const nsfw = Boolean(context.channel?.NSFW);
     const filteredPosts = (nsfw)
         ? response.body.data.posts
         : response.body.data.posts.filter(i => i.nsfw !== 1);
 
-    const post = sb.Utils.randArray(filteredPosts);
+    const post = core.Utils.randArray(filteredPosts);
     if (!post) {
         return {
             success: false,
@@ -216,9 +216,9 @@ Since all command code functions are `await`ed, it doesn't really make a differe
         };
     }
 
-    const delta = sb.Utils.timeDelta(new sb.Date(post.creationTs * 1000));
+    const delta = core.Utils.timeDelta(new sb.Date(post.creationTs * 1000));
     return {
-        reply: `${sb.Utils.fixHTML(post.title)} - ${post.url} - Score: ${post.upVoteCount}, posted ${delta}.`
+        reply: `${core.Utils.fixHTML(post.title)} - ${post.url} - Score: ${post.upVoteCount}, posted ${delta}.`
     };
 })
 ```

@@ -21,7 +21,7 @@ export default {
 		}
 
 		/** @type {{ Amount: bigint, Delta: number }} */
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("COUNT(*) AS Amount")
 			.select("SUM(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Delta")
 			.from("chat_data", "AFK")
@@ -40,7 +40,7 @@ export default {
 			.single()
 		);
 
-		const interruptedAmount = await sb.Query.getRecordset(rs => rs
+		const interruptedAmount = await core.Query.getRecordset(rs => rs
 			.select("COUNT(*) AS Amount")
 			.from("chat_data", "AFK")
 			.where("User_Alias = %n", targetUser.ID)
@@ -67,11 +67,11 @@ export default {
 			};
 		}
 		else {
-			const delta = sb.Utils.timeDelta(sb.Date.now() + data.Delta * 1000, true);
-			const average = sb.Utils.timeDelta(sb.Date.now() + (data.Delta * 1000 / Number(data.Amount)), true);
+			const delta = core.Utils.timeDelta(sb.Date.now() + data.Delta * 1000, true);
+			const average = core.Utils.timeDelta(sb.Date.now() + (data.Delta * 1000 / Number(data.Amount)), true);
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${who} been AFK with status "${target}"
 					${data.Amount} times,
 					for a total of ~${delta}.

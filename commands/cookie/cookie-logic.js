@@ -204,7 +204,7 @@ const eatCookie = (data, options = {}) => {
 	}
 	else {
 		const nextUTCMidnight = new sb.Date(sb.Date.getTodayUTC()).addHours(24);
-		const delta = sb.Utils.timeDelta(nextUTCMidnight);
+		const delta = core.Utils.timeDelta(nextUTCMidnight);
 		const rudeRoll = randomInt(1, 100);
 
 		return {
@@ -280,7 +280,7 @@ const donateCookie = (donator, receiver, donatorOptions = {}, receiverOptions = 
 
 /* istanbul ignore next */
 const fetchRandomCookieText = async () => {
-	const cookie = sb.Utils.randArray(fortuneCookieData);
+	const cookie = core.Utils.randArray(fortuneCookieData);
 	return cookie.text;
 };
 

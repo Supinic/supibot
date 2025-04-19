@@ -88,7 +88,7 @@ export default {
 
 		let data = await this.getCacheData("currency-rates");
 		if (!data) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				method: "GET",
 				url: "https://openexchangerates.org/api/latest.json",
 				searchParams: {
@@ -142,8 +142,8 @@ export default {
 			amount = 10 ** power;
 		}
 
-		const firstAmount = sb.Utils.groupDigits(amount * multiplier);
-		const secondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 2));
+		const firstAmount = core.Utils.groupDigits(amount * multiplier);
+		const secondAmount = core.Utils.groupDigits(core.Utils.round(amount * multiplier * ratio, 2));
 
 		let message = `${firstAmount} ${first} = ${secondAmount} ${second}`;
 
@@ -151,7 +151,7 @@ export default {
 		if (first === "IRR" || second === "IRR") {
 			let dollarExchangeRate = await this.getCacheData("irr-usd-exchange-rate");
 			if (!dollarExchangeRate) {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: "https://call4.tgju.org/ajax.json",
 					throwHttpErrors: false
 				});
@@ -189,7 +189,7 @@ export default {
 				}
 
 				const roundLimit = (first === "IRR") ? 2 : 0;
-				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, roundLimit));
+				const fixedSecondAmount = core.Utils.groupDigits(core.Utils.round(amount * multiplier * ratio, roundLimit));
 				message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
 			}
 		}

@@ -13,7 +13,7 @@ export default async function youtubeStreamInfoHandler (context) {
 		channelID = input;
 	}
 	else {
-		const channelResponse = await sb.Got.get("GenericAPI")({
+		const channelResponse = await core.Got.get("GenericAPI")({
 			throwHttpErrors: false,
 			responseType: "json",
 			url: "https://www.googleapis.com/youtube/v3/search",
@@ -28,7 +28,7 @@ export default async function youtubeStreamInfoHandler (context) {
 		if (channelResponse.body.items.length === 0) {
 			return {
 				success: false,
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					No channel found for that name!
 					Try using the "real" channel name instead of its display name.
 					You could also try using the channel's ID directly.
@@ -39,7 +39,7 @@ export default async function youtubeStreamInfoHandler (context) {
 		channelID = channelResponse.body.items[0].id.channelId;
 	}
 
-	const streamResponse = await sb.Got.get("GenericAPI")({
+	const streamResponse = await core.Got.get("GenericAPI")({
 		throwHttpErrors: false,
 		responseType: "json",
 		url: "https://www.googleapis.com/youtube/v3/search",
@@ -69,12 +69,12 @@ export default async function youtubeStreamInfoHandler (context) {
 
 	const [stream] = items;
 	const { snippet } = stream;
-	const delta = sb.Utils.timeDelta(new sb.Date(snippet.publishTime));
+	const delta = core.Utils.timeDelta(new sb.Date(snippet.publishTime));
 
 	return {
-		reply: sb.Utils.tag.trim `
+		reply: core.Utils.tag.trim `
 			Channel ${snippet.channelTitle} is live:
-			${sb.Utils.fixHTML(snippet.title)}
+			${core.Utils.fixHTML(snippet.title)}
 			https://youtu.be/${stream.id.videoId}
 			(live since ${delta})
 		`

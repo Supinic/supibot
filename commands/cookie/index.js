@@ -44,7 +44,7 @@ export default {
 	Dynamic_Description: (async function (prefix) {
 		const utcMidnightToday = sb.Date.getTodayUTC();
 		const nextUtcMidnightDate = new sb.Date(utcMidnightToday).addHours(24);
-		const delta = sb.Utils.timeDelta(nextUtcMidnightDate);
+		const delta = core.Utils.timeDelta(nextUtcMidnightDate);
 
 		return [
 			"Fetches a daily fortune cookie and read its wisdom!",

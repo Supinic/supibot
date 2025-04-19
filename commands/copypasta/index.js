@@ -1,16 +1,16 @@
 const MAXIMUM_REPEATS = 5;
 
 const fetchCopypasta = async () => {
-	const response = await sb.Got.get("FakeAgent")({
+	const response = await core.Got.get("FakeAgent")({
 		url: "https://www.twitchquotes.com/random",
 		responseType: "text"
 	});
 
-	const $ = sb.Utils.cheerio(response.body);
+	const $ = core.Utils.cheerio(response.body);
 	const text = $("span.-main-text").text();
 
 	if (typeof text === "string") {
-		return sb.Utils.removeHTML(text).trim();
+		return core.Utils.removeHTML(text).trim();
 	}
 	else {
 		return text;

@@ -27,7 +27,7 @@ export default class LoggerSingleton {
 
 			const loggingWarnLimit = logging.messages.warnLimit ?? FALLBACK_WARN_LIMIT;
 
-			sb.Query.getRecordset(rs => rs
+			core.Query.getRecordset(rs => rs
 				.select("TABLE_NAME")
 				.from("INFORMATION_SCHEMA", "TABLES")
 				.where("TABLE_SCHEMA = %s", "chat_line")
@@ -68,7 +68,7 @@ export default class LoggerSingleton {
 		}
 
 		if (logging.commands.enabled) {
-			sb.Query.getBatch(
+			core.Query.getBatch(
 				"chat_data",
 				"Command_Execution",
 				[
@@ -109,7 +109,7 @@ export default class LoggerSingleton {
 
 				const metaPromises = Object.entries(channels).map(async (data) => {
 					const [channelId, meta] = data;
-					const row = await sb.Query.getRow("chat_data", "Meta_Channel_Command");
+					const row = await core.Query.getRow("chat_data", "Meta_Channel_Command");
 					await row.load(channelId, true);
 
 					if (!row.loaded) {
@@ -169,8 +169,8 @@ export default class LoggerSingleton {
 				}
 
 				try {
-					await sb.Query.pool.batch(
-						sb.Utils.tag.trim `
+					await core.Query.pool.batch(
+						core.Utils.tag.trim `
 							INSERT INTO chat_data.Message_Meta_User_Alias
 							(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
 							VALUES (?, ?, ?, ?, ?)
@@ -208,7 +208,7 @@ export default class LoggerSingleton {
 	 */
 	async log (tag, description = null, channel = null, user = null) {
 		const [parentTag, childTag = null] = tag.split(".");
-		const row = await sb.Query.getRow("chat_data", "Log");
+		const row = await core.Query.getRow("chat_data", "Log");
 
 		row.setValues({
 			Tag: parentTag,
@@ -244,7 +244,7 @@ export default class LoggerSingleton {
 			return;
 		}
 
-		const row = await sb.Query.getRow("chat_data", "Error");
+		const row = await core.Query.getRow("chat_data", "Error");
 		row.setValues({
 			Type: type,
 			Origin: data.origin ?? null,
@@ -294,9 +294,9 @@ export default class LoggerSingleton {
 				}
 
 				const [hasUserAlias, hasHistoric, hasPlatformID] = await Promise.all([
-					sb.Query.isTableColumnPresent("chat_line", name, "User_Alias"),
-					sb.Query.isTableColumnPresent("chat_line", name, "Historic"),
-					sb.Query.isTableColumnPresent("chat_line", name, "Platform_ID")
+					core.Query.isTableColumnPresent("chat_line", name, "User_Alias"),
+					core.Query.isTableColumnPresent("chat_line", name, "Historic"),
+					core.Query.isTableColumnPresent("chat_line", name, "Platform_ID")
 				]);
 
 				const columns = ["Text", "Posted"];
@@ -310,7 +310,7 @@ export default class LoggerSingleton {
 					columns.push("Platform_ID"); // Always present
 				}
 
-				this.batches[chan] = await sb.Query.getBatch("chat_line", name, columns);
+				this.batches[chan] = await core.Query.getBatch("chat_line", name, columns);
 				this.channels.push(chan);
 			}
 
@@ -365,7 +365,7 @@ export default class LoggerSingleton {
 					await platformData.setupLoggingTable();
 				}
 
-				this.batches[id] = await sb.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID", "Historic"]);
+				this.batches[id] = await core.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID", "Historic"]);
 				this.platforms.push(id);
 			}
 

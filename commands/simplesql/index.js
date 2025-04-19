@@ -14,7 +14,7 @@ export default {
 				query += " LIMIT 1";
 			}
 
-			const result = await sb.Query.raw(query);
+			const result = await core.Query.raw(query);
 			if (!result[0]) {
 				return {
 					reply: "The result has zero rows!"

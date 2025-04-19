@@ -105,7 +105,7 @@ export default {
 			const itemTypeAmount = fishData.catch[showTypeData.name] ?? 0;
 			if (itemTypeAmount <= 0) {
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						${subject} have no ${showTypeData.description} in ${possessive} collection,
 						and ${possessive} purse contains ${fishData.coins}${COIN_EMOJI}.
 					`
@@ -132,7 +132,7 @@ export default {
 			}
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${subject} have ${itemTypeAmount} ${showTypeData.description} in ${possessive} collection.
 					Here they are: ${result.join("")}
 					${subject} also have ${fishData.coins}${COIN_EMOJI} in ${possessive} purse.

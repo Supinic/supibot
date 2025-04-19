@@ -16,7 +16,7 @@ export default {
 			randomInt(1, 12)
 		);
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			responseType: "json",
 			throwHttpErrors: false,
 
@@ -32,7 +32,7 @@ export default {
 			};
 		}
 
-		const randomFact = sb.Utils.randArray(data);
+		const randomFact = core.Utils.randArray(data);
 		this.data.previousFactID = randomFact._id;
 
 		return {

@@ -6,7 +6,7 @@ let tooManySubsWarningSent = false;
 export default {
 	name: "fetch-twitch-subscriber-list",
 	expression: "0 0 0 * * *",
-	description: "Fetches the current subscriber list, then saves it to sb.Cache",
+	description: "Fetches the current subscriber list, then saves it to core.Cache",
 	code: (async function fetchTwitchSubscriberList () {
 		if (!process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID) {
 			throw new sb.Error({
@@ -14,7 +14,7 @@ export default {
 			});
 		}
 
-		const cacheRefreshToken = await sb.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN");
+		const cacheRefreshToken = await core.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN");
 		const envRefreshToken = process.env.TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN;
 		if (!cacheRefreshToken && !envRefreshToken) {
 			throw new sb.Error({
@@ -22,7 +22,7 @@ export default {
 			});
 		}
 
-		const identityResponse = await sb.Got.get("GenericAPI")({
+		const identityResponse = await core.Got.get("GenericAPI")({
 			url: "https://id.twitch.tv/oauth2/token",
 			method: "POST",
 			searchParams: {
@@ -36,11 +36,11 @@ export default {
 		const accessToken = identityResponse.body.access_token;
 		const newRefreshToken = identityResponse.body.refresh_token;
 		await Promise.all([
-			sb.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", accessToken),
-			sb.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", newRefreshToken)
+			core.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", accessToken),
+			core.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", newRefreshToken)
 		]);
 
-		const subsResponse = await sb.Got.get("GenericAPI")({
+		const subsResponse = await core.Got.get("GenericAPI")({
 			url: "https://api.twitch.tv/helix/subscriptions",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -66,7 +66,7 @@ export default {
 			tooManySubsWarningSent = true;
 		}
 
-		await sb.Cache.setByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST, data, {
+		await core.Cache.setByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST, data, {
 			expiry: 864e5 // 1 day
 		});
 

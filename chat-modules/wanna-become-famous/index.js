@@ -17,7 +17,7 @@ export default {
 		}
 
 		let reason = "";
-		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
+		const msg = core.Utils.removeAccents(context.message).toLowerCase();
 		if (msg.includes("become famous?")) {
 			reason = "becoming famous";
 		}
@@ -58,7 +58,7 @@ export default {
 			return;
 		}
 
-		const messageCount = await sb.Query.getRecordset(rs => rs
+		const messageCount = await core.Query.getRecordset(rs => rs
 			.select("Message_Count")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("Channel = %n", context.channel.ID)

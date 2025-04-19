@@ -8,7 +8,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function githubStatus () {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://www.githubstatus.com/history.json",
 			retry: {
 				limit: 0
@@ -19,7 +19,7 @@ export default {
 		});
 
 		const { components, page_status: pageStatus } = response.body;
-		const lastUpdate = sb.Utils.timeDelta(new sb.Date(pageStatus.page.updated_at));
+		const lastUpdate = core.Utils.timeDelta(new sb.Date(pageStatus.page.updated_at));
 
 		const degraded = components.filter(i => i.status !== "operational");
 		if (degraded.length === 0) {
@@ -35,7 +35,7 @@ export default {
 		}
 		else {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					🚨 ${degraded.length} components are not operational. 
 					Check https://www.githubstatus.com for more info.
 					Updated ${lastUpdate}.

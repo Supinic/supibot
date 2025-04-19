@@ -11,15 +11,15 @@ import {
 import { checkLimits } from "../../gpt/cache-control.js";
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "mysterious", "hilarious", "enchanting", "touching", "intriguing"];
-const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim `
-	Write a short, ${sb.Utils.randArray(gptStyles)} fishing story
+const createGptPrompt = (executor, resultFish, sizeString) => core.Utils.tag.trim `
+	Write a short, ${core.Utils.randArray(gptStyles)} fishing story
 	about a user named "${executor}"
 	who catches a ${resultFish} in the water and keeps it!
 	${sizeString}
 	Make it very concise - a maximum of 150 characters.
 `;
 
-const formatDelay = (delay) => sb.Utils.timeDelta(sb.Date.now() + delay, true);
+const formatDelay = (delay) => core.Utils.timeDelta(sb.Date.now() + delay, true);
 
 const useDiscordReactions = (context, config, resultType) => {
 	if (context.platform.Name !== "discord") {
@@ -87,7 +87,7 @@ export default {
 			return {
 				success: false,
 				replyWithPrivateMessage: whisperOnFailure,
-				reply: `Hol' up partner! You can go fishing again ${sb.Utils.timeDelta(fishData.readyTimestamp)}!`
+				reply: `Hol' up partner! You can go fishing again ${core.Utils.timeDelta(fishData.readyTimestamp)}!`
 			};
 		}
 
@@ -97,7 +97,7 @@ export default {
 				return {
 					success: false,
 					replyWithPrivateMessage: whisperOnFailure,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						You cannot go fishing while your traps are laid out - you would be disturbing the catch!
 						Your traps are ready to be collected! Go ahead and use "$fish trap" to get your stuff.
 					`
@@ -107,7 +107,7 @@ export default {
 				return {
 					success: false,
 					replyWithPrivateMessage: whisperOnFailure,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						You cannot go fishing while your traps are laid out - you would be disturbing the catch!
 						If you wish to get rid of the traps immediately, use "$fish trap cancel",
 						but you will not get any catch from them.
@@ -146,7 +146,7 @@ export default {
 
 		const roll = randomInt(1, rollMaximum);
 		if (roll !== 1) {
-			const fishingDelay = sb.Utils.round(randomInt(...unsuccessfulFishDelay), -3);
+			const fishingDelay = core.Utils.round(randomInt(...unsuccessfulFishDelay), -3);
 
 			fishData.catch.dryStreak++;
 			fishData.catch.luckyStreak = 0;
@@ -192,7 +192,7 @@ export default {
 			const emote = await getEmote(context, "failure");
 			return {
 				replyWithPrivateMessage: whisperOnFailure,
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					No luck... ${emote}
 					${message}
 					(${formatDelay(fishingDelay)} cooldown${appendix})
@@ -273,7 +273,7 @@ export default {
 
 		const emote = await getEmote(context, "success");
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				You caught a ✨${fishType}✨
 				${sizeString}
 				${emote}

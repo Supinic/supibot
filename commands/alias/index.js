@@ -25,7 +25,7 @@ export default {
 
 		if (!type) {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					This command lets you create your own command aliases.
 					Check the extended help here:
 					${this.getDetailURL()}
@@ -56,7 +56,7 @@ export default {
 					};
 				}
 
-				const alias = await sb.Query.getRecordset(rs => rs
+				const alias = await core.Query.getRecordset(rs => rs
 					.select("ID", "Name", "Invocation", "Arguments")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
@@ -81,7 +81,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				if (alias) {
 					await row.load(alias.ID);
 				}
@@ -121,7 +121,7 @@ export default {
 					};
 				}
 				else if (firstName && !secondName) {
-					const aliases = await sb.Query.getRecordset(rs => rs
+					const aliases = await core.Query.getRecordset(rs => rs
 						.select("Name")
 						.from("data", "Custom_Command_Alias")
 						.where("Channel IS NULL")
@@ -132,7 +132,7 @@ export default {
 					let targetAliases = [];
 					const targetUser = await sb.User.get(firstName);
 					if (targetUser) {
-						targetAliases = await sb.Query.getRecordset(rs => rs
+						targetAliases = await core.Query.getRecordset(rs => rs
 							.select("Name")
 							.from("data", "Custom_Command_Alias")
 							.where("Channel IS NULL")
@@ -167,7 +167,7 @@ export default {
 						const username = encodeURIComponent(context.user.Name);
 						const escapedString = encodeURIComponent(firstName);
 						return {
-							reply: sb.Utils.tag.trim `
+							reply: core.Utils.tag.trim `
 								Special case!
 								Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
 								List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
@@ -189,7 +189,7 @@ export default {
 				}
 
 				/** @type {{ Command: string|null, Invocation: string|null, Arguments: string|null, Parent: number|null } | undefined} */
-				let alias = await sb.Query.getRecordset(rs => rs
+				let alias = await core.Query.getRecordset(rs => rs
 					.select("Command", "Invocation", "Arguments", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", user.ID)
@@ -208,7 +208,7 @@ export default {
 				}
 				else if (alias.Command === null && alias.Parent !== null) {
 					// special case for linked aliases
-					alias = await sb.Query.getRecordset(rs => rs
+					alias = await core.Query.getRecordset(rs => rs
 						.select("User_Alias", "Name", "Command", "Invocation", "Arguments", "Parent")
 						.from("data", "Custom_Command_Alias")
 						.where("ID = %n", alias.Parent)
@@ -282,7 +282,7 @@ export default {
 					};
 				}
 
-				const existing = await sb.Query.getRecordset(rs => rs
+				const existing = await core.Query.getRecordset(rs => rs
 					.select("ID", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias IS NULL")
@@ -311,7 +311,7 @@ export default {
 					}
 
 					/** @type {number | null} */
-					const alias = await sb.Query.getRecordset(rs => rs
+					const alias = await core.Query.getRecordset(rs => rs
 						.select("ID", "Parent")
 						.from("data", "Custom_Command_Alias")
 						.where("User_Alias = %n", userData.ID)
@@ -327,20 +327,20 @@ export default {
 						};
 					}
 					else if (existing) {
-						const sourceAlias = await sb.Query.getRow("data", "Custom_Command_Alias");
+						const sourceAlias = await core.Query.getRow("data", "Custom_Command_Alias");
 						await sourceAlias.load(existing.Parent);
 
 						const sourceAuthorData = await sb.User.get(sourceAlias.values.User_Alias);
 						return {
 							success: false,
-							reply: sb.Utils.tag.trim `
+							reply: core.Utils.tag.trim `
 								The alias name "${aliasName}" (by ${sourceAuthorData.Name}) is already published in this channel!
 								If you want to publish the version made by ${userData.Name}, you must unpublish the other one first.
 							`
 						};
 					}
 
-					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+					const row = await core.Query.getRow("data", "Custom_Command_Alias");
 					row.setValues({
 						Name: aliasName,
 						Channel: context.channel.ID,
@@ -360,7 +360,7 @@ export default {
 						};
 					}
 
-					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+					const row = await core.Query.getRow("data", "Custom_Command_Alias");
 					await row.load(existing.ID);
 					await row.delete();
 
@@ -413,7 +413,7 @@ export default {
 					};
 				}
 
-				let targetAlias = await sb.Query.getRecordset(rs => rs
+				let targetAlias = await core.Query.getRecordset(rs => rs
 					.select("ID", "Command", "Invocation", "Arguments", "Parent", "Restrictions")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
@@ -430,7 +430,7 @@ export default {
 					};
 				}
 				else if (targetAlias.Command === null) {
-					const parentAlias = await sb.Query.getRecordset(rs => rs
+					const parentAlias = await core.Query.getRecordset(rs => rs
 						.select("ID", "Command", "Invocation", "Arguments", "Parent", "Restrictions")
 						.from("data", "Custom_Command_Alias")
 						.where("ID = %n", targetAlias.Parent)
@@ -441,7 +441,7 @@ export default {
 					if (!parentAlias) {
 						return {
 							success: false,
-							reply: sb.Utils.tag.trim `
+							reply: core.Utils.tag.trim `
 								You cannot copy this alias because the original it links to has been deleted!
 							`
 						};
@@ -457,7 +457,7 @@ export default {
 					};
 				}
 
-				const currentAlias = await sb.Query.getRecordset(rs => rs
+				const currentAlias = await core.Query.getRecordset(rs => rs
 					.select("ID", "Command", "Invocation", "Arguments")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
@@ -474,7 +474,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				if (currentAlias) {
 					await row.load(currentAlias.ID);
 				}
@@ -509,7 +509,7 @@ export default {
 					};
 				}
 
-				const alias = await sb.Query.getRecordset(rs => rs
+				const alias = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -533,7 +533,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(alias.ID);
 
 				let verb;
@@ -566,7 +566,7 @@ export default {
 					};
 				}
 
-				const oldAlias = await sb.Query.getRecordset(rs => rs
+				const oldAlias = await core.Query.getRecordset(rs => rs
 					.select("ID", "Command", "Invocation", "Arguments", "Description", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -587,7 +587,7 @@ export default {
 					};
 				}
 
-				const newAlias = await sb.Query.getRecordset(rs => rs
+				const newAlias = await core.Query.getRecordset(rs => rs
 					.select("Command", "Invocation", "Arguments", "Description")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -602,7 +602,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				row.setValues({
 					User_Alias: context.user.ID,
 					Channel: null,
@@ -639,7 +639,7 @@ export default {
 					};
 				}
 
-				const alias = await sb.Query.getRecordset(rs => rs
+				const alias = await core.Query.getRecordset(rs => rs
 					.select("ID", "Command", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -660,7 +660,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(alias.ID);
 				row.setValues({
 					Command: commandCheck.Name,
@@ -704,7 +704,7 @@ export default {
 					prefix = (context.user === user) ? "You" : "They";
 				}
 
-				const alias = await sb.Query.getRecordset(rs => rs
+				const alias = await core.Query.getRecordset(rs => rs
 					.select("Description")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", user.ID)
@@ -739,7 +739,7 @@ export default {
 				}
 
 				const name = customLinkName ?? aliasName;
-				const existingID = await sb.Query.getRecordset(rs => rs
+				const existingID = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
@@ -764,7 +764,7 @@ export default {
 					};
 				}
 
-				let targetAlias = await sb.Query.getRecordset(rs => rs
+				let targetAlias = await core.Query.getRecordset(rs => rs
 					.select("ID", "Name", "Description", "Command", "Parent", "Restrictions")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
@@ -791,7 +791,7 @@ export default {
 
 				else if (targetAlias.Command === null && targetAlias.Parent !== null) {
 					// If attempting to link an already linked alias, change the pointer to the original alias
-					targetAlias = await sb.Query.getRecordset(rs => rs
+					targetAlias = await core.Query.getRecordset(rs => rs
 						.select("ID", "User_Alias", "Name", "Description", "Command", "Parent")
 						.from("data", "Custom_Command_Alias")
 						.where("ID = %n", targetAlias.Parent)
@@ -816,7 +816,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				if (existingID) {
 					if (type !== "linkplace") {
 						throw new sb.Error({
@@ -862,7 +862,7 @@ export default {
 					};
 				}
 
-				const alias = await sb.Query.getRecordset(rs => rs
+				const alias = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -878,7 +878,7 @@ export default {
 				}
 
 				let publishString = "";
-				const publishedIDs = await sb.Query.getRecordset(rs => rs
+				const publishedIDs = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NOT NULL")
@@ -887,7 +887,7 @@ export default {
 				);
 
 				if (publishedIDs.length !== 0) {
-					await sb.Query.getRecordDeleter(rd => rd
+					await core.Query.getRecordDeleter(rd => rd
 						.delete()
 						.from("data", "Custom_Command_Alias")
 						.where("ID IN %n+", publishedIDs)
@@ -898,7 +898,7 @@ export default {
 					publishString = ` It was also published in ${publishedIDs.length} channels - these have also been removed.`;
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(alias.ID);
 
 				await row.delete();
@@ -923,7 +923,7 @@ export default {
 					};
 				}
 
-				const oldAlias = await sb.Query.getRecordset(rs => rs
+				const oldAlias = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -938,7 +938,7 @@ export default {
 					};
 				}
 
-				const newAlias = await sb.Query.getRecordset(rs => rs
+				const newAlias = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -953,7 +953,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(oldAlias.ID);
 				row.values.Name = newAliasName;
 
@@ -974,7 +974,7 @@ export default {
 				}
 
 				const verb = (restriction === "link") ? "linked" : "copied";
-				const alias = await sb.Query.getRecordset(rs => rs
+				const alias = await core.Query.getRecordset(rs => rs
 					.select("ID", "Restrictions")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
@@ -1002,7 +1002,7 @@ export default {
 					};
 				}
 
-				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(alias.ID);
 				row.values.Restrictions = (row.values.Restrictions) ? [...row.values.Restrictions] : [];
 
@@ -1054,7 +1054,7 @@ export default {
 					};
 				}
 
-				const conflictingAliases = await sb.Query.getRecordset(rs => rs
+				const conflictingAliases = await core.Query.getRecordset(rs => rs
 					.select("Custom_Command_Alias.Name")
 					.from("data", "Custom_Command_Alias")
 					.join({
@@ -1070,7 +1070,7 @@ export default {
 				if (conflictingAliases.length !== 0) {
 					return {
 						success: false,
-						reply: sb.Utils.tag.trim `
+						reply: core.Utils.tag.trim `
 							You have ${conflictingAliases.length} aliases that your previous username also has!
 							Rename or delete them first, then run this command again.
 							List: ${conflictingAliases.join(", ")}
@@ -1078,7 +1078,7 @@ export default {
 					};
 				}
 
-				const aliasIDs = await sb.Query.getRecordset(rs => rs
+				const aliasIDs = await core.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", oldUserData.ID)
@@ -1086,7 +1086,7 @@ export default {
 				);
 
 				for (const aliasID of aliasIDs) {
-					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+					const row = await core.Query.getRow("data", "Custom_Command_Alias");
 					await row.load(aliasID);
 
 					row.values.User_Alias = context.user.ID;
@@ -1147,7 +1147,7 @@ export default {
 				 */
 
 				/** @type {EligibleAlias[]} */
-				const eligibleAliases = await sb.Query.getRecordset(rs => rs
+				const eligibleAliases = await core.Query.getRecordset(rs => rs
 					.select("ID", "User_Alias", "Channel", "Command", "Invocation", "Arguments", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where({ condition: !context.channel }, "User_Alias = %n", user.ID)
@@ -1186,7 +1186,7 @@ export default {
 					};
 				}
 				else if (alias.Command === null && alias.Parent !== null) {
-					alias = await sb.Query.getRecordset(rs => rs
+					alias = await core.Query.getRecordset(rs => rs
 						.select("User_Alias", "Command", "Invocation", "Arguments", "Parent")
 						.from("data", "Custom_Command_Alias")
 						.where("ID = %n", alias.Parent)
@@ -1249,7 +1249,7 @@ export default {
 				if (aliasCount > NESTED_ALIAS_LIMIT) {
 					return {
 						success: false,
-						reply: sb.Utils.tag.trim `
+						reply: core.Utils.tag.trim `
 							Your alias cannot continue!
 							It causes more than ${NESTED_ALIAS_LIMIT} alias calls.
 							Please reduce the complexity first.
@@ -1326,7 +1326,7 @@ export default {
 
 		return {
 			success: false,
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Invalid sub-command provided!
 				Check the extended help here:
 				${this.getDetailURL()}

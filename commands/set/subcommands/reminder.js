@@ -6,7 +6,7 @@ export default {
 	flags: {
 		pipe: true
 	},
-	getLastID: (context) => sb.Query.getRecordset(rs => rs
+	getLastID: (context) => core.Query.getRecordset(rs => rs
 		.select("ID")
 		.from("chat_data", "Reminder")
 		.where("User_From = %n", context.user.ID)
@@ -20,11 +20,11 @@ export default {
 		reply: `Use the $remind command instead!`
 	}),
 	unset: async (context, ID) => {
-		const row = await sb.Query.getRow("chat_data", "Reminder");
+		const row = await core.Query.getRow("chat_data", "Reminder");
 		await row.load(ID, true);
 
 		if (!row.loaded) {
-			const historyRow = await sb.Query.getRow("chat_data", "Reminder_History");
+			const historyRow = await core.Query.getRow("chat_data", "Reminder_History");
 			await historyRow.load(ID, true);
 			if (historyRow.loaded) {
 				return {
@@ -85,7 +85,7 @@ export default {
 			};
 		}
 
-		const reminderIDs = await sb.Query.getRecordset(rs => rs
+		const reminderIDs = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("chat_data", "Reminder")
 			.where("Schedule IS NOT NULL")

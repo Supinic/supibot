@@ -29,7 +29,7 @@ export default {
 
 		const isoCode = lang.getIsoCode(1);
 		if (isoCode === "ja") {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://ichi.moe/cl/qr",
 				responseType: "text",
 				searchParams: {
@@ -39,7 +39,7 @@ export default {
 			});
 
 			const html = response.body;
-			const $ = sb.Utils.cheerio(html);
+			const $ = core.Utils.cheerio(html);
 
 			const els = $("#div-ichiran-result span.ds-text:not(.hidden) span.ds-word");
 			const words = [...els].map(i => i.firstChild.data);
@@ -57,7 +57,7 @@ export default {
 			}
 		}
 		else if (isoCode === "he") {
-			const nakdanResponse = await sb.Got.get("FakeAgent")({
+			const nakdanResponse = await core.Got.get("FakeAgent")({
 				method: "POST",
 				url: "https://nakdan-5-2.loadbalancer.dicta.org.il/api",
 				json: {
@@ -78,7 +78,7 @@ export default {
 
 			let pageData = await this.getCacheData("page-data");
 			if (!pageData) {
-				const tokenResponse = await sb.Got.get("FakeAgent")({
+				const tokenResponse = await core.Got.get("FakeAgent")({
 					responseType: "text",
 					url: "https://alittlehebrew.com/transliterate/"
 				});
@@ -90,7 +90,7 @@ export default {
 					};
 				}
 
-				const $ = sb.Utils.cheerio(tokenResponse.body);
+				const $ = core.Utils.cheerio(tokenResponse.body);
 				const token = $("input[type='hidden']")[0]?.attribs?.value;
 				if (!token) {
 					return {
@@ -109,7 +109,7 @@ export default {
 				});
 			}
 
-			const transliterateResponse = await sb.Got.get("FakeAgent")({
+			const transliterateResponse = await core.Got.get("FakeAgent")({
 				url: "https://alittlehebrew.com/transliterate/get.php",
 				headers: {
 					"X-Requested-With": "XMLHttpRequest",
@@ -133,7 +133,7 @@ export default {
 			}
 
 			return {
-				reply: sb.Utils.removeHTML(result)
+				reply: core.Utils.removeHTML(result)
 			};
 		}
 	}),

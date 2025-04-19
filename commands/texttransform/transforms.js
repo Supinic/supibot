@@ -53,7 +53,7 @@ const convert = {
 		string = string.trim().replaceAll("_", "");
 
 		if (dictionary.endings && /[).?!]$/.test(string)) {
-			string += ` ${sb.Utils.randArray(dictionary.endings)}`;
+			string += ` ${core.Utils.randArray(dictionary.endings)}`;
 		}
 
 		return string;
@@ -165,7 +165,7 @@ const types = [
 		data: (message) => message
 			.split(" ")
 			.filter(Boolean)
-			.map(i => sb.Utils.capitalize(i))
+			.map(i => core.Utils.capitalize(i))
 			.join(" ")
 	},
 	{
@@ -204,7 +204,7 @@ const types = [
 			.replaceAll(/N([aeiou])/g, "Ny$1")
 			.replaceAll(/N([AEIOU])/g, "Ny$1")
 			.replaceAll("ove", "uv")
-			.replaceAll(/[!?]+/g, ` ${sb.Utils.randArray(["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"])} `)
+			.replaceAll(/[!?]+/g, ` ${core.Utils.randArray(["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"])} `)
 	},
 	{
 
@@ -222,7 +222,7 @@ const types = [
 		aliases: [],
 		description: "Picks a random different text transform and applies it",
 		data: (message) => {
-			const random = sb.Utils.randArray(types.filter(i => i.name !== "random"));
+			const random = core.Utils.randArray(types.filter(i => i.name !== "random"));
 			return convert[random.type](message, random.data);
 		}
 	},
@@ -355,7 +355,7 @@ const types = [
 					continue;
 				}
 
-				const stripped = sb.Utils.removeAccents(word);
+				const stripped = core.Utils.removeAccents(word);
 				if (/[^a-z]/i.test(stripped)) {
 					result.push(word);
 					continue;

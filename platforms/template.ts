@@ -368,6 +368,11 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			}
 		}
 
+		if (options.returnEmoteObject) {
+			const emote = availableEmotes.find(i => i.name === fallback);
+			return emote;
+		}
+
 		return fallback;
 	}
 

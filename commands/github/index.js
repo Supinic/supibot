@@ -11,7 +11,7 @@ export default {
 		const query = args.join("");
 		if (!query) {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					Supibot: https://github.com/Supinic/supibot 
 					// Website: https://github.com/Supinic/supinic.com
 					// Modules: https://github.com/Supinic/supi-core
@@ -20,7 +20,7 @@ export default {
 		}
 
 		const encodedQuery = encodeURIComponent(query);
-		const response = await sb.Got.get("GitHub")({
+		const response = await core.Got.get("GitHub")({
 			url: `search/code?q=${encodedQuery}+in:file+repo:supinic/supi-core+repo:supinic/supibot`
 		});
 

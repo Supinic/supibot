@@ -6,7 +6,7 @@ export default {
 	flags: {
 		pipe: false // $suggest itself isn't pipe-able
 	},
-	getLastID: (context) => sb.Query.getRecordset(rs => rs
+	getLastID: (context) => core.Query.getRecordset(rs => rs
 		.select("ID")
 		.from("data", "Suggestion")
 		.where("User_Alias = %n", context.user.ID)
@@ -20,7 +20,7 @@ export default {
 		reply: `Use the $suggest command instead!`
 	}),
 	unset: async (context, ID, ...args) => {
-		const row = await sb.Query.getRow("data", "Suggestion");
+		const row = await core.Query.getRow("data", "Suggestion");
 		try {
 			await row.load(ID);
 		}

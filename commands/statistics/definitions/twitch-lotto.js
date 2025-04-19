@@ -4,7 +4,7 @@ export default {
 	description: "Posts stats for the $twitchlotto command - globally, or for a selected channel. You can use <code>recalculate:true</code> to force an update for the statistics in a specific channel.",
 	execute: async (context, type, channel) => {
 		if (channel) {
-			const lottoData = await sb.Query.getRecordset(rs => rs
+			const lottoData = await core.Query.getRecordset(rs => rs
 				.select("Amount", "Scored", "Tagged")
 				.from("data", "Twitch_Lotto_Channel")
 				.where("Name = %s", channel)
@@ -26,7 +26,7 @@ export default {
 
 			if (context.params.recalculate) {
 				const [total, scored, tagged, deleted] = await Promise.all([
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("COUNT(*) AS Count")
 						.from("data", "Twitch_Lotto")
 						.where("Channel = %s", channel)
@@ -34,7 +34,7 @@ export default {
 						.single()
 						.flat("Count")
 					),
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("COUNT(*) AS Count")
 						.from("data", "Twitch_Lotto")
 						.where("Channel = %s", channel)
@@ -43,7 +43,7 @@ export default {
 						.single()
 						.flat("Count")
 					),
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("COUNT(*) AS Count")
 						.from("data", "Twitch_Lotto")
 						.where("Channel = %s", channel)
@@ -53,7 +53,7 @@ export default {
 						.single()
 						.flat("Count")
 					),
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("COUNT(*) AS Count")
 						.from("data", "Twitch_Lotto")
 						.where("Channel = %s", channel)
@@ -63,7 +63,7 @@ export default {
 					)
 				]);
 
-				await sb.Query.getRecordUpdater(ru => ru
+				await core.Query.getRecordUpdater(ru => ru
 					.update("data", "Twitch_Lotto_Channel")
 					.set("Amount", total)
 					.set("Scored", scored)
@@ -77,32 +77,32 @@ export default {
 				obj.total = total;
 			}
 
-			const scorePercent = sb.Utils.round(obj.scored / obj.total * 100, 2);
-			const tagPercent = sb.Utils.round(obj.tagged / obj.total * 100, 2);
+			const scorePercent = core.Utils.round(obj.scored / obj.total * 100, 2);
+			const tagPercent = core.Utils.round(obj.tagged / obj.total * 100, 2);
 
 			return {
-				reply: sb.Utils.tag.trim `
-					Channel "${channel}" has ${sb.Utils.groupDigits(obj.total)} TwitchLotto images in total.
-					${sb.Utils.groupDigits(obj.scored)} (${scorePercent}%) have been rated by the NSFW AI,
-					and out of those, ${sb.Utils.groupDigits(obj.tagged)} (${tagPercent}%) have been flagged by contributors.
+				reply: core.Utils.tag.trim `
+					Channel "${channel}" has ${core.Utils.groupDigits(obj.total)} TwitchLotto images in total.
+					${core.Utils.groupDigits(obj.scored)} (${scorePercent}%) have been rated by the NSFW AI,
+					and out of those, ${core.Utils.groupDigits(obj.tagged)} (${tagPercent}%) have been flagged by contributors.
 				`
 			};
 		}
 		else {
-			const lottoData = await sb.Query.getRecordset(rs => rs
+			const lottoData = await core.Query.getRecordset(rs => rs
 				.select("SUM(Amount) AS Amount", "SUM(Scored) AS Scored", "SUM(Tagged) AS Tagged")
 				.from("data", "Twitch_Lotto_Channel")
 				.single()
 			);
 
-			const scorePercent = sb.Utils.round(lottoData.Scored / lottoData.Amount * 100, 2);
-			const tagPercent = sb.Utils.round(lottoData.Tagged / lottoData.Amount * 100, 2);
+			const scorePercent = core.Utils.round(lottoData.Scored / lottoData.Amount * 100, 2);
+			const tagPercent = core.Utils.round(lottoData.Tagged / lottoData.Amount * 100, 2);
 
 			return {
-				reply: sb.Utils.tag.trim `
-					The TwitchLotto database has ${sb.Utils.groupDigits(lottoData.Amount)} images in total.
-					${sb.Utils.groupDigits(lottoData.Scored)} (${scorePercent}%) have been rated by the NSFW AI,
-					and out of those, ${sb.Utils.groupDigits(lottoData.Tagged)} (${tagPercent}%) have been flagged by contributors.
+				reply: core.Utils.tag.trim `
+					The TwitchLotto database has ${core.Utils.groupDigits(lottoData.Amount)} images in total.
+					${core.Utils.groupDigits(lottoData.Scored)} (${scorePercent}%) have been rated by the NSFW AI,
+					and out of those, ${core.Utils.groupDigits(lottoData.Tagged)} (${tagPercent}%) have been flagged by contributors.
 				`
 			};
 		}

@@ -123,7 +123,7 @@ export default {
 
 				let response;
 				try {
-					response = await sb.Got.get("GenericAPI")({
+					response = await core.Got.get("GenericAPI")({
 						method: "POST",
 						url: `https://${server}/documents`,
 						throwHttpErrors: false,
@@ -148,7 +148,7 @@ export default {
 			else {
 				return {
 					success: false,
-					reply: `Cannot create new files/pastes with ${sb.Utils.capitalize(provider)}!`
+					reply: `Cannot create new files/pastes with ${core.Utils.capitalize(provider)}!`
 				};
 			}
 		}
@@ -156,7 +156,7 @@ export default {
 			let userInput = args[0];
 			if (provider === "gist" && context.params.gistUser) {
 				const escapedUser = encodeURI(context.params.gistUser);
-				const response = await sb.Got.get("GitHub")({
+				const response = await core.Got.get("GitHub")({
 					url: `users/${escapedUser}/gists`,
 					throwHttpErrors: false
 				});
@@ -184,7 +184,7 @@ export default {
 				if (eligibleGists.length === 0) {
 					return {
 						success: false,
-						reply: sb.Utils.tag.trim `
+						reply: core.Utils.tag.trim `
 							That user does not have any Gists I can use!							
 							A Gist valid for this command must use exactly one file of one of these types:
 							${ALLOWED_GIST_TYPES.join(", ")}
@@ -192,7 +192,7 @@ export default {
 					};
 				}
 
-				const randomUserGist = sb.Utils.randArray(eligibleGists);
+				const randomUserGist = core.Utils.randArray(eligibleGists);
 				userInput = randomUserGist.id;
 			}
 
@@ -215,7 +215,7 @@ export default {
 
 			let textData;
 			if (provider === "pastebin") {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: `https://pastebin.com/raw/${id}`,
 					throwHttpErrors: false,
 					responseType: "text",
@@ -258,7 +258,7 @@ export default {
 					};
 				}
 
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					method: "GET",
 					url: `https://${server}/raw/${id}`,
 					throwHttpErrors: false,
@@ -275,7 +275,7 @@ export default {
 				textData = response.body;
 			}
 			else if (provider === "gist") {
-				const response = await sb.Got.get("GitHub")({
+				const response = await core.Got.get("GitHub")({
 					url: `gists/${id}`
 				});
 
@@ -285,7 +285,7 @@ export default {
 
 					return {
 						success: false,
-						reply: `Too many requests have been used recently! Try again ${sb.Utils.timeDelta(resetDate)}.`
+						reply: `Too many requests have been used recently! Try again ${core.Utils.timeDelta(resetDate)}.`
 					};
 				}
 				else if (response.statusCode !== 200) {
@@ -307,7 +307,7 @@ export default {
 				if (eligibleFiles.length === 0) {
 					return {
 						success: false,
-						reply: sb.Utils.tag.trim `
+						reply: core.Utils.tag.trim `
 							No eligible files found in this Gist!
 							Use exactly one file of one of these types:
 							${ALLOWED_GIST_TYPES.join(", ")}
@@ -317,7 +317,7 @@ export default {
 				else if (eligibleFiles.length > 1) {
 					return {
 						success: false,
-						reply: sb.Utils.tag.trim `
+						reply: core.Utils.tag.trim `
 							Too many eligible files found in this Gist!
 							Use exactly one file of one of these types:
 							${ALLOWED_GIST_TYPES.join(", ")}
@@ -330,7 +330,7 @@ export default {
 			else {
 				return {
 					success: false,
-					reply: `Cannot fetch existing files/pastes with ${sb.Utils.capitalize(provider)}!`
+					reply: `Cannot fetch existing files/pastes with ${core.Utils.capitalize(provider)}!`
 				};
 			}
 
@@ -343,9 +343,9 @@ export default {
 			else if (textData.length > TEXT_LENGTH_LIMIT) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						File/paste character limit exceeded!
-						(${sb.Utils.groupDigits(TEXT_LENGTH_LIMIT)} characters)
+						(${core.Utils.groupDigits(TEXT_LENGTH_LIMIT)} characters)
 					`
 				};
 			}
@@ -366,7 +366,7 @@ export default {
 		}
 	},
 	Dynamic_Description: async function () {
-		const threshold = sb.Utils.groupDigits(TEXT_LENGTH_LIMIT);
+		const threshold = core.Utils.groupDigits(TEXT_LENGTH_LIMIT);
 		return [
 			"Gets or creates a new text paste on Pastebin or Hastebin; or fetches one from Gist.",
 			`When fetching existing text, the output must not be longer than ${threshold} characters, for performance reasons.`,

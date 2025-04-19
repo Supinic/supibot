@@ -18,7 +18,7 @@ export default {
 		}
 		else if (fixedInput.includes("shouldiblametmi.com")) {
 			const emote = await context.getBestAvailableEmote(["TMIAteMyMessage", "Clue", "OpieOP"], "😋");
-			const [first, second] = sb.Utils.shuffleArray([
+			const [first, second] = core.Utils.shuffleArray([
 				"That website is currently up and available.",
 				`Website is currently down: ${emote}`
 			]);
@@ -29,7 +29,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://sitecheck.sucuri.net/api/v3/?scan=${fixedInput}`
 		});
 
@@ -49,7 +49,7 @@ export default {
 		}
 
 		const lastScan = new sb.Date(scan.last_scan);
-		const delta = sb.Utils.timeDelta(lastScan);
+		const delta = core.Utils.timeDelta(lastScan);
 
 		if (Array.isArray(warnings?.scan_failed)) {
 			const error = warnings.scan_failed[0].msg;

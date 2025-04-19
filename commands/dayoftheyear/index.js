@@ -38,7 +38,7 @@ export default {
 
 		let data = await this.getCacheData(identifier);
 		if (!data) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: `https://www.daysoftheyear.com/api/v1/date/${identifier}`,
 				headers: {
 					"X-Api-Key": process.env.API_DAYS_OF_THE_YEAR
@@ -64,9 +64,9 @@ export default {
 			};
 		}
 
-		const item = sb.Utils.randArray(eligibleItems);
+		const item = core.Utils.randArray(eligibleItems);
 		return {
-			reply: `${typeName} is ${item.name}: ${sb.Utils.fixHTML(item.excerpt)} ${item.url}`
+			reply: `${typeName} is ${item.name}: ${core.Utils.fixHTML(item.excerpt)} ${item.url}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [

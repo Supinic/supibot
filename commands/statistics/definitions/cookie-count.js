@@ -4,7 +4,7 @@ export default {
 	description: "Fetches the amount of cookies you (or someone else) have eaten so far. If you use \"total\", then you will see the total amount of cookies eaten.",
 	execute: async (context, type, user) => {
 		if (user === "total" || type === "tcc") {
-			const data = await sb.Query.getRecordset(rs => rs
+			const data = await core.Query.getRecordset(rs => rs
 				.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.total.eaten.daily'), INT)) AS Modern`)
 				.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.legacy.daily'), INT)) AS Legacy`)
 				.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.total.donated'), INT)) AS Donated`)
@@ -14,8 +14,8 @@ export default {
 				.single()
 			);
 
-			const total = sb.Utils.groupDigits(data.Modern + data.Legacy);
-			const donated = sb.Utils.groupDigits(data.Donated + data.Legacy_Donated);
+			const total = core.Utils.groupDigits(data.Modern + data.Legacy);
+			const donated = core.Utils.groupDigits(data.Donated + data.Legacy_Donated);
 
 			return {
 				reply: `${total} cookies have been eaten so far in total, out of which ${donated} were gifted :)`
@@ -76,7 +76,7 @@ export default {
 			: `${who} gifted away ${donated} cookie(s).`;
 
 		let reaction;
-		const percentage = sb.Utils.round((donated / (daily + donated)) * 100, 0);
+		const percentage = core.Utils.round((donated / (daily + donated)) * 100, 0);
 		if (percentage <= 0) {
 			reaction = "😧 what a scrooge 😒";
 			if (received > 100) {
@@ -97,7 +97,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${eatenString}
 			    ${received} were gifted to ${target}.
 			    ${donatedString}

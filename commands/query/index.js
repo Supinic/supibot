@@ -26,7 +26,7 @@ export default {
 		}
 
 		if (context.params.imageSummary) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "http://api.wolframalpha.com/v1/simple",
 				throwHttpErrors: false,
 				responseType: "buffer",
@@ -61,7 +61,7 @@ export default {
 			};
 		}
 		else {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "http://api.wolframalpha.com/v1/result",
 				throwHttpErrors: false,
 				responseType: "text",

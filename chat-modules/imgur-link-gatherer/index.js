@@ -35,7 +35,7 @@ export default {
 			this.data.processedLinks.add(slug);
 
 			const link = `${slug}.${extension}`;
-			const row = await sb.Query.getRow("data", "Imgur_Reupload");
+			const row = await core.Query.getRow("data", "Imgur_Reupload");
 			await row.load(link, true);
 			if (row.loaded) {
 				return;
@@ -47,7 +47,7 @@ export default {
 			let uploaded;
 			let imgbbReupload;
 			try {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: "https://api.imgbb.com/1/upload",
 					searchParams: {
 						key: process.env.API_IMGBB

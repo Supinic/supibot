@@ -97,10 +97,10 @@ export default {
 
 				const punishment = (permanent)
 					? "permanent ban"
-					: `${sb.Utils.formatTime(length)} timeout`;
+					: `${core.Utils.formatTime(length)} timeout`;
 
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Banphrase ID ${id} - ${name}
 						${operator}: "${phrase}";
 						punishment: ${punishment};

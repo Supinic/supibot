@@ -19,7 +19,7 @@ export default {
 		let retries = 0;
 		while (!data && retries < MAX_RETRIES) {
 			const albumID = randomInt(ALBUM_ID_RANGE[0], ALBUM_ID_RANGE[1]);
-			const { statusCode, body: albumData } = await sb.Got.get("GenericAPI")({
+			const { statusCode, body: albumData } = await core.Got.get("GenericAPI")({
 				url: `https://api.genius.com/albums/${albumID}`,
 				responseType: "json",
 				throwHttpErrors: false,

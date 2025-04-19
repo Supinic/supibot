@@ -20,7 +20,7 @@ export default {
 
 		// normalize input - there might be arguments with other or multiple whitespace inside them
 		const prepared = words.join(" ").split(splitRegex).filter(Boolean);
-		const word = sb.Utils.randArray(prepared);
+		const word = core.Utils.randArray(prepared);
 
 		return {
 			reply: word,

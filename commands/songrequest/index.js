@@ -15,7 +15,7 @@ const fetchVimeoData = async (query) => {
 		});
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: "https://api.vimeo.com/videos",
 		throwHttpErrors: false,
 		headers: {
@@ -110,7 +110,7 @@ export default {
 		}
 
 		// Figure out whether song request are available, and where specifically
-		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
 		if (!state || state === "off") {
 			return {
 				reply: "Song requests are currently turned off."
@@ -140,7 +140,7 @@ export default {
 
 		// Determine requested video segment, if provided via the `start` and `end` parameters
 		/** @type {number|null} */
-		let startTime = (context.params.start) ? sb.Utils.parseVideoDuration(context.params.start) : null;
+		let startTime = (context.params.start) ? core.Utils.parseVideoDuration(context.params.start) : null;
 		if (startTime !== null && (!Number.isFinite(startTime) || startTime > 2 ** 32)) {
 			return {
 				success: false,
@@ -149,7 +149,7 @@ export default {
 		}
 
 		/** @type {number|null} */
-		let endTime = (context.params.end) ? sb.Utils.parseVideoDuration(context.params.end) : null;
+		let endTime = (context.params.end) ? core.Utils.parseVideoDuration(context.params.end) : null;
 		if (endTime !== null && (!Number.isFinite(endTime) || endTime > 2 ** 32)) {
 			return {
 				success: false,
@@ -183,7 +183,7 @@ export default {
 				return { reply: "Invalid link!" };
 			}
 
-			let songData = await sb.Query.getRecordset(rs => rs
+			let songData = await core.Query.getRecordset(rs => rs
 				.select("Available", "Link", "Name", "Duration")
 				.select("Video_Type.Link_Prefix AS Prefix")
 				.from("music", "Track")
@@ -195,7 +195,7 @@ export default {
 
 			if (!songData) {
 				let targetID = null;
-				const main = await sb.Query.getRecordset(rs => rs
+				const main = await core.Query.getRecordset(rs => rs
 					.select("Track.ID", "Available", "Link", "Name", "Duration")
 					.select("Video_Type.Link_Prefix AS Prefix")
 					.from("music", "Track")
@@ -211,7 +211,7 @@ export default {
 
 				targetID = main?.ID ?? songID;
 
-				songData = await sb.Query.getRecordset(rs => rs
+				songData = await core.Query.getRecordset(rs => rs
 					.select("Track.ID", "Available", "Link", "Name", "Duration")
 					.select("Video_Type.Link_Prefix AS Prefix")
 					.from("music", "Track")
@@ -257,7 +257,7 @@ export default {
 			if (parsedURL.host === "clips.twitch.tv") {
 				// `find(Boolean)` is meant to take the first non-empty string in the resulting split-array
 				const slug = parsedURL.path.split("/").find(Boolean);
-				const response = await sb.Got.get("IVR")(`v2/twitch/clip/${slug}`);
+				const response = await core.Got.get("IVR")(`v2/twitch/clip/${slug}`);
 				if (!response.ok) {
 					return {
 						success: false,
@@ -373,18 +373,18 @@ export default {
 		let bonusString = "";
 		const bonusLimit = await context.user.getDataProperty("supinicStreamSongRequestExtension") ?? 0;
 		if ((limits.totalTime + segmentLength) > limits.time) {
-			const excess = sb.Utils.round((limits.totalTime + segmentLength) - limits.time, 1);
+			const excess = core.Utils.round((limits.totalTime + segmentLength) - limits.time, 1);
 			if (excess > bonusLimit) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Your video would exceed the total video limit by ${excess} seconds!.
 						You can change the start and end points of the video with these arguments, e.g.: start:0 end:${limits.totalTime - limits.time}
 					`
 				};
 			}
 			else {
-				const remainingBonus = sb.Utils.round(bonusLimit - excess, 1);
+				const remainingBonus = core.Utils.round(bonusLimit - excess, 1);
 				await context.user.setDataProperty("supinicStreamSongRequestExtension", remainingBonus);
 				bonusString = `Used up ${excess} seconds from your extension, ${remainingBonus} remaining.`;
 			}
@@ -407,13 +407,13 @@ export default {
 		}
 		catch (e) {
 			console.warn("sr error", e);
-			await sb.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
+			await core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			return {
 				reply: `The desktop listener is currently turned off! Turning song requests off.`
 			};
 		}
 
-		const videoType = data.videoType ?? await sb.Query.getRecordset(rs => rs
+		const videoType = data.videoType ?? await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Video_Type")
 			.where("Parser_Name = %s", data.type)
@@ -422,11 +422,11 @@ export default {
 		);
 
 		// Log the request into database
-		const row = await sb.Query.getRow("chat_data", "Song_Request");
+		const row = await core.Query.getRow("chat_data", "Song_Request");
 		row.setValues({
 			VLC_ID: id,
 			Link: data.ID,
-			Name: sb.Utils.wrapString(data.name, 100),
+			Name: core.Utils.wrapString(data.name, 100),
 			Video_Type: videoType.ID,
 			Length: (data.duration) ? Math.ceil(data.duration) : null,
 			Status: (queue.length === 0) ? "Current" : "Queued",
@@ -455,19 +455,19 @@ export default {
 				when = "right now";
 			}
 			else {
-				when = sb.Utils.timeDelta(playingDate);
+				when = core.Utils.timeDelta(playingDate);
 			}
 		}
 
 		const seek = [];
 		if (startTime !== null) {
-			seek.push(`starting at ${sb.Utils.formatTime(startTime, true)}`);
+			seek.push(`starting at ${core.Utils.formatTime(startTime, true)}`);
 		}
 		if (endTime !== null) {
-			seek.push(`ending at ${sb.Utils.formatTime(endTime, true)}`);
+			seek.push(`ending at ${core.Utils.formatTime(endTime, true)}`);
 		}
 
-		const pauseState = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
 		const pauseString = (pauseState === true)
 			? "Song requests are paused at the moment."
 			: "";
@@ -476,7 +476,7 @@ export default {
 			: "";
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Video "${data.name}"${authorString} successfully added to queue with ID ${id}!
 				It is playing ${when}.
 				${seekString}

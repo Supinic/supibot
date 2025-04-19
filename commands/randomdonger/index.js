@@ -11,7 +11,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function randomDonger () {
 		return {
-			reply: sb.Utils.randArray(dongers)
+			reply: core.Utils.randArray(dongers)
 		};
 	}),
 	Dynamic_Description: null

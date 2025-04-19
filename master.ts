@@ -142,14 +142,34 @@ globalThis.core = {
 
 // @ts-expect-error Assignment is partial due to legacy globals split */
 globalThis.sb = {
-	Date: supiCore.Date,
-	Error: supiCore.Error,
-	Got: supiCore.Got,
-
-	get Query () { return core.Query; },
-	get Cache () { return core.Cache; },
-	get Metrics () { return core.Metrics; },
-	get Utils () { return core.Utils; }
+	get Date () {
+		// console.warn("Deprecated sb.Date access");
+		return supiCore.Date;
+	},
+	get Error () {
+		// console.warn("Deprecated sb.Error access");
+		return supiCore.Error;
+	},
+	get Got () {
+		console.warn("Deprecated sb.Got access");
+		return supiCore.Got;
+	},
+	get Query () {
+		console.warn("Deprecated sb.Query access");
+		return core.Query;
+	},
+	get Cache () {
+		console.warn("Deprecated sb.Cache access");
+		return core.Cache;
+	},
+	get Metrics () {
+		console.warn("Deprecated sb.Metrics access");
+		return core.Metrics;
+	},
+	get Utils () {
+		console.warn("Deprecated sb.Utils access");
+		return core.Utils;
+	}
 };
 
 console.timeEnd("supi-core");

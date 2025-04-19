@@ -4,14 +4,14 @@ const { instances } = config.rustlog;
 const instancesCacheKey = "rustlog-supported-channels";
 
 const getChannelLoggingInstances = async function () {
-	const data = await sb.Cache.getByPrefix(instancesCacheKey);
+	const data = await core.Cache.getByPrefix(instancesCacheKey);
 	if (data && Object.keys(data).length !== 0) {
 		return data;
 	}
 
 	const result = {};
 	const promises = Object.entries(instances).map(async ([instanceKey, instance]) => {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://${instance.url}/channels`,
 			throwHttpErrors: false,
 			timeout: {
@@ -36,7 +36,7 @@ const getChannelLoggingInstances = async function () {
 
 	await Promise.allSettled(promises);
 
-	await sb.Cache.setByPrefix(instancesCacheKey, result, {
+	await core.Cache.setByPrefix(instancesCacheKey, result, {
 		expiry: 3_600_000 // 1 hour
 	});
 
@@ -74,7 +74,7 @@ export const isSupported = async function (channelID) {
 
 export const getRandomChannelLine = async function (channelID) {
 	const instance = await getInstance(channelID);
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
@@ -119,7 +119,7 @@ export const getRandomChannelLine = async function (channelID) {
 
 export const getRandomUserLine = async function (channelID, userID) {
 	const instance = await getInstance(channelID);
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelID}/userid/${userID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
@@ -163,7 +163,7 @@ export const addChannel = async function (channelID) {
 		};
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: "https://logs.ivr.fi/admin/channels",
 		method: "POST",
 		throwHttpErrors: false,
@@ -183,7 +183,7 @@ export const addChannel = async function (channelID) {
 	}
 	else {
 		// Purge all rustlog instances cache after a new channel is added to IVR Rustlog
-		await sb.Cache.setByPrefix(instancesCacheKey, null);
+		await core.Cache.setByPrefix(instancesCacheKey, null);
 
 		return {
 			success: true

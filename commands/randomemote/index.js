@@ -26,7 +26,7 @@ export default {
 	Code: (async function randomEmote (context, number = 1) {
 		const repeats = Number(number);
 
-		if (!sb.Utils.isValidInteger(repeats, 1)) {
+		if (!core.Utils.isValidInteger(repeats, 1)) {
 			return {
 				success: false,
 				reply: `You must provide a valid number of emotes to post! Use a number between 1 and ${MAXIMUM_EMOTE_LIMIT}.`
@@ -73,7 +73,7 @@ export default {
 				}
 
 				if (!channelPrefix) {
-					const response = await sb.Got.get("IVR")({
+					const response = await core.Got.get("IVR")({
 						url: "v2/twitch/user",
 						searchParams: {
 							login: channel
@@ -174,7 +174,7 @@ export default {
 			? 50_000 // maximum character limit in a pipe command (resultCharacterLimit)
 			: (context.channel?.Message_Limit ?? context.platform.Message_Limit);
 
-		const [partition] = sb.Utils.partitionString(string, messageLengthLimit, 1);
+		const [partition] = core.Utils.partitionString(string, messageLengthLimit, 1);
 		return {
 			reply: partition
 		};

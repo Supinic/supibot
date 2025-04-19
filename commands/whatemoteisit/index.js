@@ -49,7 +49,7 @@ export default {
 			inputEmoteIdentifier = args[0];
 		}
 
-		const response = await sb.Got.get("IVR")({
+		const response = await core.Got.get("IVR")({
 			url: `v2/twitch/emotes/${encodeURIComponent(inputEmoteIdentifier)}`,
 			searchParams: {
 				id: String(isEmoteID) // literally "true" or "false" based on if the input is an emote ID
@@ -82,7 +82,7 @@ export default {
 			emoteType
 		} = response.body;
 
-		const originID = await sb.Query.getRecordset(rs => rs
+		const originID = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Origin")
 			.where("Emote_ID = %s", emoteID)

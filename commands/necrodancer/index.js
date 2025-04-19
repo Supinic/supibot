@@ -59,7 +59,7 @@ export default {
 				};
 			}
 
-			const result = await sb.Got.get("GenericAPI")({
+			const result = await core.Got.get("GenericAPI")({
 				url: createURL({
 					command: "reset",
 					zone: args
@@ -136,7 +136,7 @@ export default {
 		this.data.cooldowns[zone] = this.data.cooldowns[zone] ?? 0;
 
 		if (this.data.cooldowns[zone] >= now) {
-			const delta = sb.Utils.timeDelta(this.data.cooldowns[zone]);
+			const delta = core.Utils.timeDelta(this.data.cooldowns[zone]);
 			return {
 				reply: `The cooldown for zone ${zone} has not passed yet. Try again in ${delta}.`
 			};
@@ -148,7 +148,7 @@ export default {
 
 		let result;
 		try {
-			result = await sb.Got.get("GenericAPI")({
+			result = await core.Got.get("GenericAPI")({
 				url: createURL({
 					link,
 					zone,
@@ -166,7 +166,7 @@ export default {
 		catch (e) {
 			this.data.cooldowns[zone] = 0;
 
-			if (e instanceof sb.Got.TimeoutError) {
+			if (e instanceof core.Got.TimeoutError) {
 				return {
 					success: false,
 					reply: "Request timed out - desktop listener is probably turned off!"
@@ -178,8 +178,8 @@ export default {
 		}
 
 		if (result.success) {
-			const length = sb.Utils.formatTime(sb.Utils.round(result.length), true);
-			const bpm = sb.Utils.round(60 / (result.length / result.beats));
+			const length = core.Utils.formatTime(core.Utils.round(result.length), true);
+			const bpm = core.Utils.round(60 / (result.length / result.beats));
 			return {
 				reply: `Song added to zone ${zone}. Song length: ${length} - beats: ${result.beats} - bpm: ${bpm} AlienPls`
 			};

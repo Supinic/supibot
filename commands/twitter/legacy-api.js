@@ -1,6 +1,6 @@
 const fetchAuthData = async () => {
 	const apiTokenKey = "twitter-api-bearer-token";
-	let bearerToken = await sb.Cache.getByPrefix(apiTokenKey);
+	let bearerToken = await core.Cache.getByPrefix(apiTokenKey);
 
 	if (!bearerToken) {
 		const key = process.env.API_TWITTER_CONSUMER_KEY;
@@ -13,7 +13,7 @@ const fetchAuthData = async () => {
 		}
 
 		const credentials = Buffer.from(`${key}:${secret}`, "utf8").toString("base64");
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			method: "POST",
 			url: "https://api.twitter.com/oauth2/token",
 			headers: {
@@ -40,7 +40,7 @@ const fetchLocationsData = async (bearerToken) => {
 	const trendLocationsKey = "trends-locations";
 	let locationsData = await this.getCacheData(trendLocationsKey);
 	if (!locationsData) {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			method: "GET",
 			url: "https://api.twitter.com/1.1/trends/available.json",
 			responseType: "json",
@@ -80,7 +80,7 @@ const fetchLocationsData = async (bearerToken) => {
 
 const getTrends = async (input, bearerToken) => {
 	// Only support countries (for now) - ignores city-related trends
-	const countryData = await sb.Query.getRecordset(rs => rs
+	const countryData = await core.Query.getRecordset(rs => rs
 		.select("Code_Alpha_2 AS Code")
 		.select("Name")
 		.from("data", "Country")
@@ -105,7 +105,7 @@ const getTrends = async (input, bearerToken) => {
 		};
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		method: "GET",
 		url: "https://api.twitter.com/1.1/trends/place.json",
 		responseType: "json",
@@ -123,7 +123,7 @@ const getTrends = async (input, bearerToken) => {
 		.sort((a, b) => (b.tweet_volume ?? 0) - (a.tweet_volume ?? 0))
 		.map(i => {
 			const volume = (i.tweet_volume)
-				? sb.Utils.groupDigits(i.tweet_volume)
+				? core.Utils.groupDigits(i.tweet_volume)
 				: "N/A";
 
 			return `${i.name} (${volume} tweets)`;
@@ -139,7 +139,7 @@ const getTrends = async (input, bearerToken) => {
 const getTweet = async (context, bearerToken, user) => {
 	// necessary to fetch this many - because deleted/suspended tweets take up space in the slice
 	const limit = (context.params.random) ? "200" : "100";
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		method: "GET",
 		url: "https://api.twitter.com/1.1/statuses/user_timeline.json",
 		responseType: "json",
@@ -235,7 +235,7 @@ const getTweet = async (context, bearerToken, user) => {
 
 	let tweet;
 	if (context.params.random) {
-		tweet = sb.Utils.randArray(eligibleTweets);
+		tweet = core.Utils.randArray(eligibleTweets);
 	}
 	else {
 		tweet = eligibleTweets[0];
@@ -248,8 +248,8 @@ const getTweet = async (context, bearerToken, user) => {
 	}
 
 	const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${user}/status/${tweet.id_str}` : "";
-	const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
-	const fullText = sb.Utils.fixHTML(tweet.full_text ?? "");
+	const delta = core.Utils.timeDelta(new sb.Date(tweet.created_at));
+	const fullText = core.Utils.fixHTML(tweet.full_text ?? "");
 	const fixedText = `${fullText} ${replyUrl}`;
 
 	if (context.params.mediaOnly) {

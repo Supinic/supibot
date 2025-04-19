@@ -1,6 +1,6 @@
 let speedrunGotInstance;
 const speedrunGot = (...args) => {
-	speedrunGotInstance ??= sb.Got.get("GenericAPI").extend({
+	speedrunGotInstance ??= core.Got.get("GenericAPI").extend({
 		prefixUrl: "https://www.speedrun.com/api/v1",
 		timeout: {
 			request: 30_000
@@ -70,7 +70,7 @@ export default {
 		}
 		else {
 			const categories = categoryData.map(i => i.name);
-			const categoryMatch = sb.Utils.selectClosestString(categoryName, categories, {
+			const categoryMatch = core.Utils.selectClosestString(categoryName, categories, {
 				ignoreCase: true,
 				descriptor: true
 			});
@@ -199,9 +199,9 @@ export default {
 
 		const link = run.videos?.links?.[0]?.uri ?? run.weblink;
 		const date = new sb.Date(run.date).format("Y-m-d");
-		const time = sb.Utils.formatTime(run.times.primary_t);
+		const time = core.Utils.formatTime(run.times.primary_t);
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Speedrun by ${runner.names.international}: ${time}.
 				Executed: ${date}.
 				Category: ${game.names.international} (${category.name})

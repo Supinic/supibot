@@ -21,7 +21,7 @@ export default {
 			? Number(context.params.index)
 			: 0;
 
-		if (!sb.Utils.isValidInteger(index) || index > 100) {
+		if (!core.Utils.isValidInteger(index) || index > 100) {
 			return {
 				success: false,
 				reply: "Invalid index number provided!"
@@ -29,7 +29,7 @@ export default {
 		}
 
 		const phrase = encodeURIComponent(args.join(" "));
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://api.dictionaryapi.dev/api/v1/entries/en/${phrase}`,
 			throwHttpErrors: false,
 			responseType: "json"

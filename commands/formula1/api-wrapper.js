@@ -17,7 +17,7 @@ const BACKUP_RACE_DATA = {
 
 let jolpicaGotInstance;
 const jolpicaGot = (...args) => {
-	jolpicaGotInstance ??= sb.Got.get("GenericAPI").extend({
+	jolpicaGotInstance ??= core.Got.get("GenericAPI").extend({
 		https: {
 			rejectUnauthorized: false
 		}
@@ -140,10 +140,10 @@ export const fetchNextRaceDetail = async (context) => {
 		const nextSeason = (month >= 11) ? (year + 1) : year;
 		const backupRace = BACKUP_RACE_DATA[nextSeason];
 		if (backupRace) {
-			const delta = sb.Utils.timeDelta(new sb.Date(backupRace.date));
+			const delta = core.Utils.timeDelta(new sb.Date(backupRace.date));
 			return {
 				success: true,
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					The ${year - 1} season is finished.
 					The first race of the ${year} season is ${backupRace.name},
 					taking place ${delta}.
@@ -189,7 +189,7 @@ export const fetchNextRaceDetail = async (context) => {
 		nextSessionString = `Next session: ${sessionNames[nextSessionType]}`;
 
 		if (now < nextSessionStart) {
-			nextSessionString += ` is scheduled ${sb.Utils.timeDelta(nextSessionStart)}.`;
+			nextSessionString += ` is scheduled ${core.Utils.timeDelta(nextSessionStart)}.`;
 		}
 		else {
 			nextSessionString += ` is currently underway.`;
@@ -203,7 +203,7 @@ export const fetchNextRaceDetail = async (context) => {
 
 	let raceString;
 	if (now < raceStart) {
-		raceString = `Race is scheduled ${sb.Utils.timeDelta(raceStart)}.`;
+		raceString = `Race is scheduled ${core.Utils.timeDelta(raceStart)}.`;
 	}
 	else if (now < raceEnd) {
 		raceString = "Race is currently underway.";
@@ -215,7 +215,7 @@ export const fetchNextRaceDetail = async (context) => {
 	}
 
 	return {
-		reply: sb.Utils.tag.trim `
+		reply: core.Utils.tag.trim `
 			Next F1 race:
 			Round ${race.round} - ${race.raceName}.
 			${nextSessionString}

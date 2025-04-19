@@ -27,7 +27,7 @@ export default {
 	Code: async function epal (context) {
 		let profilesData = await this.getCacheData(PROFILES_CACHE_KEY);
 		if (!profilesData) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				method: "POST",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -52,7 +52,7 @@ export default {
 				profilePicture: i.cover,
 				tags: i.styleDesc ?? [],
 				revenue: (i.serveNum)
-					? sb.Utils.round(i.serveNum * i.price / 100, 2)
+					? core.Utils.round(i.serveNum * i.price / 100, 2)
 					: null,
 				price: {
 					regular: (i.price / 100),
@@ -79,11 +79,11 @@ export default {
 			price,
 			product,
 			tags
-		} = sb.Utils.randArray(profilesData);
+		} = core.Utils.randArray(profilesData);
 
-		const ttsStatus = await sb.Cache.getByPrefix(TTS_ENABLED);
+		const ttsStatus = await core.Cache.getByPrefix(TTS_ENABLED);
 		if (epalAudioChannels.includes(context.channel?.ID) && ttsStatus && this.data.listenerEnabled) {
-			await sb.Got.get("GenericAPI")({
+			await core.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",
 				searchParams: new URLSearchParams({
@@ -103,7 +103,7 @@ export default {
 		const profileUrl = `https://www.epal.gg/epal/${ID}`;
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${name} provides "${product}" content for ${priceString}.
 				${tagsString}
 				${revenueString}

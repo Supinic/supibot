@@ -1,6 +1,6 @@
 const validate = async function (server) {
-	const slug = sb.Utils.randomString(64);
-	const postResponse = await sb.Got.get("GenericAPI")({
+	const slug = core.Utils.randomString(64);
+	const postResponse = await core.Got.get("GenericAPI")({
 		method: "POST",
 		url: `https://${server}/documents`,
 		throwHttpErrors: false,
@@ -19,7 +19,7 @@ const validate = async function (server) {
 		return false;
 	}
 
-	const getResponse = await sb.Got.get("GenericAPI")({
+	const getResponse = await core.Got.get("GenericAPI")({
 		url: `https://${server}/raw/${key}`,
 		throwHttpErrors: false,
 		responseType: "text"

@@ -7,7 +7,7 @@ export default {
 		pipe: true
 	},
 	unset: async (context, ID) => {
-		const row = await sb.Query.getRow("music", "Track");
+		const row = await core.Query.getRow("music", "Track");
 		try {
 			await row.load(ID);
 		}
@@ -30,7 +30,7 @@ export default {
 			};
 		}
 
-		const tags = await sb.Query.getRecordset(rs => rs
+		const tags = await core.Query.getRecordset(rs => rs
 			.select("Tag")
 			.from("music", "Track_Tag")
 			.where("Track = %n", ID)
@@ -46,7 +46,7 @@ export default {
 		}
 
 		// Deletes the "to-do" tag of given track.
-		await sb.Query.raw(`DELETE FROM music.Track_Tag WHERE (Track = ${ID} AND Tag = 20)`);
+		await core.Query.raw(`DELETE FROM music.Track_Tag WHERE (Track = ${ID} AND Tag = 20)`);
 
 		return {
 			reply: `Track ID ${ID} (${row.values.Name}) has been stripped of the TODO tag.`

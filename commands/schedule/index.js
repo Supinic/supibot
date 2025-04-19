@@ -33,7 +33,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("Helix")({
+		const response = await core.Got.get("Helix")({
 			url: "schedule",
 			searchParams: {
 				broadcaster_id: channelID
@@ -82,10 +82,10 @@ export default {
 			if (firstSegStart > start && firstSegEnd < end && end > sb.Date.now()) {
 				const verb = (start < sb.Date.now()) ? "started" : "starts";
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Streaming schedule is interrupted.
 						Vacation ${verb} on ${start.format("Y-m-d")}
-						and ends on ${end.format("Y-m-d")} (${sb.Utils.timeDelta(end)}).
+						and ends on ${end.format("Y-m-d")} (${core.Utils.timeDelta(end)}).
 						${scheduleUrl}
 					`
 				};
@@ -100,7 +100,7 @@ export default {
 		else {
 			const firstSegmentStart = new sb.Date(segments[0].start_time);
 			if (firstSegmentStart < sb.Date.now()) { // First stream segment should already be underway
-				const response = await sb.Got.get("Helix")({
+				const response = await core.Got.get("Helix")({
 					url: "streams",
 					searchParams: {
 						user_id: channelID
@@ -138,9 +138,9 @@ export default {
 			? "Your"
 			: `${channelName}'s`;
 
-		const time = sb.Utils.timeDelta(new sb.Date(segment.start_time));
+		const time = core.Utils.timeDelta(new sb.Date(segment.start_time));
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${target} next stream:
 				${game} - ${title},
 				starting ${time}.

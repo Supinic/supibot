@@ -8,7 +8,7 @@ export default {
 		pipe: false
 	},
 	set: async (context) => {
-		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
+		const row = await core.Query.getRow("chat_data", "User_Alias_Data");
 		await row.load({
 			User_Alias: context.user.ID,
 			Property: "noAbbChatter"
@@ -34,7 +34,7 @@ export default {
 		};
 	},
 	unset: async (context) => {
-		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
+		const row = await core.Query.getRow("chat_data", "User_Alias_Data");
 		await row.load({
 			User_Alias: context.user.ID,
 			Property: "noAbbChatter"

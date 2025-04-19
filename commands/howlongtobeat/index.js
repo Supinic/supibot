@@ -10,12 +10,12 @@ const FILE_HASH_REGEX = /static\/chunks\/pages\/(_app-\w+?\.js)/;
 const ENDPOINT_HASH_REGEX = /\/api\/ouch\/".concat\("(\w+)"\)\s*(.concat\("(\w+)"\))?/;
 
 const fetchFileHash = async (force = false) => {
-	const existing = await sb.Cache.getByPrefix(HLTB_JS_FILE_HASH_KEY);
+	const existing = await core.Cache.getByPrefix(HLTB_JS_FILE_HASH_KEY);
 	if (!force && existing) {
 		return existing;
 	}
 
-	const response = await sb.Got.get("FakeAgent")({
+	const response = await core.Got.get("FakeAgent")({
 		url: "https://howlongtobeat.com/",
 		responseType: "text"
 	});
@@ -29,7 +29,7 @@ const fetchFileHash = async (force = false) => {
 		return null;
 	}
 
-	await sb.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, match[1], {
+	await core.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, match[1], {
 		expiry: 864e5 // 1 day
 	});
 
@@ -37,18 +37,18 @@ const fetchFileHash = async (force = false) => {
 };
 
 const fetchEndpointHash = async (fileHash, force = false) => {
-	const existing = await sb.Cache.getByPrefix(HLTB_ENDPOINT_HASH_KEY);
+	const existing = await core.Cache.getByPrefix(HLTB_ENDPOINT_HASH_KEY);
 	if (!force && existing) {
 		return existing;
 	}
 
-	const response = await sb.Got.get("FakeAgent")({
+	const response = await core.Got.get("FakeAgent")({
 		url: `https://howlongtobeat.com/${FILE_PREFIX}/${fileHash}`,
 		responseType: "text"
 	});
 
 	if (!response.ok) {
-		await sb.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, null);
+		await core.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, null);
 		return null;
 	}
 
@@ -58,7 +58,7 @@ const fetchEndpointHash = async (fileHash, force = false) => {
 	}
 
 	const hash = (match[3]) ? `${match[1]}${match[3]}` : match[1];
-	await sb.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, hash, {
+	await core.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, hash, {
 		expiry: 864e5 // 1 day
 	});
 
@@ -98,7 +98,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("FakeAgent")({
+		const response = await core.Got.get("FakeAgent")({
 			url: `https://howlongtobeat.com/api/ouch/${endpointHash}`,
 			method: "POST",
 			throwHttpErrors: false,
@@ -136,7 +136,7 @@ export default {
 		});
 
 		if (!response.ok) {
-			await sb.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, null);
+			await core.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, null);
 			return {
 				success: false,
 				reply: "Could not fetch game data! Resetting cache - try again, please."
@@ -157,15 +157,15 @@ export default {
 
 		const [gameData] = data;
 		const hours = {
-			main: sb.Utils.round(gameData.comp_main / 3600, 1),
-			plus: sb.Utils.round(gameData.comp_plus / 3600, 1),
-			full: sb.Utils.round(gameData.comp_100 / 3600, 1),
-			all: sb.Utils.round(gameData.comp_all / 3600, 1)
+			main: core.Utils.round(gameData.comp_main / 3600, 1),
+			plus: core.Utils.round(gameData.comp_plus / 3600, 1),
+			full: core.Utils.round(gameData.comp_100 / 3600, 1),
+			all: core.Utils.round(gameData.comp_all / 3600, 1)
 		};
 
 		const url = `https://howlongtobeat.com/game/${gameData.game_id}`;
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Average time to beat ${gameData.game_name} (${gameData.release_world}):
 				Main story - ${hours.main} hours;
 				Side content - ${hours.plus} hours;

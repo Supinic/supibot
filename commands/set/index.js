@@ -106,7 +106,7 @@ export default {
 
 			const results = [];
 			for (const ID of IDs) {
-				if (!sb.Utils.isValidInteger(ID)) {
+				if (!core.Utils.isValidInteger(ID)) {
 					results.push({
 						ID,
 						success: false,
@@ -130,7 +130,7 @@ export default {
 				};
 			}
 			else {
-				const [success, fail] = sb.Utils.splitByCondition(results, i => (i.success !== false));
+				const [success, fail] = core.Utils.splitByCondition(results, i => (i.success !== false));
 				const successString = (success.length > 0)
 					? `Success: ${invocation}ting IDs ${success.map(i => i.ID).join(", ")}.`
 					: "";

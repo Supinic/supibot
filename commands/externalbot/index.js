@@ -11,11 +11,11 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	initialize: async () => {
-		if (!await sb.Query.isTablePresent("bot_data", "Bot")) {
+		if (!await core.Query.isTablePresent("bot_data", "Bot")) {
 			prefixes = [];
 		}
 		else {
-			prefixes = await sb.Query.getRecordset(rs => rs
+			prefixes = await core.Query.getRecordset(rs => rs
 				.select("Bot_Alias AS ID", "Prefix as prefix")
 				.from("bot_data", "Bot")
 				.where("Prefix IS NOT NULL")

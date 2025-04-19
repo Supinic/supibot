@@ -14,7 +14,7 @@ const getRemaining = (star) => {
 	return (fullTime - elapsedTime);
 };
 const formatStar = (star, worldsData) => {
-	const delta = sb.Utils.formatTime(star.remains / 1000, true);
+	const delta = core.Utils.formatTime(star.remains / 1000, true);
 	const world = worldsData[star.world];
 	const activityString = activityRegex.test(world.activity)
 		? ` (${world.activity})`
@@ -35,7 +35,7 @@ export default {
 		`Powered by the <a href="https://map.starminers.site/">Starminers API</a>.`
 	],
 	execute: async function () {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://map.starminers.site/data2",
 			searchParams: {
 				timestamp: sb.Date.now()

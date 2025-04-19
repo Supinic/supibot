@@ -56,7 +56,7 @@ export default {
 
 		const startDate = targetDate.format("Ymd");
 		const endDate = targetDate.addDays(GAME_RANGE_DAYS).format("Ymd");
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: makeUrl(league),
 			searchParams: {
 				dates: `${startDate}-${endDate}`
@@ -72,7 +72,7 @@ export default {
 			if (!event) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						No upcoming ${leagueAbbr} match is currently scheduled! 
 						Check full info here: https://www.espn.com/${league}/scoreboard
 					`
@@ -91,7 +91,7 @@ export default {
 			}
 
 			const link = createGamecastLink(league, event.id);
-			const delta = sb.Utils.timeDelta(new sb.Date(event.date));
+			const delta = core.Utils.timeDelta(new sb.Date(event.date));
 			return {
 				reply: `Next ${leagueAbbr} match: ${event.name} ${delta}${playedAtString}.${statusString} ${link}`
 			};
@@ -104,14 +104,14 @@ export default {
 			if (events.length === 0) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						There are no upcoming ${leagueAbbr} matches for today!
 						Check full info here: https://www.espn.com/${league}/scoreboard
 					`
 				};
 			}
 
-			const list = events.map(i => `${i.shortName} ${sb.Utils.timeDelta(new sb.Date(i.date))}`);
+			const list = events.map(i => `${i.shortName} ${core.Utils.timeDelta(new sb.Date(i.date))}`);
 			return {
 				reply: `Upcoming ${leagueAbbr} matches: ${list.join("; ")}`
 			};
@@ -124,7 +124,7 @@ export default {
 			if (events.length === 0) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						There are no finished ${leagueAbbr} matches for today!
 						Check full info here: https://www.espn.com/${league}/scoreboard
 					`
@@ -133,7 +133,7 @@ export default {
 
 			const list = events.map(event => {
 				const teams = event.competitions[0].competitors;
-				const [[homeTeam], [awayTeam]] = sb.Utils.splitByCondition(teams, (i => i.homeAway === "home"));
+				const [[homeTeam], [awayTeam]] = core.Utils.splitByCondition(teams, (i => i.homeAway === "home"));
 
 				return `${event.shortName} ${awayTeam.score}:${homeTeam.score}`;
 			});

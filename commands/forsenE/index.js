@@ -14,7 +14,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function forsenE (context) {
 		const eligibleLines = forsenData.lines.filter(i => !previousLines.includes(i));
-		const line = sb.Utils.randArray(eligibleLines);
+		const line = core.Utils.randArray(eligibleLines);
 
 		previousLines.unshift(line);
 		previousLines.splice(MAXIMUM_REPEATS);

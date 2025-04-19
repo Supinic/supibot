@@ -28,7 +28,7 @@ export default {
 		}
 
 		while (length < limit) {
-			const randomWord = sb.Utils.randArray(words);
+			const randomWord = core.Utils.randArray(words);
 			result.push(randomWord);
 			length += randomWord.length + 1;
 		}

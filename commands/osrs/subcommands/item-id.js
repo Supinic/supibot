@@ -7,7 +7,7 @@ export default {
 		`Posts the item's in-game ID. Shows up to 5 best matching results.`
 	],
 	execute: async function (context, ...args) {
-		const data = await sb.Query.getRecordset(rs => {
+		const data = await core.Query.getRecordset(rs => {
 			rs.select("Game_ID", "Name")
 				.from("osrs", "Item")
 				.limit(5);

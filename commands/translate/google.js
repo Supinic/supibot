@@ -25,9 +25,9 @@ const execute = async function (context, query) {
 		}
 
 		if (option === "to" && lang === "random") {
-			let codeList = await sb.Cache.getByPrefix(LANGUAGE_LIST_KEY);
+			let codeList = await core.Cache.getByPrefix(LANGUAGE_LIST_KEY);
 			if (!codeList) {
-				const response = await sb.Got.get("FakeAgent")({
+				const response = await core.Got.get("FakeAgent")({
 					url: "https://translate.google.com/",
 					responseType: "text"
 				});
@@ -39,7 +39,7 @@ const execute = async function (context, query) {
 					};
 				}
 
-				const $ = sb.Utils.cheerio(response.body);
+				const $ = core.Utils.cheerio(response.body);
 				const codes = [...$("[data-language-code]")].map(i => i.attribs["data-language-code"]);
 				const list = new Set(codes.filter(i => {
 					if (i === "auto" || i.includes("-")) {
@@ -51,12 +51,12 @@ const execute = async function (context, query) {
 
 				codeList = [...list];
 
-				await sb.Cache.setByPrefix(LANGUAGE_LIST_KEY, codeList, {
+				await core.Cache.setByPrefix(LANGUAGE_LIST_KEY, codeList, {
 					expiry: 864e5 // 1 day
 				});
 			}
 
-			lang = sb.Utils.randArray(codeList);
+			lang = core.Utils.randArray(codeList);
 		}
 
 		const newLang = getLanguage(lang);
@@ -79,7 +79,7 @@ const execute = async function (context, query) {
 			: "en";
 	}
 
-	const response = await sb.Got.get("FakeAgent")({
+	const response = await core.Got.get("FakeAgent")({
 		url: "https://translate.googleapis.com/translate_a/single",
 		responseType: "json",
 		throwHttpErrors: false,
@@ -127,14 +127,14 @@ const execute = async function (context, query) {
 
 	const additionalInfo = [];
 	if (!textOnly) {
-		additionalInfo.push(sb.Utils.capitalize(fromLanguageName));
+		additionalInfo.push(core.Utils.capitalize(fromLanguageName));
 
 		if (options.confidence && data[6] && data[6] !== 1) {
-			const confidence = `${sb.Utils.round(data[6] * 100, 0)}%`;
+			const confidence = `${core.Utils.round(data[6] * 100, 0)}%`;
 			additionalInfo.push(`(${confidence})`);
 		}
 
-		const toLanguageName = sb.Utils.capitalize(getName(options.to));
+		const toLanguageName = core.Utils.capitalize(getName(options.to));
 		additionalInfo.push("→", `${toLanguageName}:`);
 	}
 

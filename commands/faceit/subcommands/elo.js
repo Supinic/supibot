@@ -17,7 +17,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://open.faceit.com/data/v4/players",
 			searchParams: {
 				nickname: user
@@ -62,7 +62,7 @@ export default {
 		const userString = (userGameData.memberships.includes("premium")) ? "premium user" : "user";
 		const region = gameData.region;
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${region}
 				${userString} 
 				"${userGameData.nickname}"

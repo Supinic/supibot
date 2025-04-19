@@ -24,7 +24,7 @@ const execute = async (data) => {
 		self = true;
 	}
 
-	const response = await sb.Got.gql({
+	const response = await core.Got.gql({
 		url: "https://api.github.com/graphql",
 		token: process.env.API_GITHUB_PUBLIC_REPO_GQL_TOKEN,
 		query: `query ($username: String!, $threshold: DateTime!) {

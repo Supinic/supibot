@@ -34,7 +34,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Markov module for channel ${channelData.Name} currently has:
 				${markov.size} unique words,
 				and ${markov.edges ?? "(unknown)"} connections between words. 

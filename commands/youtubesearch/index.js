@@ -47,7 +47,7 @@ export default {
 		searchAmountToday++;
 
 		if (searchAmountToday >= DAILY_SEARCHES_CAP) {
-			const when = sb.Utils.timeDelta(getClosestPacificMidnight());
+			const when = core.Utils.timeDelta(getClosestPacificMidnight());
 			return {
 				success: false,
 				reply: `No more YouTube searches available today! Reset happens at midnight Pacific Time, which is ${when}.`
@@ -55,7 +55,7 @@ export default {
 		}
 
 		const index = context.params.index ?? 0;
-		if (!sb.Utils.isValidInteger(index)) {
+		if (!core.Utils.isValidInteger(index)) {
 			return {
 				success: false,
 				reply: `Provided index must be a valid integer!`
@@ -125,13 +125,13 @@ export default {
 		const published = new sb.Date(data.created).format("Y-m-d");
 		const durationString = (data.duration === null)
 			? ""
-			: `Duration: ${sb.Utils.formatTime(data.duration, true)}`;
+			: `Duration: ${core.Utils.formatTime(data.duration, true)}`;
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				"${data.name}"
 				by ${data.author},
-				${sb.Utils.groupDigits(data.views)} views,
+				${core.Utils.groupDigits(data.views)} views,
 				published on ${published}.
 				${durationString}
 				${data.link}

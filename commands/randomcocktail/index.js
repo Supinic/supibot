@@ -12,7 +12,7 @@ export default {
 	Code: (async function randomCocktail (context, ...args) {
 		let response;
 		if (context.params.ingredient) {
-			const drinkResponse = await sb.Got.get("GenericAPI")({
+			const drinkResponse = await core.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/filter.php",
 				searchParams: {
 					i: context.params.ingredient
@@ -27,8 +27,8 @@ export default {
 				};
 			}
 
-			const randomDrink = sb.Utils.randArray(ingredientDrinks);
-			response = await sb.Got.get("GenericAPI")({
+			const randomDrink = core.Utils.randArray(ingredientDrinks);
+			response = await core.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/lookup.php",
 				searchParams: {
 					i: randomDrink.idDrink
@@ -36,13 +36,13 @@ export default {
 			});
 		}
 		else if (args.length === 0) {
-			response = await sb.Got.get("GenericAPI")({
+			response = await core.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/random.php",
 				responseType: "json"
 			});
 		}
 		else {
-			response = await sb.Got.get("GenericAPI")({
+			response = await core.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/search.php",
 				searchParams: {
 					s: args.join(" ")
@@ -58,7 +58,7 @@ export default {
 			};
 		}
 
-		const drink = sb.Utils.randArray(data.drinks);
+		const drink = core.Utils.randArray(data.drinks);
 		const ingredients = [];
 		for (const [key, value] of Object.entries(drink)) {
 			if (!/ingredient\d+/i.test(key) || !value) {

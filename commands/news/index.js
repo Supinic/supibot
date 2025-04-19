@@ -19,7 +19,7 @@ export default {
 		let input;
 		if (context.params.country) {
 			const value = context.params.country;
-			const code = await sb.Query.getRecordset(rs => rs
+			const code = await core.Query.getRecordset(rs => rs
 				.select("Code_Alpha_2 AS Code")
 				.from("data", "Country")
 				.where("Name = %s OR Code_Alpha_2 = %s OR Code_Alpha_3 = %s", value, value, value)
@@ -53,7 +53,7 @@ export default {
 		else {
 			return {
 				success: false,
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					Your provided country code is currently not supported!
 					If you know a good relevant news source with RSS support, you could $suggest it and it would be added.
 				`
@@ -77,10 +77,10 @@ export default {
 				? [...new Set(helpers)].join(", ")
 				: "N/A";
 
-			return sb.Utils.tag.trim `
+			return core.Utils.tag.trim `
 				<tr>
 					<td>${code.toUpperCase()}</td>
-					<td>${sb.Utils.capitalize(language)}</td>
+					<td>${core.Utils.capitalize(language)}</td>
 					<td>${links.join("<br>")}
 					<td>${uniqueHelpers}</td>
 				</tr>

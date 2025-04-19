@@ -12,7 +12,7 @@ export default {
 	Code: (async function _4head (context) {
 		let joke;
 		if (context.params.search) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://icanhazdadjoke.com/search",
 				searchParams: {
 					term: context.params.search,
@@ -28,10 +28,10 @@ export default {
 				};
 			}
 
-			joke = sb.Utils.randArray(jokes).joke;
+			joke = core.Utils.randArray(jokes).joke;
 		}
 		else {
-			const response = await sb.Got.get("GenericAPI")("https://icanhazdadjoke.com/");
+			const response = await core.Got.get("GenericAPI")("https://icanhazdadjoke.com/");
 			joke = response.body.joke;
 		}
 

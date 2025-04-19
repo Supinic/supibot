@@ -25,7 +25,7 @@ export default {
 		}
 
 		const channelId = channelData.Specific_ID;
-		const response = await sb.Got.get("Helix")({
+		const response = await core.Got.get("Helix")({
 			url: "streams",
 			searchParams: {
 				user_id: channelId

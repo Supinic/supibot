@@ -89,12 +89,12 @@ const isTypeSupported = (value) => {
 };
 
 const predefinedQueries = {
-	content: () => sb.Query.getRecordset(rs => rs
+	content: () => core.Query.getRecordset(rs => rs
 		.select("Category AS category", "Status AS status")
 		.from("data", "Suggestion")
 		.where("Status IS NULL OR Status IN %s+", ["Approved", "Blocked"])
 	),
-	suscheck: (context, username) => sb.Query.getRecordset(rs => rs
+	suscheck: (context, username) => core.Query.getRecordset(rs => rs
 		.select("Twitch_ID")
 		.from("chat_data", "User_Alias")
 		.where("Name = %s", username)
@@ -103,7 +103,7 @@ const predefinedQueries = {
 		.limit(1)
 	),
 	ownAlias: async (context, name) => {
-		const raw = await sb.Query.getRecordset(rs => rs
+		const raw = await core.Query.getRecordset(rs => rs
 			.select("Invocation", "Arguments")
 			.from("data", "Custom_Command_Alias")
 			.where("Name = %s", name)
@@ -125,7 +125,7 @@ const predefinedQueries = {
 				: []
 		};
 	},
-	randomSongRequest: () => sb.Query.getRecordset(rs => rs
+	randomSongRequest: () => core.Query.getRecordset(rs => rs
 		.select("Name", "Link", "Video_Type")
 		.from("chat_data", "Song_Request")
 		.where("Video_Type IN %n+", [1])
@@ -133,13 +133,13 @@ const predefinedQueries = {
 		.limit(1)
 		.single()
 	),
-	osrsClueTags: () => sb.Query.getRecordset(rs => rs
+	osrsClueTags: () => core.Query.getRecordset(rs => rs
 		.select("ID", "Tier as tier", "Type as type", "Description as description", "Hint as hint")
 		.from("personal", "Clue_Scroll_Tag")
 		.where("Tier NOT IN %s+", ["Beginner", "Master"])
 		.orderBy("Hint ASC", "ID ASC")
 	),
-	randomSteamGames: () => sb.Query.getRecordset(rs => rs
+	randomSteamGames: () => core.Query.getRecordset(rs => rs
 		.select("ID", "Name AS name")
 		.from("data", "Steam_Game")
 		.orderBy("RAND()")
@@ -148,7 +148,7 @@ const predefinedQueries = {
 };
 const predefinedRequests = {
 	olympics2024: async () => {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://api.olympics.kevle.xyz/medals",
 			throwHttpErrors: false
 		});
@@ -199,7 +199,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 		executor: context.user.Name,
 		executorID: context.user.ID,
 		platform: context.platform.Name,
-		permissions: sb.Utils.deepFreeze({
+		permissions: core.Utils.deepFreeze({
 			get: () => userPermissions.flag,
 			is: (level) => {
 				if (!Object.hasOwn(sb.User.permissions, level)) {
@@ -209,7 +209,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 				return userPermissions.is(level);
 			}
 		}),
-		query: sb.Utils.deepFreeze({
+		query: core.Utils.deepFreeze({
 			run: async (queryName, ...args) => {
 				if (!queryName) {
 					throw new Error("Query name must be provided");
@@ -258,7 +258,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 				return data;
 			}
 		}),
-		request: sb.Utils.deepFreeze({
+		request: core.Utils.deepFreeze({
 			run: async (requestName, ...args) => {
 				if (!requestName) {
 					throw new Error("Request name must be provided");
@@ -282,7 +282,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 				return await callback(context, ...args);
 			}
 		}),
-		command: sb.Utils.deepFreeze({
+		command: core.Utils.deepFreeze({
 			multi: async function (input) {
 				if (!Array.isArray(input) || input.some(i => !Array.isArray(i) || i.some(j => typeof j !== "string"))) {
 					throw new Error("Provided input must be an array of arrays - each being the name and arguments for one command");
@@ -380,7 +380,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 
 			return context.tee.push(value);
 		},
-		channelCustomData: sb.Utils.deepFreeze({
+		channelCustomData: core.Utils.deepFreeze({
 			getKeys: () => {
 				if (!customChannelData) {
 					throw new Error("There is no channel data available here");
@@ -415,7 +415,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 					: undefined;
 			}
 		}),
-		customData: sb.Utils.deepFreeze({
+		customData: core.Utils.deepFreeze({
 			getKeys: () => Object.keys(customUserData),
 			set: (key, value) => {
 				if (typeof key !== "string") {
@@ -477,7 +477,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 
 				return sb.Command.parseParametersFromArguments(definition, args);
 			},
-			trim: (...args) => sb.Utils.tag.trim(...args),
+			trim: (...args) => core.Utils.tag.trim(...args),
 			unping: (string) => {
 				if (typeof string !== "string") {
 					throw new Error("Passed value must be a string");
@@ -492,7 +492,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 	};
 
 	for (const method of allowedUtilsMethods) {
-		sandbox.utils[method] = (...args) => sb.Utils[method](...args);
+		sandbox.utils[method] = (...args) => core.Utils[method](...args);
 	}
 
 	return {

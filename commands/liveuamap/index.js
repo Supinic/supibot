@@ -36,7 +36,7 @@ export default {
 		if (!data) {
 			let response;
 			try {
-				response = await sb.Got.get("FakeAgent")({
+				response = await core.Got.get("FakeAgent")({
 					url: `https://liveuamap.com/${languageCode}`,
 					responseType: "text",
 					timeout: {
@@ -59,7 +59,7 @@ export default {
 			}
 
 			const result = [];
-			const $ = sb.Utils.cheerio(response.body);
+			const $ = core.Utils.cheerio(response.body);
 			const events = $("div.event");
 			if (events.length === 0) {
 				return {

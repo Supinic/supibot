@@ -23,7 +23,7 @@ export default {
 			searchParams.game_id = games[0].id;
 		}
 
-		const response = await sb.Got.get("Helix")({
+		const response = await core.Got.get("Helix")({
 			url: "streams",
 			searchParams
 		});
@@ -51,7 +51,7 @@ export default {
 				? `- ${stream.game_name}`
 				: "";
 
-			return `@${stream.user_login} ${specificGame} (${sb.Utils.groupDigits(stream.viewer_count)})`;
+			return `@${stream.user_login} ${specificGame} (${core.Utils.groupDigits(stream.viewer_count)})`;
 		});
 
 		return {

@@ -20,7 +20,7 @@ const redditGot = (...args) => {
 		console.log("$rm command will not use authorized requests - no credentials found");
 	}
 
-	redditGotInstance ??= sb.Got.get("GenericAPI").extend(options);
+	redditGotInstance ??= core.Got.get("GenericAPI").extend(options);
 	return redditGotInstance(...args);
 };
 
@@ -61,7 +61,7 @@ export default {
 			safeSpace = true;
 		}
 
-		const input = (args.shift() ?? sb.Utils.randArray(config.defaultMemeSubreddits));
+		const input = (args.shift() ?? core.Utils.randArray(config.defaultMemeSubreddits));
 		let subreddit = encodeURIComponent(input.toLowerCase());
 
 		/** @type {Subreddit} */
@@ -254,7 +254,7 @@ export default {
 			}
 		}
 
-		const post = sb.Utils.randArray(validPosts);
+		const post = core.Utils.randArray(validPosts);
 		if (!post) {
 			return {
 				success: false,
@@ -294,7 +294,7 @@ export default {
 			: post.toString();
 
 		return {
-			reply: sb.Utils.fixHTML(`${symbol} r/${forum.name}: ${postString} ${commentsUrl} ${galleryLinksString}`)
+			reply: core.Utils.fixHTML(`${symbol} r/${forum.name}: ${postString} ${commentsUrl} ${galleryLinksString}`)
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {

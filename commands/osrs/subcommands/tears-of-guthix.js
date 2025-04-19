@@ -13,7 +13,7 @@ export default {
 		`Powered by <a href="https://github.com/jcarbelbide/tog-crowdsourcing-server">Tears of Guthix Crowdsourcing API</a>.`
 	],
 	execute: async function () {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://www.togcrowdsourcing.com/worldinfo"
 		});
 

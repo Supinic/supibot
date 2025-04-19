@@ -1,6 +1,6 @@
 import { parseRSS } from "../../utils/command-utils.js";
 
-const cleanString = (str) => sb.Utils.fixHTML(sb.Utils.removeHTML(str)).replaceAll(/\s+/g, " ");
+const cleanString = (str) => core.Utils.fixHTML(core.Utils.removeHTML(str)).replaceAll(/\s+/g, " ");
 
 export default {
 	fetch: async (context, query) => {
@@ -13,7 +13,7 @@ export default {
 
 		let response;
 		if (query) {
-			response = await sb.Got.get("GenericAPI")({
+			response = await core.Got.get("GenericAPI")({
 				url: "https://news.google.com/rss/search",
 				responseType: "text",
 				searchParams: {
@@ -25,7 +25,7 @@ export default {
 			});
 		}
 		else {
-			response = await sb.Got.get("GenericAPI")({
+			response = await core.Got.get("GenericAPI")({
 				url: "https://news.google.com/rss",
 				responseType: "text"
 			});
@@ -48,12 +48,12 @@ export default {
 
 		const article = (context.params.latest)
 			? articles.sort((a, b) => b.published - a.published)[0]
-			: sb.Utils.randArray(articles);
+			: core.Utils.randArray(articles);
 
 		const { content, title, published } = article;
 		const separator = (title && content) ? " - " : "";
 		const delta = (published)
-			? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
+			? `(published ${core.Utils.timeDelta(new sb.Date(published))})`
 			: "";
 
 		let result;

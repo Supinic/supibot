@@ -16,7 +16,7 @@ export const createRecentUseCacheKey = (context) => ({
 
 export const formatScore = (score) => (score === null)
 	? "N/A"
-	: `${sb.Utils.round(score * 100, 2)}%`;
+	: `${core.Utils.round(score * 100, 2)}%`;
 
 export const flags = [
 	{

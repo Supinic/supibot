@@ -8,7 +8,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function beeFact () {
-		const fact = await sb.Query.getRecordset(rs => rs
+		const fact = await core.Query.getRecordset(rs => rs
 			.select("Text")
 			.from("data", "Fun_Fact")
 			.where("Tag = %s", "Bees")

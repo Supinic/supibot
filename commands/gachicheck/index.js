@@ -85,7 +85,7 @@ export default {
 			: `track list ID ${id}`;
 
 		if (!this.data.typeMap) {
-			const typeData = await sb.Query.getRecordset(rs => rs
+			const typeData = await core.Query.getRecordset(rs => rs
 				.select("ID", "Parser_Name")
 				.from("data", "Video_Type")
 				.where("Parser_Name IS NOT NULL"));
@@ -112,7 +112,7 @@ export default {
 				continue;
 			}
 
-			const check = await sb.Query.getRecordset(rs => rs
+			const check = await core.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("music", "Track")
 				.where("Link = %s", String(videoData.ID))
@@ -120,7 +120,7 @@ export default {
 			);
 
 			if (check) {
-				const tagData = (await sb.Query.getRecordset(rs => rs
+				const tagData = (await core.Query.getRecordset(rs => rs
 					.select("Tag.Name AS Tag_Name")
 					.from("music", "Track_Tag")
 					.join("music", {
@@ -131,7 +131,7 @@ export default {
 				));
 
 				const tags = tagData.join(", ");
-				const row = await sb.Query.getRow("music", "Track");
+				const row = await core.Query.getRow("music", "Track");
 				await row.load(check.ID);
 
 				const added = { name: "(unknown)", date: "(unknown time ago)" };
@@ -140,14 +140,14 @@ export default {
 					added.name = userData.Name;
 				}
 				if (row.values.Added_On) {
-					added.date = sb.Utils.timeDelta(row.values.Added_On);
+					added.date = core.Utils.timeDelta(row.values.Added_On);
 				}
 
 				results.push({
 					link,
 					existing: true,
 					ID: check.ID,
-					formatted: sb.Utils.tag.trim `
+					formatted: core.Utils.tag.trim `
 						Link is in the list already:
 						${trackToLink(check.ID)}
 						with tags: ${tags}.
@@ -158,7 +158,7 @@ export default {
 			else {
 				const tag = { todo: 20 };
 				const videoData = await linkParser.fetchData(link, type);
-				const row = await sb.Query.getRow("music", "Track");
+				const row = await core.Query.getRow("music", "Track");
 
 				row.setValues({
 					Link: videoData.ID,
@@ -173,7 +173,7 @@ export default {
 				});
 
 				const { insertId: trackID } = await row.save();
-				const tagRow = await sb.Query.getRow("music", "Track_Tag");
+				const tagRow = await core.Query.getRow("music", "Track_Tag");
 				tagRow.setValues({
 					Track: trackID,
 					Tag: tag.todo,
@@ -186,7 +186,7 @@ export default {
 				if (videoData?.author) {
 					let authorID = null;
 					const normal = videoData.author.toLowerCase().replaceAll(/\s+/g, "_");
-					const authorExists = await sb.Query.getRecordset(rs => rs
+					const authorExists = await core.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("music", "Author")
 						.where("Normalized_Name = %s", normal)
@@ -196,7 +196,7 @@ export default {
 						authorID = authorExists.ID;
 					}
 					else {
-						const authorRow = await sb.Query.getRow("music", "Author");
+						const authorRow = await core.Query.getRow("music", "Author");
 						authorRow.setValues({
 							Name: videoData.author,
 							Normalized_Name: normal,
@@ -207,7 +207,7 @@ export default {
 						authorID = result.insertId;
 					}
 
-					const authorRow = await sb.Query.getRow("music", "Track_Author");
+					const authorRow = await core.Query.getRow("music", "Track_Author");
 					authorRow.setValues({
 						Track: trackID,
 						Author: authorID,

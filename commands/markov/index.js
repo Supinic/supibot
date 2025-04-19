@@ -22,7 +22,7 @@ const updateMarkovWordList = async () => {
 	for (const [channelID, markov] of module.data.markovs.entries()) {
 		const words = markov.keys.sort();
 
-		promises.push(sb.Cache.setByPrefix("markov-word-list", words, {
+		promises.push(core.Cache.setByPrefix("markov-word-list", words, {
 			keys: { channelID },
 			expiry: 864e5
 		}));
@@ -175,7 +175,7 @@ export default {
 			}
 			else if (debug === "threshold") {
 				const threshold = Number(input);
-				if (!sb.Utils.isValidInteger(threshold)) {
+				if (!core.Utils.isValidInteger(threshold)) {
 					return {
 						success: false,
 						reply: `Dank number!`
@@ -202,7 +202,7 @@ export default {
 		let wordCount = DEFAULT_WORD_AMOUNT;
 		if (context.params.words) {
 			const { words } = context.params;
-			if (!sb.Utils.isValidInteger(words, 1)) {
+			if (!core.Utils.isValidInteger(words, 1)) {
 				return {
 					success: false,
 					reply: "Invalid number of words provided!"
@@ -223,7 +223,7 @@ export default {
 			if (exact) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						That exact word is not available as seed for random generation!
 						Check the list here:
 						https://supinic.com/data/other/markov/${targetChannel.ID}/words
@@ -246,7 +246,7 @@ export default {
 			if (!markov.has(input)) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						That word is not available as seed for random generation!
 						Check the list here:
 						https://supinic.com/data/other/markov/${targetChannel.ID}/words
@@ -264,7 +264,7 @@ export default {
 		};
 	},
 	Dynamic_Description: async function (prefix) {
-		const channels = await sb.Query.getRecordset(rs => rs
+		const channels = await core.Query.getRecordset(rs => rs
 			.select("Channel.ID AS Channel_ID", "Name")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Chat_Module = %s", "async-markov-experiment")

@@ -26,23 +26,23 @@ export default {
 			case "roll": {
 				const lowercaseClasses = TEAM_FORTRESS_CLASSES.map(i => i.toLowerCase());
 				const playerClass = (lowercaseClasses.includes(args[0]?.toLowerCase()))
-					? sb.Utils.capitalize(args[0])
-					: sb.Utils.randArray(TEAM_FORTRESS_CLASSES);
+					? core.Utils.capitalize(args[0])
+					: core.Utils.randArray(TEAM_FORTRESS_CLASSES);
 
 				const classWeapons = weapons.filter(i => i.classes.includes(playerClass));
 
-				const primary = sb.Utils.randArray(classWeapons.filter(i => i.slot === "primary"));
-				const secondary = sb.Utils.randArray(classWeapons.filter(i => i.slot === "secondary"));
-				const melee = sb.Utils.randArray(classWeapons.filter(i => i.slot === "melee"));
+				const primary = core.Utils.randArray(classWeapons.filter(i => i.slot === "primary"));
+				const secondary = core.Utils.randArray(classWeapons.filter(i => i.slot === "secondary"));
+				const melee = core.Utils.randArray(classWeapons.filter(i => i.slot === "melee"));
 
 				const loadout = [primary.name, secondary.name, melee.name];
 				if (playerClass === "Spy") {
-					const watch = sb.Utils.randArray(classWeapons.filter(i => i.slot === "watch"));
+					const watch = core.Utils.randArray(classWeapons.filter(i => i.slot === "watch"));
 					loadout.push(watch.name);
 				}
 
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Your random ${playerClass} loadout is:
 						${loadout.join(", ")}
 					`

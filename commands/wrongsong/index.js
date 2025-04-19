@@ -11,7 +11,7 @@ export default {
 		let targetID;
 		if (target) {
 			targetID = Number(target);
-			if (!sb.Utils.isValidInteger(targetID)) {
+			if (!core.Utils.isValidInteger(targetID)) {
 				return {
 					success: false,
 					reply: `Could not parse your provided song ID!`
@@ -19,7 +19,7 @@ export default {
 			}
 		}
 
-		const userRequest = await sb.Query.getRecordset(rs => rs
+		const userRequest = await core.Query.getRecordset(rs => rs
 			.select("Song_Request.ID", "Name", "VLC_ID", "Status")
 			.select("Video_Type.Link_Prefix AS Prefix")
 			.from("chat_data", "Song_Request")
@@ -46,7 +46,7 @@ export default {
 
 		let action = "";
 		if (userRequest.Status === "Current") {
-			const requestsAhead = await sb.Query.getRecordset(rs => rs
+			const requestsAhead = await core.Query.getRecordset(rs => rs
 				.select("COUNT(*) AS Amount")
 				.from("chat_data", "Song_Request")
 				.where("Status = %s", "Queued")

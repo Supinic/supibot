@@ -50,7 +50,7 @@ export default {
 	Code: (async function dallE (context, ...args) {
 		if (context.params.search || context.params.random || context.params.id) {
 			const { id, random, search } = context.params;
-			const image = await sb.Query.getRecordset(rs => rs
+			const image = await core.Query.getRecordset(rs => rs
 				.select("ID", "Prompt", "Created", "Creation_Time")
 				.from("data", "DALL-E")
 				.orderBy("RAND()")
@@ -128,7 +128,7 @@ export default {
 		Pending.set(context.user, context.channel);
 
 		const notificationTimeout = setTimeout(async (timeoutContext) => {
-			await timeoutContext.sendIntermediateMessage(sb.Utils.tag.trim `
+			await timeoutContext.sendIntermediateMessage(core.Utils.tag.trim `
 				${mentionUsername}
 				Processing...
 				${waitingEmote} ${loadingEmote}
@@ -137,7 +137,7 @@ export default {
 		}, 2000, context);
 
 		const start = process.hrtime.bigint();
-		const response = await sb.Got.get("FakeAgent")({
+		const response = await core.Got.get("FakeAgent")({
 			url: "https://bf.dallemini.ai/generate",
 			method: "POST",
 			responseType: "json",
@@ -182,7 +182,7 @@ export default {
 		}
 
 		const jsonImageData = images.map(i => i.replaceAll("\n", ""));
-		const row = await sb.Query.getRow("data", "DALL-E");
+		const row = await core.Query.getRow("data", "DALL-E");
 		const ID = hash.digest().toString("hex").slice(0, 16);
 		const created = new sb.Date();
 		const creationTime = (Number(nanoExecutionTime) / 1e9);

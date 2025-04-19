@@ -14,12 +14,12 @@ export default {
 			};
 		}
 
-		const { data } = await sb.Got.get("Supinic")(`data/suggestion/stats/user/${userData.Name}`).json();
-		const percent = sb.Utils.round(data.userTotal / data.globalTotal * 100, 2);
+		const { data } = await core.Got.get("Supinic")(`data/suggestion/stats/user/${userData.Name}`).json();
+		const percent = core.Utils.round(data.userTotal / data.globalTotal * 100, 2);
 		const who = (userData === context.user) ? "You" : "They";
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${who} have made ${data.userTotal} suggestions, out of ${data.globalTotal} (${percent}%)							
 				More info: https://supinic.com/data/suggestion/stats/user/${userData.Name}
 				--

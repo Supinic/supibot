@@ -24,7 +24,7 @@ export default {
 				reply: args.join(" ")
 			};
 		}
-		else if (range.some(i => i !== null && !sb.Utils.isValidInteger(i))) {
+		else if (range.some(i => i !== null && !core.Utils.isValidInteger(i))) {
 			return {
 				success: false,
 				reply: `Invalid arguments range provided`

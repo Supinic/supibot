@@ -27,7 +27,7 @@ export default {
 			setTimeout(() => (channelData.Mode = "Read"), 5000);
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					I will go to read-only mode in channel "${channelData.Name}" after ~5 seconds.
 					Use the "${sb.Command.prefix}${this.Name} enable ${channelData.Name}" command in private messages to re-enable me.
 				`

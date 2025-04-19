@@ -36,7 +36,7 @@ export default {
 
 		let dictPromise;
 		if (allowedPartials.dictionary) {
-			dictPromise = sb.Got.get("GenericAPI")({
+			dictPromise = core.Got.get("GenericAPI")({
 				url: `https://api.dictionaryapi.dev/api/v1/entries/en/${query}`,
 				throwHttpErrors: false,
 				responseType: "json"
@@ -46,7 +46,7 @@ export default {
 		let wikiPromise;
 		let wiktionaryPromise;
 		if (allowedPartials.wiki) {
-			wikiPromise = sb.Got.get("GenericAPI")({
+			wikiPromise = core.Got.get("GenericAPI")({
 				url: `https://${languageCode}.wikipedia.org/w/api.php`,
 				searchParams: {
 					format: "json",
@@ -57,7 +57,7 @@ export default {
 				}
 			});
 
-			wiktionaryPromise = sb.Got.get("FakeAgent")({
+			wiktionaryPromise = core.Got.get("FakeAgent")({
 				url: `https://${languageCode}.wiktionary.org/wiki/${encodeURIComponent(query)}`,
 				throwHttpErrors: false,
 				responseType: "text"
@@ -66,7 +66,7 @@ export default {
 
 		let urbanPromise;
 		if (allowedPartials.urban) {
-			urbanPromise = sb.Got.get("GenericAPI")({
+			urbanPromise = core.Got.get("GenericAPI")({
 				url: "https://api.urbandictionary.com/v0/define",
 				searchParams: {
 					term: query
@@ -97,7 +97,7 @@ export default {
 				})));
 
 				if (items.length !== 0) {
-					result.push(`Dictionary: "${sb.Utils.wrapString(items[0].definition, 150)}"`);
+					result.push(`Dictionary: "${core.Utils.wrapString(items[0].definition, 150)}"`);
 				}
 			}
 
@@ -108,7 +108,7 @@ export default {
 					.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
 				if (item) {
-					const definition = sb.Utils.wrapString(item.definition.replaceAll(/[[\]]/g, ""), 150);
+					const definition = core.Utils.wrapString(item.definition.replaceAll(/[[\]]/g, ""), 150);
 					result.push(`Urban: "${definition}"`);
 				}
 			}
@@ -117,7 +117,7 @@ export default {
 		if (wikiData.status === "fulfilled" && wikiData.value?.statusCode === 200) {
 			const searchData = wikiData.value.body;
 			if (searchData[1].length !== 0) {
-				const data = await sb.Got.get("GenericAPI")({
+				const data = await core.Got.get("GenericAPI")({
 					url: `https://${languageCode}.wikipedia.org/w/api.php`,
 					searchParams: {
 						format: "json",
@@ -134,7 +134,7 @@ export default {
 				let message = `Wiki: https://${languageCode}.wikipedia.org/?curid=${key}`;
 				if (languageCode !== "en") {
 					const { extract } = data.body.query.pages[key];
-					message += ` ${sb.Utils.wrapString(extract, 150)}`;
+					message += ` ${core.Utils.wrapString(extract, 150)}`;
 				}
 
 				result.push(message);
@@ -151,7 +151,7 @@ export default {
 			if (filteredCommandsCount === checkedCommands.length) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						This command cannot fetch anything, because all of its sources have been filtered out!
 						Check this command's help article if you're unsure why.
 					`

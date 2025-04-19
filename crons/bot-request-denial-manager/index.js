@@ -6,13 +6,13 @@ export default {
 	expression: "*/15 * * * *",
 	description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
 	code: (async function botRequestDenialManager (cron) {
-		isTableAvailable ??= await sb.Query.isTablePresent("data", "Suggestion");
+		isTableAvailable ??= await core.Query.isTablePresent("data", "Suggestion");
 		if (isTableAvailable === false) {
 			cron.job.stop();
 			return;
 		}
 
-		const unresolvedRequestIDs = await sb.Query.getRecordset(rs => rs
+		const unresolvedRequestIDs = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Suggestion")
 			.where("Category = %s", "Bot addition")
@@ -30,7 +30,7 @@ export default {
 			return;
 		}
 
-		const resolvedRequests = await sb.Query.getRecordset(rs => rs
+		const resolvedRequests = await core.Query.getRecordset(rs => rs
 			.select("Suggestion.ID", "Suggestion.Status")
 			.select("User_Alias.Name AS Username")
 			.from("data", "Suggestion")

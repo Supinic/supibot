@@ -17,7 +17,7 @@ export default {
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
 	Code: (async function current (context, ...args) {
 		const linkSymbol = VIDEO_TYPE_REPLACE_PREFIX;
-		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
 
 		if (!state || state === "off") {
 			return {
@@ -55,7 +55,7 @@ export default {
 			}
 
 			const media = playing.media;
-			const prefix = await sb.Query.getRecordset(rs => rs
+			const prefix = await core.Query.getRecordset(rs => rs
 				.select("Link_Prefix")
 				.from("data", "Video_Type")
 				.where("Type = %s", media.type)
@@ -88,7 +88,7 @@ export default {
 		let includePosition = false;
 		let introductionString = null;
 
-		const playing = await sb.Query.getRecordset(rs => {
+		const playing = await core.Query.getRecordset(rs => {
 			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time")
 				.select("Video_Type.ID AS VTID", "Video_Type.Link_Prefix AS Prefix")
 				.from("chat_data", "Song_Request")
@@ -147,14 +147,14 @@ export default {
 				}
 			}
 
-			const pauseStatus = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+			const pauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
 			const pauseString = (pauseStatus === true)
 				? "The song request is paused at the moment."
 				: "";
 
 			if (playing.VTID === 15) {
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						${introductionString}
 						${playing.Name}
 						(ID ${playing.VLC_ID}) - requested by ${userData.Name}.
@@ -165,7 +165,7 @@ export default {
 			}
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${introductionString}
 					${playing.Name}
 					(ID ${playing.VLC_ID}) - requested by ${userData.Name}.
