@@ -42,7 +42,8 @@ export default {
 
 		/** @type {TwitchPlatform} */
 		const platform = channelData.Platform;
-		const emote = await channelData.getBestAvailableEmote(
+		const emote = await platform.getBestAvailableEmote(
+			channelData,
 			["NOIDONTTHINKSO", "forsenSmug", "supiniNOIDONTTHINKSO", "RarePepe"],
 			"😅",
 			{ shuffle: true }
