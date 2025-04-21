@@ -110,12 +110,20 @@ export default {
 			meta: {
 				skipWhitespaceCheck: true
 			},
-			reply: core.Utils.tag.trim `
-				${who} last seen in chat ${delta}, 
-				(${channelString})
-				last message:
-				${messageString}
-			`
+			partialReplies: [
+				{
+					bancheck: true,
+					message: who
+				},
+				{
+					bancheck: false,
+					message: `last seen in chat ${delta} (${channelString}) Last message:`
+				},
+				{
+					bancheck: true,
+					message: messageString
+				}
+			]
 		};
 	}),
 	Dynamic_Description: null
