@@ -216,6 +216,7 @@ export default tseslint.config(
 				ignoreVoidReturningFunctions: true
 			}],
 			"@typescript-eslint/no-unused-vars": "warn", // Only warn for unused vars instead of resulting in an error
+			"@typescript-eslint/no-unnecessary-condition": "warn", // Only warn for unnecessary conditions  instead of resulting in an error
 
 			"unicorn/prevent-abbreviations": "off",
 			"unicorn/no-null": "off",
