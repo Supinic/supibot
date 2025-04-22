@@ -1,4 +1,4 @@
-// Need to fetch a randomized hash to attach to the ~~api/search~~ ~~api/find~~ ~~api/lookup~~ ~~api/s~~ api/ouch endpoint
+// Need to fetch a randomized hash to attach to the ~~api/search~~ ~~api/find~~ ~~api/lookup~~ ~~api/s~~ ~~api/ouch~~ api/seek endpoint
 // Reference: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/issues/25
 // Reference from `search` to `find`: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/pull/35
 // Reference from `find` to `lookup`: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/pull/38
@@ -7,7 +7,7 @@ const HLTB_ENDPOINT_HASH_KEY = "hltb-endpoint-hash";
 
 const FILE_PREFIX = "_next/static/chunks/pages";
 const FILE_HASH_REGEX = /static\/chunks\/pages\/(_app-\w+?\.js)/;
-const ENDPOINT_HASH_REGEX = /\/api\/ouch\/".concat\("(\w+)"\)\s*(.concat\("(\w+)"\))?/;
+const ENDPOINT_HASH_REGEX = /\/api\/seek\/".concat\("(\w+)"\)\s*(.concat\("(\w+)"\))?/;
 
 const fetchFileHash = async (force = false) => {
 	const existing = await core.Cache.getByPrefix(HLTB_JS_FILE_HASH_KEY);
@@ -99,7 +99,7 @@ export default {
 		}
 
 		const response = await core.Got.get("FakeAgent")({
-			url: `https://howlongtobeat.com/api/ouch/${endpointHash}`,
+			url: `https://howlongtobeat.com/api/seek/${endpointHash}`,
 			method: "POST",
 			throwHttpErrors: false,
 			headers: {
