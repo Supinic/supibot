@@ -7,24 +7,30 @@ import {
 	type JavascriptValue as RowValue,
 	type Query
 } from "supi-core";
+import type { Channel } from "./channel.js";
+import type { User } from "./user.js";
+import { ChannelDataPropertyMap, UserDataPropertyMap } from "./custom-data-properties.js";
 
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
 
 type KeyLike = string | Record<string, string>;
 type SetCacheOptions = Pick<KeyObject, "expiry" | "expiresAt" | "keepTTL">;
-export type GenericDataPropertyObject<T extends Template> = {
-	cacheMap: WeakMap<T, Map<string, GenericDataPropertyValue>>;
+
+export type GenericDataPropertyObject <T extends Channel | User> = {
+	instance: T;
+	propertyName: T extends Channel
+		? keyof ChannelDataPropertyMap
+		: keyof UserDataPropertyMap;
 	databaseProperty: string;
 	databaseTable: string;
-	propertyName: string;
 	propertyContext: string;
-	instance: T;
 	options: {
 		forceCacheReload?: boolean;
 		transaction?: PoolConnection;
-	}
+	};
 };
-export type SetGenericDataPropertyObject<T extends Template> = GenericDataPropertyObject<T> & {
+
+export type SetGenericDataPropertyObject<T extends Channel | User> = GenericDataPropertyObject<T> & {
 	value: GenericDataPropertyValue;
 };
 type SetGenericDataPropertyResult = {
@@ -35,7 +41,7 @@ type GenericDataPropertyResult = SetGenericDataPropertyResult & {
 	Property: string;
 	Value: string;
 };
-export type GenericDataPropertyValue = string | number | boolean | null | SupiDate | GenericDataPropertyValue[] | {
+export type GenericDataPropertyValue = string | number | boolean | null | GenericDataPropertyValue[] | {
 	[P: string]: GenericDataPropertyValue;
 };
 
@@ -43,20 +49,14 @@ export interface TemplateDefinition {
 	[P: string]: unknown;
 }
 
-export const getGenericDataProperty = async <T extends TemplateWithId>(inputData: GenericDataPropertyObject<T>) => {
+export const getGenericDataProperty = async <T extends Channel | User>(inputData: GenericDataPropertyObject<T>) => {
 	const {
-		cacheMap,
 		databaseProperty,
 		databaseTable,
 		instance,
 		options,
 		propertyName
 	} = inputData;
-
-	const cache = cacheMap.get(instance);
-	if (cache && cache.has(propertyName) && !options.forceCacheReload) {
-		return cache.get(propertyName);
-	}
 
 	const rsOptions = (options.transaction) ? { transaction: options.transaction } : {};
 	const data = await core.Query.getRecordset<GenericDataPropertyResult | undefined>(
@@ -93,10 +93,6 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 			value = Number(data.Value);
 			break;
 
-		case "date":
-			value = new SupiDate(data.Value);
-			break;
-
 		case "array":
 		case "object": {
 			try {
@@ -122,7 +118,7 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 	return value;
 };
 
-export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, inputData: SetGenericDataPropertyObject<T>) => {
+export const setGenericDataProperty = async <T extends Channel | User>(self: T, inputData: SetGenericDataPropertyObject<T>) => {
 	const {
 		cacheMap,
 		databaseProperty,

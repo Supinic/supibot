@@ -8,6 +8,7 @@ import {
 } from "./template.js";
 
 import config from "../config.json" with { type: "json" };
+import { UserDataPropertyMap } from "./custom-data-properties.js";
 
 type ConstructorData = {
 	ID: User["ID"];
@@ -44,7 +45,7 @@ export class User extends TemplateWithIdString {
 	static readonly mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
 	static data: Map<string, User> = new Map();
-	static readonly dataCache: WeakMap<User, Map<string, GenericDataPropertyValue>> = new WeakMap();
+	static readonly dataCache: WeakMap<User, Partial<UserDataPropertyMap>> = new WeakMap();
 	static readonly pendingNewUsers: Map<User["Name"], Promise<User> | null> = new Map();
 
 	static readonly permissions = {
@@ -87,7 +88,15 @@ export class User extends TemplateWithIdString {
 		await User.populateCaches(this);
 	}
 
-	async getDataProperty (propertyName: string, options: GenericFetchData = {}) {
+	async getDataProperty <T extends keyof UserDataPropertyMap> (
+		propertyName: T,
+		options: GenericFetchData = {}
+	): Promise<UserDataPropertyMap[T] | null> {
+		const cache = User.dataCache.get(this);
+		if (cache && typeof cache[propertyName] !== "undefined" && !options.forceCacheReload) {
+			return cache[propertyName];
+		}
+
 		return await getGenericDataProperty({
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
@@ -99,7 +108,11 @@ export class User extends TemplateWithIdString {
 		});
 	}
 
-	async setDataProperty (propertyName: string, value: CacheValue, options: GenericFetchData = {}) {
+	async setDataProperty <T extends keyof UserDataPropertyMap> (
+		propertyName: T,
+		value: UserDataPropertyMap[T],
+		options: GenericFetchData = {}
+	) {
 		await setGenericDataProperty(this, {
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
