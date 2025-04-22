@@ -698,6 +698,19 @@ export class Command extends TemplateWithoutId {
 
 		// If params parsing failed, filters were checked and none applied, return the failure result now
 		if (failedParamsParseResult) {
+			sb.Logger.logCommandExecution({
+				User_Alias: userData.ID,
+				Command: command.Name,
+				Platform: platformData.ID,
+				Executed: new SupiDate(),
+				Channel: channelData?.ID ?? null,
+				Success: false,
+				Invocation: identifier,
+				Arguments: JSON.stringify(args.filter(Boolean)),
+				Result: failedParamsParseResult.reply,
+				Execution_Time: null
+			});
+
 			Command.#cooldownManager.unsetPending(userData.ID);
 			return failedParamsParseResult;
 		}
