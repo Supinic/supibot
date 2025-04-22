@@ -399,22 +399,13 @@ export class Command extends TemplateWithoutId {
 	}
 
 	getDetailURL (options: { useCodePath?: boolean } = {}) {
-		if (options.useCodePath) {
-			const baseURL = config.values.commandCodeUrlPrefix;
-			if (!baseURL) {
-				return "N/A";
-			}
+		const baseURL = (options.useCodePath)
+			? config.values.commandCodeUrlPrefix
+			: config.values.commandDetailUrlPrefix;
 
-			return `${baseURL}/${encodeURIComponent(this.Name)}/index.js`;
-		}
-		else {
-			const baseURL = config.values.commandDetailUrlPrefix;
-			if (!baseURL) {
-				return "N/A";
-			}
-
-			return `${baseURL}/${encodeURIComponent(this.Name)}`;
-		}
+		return (baseURL)
+			? `${baseURL}/${encodeURIComponent(this.Name)}`
+			: "N/A";
 	}
 
 	getCacheKey () {

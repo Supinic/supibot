@@ -35,7 +35,7 @@
     "search": {
       "url": "gpt-4o-mini-search-preview",
       "type": "openai",
-      "default": true,
+      "default": false,
       "inputLimit": 1500,
       "outputLimit": {
         "default": 150,
