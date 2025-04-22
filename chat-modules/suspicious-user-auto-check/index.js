@@ -75,7 +75,7 @@ export default {
 			I'd like to verify whether @${data.login} is 
 			a different account/name that you used in the past,
 			or if it belongs to someone else.
-			Respond to this messge with "me" or "not me" accordingly.
+			Respond to this message with "me" or "not me" accordingly.
 			@Supinic has to fix this manually, please stay patient :)
 			His time is currently: ${new sb.Date().format("H:i")}
 		`;
