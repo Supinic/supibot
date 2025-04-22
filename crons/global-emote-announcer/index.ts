@@ -31,13 +31,13 @@ const definition: CronDefinition = {
 	code: (async function globalEmoteAnnouncer (cron) {
 		const twitchPlatform = sb.Platform.get("twitch");
 		if (!twitchPlatform) {
-			cron.job.stop();
+			await cron.job.stop();
 			return;
 		}
 
 		const channelData = sb.Channel.get("supinic", twitchPlatform);
 		if (!channelData) {
-			cron.job.stop();
+			await cron.job.stop();
 			return;
 		}
 
