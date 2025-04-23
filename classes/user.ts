@@ -8,7 +8,12 @@ import {
 } from "./template.js";
 
 import config from "../config.json" with { type: "json" };
-import { UserDataPropertyMap } from "./custom-data-properties.js";
+import {
+	type UserDataProperty,
+	fetchUserDataProperty,
+	cachedUserProperties,
+	UserDataPropertyMap, isCachedUserProperty
+} from "./custom-data-properties.js";
 
 type ConstructorData = {
 	ID: User["ID"];
@@ -88,24 +93,33 @@ export class User extends TemplateWithIdString {
 		await User.populateCaches(this);
 	}
 
-	async getDataProperty <T extends keyof UserDataPropertyMap> (
+	async getDataProperty <T extends UserDataProperty> (
 		propertyName: T,
 		options: GenericFetchData = {}
 	): Promise<UserDataPropertyMap[T] | null> {
-		const cache = User.dataCache.get(this);
-		if (cache && typeof cache[propertyName] !== "undefined" && !options.forceCacheReload) {
-			return cache[propertyName];
+		if (!options.forceCacheReload && isCachedUserProperty(propertyName)) {
+			const cache = User.dataCache.get(this);
+			if (cache && cache[propertyName]) {
+				return cache[propertyName];
+			}
 		}
 
-		return await getGenericDataProperty({
-			cacheMap: User.dataCache,
-			databaseProperty: "User_Alias",
-			databaseTable: "User_Alias_Data",
-			instance: this,
-			propertyContext: "User",
-			options,
-			propertyName
-		});
+		const value = await fetchUserDataProperty(propertyName, this.ID, options);
+		if (value === null) {
+			return null;
+		}
+
+		if (isCachedUserProperty(propertyName)) {
+			let cache = User.dataCache.get(this);
+			if (!cache) {
+				cache = {};
+				User.dataCache.set(this, cache);
+			}
+
+			cache[propertyName] = value;
+		}
+
+		return value;
 	}
 
 	async setDataProperty <T extends keyof UserDataPropertyMap> (

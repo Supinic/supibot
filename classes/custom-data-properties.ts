@@ -1,62 +1,94 @@
 import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
 import type { SimpleGenericData } from "../@types/globals.js";
+import { type Query } from "supi-core";
 
-export type ChannelDataPropertyMap = {
-	ambassadors: User["ID"][];
-	botScopeNotificationSent: number;
-	disableDiscordGlobalEmotes: boolean;
-	discord: string;
-	fishConfig: {
-		whisperOnFailure?: boolean;
-		discordReactionType?: "all" | "fail-only" | "none";
-	};
-	forceRustlog: boolean;
-	globalPingRemoved: boolean;
-	inactiveReason: string;
-	instagramNSFW: boolean;
-	logsRemovedReason: string;
-	offlineOnlyBot: {
-		started: string;
-		mode: Channel["Mode"];
-	};
-	offlineOnlyMirror: boolean;
-	redditNSFW: boolean;
-	removeReason: string;
-	sharedCustomData: SimpleGenericData;
-	showFullCommandErrorMessage: boolean;
-	stalkPrevention: boolean;
-	twitchLottoBlacklistedFlags: string[]; // @todo
-	twitchLottoNSFW: boolean;
-	twitchLottoSafeMode: boolean;
-	twitchNoScopeDisabled: boolean;
-	twitterNSFW: boolean;
+type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
+
+type PrimitiveTag = "number" | "boolean" | "string";
+const isPrimitiveTag = (input: unknown): input is PrimitiveTag => (
+	input === "number" || input === "boolean" || input === "string"
+);
+
+function parsePrimitiveTag (input: string, type: "boolean"): boolean;
+function parsePrimitiveTag (input: string, type: "number"): number;
+function parsePrimitiveTag (input: string, type: "string"): string;
+function parsePrimitiveTag (input: string, type: PrimitiveTag): number | string | boolean;
+function parsePrimitiveTag (input: string, type: PrimitiveTag): number | string | boolean {
+	if (type === "string") {
+		return String(type);
+	}
+	else if (type === "number") {
+		return Number(type);
+	}
+	else {
+		return (input === "true");
+	}
+}
+
+type BaseType <T extends PrimitiveTag> =
+	T extends "boolean" ? boolean :
+	T extends "number" ? number :
+	T extends "string" ? string
+	: never;
+
+type ConvertSchemaToType<T> = {
+	[K in keyof T]:
+		T[K] extends PrimitiveTag ? BaseType<T[K]> : // converts primitives into types, `string` => `string`
+		T[K] extends readonly (infer U)[] ? U : // converts tuples into unions, `readonly ["A", "B"]` => `"A" | "B"`
+		T[K] // uses the defined type itself
 };
 
-export const cachedChannelProperties = [
-	"disableDiscordGlobalEmotes",
-	"globalPingRemoved"
-] as const satisfies readonly (keyof ChannelDataPropertyMap)[];
+const channelDataSchema = {
+	ambassadors: [] as User["ID"][],
+	botScopeNotificationSent: "number",
+	disableDiscordGlobalEmotes: "boolean",
+	discord: "string",
+	fishConfig: {} as {
+		whisperOnFailure?: boolean,
+		discordReactionType?: "all" | "fail-only" | "none",
+	},
+	forceRustlog: "boolean",
+	globalPingRemoved: "boolean",
+	inactiveReason: "string",
+	instagramNSFW: "boolean",
+	logsRemovedReason: "string",
+	offlineOnlyBot: {} as {
+		started: string,
+		mode: Channel["Mode"],
+	},
+	offlineOnlyMirror: "boolean",
+	redditNSFW: "boolean",
+	removeReason: "string",
+	sharedCustomData: {} as SimpleGenericData,
+	showFullCommandErrorMessage: "boolean",
+	stalkPrevention: "boolean",
+	twitchLottoBlacklistedFlags: [] as string[], // @todo
+	twitchLottoNSFW: "boolean",
+	twitchLottoSafeMode: "boolean",
+	twitchNoScopeDisabled: "boolean",
+	twitterNSFW: "boolean"
+} as const;
 
-export type UserDataPropertyMap = {
-	administrator: boolean;
-	animals: Record<"bird" | "cat" | "dog" | "fox", {
+const userDataSchema = {
+	administrator: "boolean",
+	animals: {} as Record<"bird" | "cat" | "dog" | "fox", {
 		verified: true;
 		notes: string | null;
-	}>;
-	authKey: string;
-	banWavePartPermissions: Channel["ID"][];
-	birthday: {
+	}>,
+	authKey: "string",
+	banWavePartPermissions: [] as Channel["ID"][],
+	birthday: {} as {
 		month: number;
 		day: number;
 		string: string;
-	};
-	chatGptHistoryMode: "enabled" | "disabled";
-	cookie: {
+	},
+	chatGptHistoryMode: ["disabled", "enabled"] as const,
+	cookie: {} as {
 		lastTimestamp: {
 			daily: number;
 			received: number;
-		},
+		};
 		today: {
 			timestamp: number;
 			donated: number;
@@ -65,7 +97,7 @@ export type UserDataPropertyMap = {
 				daily: number;
 				received: number;
 			};
-		},
+		};
 		total: {
 			donated: number;
 			received: number;
@@ -73,21 +105,21 @@ export type UserDataPropertyMap = {
 				daily: number;
 				received: number;
 			};
-		},
+		};
 		legacy: {
 			daily: number;
 			donated: number;
 			received: number;
 		};
-	};
-	customDeveloperData: SimpleGenericData;
-	defaultUserLanguage: {
+	},
+	customDeveloperData: {} as SimpleGenericData,
+	defaultUserLanguage: {} as {
 		code: string;
 		nname: string;
-	};
-	developer: boolean;
-	discordChallengeNotificationSent: boolean;
-	fishData: {
+	},
+	developer: "boolean",
+	discordChallengeNotificationSent: "boolean",
+	fishData: {} as {
 		catch: {
 			luckyStreak: number;
 			dryStreak: number;
@@ -98,7 +130,7 @@ export type UserDataPropertyMap = {
 		readyTimestamp: number;
 		coins: number;
 		trap?: {
-			active: false,
+			active: false;
 			start: number;
 			end: number;
 			duration: number;
@@ -119,18 +151,18 @@ export type UserDataPropertyMap = {
 				timeSpent: number;
 				bestFishCatch: number;
 				cancelled: number;
-			}
-		}
-	};
-	github: {
-		created: number;
-		login: string;
-		type: string;
-	};
-	inspectErrorStacks: boolean;
-	leagueDefaultRegion: string;
-	leagueDefaultUserIdentifier: string;
-	location: {
+			};
+		};
+	},
+	github: {} as {
+		created: number,
+		login: string,
+		type: string,
+	},
+	inspectErrorStacks: "boolean",
+	leagueDefaultRegion: "string",
+	leagueDefaultUserIdentifier: "string",
+	location: {} as {
 		formatted: string;
 		placeID: string;
 		components: {
@@ -139,12 +171,12 @@ export type UserDataPropertyMap = {
 			level1?: string;
 			level2?: string;
 			level3?: string;
-		},
+		};
 		hidden: boolean;
 		coordinates: {
 			lat: number;
 			lng: number;
-		},
+		};
 		original: string;
 		timezone: {
 			dstOffset: number;
@@ -152,31 +184,136 @@ export type UserDataPropertyMap = {
 			offset: number;
 			name: string;
 		};
-	};
-	noAbbChatter: boolean;
-	osrsGameUsername: string;
-	pathOfExile: {
+	},
+	noAbbChatter: "boolean",
+	osrsGameUsername: "string",
+	pathOfExile: {} as {
 		uniqueTabs: string;
-	};
-	platformVerification: Record<number, {
+	},
+	platformVerification: {} as Record<number, {
 		active?: boolean;
 		notificationSent: boolean;
-	}>;
-	previousUserID: string;
-	skipGlobalPing: boolean;
-	supinicStreamSongRequestExtension: number;
-	supiPoints: number;
+	}>,
+	previousUserID: "string",
+	skipGlobalPing: "boolean",
+	supinicStreamSongRequestExtension: "number",
+	supiPoints: "number",
 	/** @deprecated */
-	timers: Record<string, { date: number; }>;
-	trackLevel: string;
-	trackListHelper: boolean;
-	trustedTwitchLottoFlagger: boolean;
-	"twitch-userid-mismatch-notification": boolean;
+	timers: {} as Record<string, { date: number; }>,
+	trackLevel: "string",
+	trackListHelper: "boolean",
+	trustedTwitchLottoFlagger: "boolean",
+	"twitch-userid-mismatch-notification": "boolean"
 };
 
-export const cachedUserProperties = [
+export type ChannelDataPropertyMap = ConvertSchemaToType<typeof channelDataSchema>;
+export type UserDataPropertyMap = ConvertSchemaToType<typeof userDataSchema>;
+
+export type ChannelDataProperty = keyof ChannelDataPropertyMap;
+export type UserDataProperty = keyof UserDataPropertyMap;
+
+const cachedChannelProperties: readonly ChannelDataProperty[] = [
+	"disableDiscordGlobalEmotes",
+	"globalPingRemoved"
+] as const;
+export const isCachedChannelProperty = (input: ChannelDataProperty): boolean => cachedChannelProperties.includes(input);
+
+const cachedUserProperties: readonly UserDataProperty[] = [
 	"administrator",
 	"animals",
 	"developer",
 	"platformVerification"
-] as const satisfies readonly (keyof UserDataPropertyMap)[];
+] as const;
+export const isCachedUserProperty = (input: UserDataProperty): boolean => cachedUserProperties.includes(input);
+
+type FetchData = {
+	databaseTable: string;
+	databaseProperty: string;
+	instanceId: number;
+	propertyName: string;
+	transaction?: PoolConnection
+};
+type SpecificFetchOptions = Pick<FetchData, "transaction">;
+
+const fetchRawDataProperty = async (data: FetchData): Promise<string | null> => {
+	const {
+		databaseTable,
+		databaseProperty,
+		instanceId,
+		propertyName,
+		transaction
+	} = data;
+
+	const rsOptions = (transaction) ? { transaction } : {};
+	const rawValue = await core.Query.getRecordset<string | undefined>(
+		rs => rs
+			.select("Value")
+			.from("chat_data", databaseTable)
+			.where(`${databaseProperty} = %n`, instanceId)
+			.where("Property = %s", propertyName)
+			.flat("Value")
+			.limit(1)
+			.single(),
+		rsOptions
+	);
+
+	return rawValue ?? null;
+};
+
+export const fetchChannelDataProperty = async <T extends ChannelDataProperty> (
+	propertyName: T,
+	instanceId: Channel["ID"],
+	data: SpecificFetchOptions = {}
+): Promise<ChannelDataPropertyMap[T] | null> => {
+	const rawValue = await fetchRawDataProperty({
+		instanceId,
+		propertyName,
+		databaseTable: "Channel_Data",
+		databaseProperty: "Channel",
+		transaction: data.transaction
+	});
+
+	if (rawValue === null) {
+		return null;
+	}
+
+	let value: ChannelDataPropertyMap[T];
+	const propertyTag = channelDataSchema[propertyName];
+	if (isPrimitiveTag(propertyTag)) {
+		value = parsePrimitiveTag(rawValue, propertyTag) as ChannelDataPropertyMap[T];
+	}
+	else {
+		value = JSON.parse(rawValue) as ChannelDataPropertyMap[T];
+	}
+
+	return value;
+};
+
+export const fetchUserDataProperty = async <T extends UserDataProperty> (
+	propertyName: T,
+	instanceId: User["ID"],
+	data: SpecificFetchOptions = {}
+): Promise<UserDataPropertyMap[T] | null> => {
+	const rawValue = await fetchRawDataProperty({
+		instanceId,
+		propertyName,
+		databaseTable: "User_Alias_Data",
+		databaseProperty: "User_Alias",
+		transaction: data.transaction
+	});
+
+	if (rawValue === null) {
+		return null;
+	}
+
+	let value: UserDataPropertyMap[T];
+	const propertyTag = userDataSchema[propertyName];
+	if (isPrimitiveTag(propertyTag)) {
+		value = parsePrimitiveTag(rawValue, propertyTag) as UserDataPropertyMap[T];
+	}
+	else {
+		value = JSON.parse(rawValue) as UserDataPropertyMap[T];
+	}
+
+	return value;
+};
