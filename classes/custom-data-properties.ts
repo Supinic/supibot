@@ -7,7 +7,10 @@ export type ChannelDataPropertyMap = {
 	botScopeNotificationSent: number;
 	disableDiscordGlobalEmotes: boolean;
 	discord: string;
-	fishConfig: {};
+	fishConfig: {
+		whisperOnFailure?: boolean;
+		discordReactionType?: "all" | "fail-only" | "none";
+	};
 	forceRustlog: boolean;
 	globalPingRemoved: boolean;
 	inactiveReason: string;
@@ -29,6 +32,11 @@ export type ChannelDataPropertyMap = {
 	twitchNoScopeDisabled: boolean;
 	twitterNSFW: boolean;
 };
+
+export const cachedChannelProperties = [
+	"disableDiscordGlobalEmotes",
+	"globalPingRemoved"
+] as const satisfies readonly (keyof ChannelDataPropertyMap)[];
 
 export type UserDataPropertyMap = {
 	administrator: boolean;
@@ -165,3 +173,10 @@ export type UserDataPropertyMap = {
 	trustedTwitchLottoFlagger: boolean;
 	"twitch-userid-mismatch-notification": boolean;
 };
+
+export const cachedUserProperties = [
+	"administrator",
+	"animals",
+	"developer",
+	"platformVerification"
+] as const satisfies readonly (keyof UserDataPropertyMap)[];
