@@ -1,9 +1,9 @@
-import { Channel } from "./channel.js";
-import { User } from "./user.js";
+import type { Channel } from "./channel.js";
+import type { User } from "./user.js";
 import type { SimpleGenericData } from "../@types/globals.js";
 import type { Query } from "supi-core";
 
-export type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
+type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
 export type GenericFetchData = {
 	forceCacheReload?: boolean;
 	transaction?: PoolConnection;
@@ -38,9 +38,8 @@ type BaseType <T extends PrimitiveTag> =
 
 type ConvertSchemaToType<T> = {
 	[K in keyof T]:
-		T[K] extends PrimitiveTag ? BaseType<T[K]> | null : // converts primitives into types, `string` => `string`
-		// T[K] extends readonly (infer U)[] ? U : // converts tuples into unions, `readonly ["A", "B"]` => `"A" | "B"`
-		T[K] | null // uses the defined type itself
+		T[K] extends PrimitiveTag ? BaseType<T[K]> | null : // converts primitives into types, `"string"` => `string`
+		T[K] | null // uses the defined type itself, `{} as { XYZ: unknown; }` => `{ XYZ: unknown; }`
 };
 
 const channelDataSchema = {
