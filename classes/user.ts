@@ -1,18 +1,14 @@
-import { SupiDate, SupiError, type CacheValue, type Batch, type Row } from "supi-core";
-import {
-	TemplateWithIdString,
-	getGenericDataProperty,
-	setGenericDataProperty,
-	type GenericDataPropertyObject,
-	type GenericDataPropertyValue
-} from "./template.js";
+import { SupiDate, SupiError, type Batch, type Row } from "supi-core";
+import { TemplateWithIdString } from "./template.js";
 
 import config from "../config.json" with { type: "json" };
 import {
 	type UserDataProperty,
+	type UserDataPropertyMap,
+	type GenericFetchData,
 	fetchUserDataProperty,
-	cachedUserProperties,
-	UserDataPropertyMap, isCachedUserProperty
+	isCachedUserProperty,
+	saveUserDataProperty
 } from "./custom-data-properties.js";
 
 type ConstructorData = {
@@ -26,7 +22,6 @@ type UserCacheData = ConstructorData & {
 	Started_Using: number | null;
 };
 
-type GenericFetchData = GenericDataPropertyObject<User>["options"];
 type GetOptions = Partial<Pick<ConstructorData, "Twitch_ID" | "Discord_ID">>;
 
 export type Like = User | User["Name"] | User["ID"];
@@ -96,7 +91,7 @@ export class User extends TemplateWithIdString {
 	async getDataProperty <T extends UserDataProperty> (
 		propertyName: T,
 		options: GenericFetchData = {}
-	): Promise<UserDataPropertyMap[T] | null> {
+	): Promise<UserDataPropertyMap[T]> {
 		if (!options.forceCacheReload && isCachedUserProperty(propertyName)) {
 			const cache = User.dataCache.get(this);
 			if (cache && cache[propertyName]) {
@@ -109,37 +104,35 @@ export class User extends TemplateWithIdString {
 			return null;
 		}
 
-		if (isCachedUserProperty(propertyName)) {
-			let cache = User.dataCache.get(this);
-			if (!cache) {
-				cache = {};
-				User.dataCache.set(this, cache);
-			}
-
-			cache[propertyName] = value;
-		}
+		this.setPropertyCache(propertyName, value);
 
 		return value;
 	}
 
-	async setDataProperty <T extends keyof UserDataPropertyMap> (
+	async setDataProperty <T extends UserDataProperty> (
 		propertyName: T,
 		value: UserDataPropertyMap[T],
 		options: GenericFetchData = {}
 	) {
-		await setGenericDataProperty(this, {
-			cacheMap: User.dataCache,
-			databaseProperty: "User_Alias",
-			databaseTable: "User_Alias_Data",
-			instance: this,
-			propertyContext: "User",
-			propertyName,
-			options,
-			value
-		});
+		await saveUserDataProperty(propertyName, value, this.ID, options);
+		this.setPropertyCache(propertyName, value);
 	}
 
-	getCacheProperties (): UserCacheData {
+	private setPropertyCache <T extends UserDataProperty> (propertyName: T, value: UserDataPropertyMap[T]) {
+		if (!isCachedUserProperty(propertyName)) {
+			return;
+		}
+
+		let cache = User.dataCache.get(this);
+		if (!cache) {
+			cache = {};
+			User.dataCache.set(this, cache);
+		}
+
+		cache[propertyName] = value;
+	}
+
+	private getCacheProperties (): UserCacheData {
 		return {
 			ID: this.ID,
 			Name: this.Name,

@@ -1,9 +1,13 @@
-import type { Channel } from "./channel.js";
-import type { User } from "./user.js";
+import { Channel } from "./channel.js";
+import { User } from "./user.js";
 import type { SimpleGenericData } from "../@types/globals.js";
-import { type Query } from "supi-core";
+import type { Query } from "supi-core";
 
-type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
+export type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
+export type GenericFetchData = {
+	forceCacheReload?: boolean;
+	transaction?: PoolConnection;
+};
 
 type PrimitiveTag = "number" | "boolean" | "string";
 const isPrimitiveTag = (input: unknown): input is PrimitiveTag => (
@@ -34,9 +38,9 @@ type BaseType <T extends PrimitiveTag> =
 
 type ConvertSchemaToType<T> = {
 	[K in keyof T]:
-		T[K] extends PrimitiveTag ? BaseType<T[K]> : // converts primitives into types, `string` => `string`
-		T[K] extends readonly (infer U)[] ? U : // converts tuples into unions, `readonly ["A", "B"]` => `"A" | "B"`
-		T[K] // uses the defined type itself
+		T[K] extends PrimitiveTag ? BaseType<T[K]> | null : // converts primitives into types, `string` => `string`
+		// T[K] extends readonly (infer U)[] ? U : // converts tuples into unions, `readonly ["A", "B"]` => `"A" | "B"`
+		T[K] | null // uses the defined type itself
 };
 
 const channelDataSchema = {
@@ -83,7 +87,7 @@ const userDataSchema = {
 		day: number;
 		string: string;
 	},
-	chatGptHistoryMode: ["disabled", "enabled"] as const,
+	chatGptHistoryMode: "" as "disabled" | "enabled",
 	cookie: {} as {
 		lastTimestamp: {
 			daily: number;
@@ -192,7 +196,7 @@ const userDataSchema = {
 	},
 	platformVerification: {} as Record<number, {
 		active?: boolean;
-		notificationSent: boolean;
+		notificationSent?: boolean;
 	}>,
 	previousUserID: "string",
 	skipGlobalPing: "boolean",
@@ -204,7 +208,7 @@ const userDataSchema = {
 	trackListHelper: "boolean",
 	trustedTwitchLottoFlagger: "boolean",
 	"twitch-userid-mismatch-notification": "boolean"
-};
+} as const;
 
 export type ChannelDataPropertyMap = ConvertSchemaToType<typeof channelDataSchema>;
 export type UserDataPropertyMap = ConvertSchemaToType<typeof userDataSchema>;
@@ -213,6 +217,7 @@ export type ChannelDataProperty = keyof ChannelDataPropertyMap;
 export type UserDataProperty = keyof UserDataPropertyMap;
 
 const cachedChannelProperties: readonly ChannelDataProperty[] = [
+	"ambassadors",
 	"disableDiscordGlobalEmotes",
 	"globalPingRemoved"
 ] as const;
@@ -264,7 +269,7 @@ export const fetchChannelDataProperty = async <T extends ChannelDataProperty> (
 	propertyName: T,
 	instanceId: Channel["ID"],
 	data: SpecificFetchOptions = {}
-): Promise<ChannelDataPropertyMap[T] | null> => {
+): Promise<ChannelDataPropertyMap[T]> => {
 	const rawValue = await fetchRawDataProperty({
 		instanceId,
 		propertyName,
@@ -293,7 +298,7 @@ export const fetchUserDataProperty = async <T extends UserDataProperty> (
 	propertyName: T,
 	instanceId: User["ID"],
 	data: SpecificFetchOptions = {}
-): Promise<UserDataPropertyMap[T] | null> => {
+): Promise<UserDataPropertyMap[T]> => {
 	const rawValue = await fetchRawDataProperty({
 		instanceId,
 		propertyName,
@@ -316,4 +321,66 @@ export const fetchUserDataProperty = async <T extends UserDataProperty> (
 	}
 
 	return value;
+};
+
+export const saveChannelDataProperty = async <T extends ChannelDataProperty> (
+	propertyName: T,
+	value: ChannelDataPropertyMap[T],
+	instanceId: Channel["ID"],
+	options: SpecificFetchOptions = {}
+): Promise<void> => {
+	type RowData = { Property: T; Channel: Channel["ID"]; Value: string | null };
+	const row = await core.Query.getRow<RowData>("chat_data", "Channel_Data", options);
+
+	await row.load({ Property: propertyName, Channel: instanceId }, true);
+
+	let rawValue: string | null = null;
+	if (value === null) {
+		rawValue = null;
+	}
+	else if (typeof channelDataSchema[propertyName] === "object") {
+		rawValue = JSON.stringify(value as object); // Guaranteed by condition
+	}
+	else {
+		rawValue = String(value as string | number | boolean); // Guaranteed by previous conditions
+	}
+
+	row.setValues({
+		Property: propertyName,
+		Channel: instanceId,
+		Value: rawValue
+	});
+
+	await row.save({ skipLoad: true });
+};
+
+export const saveUserDataProperty = async <T extends UserDataProperty> (
+	propertyName: T,
+	value: UserDataPropertyMap[T] ,
+	instanceId: User["ID"],
+	options: SpecificFetchOptions = {}
+): Promise<void> => {
+	type RowData = { Property: T; User_Alias: User["ID"]; Value: string | null; };
+	const row = await core.Query.getRow<RowData>("chat_data", "User_Alias_Data", options);
+
+	await row.load({ Property: propertyName, User_Alias: instanceId }, true);
+
+	let rawValue: string | null = null;
+	if (value === null) {
+		rawValue = null;
+	}
+	else if (typeof userDataSchema[propertyName] === "object") {
+		rawValue = JSON.stringify(value as object); // Guaranteed by condition
+	}
+	else {
+		rawValue = String(value as string | number | boolean); // Guaranteed by previous conditions
+	}
+
+	row.setValues({
+		Property: propertyName,
+		User_Alias: instanceId,
+		Value: rawValue
+	});
+
+	await row.save({ skipLoad: true });
 };
