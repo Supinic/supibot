@@ -1,3 +1,5 @@
+import type { Context } from "../../classes/command.js";
+
 export { default as detections } from "./detections.json" with { type: "json" };
 
 export const scoreThreshold = 0.5;
@@ -6,15 +8,15 @@ export const taggingGuide = [
 	"The main idea of tagging TwitchLotto pictures is to only tag them when they contain NSFW content.",
 	"E.g. the \"Anime\" tag should not be used unless the image contains NSFW content related to Anime",
 	"The exceptions are the \"None\" and the \"Bait\" tags - see below for full explanation."
-];
+] as const;
 
-export const createRecentUseCacheKey = (context) => ({
+export const createRecentUseCacheKey = (context: Context) => ({
 	type: "recent-use",
 	user: context.user.ID,
 	channel: context.channel?.ID ?? null
 });
 
-export const formatScore = (score) => (score === null)
+export const formatScore = (score: number | null) => (score === null)
 	? "N/A"
 	: `${core.Utils.round(score * 100, 2)}%`;
 
@@ -161,4 +163,4 @@ export const flags = [
 		correct: [],
 		wrong: []
 	}
-];
+] as const;
