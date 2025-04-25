@@ -13,7 +13,8 @@ import {
 	PermissionFlagsBits,
 	Routes,
 	TextChannel,
-	User as DiscordUser
+	User as DiscordUser,
+	escapeMarkdown
 } from "discord.js";
 
 import { BaseConfig, Platform, PlatformVerificationStatus, PrepareMessageOptions } from "./template.js";
@@ -75,20 +76,6 @@ const formatEmoji = (emote: Emote) => {
 	}
 	else {
 		return `<:${name}:${emote.ID}>`;
-	}
-};
-const fixMarkdown = (text: string) => {
-	let isMarkdown = false;
-	for (const regex of Object.values(MARKDOWN_TESTS)) {
-		isMarkdown ||= regex.test(text);
-	}
-
-	if (!isMarkdown) {
-		return text;
-	}
-	else {
-		const replaced = text.replaceAll("```", "`\u{200B}`\u{200B}`\u{200B}");
-		return `\`\`\`${replaced}\`\`\``;
 	}
 };
 
@@ -240,7 +227,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			});
 		}
 
-		const fixed = (typeof sendTarget === "string") ? fixMarkdown(sendTarget) : sendTarget;
+		const fixed = (typeof sendTarget === "string") ? escapeMarkdown(sendTarget) : sendTarget;
 		try {
 			await channelObject.send(fixed);
 			this.incrementMessageMetric("sent", channelData);
@@ -307,7 +294,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 		try {
 			if (typeof message === "string") {
-				const fixed = fixMarkdown(message);
+				const fixed = escapeMarkdown(message);
 				await discordUser.send(fixed);
 			}
 			else if (options.embeds && options.embeds.length !== 0) {
@@ -351,7 +338,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		}
 
 		try {
-			const fixed = fixMarkdown(message);
+			const fixed = escapeMarkdown(message);
 			await discordUser.send(fixed);
 			this.incrementMessageMetric("sent", null);
 		}
