@@ -60,11 +60,6 @@ const IGNORED_CHANNEL_TYPES = new Set([
 ]);
 
 const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
-const MARKDOWN_TESTS = {
-	ANY: /(?<!\S)(\*{1,3}|~~|`|_|__)(.+?)(\1)(?!\S)/g,
-	SOL_NO_SPACE: /^(#{1,3}|>|>>>|```)/gm,
-	SOL_SPACE: /^\s+([*-])\s+/gm
-} as const;
 
 const isTextChannel = (input: DiscordChannel): input is TextChannel => (input instanceof TextChannel);
 
