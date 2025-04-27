@@ -11,6 +11,7 @@ import type { DiscordConfig, DiscordPlatform } from "./discord.js";
 import type { CytubeConfig, CytubePlatform } from "./cytube.js";
 import type { IrcConfig, IrcPlatform } from "./irc.js";
 
+import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
 import type { Emote } from "../@types/globals.d.ts";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
@@ -41,11 +42,8 @@ export type GetEmoteOptions = {
 	returnEmoteObject?: boolean;
 	filter?: (emote: Emote) => boolean;
 };
-export type PlatformVerification = {
-	active?: boolean;
-	notificationSent?: boolean;
-};
 
+export type PlatformVerification = UserDataPropertyMap["platformVerification"];
 export type PlatformVerificationStatus = "Active" | "Completed" | "Cancelled";
 
 export type MirrorOptions = PrepareMessageOptions & { commandUsed?: boolean; };

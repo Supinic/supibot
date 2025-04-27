@@ -249,7 +249,7 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		targetUser = userData;
 	}
 
-	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY) as null | string;
+	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY);
 	if (!gameUsername) {
 		const verb = (targetUser === context.user) ? "You" : "They";
 		return {

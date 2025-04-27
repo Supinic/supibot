@@ -191,7 +191,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const platformData = options.platform ?? this.platform;
 
 		const promises: (Promise<boolean | null> | null)[] = [
-			userData.getDataProperty("administrator") as Promise<boolean | null>
+			userData.getDataProperty("administrator")
 		];
 		if (channelData) {
 			promises.push(

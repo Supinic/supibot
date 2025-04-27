@@ -126,8 +126,7 @@ export const handleHistoryCommand = async (context: GptContext, query: string): 
 			};
 		}
 
-		const state = `${command}d`;
-		await context.user.setDataProperty("chatGptHistoryMode", state);
+		await context.user.setDataProperty("chatGptHistoryMode", `${command}d`);
 		return {
 			success: true,
 			reply: `Your ChatGPT history was successfully ${command}d.`,
