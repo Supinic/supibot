@@ -95,7 +95,7 @@ export const GptDeepInfra: GptTemplate = {
 		return response.body.usage.completion_tokens;
 	},
 	getProcessingTime () { return null; },
-	extractMessage (response: GotResponse<DeepinfraResponse>) {
+	extractMessage (context, response: GotResponse<DeepinfraResponse>) {
 		return response.body.choices[0].message.content.trim();
 	},
 

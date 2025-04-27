@@ -173,7 +173,7 @@ export interface GptTemplate {
 	getProcessingTime (response: GotResponse): number | null;
 
 	execute (context: GptContext, query: string, modelData: ModelData): Promise<ExecuteSuccess | ExecuteFailure>;
-	extractMessage (response: GotResponse): string;
+	extractMessage (context: GptContext, response: GotResponse): string;
 	setHistory (context: GptContext, query: string, reply: string): Promise<void>;
 	getRequestErrorMessage (): string;
 }

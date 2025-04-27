@@ -127,7 +127,7 @@ export const GptNexra: GptTemplate = {
 		};
 	},
 
-	extractMessage (response: GotResponse<NexraSuccess>) {
+	extractMessage (context, response: GotResponse<NexraSuccess>) {
 		return response.body.gpt;
 	},
 
@@ -201,7 +201,7 @@ export const GptNexraComplements: GptTemplate = {
 		};
 	},
 
-	extractMessage (response: GotResponse<NexraComplementSuccess>) {
+	extractMessage (context, response: GotResponse<NexraComplementSuccess>) {
 		return response.body.message;
 	}
 };

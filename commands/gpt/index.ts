@@ -192,7 +192,7 @@ export default {
 			await GptCache.addUsageRecord(context.user, usageRecord, modelData);
 		}
 
-		const reply = Handler.extractMessage(response);
+		const reply = Handler.extractMessage(context, response);
 		if (typeof reply !== "string") {
 			return {
 				success: false,

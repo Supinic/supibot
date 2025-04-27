@@ -72,6 +72,9 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 	}
 };
 
+const gptLinkRegex = /\[.+?]\((.+)[?&]utm_source=openai\)/gi;
+const removeMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "$1");
+
 export const GptOpenAI: GptTemplate = {
 	async execute (context: GptContext, query: string, modelData: ModelData) {
 		if (!process.env.API_OPENAI_KEY) {
@@ -163,8 +166,11 @@ export const GptOpenAI: GptTemplate = {
 
 		return Number(response.headers["openai-processing-ms"]);
 	},
-	extractMessage (response: GotResponse<OpenAiResponse>) {
-		return response.body.choices[0].message.content.trim();
+	extractMessage (context, response: GotResponse<OpenAiResponse>) {
+		const message = response.body.choices[0].message.content.trim();
+		return (context.platform.name === "twitch")
+			? removeMarkdownLinks(message)
+			: message;
 	},
 
 	async setHistory (context: GptContext, query: string, reply: string) {
