@@ -89,7 +89,7 @@ const userDataSchema = {
 		day: number;
 		string: string;
 	},
-	chatGptHistoryMode: "" as "disabled" | "enabled",
+	chatGptHistoryMode: "string" as "disabled" | "enabled",
 	cookie: {} as {
 		lastTimestamp: {
 			daily: number;
