@@ -27,9 +27,7 @@ const config = {
 		"chat_data/triggers/add_missing_first_channel_command_after_insert",
 		"chat_data/triggers/add_missing_first_message_data_after_insert"
 	],
-	initialDataFilePaths: [
-		"chat_data/Custom_Data_Property"
-	],
+	initialDataFilePaths: [],
 	meta: {
 		dataPath: path.join(import.meta.dirname, "initial-data"),
 		definitionPath: path.join(import.meta.dirname, "definitions"),
