@@ -1,21 +1,35 @@
-import { GptNexra } from "../gpt/gpt-nexra.js";
+import { GptNexraComplements } from "../gpt/gpt-nexra.js";
+import gptConfig from "../gpt/config.json" with { type: "json" };
+
 import { check as checkModeration } from "../gpt/moderation.js";
+import { CommandDefinition, Context } from "../../classes/command.js";
+import { GptContext, ModelData } from "../gpt/index.js";
+import { SupiDate, SupiError } from "supi-core";
+
+const { models } = gptConfig;
+const summaryModel = models.qwen as ModelData;
 
 const RAW_TEXT_REGEX = /^\[(?<date>[\d-\s:]+)]\s+#\w+\s+(?<username>\w+):\s+(?<message>.+?)$/;
 
-const addQueryContext = (query, context, channelName) => query.replace("%CHANNEL_NAME%", channelName);
+const addQueryContext = (query: string, channelName: string) => query.replace("%CHANNEL_NAME%", channelName);
 const RUSTLOG_RESPONSES = {
 	403: "That channel has opted out from being logged!",
 	404: "That channel is not being logged at the moment!",
 	default: "Unspecified error occured! Try again later."
 };
 
-const getLocalLogs = async (channel, limit = 50) => {
-	const twitch = sb.Platform.get("twitch");
+const getLocalLogs = async (channel: string, limit: number = 50) => {
+	const twitch = sb.Platform.getAsserted("twitch");
 	const channelData = sb.Channel.get(channel, twitch);
+	if (!channelData) {
+		throw new SupiError({
+		    message: "Assert error: Local channel does not exist",
+			args: { channel }
+		});
+	}
 
 	const tableName = channelData.getDatabaseName();
-	const data = await core.Query.getRecordset(rs => rs
+	const data = await core.Query.getRecordset<{ Platform_ID: string; Text: string; }[]>(rs => rs
 		.select("Platform_ID", "Text")
 		.from("chat_line", tableName)
 		.orderBy("ID DESC")
@@ -48,8 +62,8 @@ const getLocalLogs = async (channel, limit = 50) => {
 	};
 };
 
-const getRustlogLogs = async (channel, limit = 50) => {
-	const twitch = sb.Platform.get("twitch");
+const getRustlogLogs = async (channel: string, limit: number = 50) => {
+	const twitch = sb.Platform.getAsserted("twitch");
 	const channelId = await twitch.getUserID(channel);
 	if (!channelId) {
 		return {
@@ -58,7 +72,7 @@ const getRustlogLogs = async (channel, limit = 50) => {
 		};
 	}
 
-	const { year, month, day } = new sb.Date(sb.Date.getTodayUTC());
+	const { year, month, day } = new SupiDate(SupiDate.getTodayUTC());
 	let logsResponse = await core.Got.get("GenericAPI")({
 		url: `https://logs.ivr.fi/channelid/${channelId}/${year}/${month}/${day}`,
 		throwHttpErrors: false,
@@ -81,18 +95,29 @@ const getRustlogLogs = async (channel, limit = 50) => {
 		});
 
 		if (!logsResponse.ok) {
+			let reply;
+			const { statusCode } = logsResponse;
+			if (statusCode === 403 || statusCode === 404) {
+				reply = RUSTLOG_RESPONSES[statusCode];
+			}
+			else {
+				reply = RUSTLOG_RESPONSES.default;
+			}
+
 			return {
 				success: false,
-				reply: RUSTLOG_RESPONSES[logsResponse.statusCode] ?? RUSTLOG_RESPONSES.default
+				reply
 			};
 		}
 	}
 
-	const text = logsResponse.body
+	const mappedText = logsResponse.body
 		.split(/\r?\n/)
 		.map(i => i.match(RAW_TEXT_REGEX)?.groups)
-		.filter(Boolean)
-		.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
+		.filter(Boolean) as Record<string, string>[];
+
+	const text = mappedText
+		.sort((a, b) => new SupiDate(a.date).valueOf() - new SupiDate(b.date).valueOf())
 		.map(i => `${i.username}: ${i.message}`)
 		.join("\n");
 
@@ -102,32 +127,36 @@ const getRustlogLogs = async (channel, limit = 50) => {
 	};
 };
 
+const params = [{ name: "type", type: "string" }] as const;
+
+const BASE_QUERY = "Reply only in English. Concisely summarize the following messages from an online chatroom %CHANNEL_NAME% (ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)";
+const queries = {
+	base: BASE_QUERY,
+	topical: `${BASE_QUERY} into a numbered list of discussion topics (maximum of 5)`,
+	single: `${BASE_QUERY} into a description of a single, most important topic being discussed - do not include any additional topics`,
+	user: `${BASE_QUERY} into a bullet point list of username-specific topics (maximum of 5, sort by importance)`
+} as const;
+
+const isQueryType = (input: string): input is keyof typeof queries => (
+	Object.keys(queries).includes(input)
+);
+
 export default {
 	Name: "chatsummary",
 	Aliases: ["csum"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Summarizes the last couple of messages in the current (or provided) channel via GPT. This command applies a 30s cooldown to all users in the channel it is used in.",
 	Flags: ["mention","pipe"],
-	Params: [
-		{ name: "type", type: "string" }
-	],
+	Params: params,
 	Whitelist_Response: null,
-	initialize: function () {
-		const BASE_QUERY = core.Utils.tag.trim `
-			Reply only in English.
-			Concisely summarize the following messages from an online chatroom %CHANNEL_NAME%
-			(ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)
-		`;
+	Code: async function chatSummary (context: Context<typeof params>, channelInput) {
+		if (!context.channel) {
+			return {
+			    success: false,
+			    reply: "This command is not available in private messages!"
+			};
+		}
 
-		this.data.queries = {
-			base: `${BASE_QUERY}`,
-			topical: `${BASE_QUERY} into a numbered list of discussion topics (maximum of 5)`,
-			single: `${BASE_QUERY} into a description of a single, most important topic being discussed - do not include any additional topics`,
-			user: `${BASE_QUERY} into a bullet point list of username-specific topics (maximum of 5, sort by importance)`
-		};
-	},
-	Code: async function chatSummary (context, channelInput) {
 		let channel = channelInput;
 		if (!channel) {
 			if (context.platform.name !== "twitch") {
@@ -150,49 +179,48 @@ export default {
 		}
 
 		const queryType = context.params.type ?? "base";
-		const query = this.data.queries[queryType];
-		if (!query) {
+		if (!isQueryType(queryType)) {
 			return {
 				success: false,
-				reply: `Invalid query type provided! Use one of: ${Object.keys(this.data.queries).join(", ")}`
+				reply: `Invalid query type provided! Use one of: ${Object.keys(queries).join(", ")}`
 			};
 		}
 
-		const contextQuery = addQueryContext(query, context, channel);
-		const nexraExecution = await GptNexra.execute(context, `${contextQuery}\n\n${logsResult.text}`, {
-			url: "gpt-4-32k"
-		});
+		const query = queries[queryType];
+		const contextQuery = addQueryContext(query, channel);
+		const fakeContext = context as unknown as GptContext;
 
-		const { response } = nexraExecution;
-		if (!response && nexraExecution.reply) {
+		const nexraExecution = await GptNexraComplements.execute(fakeContext, `${contextQuery}\n\n${logsResult.text}`, summaryModel);
+		if (!nexraExecution.success) {
 			return nexraExecution;
 		}
 
+		const { response } = nexraExecution;
 		// API errors can come as 200 OK with error status code in body
-		if (!response.ok || response.body.status === false) {
+		if (!response.ok) {
 			return {
 				success: false,
-				reply: GptNexra.getRequestErrorMessage()
+				reply: GptNexraComplements.getRequestErrorMessage()
 			};
 		}
 
-		const message = GptNexra.extractMessage(response);
-		const modCheck = await checkModeration(context, message);
+		const message = GptNexraComplements.extractMessage(fakeContext, response);
+		const modCheck = await checkModeration(fakeContext, message);
 		if (!modCheck.success) {
 			return modCheck;
 		}
 
 		return {
-			reply: `${message}`,
+			reply: message,
 			cooldown: {
 				length: 30_000,
 				command: this.Name,
 				user: null,
-				channel: context.channel?.ID
+				channel: context.channel.ID
 			}
 		};
 	},
-	Dynamic_Description: async () => ([
+	Dynamic_Description: () => ([
 		"Fetches the last several chat messages in the current or provided channel and summarizes them using GPT.",
 		"",
 
@@ -220,4 +248,4 @@ export default {
 			</li>
 		`
 	])
-};
+} satisfies CommandDefinition;

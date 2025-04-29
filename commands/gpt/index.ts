@@ -3,7 +3,7 @@ import GptCache from "./cache-control.js";
 import { process as processMetrics } from "./metrics.js";
 import { check as checkModeration } from "./moderation.js";
 
-import { determineOutputLimit, handleHistoryCommand } from "./gpt-template.js";
+import { determineOutputLimit, GptTemplate, handleHistoryCommand } from "./gpt-template.js";
 import { GptOpenAI } from "./gpt-openai.js";
 import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
 import { GptDeepInfra } from "./gpt-deepinfra.js";
@@ -70,7 +70,7 @@ export default {
 	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: params,
-	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
+	Whitelist_Response: null,
 	initialize: async function () {
 		isLogTablePresent = await core.Query.isTablePresent("data", "ChatGPT_Log");
 	},
@@ -136,7 +136,7 @@ export default {
 			return limitCheckResult;
 		}
 
-		const Handler = handlerMap[modelData.type];
+		const Handler: GptTemplate = handlerMap[modelData.type];
 		if (!Handler.isAvailable()) {
 			return {
 				success: false,

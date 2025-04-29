@@ -76,7 +76,7 @@ const processResponseTask = async <T extends NexraSuccess | NexraComplementSucce
 	};
 };
 
-export const GptNexra: GptTemplate = {
+export const GptNexra = {
 	async execute (context: GptContext, query: string, modelData: ModelData) {
 		const messages = await getHistoryEntries(context);
 		if (context.params.context) {
@@ -145,9 +145,9 @@ export const GptNexra: GptTemplate = {
 
 	isAvailable () { return true; },
 	getRequestErrorMessage () { return "Nexra is currently overloaded! Try again later."; }
-};
+} satisfies GptTemplate;
 
-export const GptNexraComplements: GptTemplate = {
+export const GptNexraComplements = {
 	...GptNexra,
 
 	async execute (context: GptContext, query: string, modelData: ModelData) {
@@ -204,4 +204,4 @@ export const GptNexraComplements: GptTemplate = {
 	extractMessage (context, response: GotResponse<NexraComplementSuccess>) {
 		return response.body.message;
 	}
-};
+} satisfies GptTemplate;
