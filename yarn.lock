@@ -4900,6 +4900,7 @@ supi-db-init@supinic/supi-db-init:
   dependencies:
     "@babel/core": "npm:^7.26.10"
     "@babel/eslint-parser": "npm:^7.27.0"
+    "@discordjs/formatters": "npm:^0.6.0"
     "@jprochazk/roll-dice": "npm:^0.4.2"
     acorn-node: "npm:^2.0.1"
     async-markov: supinic/async-markov

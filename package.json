@@ -11,6 +11,7 @@
     "cron": "^4.3.0",
     "cytube-connector": "supinic/cytube-connector",
     "discord.js": "^14.18.0",
+    "@discordjs/formatters": "^0.6.0",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
