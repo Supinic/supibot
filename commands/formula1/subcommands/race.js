@@ -11,7 +11,9 @@ const getHighlights = async (race) => {
 		return [];
 	}
 
-	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`);
+	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`, {
+		filterShortsHeuristic: true
+	});
 };
 
 export default {

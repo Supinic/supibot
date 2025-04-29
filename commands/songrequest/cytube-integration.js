@@ -11,7 +11,10 @@ export default {
 		const linkParser = await getLinkParser();
 		const properLink = linkParser.autoRecognize(link);
 		if (!properLink) {
-			const [bestResult] = await searchYoutube(link.replaceAll("-", ""));
+			const [bestResult] = await searchYoutube(link.replaceAll("-", ""), {
+				filterShortsHeuristic: true
+			});
+
 			if (!bestResult) {
 				return {
 					success: false,

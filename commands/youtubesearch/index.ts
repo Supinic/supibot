@@ -1,32 +1,35 @@
+import { SupiDate, SupiError } from "supi-core";
 import { searchYoutube } from "../../utils/command-utils.js";
 import getLinkParser from "../../utils/link-parser.js";
+import { CommandDefinition, Context } from "../../classes/command.js";
 
 const RESULTS_PER_SEARCH = 25;
 const DAILY_SEARCHES_CAP = 2000;
 
 const getClosestPacificMidnight = () => {
-	const now = new sb.Date().discardTimeUnits("m", "s", "ms");
+	const now = new SupiDate().discardTimeUnits("m", "s", "ms");
 	const result = now.clone().discardTimeUnits("h").addHours(9);
 	if (now.hours >= 9) {
 		result.addDays(1);
 	}
 
-	return result;
+	return result.valueOf();
 };
+
+const params = [
+	{ name: "index", type: "number" },
+	{ name: "linkOnly", type: "boolean" }
+] as const;
 
 export default {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Searches YouTube for video(s) with your query. Only a certain number of uses are available daily.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: [
-		{ name: "index", type: "number" },
-		{ name: "linkOnly", type: "boolean" }
-	],
+	Params: params,
 	Whitelist_Response: null,
-	Code: (async function youtubeSearch (context, ...args) {
+	Code: (async function youtubeSearch (context: Context<typeof params>, ...args) {
 		const query = args.join(" ");
 
 		if (!query) {
@@ -37,7 +40,7 @@ export default {
 			};
 		}
 
-		let searchAmountToday = await this.getCacheData("search-amount-today");
+		let searchAmountToday = await this.getCacheData("search-amount-today") as number | null;
 		let cacheRecordExists = true;
 		if (!searchAmountToday) {
 			cacheRecordExists = false;
@@ -86,7 +89,8 @@ export default {
 
 		if (!data) {
 			const tracks = await searchYoutube(query, {
-				maxResults: RESULTS_PER_SEARCH
+				maxResults: RESULTS_PER_SEARCH,
+				filterShortsHeuristic: true
 			});
 
 			if (cacheRecordExists) {
@@ -100,7 +104,7 @@ export default {
 				});
 			}
 
-			const track = tracks[index];
+			const track = tracks.at(index);
 			if (!track) {
 				const message = (tracks.length > 0 && typeof context.params.index === "number")
 					? `There is no such video for your provided index! Up to ${tracks.length} videos are available.`
@@ -120,9 +124,16 @@ export default {
 			}
 
 			data = await youtubeParser.fetchData(track.ID);
+
+			if (!data) {
+				throw new SupiError({
+				    message: "Assert error: YouTube ID found in search but not in fetchData",
+					args: { track }
+				});
+			}
 		}
 
-		const published = new sb.Date(data.created).format("Y-m-d");
+		const published = (data.created) ? new SupiDate(data.created).format("Y-m-d") : "N/A";
 		const durationString = (data.duration === null)
 			? ""
 			: `Duration: ${core.Utils.formatTime(data.duration, true)}`;
@@ -130,8 +141,8 @@ export default {
 		return {
 			reply: core.Utils.tag.trim `
 				"${data.name}"
-				by ${data.author},
-				${core.Utils.groupDigits(data.views)} views,
+				by ${data.author ?? "(N/A)"},
+				${core.Utils.groupDigits(data.views ?? 0)} views,
 				published on ${published}.
 				${durationString}
 				${data.link}
@@ -139,4 +150,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+} satisfies CommandDefinition;

@@ -129,7 +129,11 @@ export default {
 			link = query;
 		}
 		else {
-			const searchResult = await searchYoutube(query, { single: true });
+			const searchResult = await searchYoutube(query, {
+				single: true,
+				filterShortsHeuristic: true
+			});
+
 			link = `https://youtu.be/${searchResult.ID}`;
 		}
 

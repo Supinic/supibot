@@ -303,7 +303,10 @@ export default {
 				}
 			}
 			else if (type === "youtube") {
-				const data = await searchYoutube(args.join(" "));
+				const data = await searchYoutube(args.join(" "), {
+					filterShortsHeuristic: true
+				});
+
 				lookup = (data[0])
 					? { link: data[0].ID }
 					: null;

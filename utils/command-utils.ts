@@ -324,12 +324,20 @@ type YoutubeSearchResult = {
 	regionCode: string;
 };
 
+type SearchOptions = {
+	maxResults?: number;
+	single?: boolean;
+	filterShortsHeuristic?: boolean;
+};
+type SingleSearchOptions = SearchOptions & { single: true; };
+type MultiSearchOptions = SearchOptions & { single?: false; };
+
 /**
  * Fetches info about a provided YouTube video.
  */
-export async function searchYoutube (query: string, options: { single: true; }): Promise<{ ID: string, title: string }>;
-export async function searchYoutube (query: string, options?: { maxResults?: number; single?: false }): Promise<{ ID: string, title: string }[]>;
-export async function searchYoutube (query: string, options?: { maxResults?: number; single?: boolean; }) {
+export async function searchYoutube (query: string, options: SingleSearchOptions): Promise<{ ID: string, title: string }>;
+export async function searchYoutube (query: string, options?: MultiSearchOptions): Promise<{ ID: string, title: string }[]>;
+export async function searchYoutube (query: string, options: SearchOptions = {}) {
 	if (!process.env.API_GOOGLE_YOUTUBE) {
 		throw new SupiError({
 			message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
@@ -361,9 +369,20 @@ export async function searchYoutube (query: string, options?: { maxResults?: num
 
 	const data = response.body;
 	const videoList = data.items
-		// This filtering shouldn't be necessary, but in some cases YouTube API returns playlists
-		// despite the `type` parameter being set to strictly return videos only.
-		.filter(i => i.id.kind === "youtube#video" && i.id.videoId)
+		.filter(i => {
+			// This filtering shouldn't be necessary, but in some cases YouTube API returns playlists
+			// despite the `type` parameter being set to strictly return videos only.
+			if (i.id.kind !== "youtube#video" || !i.id.videoId) {
+				return false;
+			}
+			// Heuristic shorts filtering. If the video's description is an empty string,
+			// it is *likely* (not guaranteed) that the video is a short. Maybe.
+			else if (options.filterShortsHeuristic && !i.snippet.description) {
+				return false;
+			}
+
+			return true;
+		})
 		.map(i => ({
 			ID: i.id.videoId,
 			title: i.snippet.title
@@ -840,7 +859,6 @@ type TextPostResult = TextPostResultFailure | TextPostResultSuccess;
 
 /**
  * Posts the provided text to Pastebin, creating a new "paste".
- * @returns {Promise<{ok: boolean, link: string | null, statusCode: number | null, reason: string | null}>}
  */
 export const postToPastebin = async (text: string, options: PastebinPostOptions = {}): Promise<TextPostResult> => {
 	if (!process.env.API_PASTEBIN) {
