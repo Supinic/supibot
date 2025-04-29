@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`User_Alias_Data` (
 	`Value` MEDIUMTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	PRIMARY KEY (`User_Alias`, `Property`) USING BTREE,
 	INDEX `FK_User_Data_User_Data_Property` (`Property`) USING BTREE,
-	CONSTRAINT `FK_User_Data_User_Alias` FOREIGN KEY (`User_Alias`) REFERENCES `chat_data`.`User_Alias` (`ID`) ON UPDATE CASCADE ON DELETE CASCAD
+	CONSTRAINT `FK_User_Data_User_Alias` FOREIGN KEY (`User_Alias`) REFERENCES `chat_data`.`User_Alias` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
