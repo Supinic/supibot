@@ -8,21 +8,7 @@ export declare type VLCOptions = {
     username: string;
     password?: string;
 };
-export declare type Video = {
-    Added: Date;
-    Duration: number;
-    End_Time: number | null;
-    ID: number;
-    Length: number;
-    Link: string;
-    Name: string;
-    Notes: string | null;
-    Start_Time: number | null;
-    Status: "Current" | "Inactive" | "Pending";
-    User_Alias: number;
-    VLC_ID: number;
-    Video_Type: number;
-};
+export declare
 
 declare type Action = "addToQueue"
     | "addToQueueAndPlay"

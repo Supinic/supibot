@@ -34,21 +34,6 @@ export declare interface VideoEffects {
     gamma: number;
 }
 
-export declare interface Node {
-    id: string;
-    name: string;
-    ro: "rw" | "ro";
-    current?: string;
-    duration?: number;
-    type?: "node" | "leaf";
-    uri?: string;
-}
-export declare interface Root extends Node {
-    children: Node[];
-    name: "Playlist";
-    type: "node";
-    ro: "ro";
-}
 
 declare type Stats = { [key: string]: number };
 
@@ -64,45 +49,6 @@ declare type AspectRatio =
 
 declare type State = "paused" | "playing" | "stopped";
 
-declare type StatusBase = {
-    fullscreen: boolean;
-    stats: Stats | null;
-    aspectratio: AspectRatio | null;
-    audiodelay: number;
-    apiversion: number;
-    currentplid: number;
-    time: number;
-    volume: number;
-    length: number;
-    random: boolean;
-    audiofilters: Audiofilters;
-    rate: number;
-    videoeffects: VideoEffects;
-    state: State;
-    loop: boolean;
-    version: string;
-    position: number;
-    information: Information;
-    repeat: boolean;
-    subtitledelay: number;
-    equalizer: any[];
-};
-declare type StatusPaused = StatusBase & {
-    stats: Stats;
-    aspectratio: AspectRatio;
-    state: "paused";
-};
-declare type StatusPlaying = StatusBase & {
-    stats: Stats;
-    aspectratio: AspectRatio;
-    state: "playing";
-};
-declare type StatusStopped = StatusBase & {
-    stats: null;
-    aspectratio: null;
-    state: "stopped";
-};
-export declare type Status = StatusPaused | StatusPlaying | StatusStopped;
 
 export enum OrderType {
     Normal = 0,
