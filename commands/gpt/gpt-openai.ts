@@ -75,7 +75,7 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 const gptLinkRegex = /\[.+?]\((.+)[?&]utm_source=openai\)/gi;
 const removeMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "$1");
 
-export const GptOpenAI: GptTemplate = {
+export const GptOpenAI = {
 	async execute (context: GptContext, query: string, modelData: ModelData) {
 		if (!process.env.API_OPENAI_KEY) {
 			throw new SupiError({
@@ -189,4 +189,4 @@ export const GptOpenAI: GptTemplate = {
 
 	isAvailable () { return Boolean(process.env.API_OPENAI_KEY); },
 	getRequestErrorMessage () { return `The OpenAI service is overloaded at the moment! Try again later.`; }
-};
+} satisfies GptTemplate;

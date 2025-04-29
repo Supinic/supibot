@@ -41,7 +41,7 @@ const getHistoryEntries = async (context: GptContext, query: string) => {
 	];
 };
 
-export const GptDeepInfra: GptTemplate = {
+export const GptDeepInfra = {
 	async execute (context: GptContext, query: string, modelData: ModelData) {
 		if (!process.env.API_KEY_DEEPINFRA) {
 			throw new SupiError({
@@ -112,4 +112,4 @@ export const GptDeepInfra: GptTemplate = {
 	getRequestErrorMessage () {
 		return `The DeepInfra service for this model is overloaded at the moment! Try again later.`;
 	}
-};
+} satisfies GptTemplate;
