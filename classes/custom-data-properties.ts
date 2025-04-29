@@ -121,7 +121,7 @@ const userDataSchema = {
 	customDeveloperData: {} as SimpleGenericData,
 	defaultUserLanguage: {} as {
 		code: string;
-		nname: string;
+		name: string;
 	},
 	developer: "boolean",
 	discordChallengeNotificationSent: "boolean",
