@@ -17,7 +17,7 @@ import Banphrase from "./classes/banphrase.js";
 import Channel from "./classes/channel.js";
 import Reminder from "./classes/reminder.js";
 import { ChatModule, ChatModuleDefinition } from "./classes/chat-module.js";
-import VLCSingleton from "./singletons/vlc-connector.js";
+import { VlcConnector } from "./singletons/vlc-client.js";
 
 import Logger from "./singletons/logger.js";
 import { Platform } from "./platforms/template.js";
@@ -56,7 +56,7 @@ interface GlobalSb {
 	Platform: typeof Platform;
 	Reminder: typeof Reminder;
 	User: typeof User;
-	VideoLANConnector: VLCSingleton | null;
+	VideoLANConnector: VlcConnector | null;
 }
 interface GlobalCore {
 	Got: typeof supiCore.Got;
@@ -206,11 +206,10 @@ for (let i = 0; i < MODULE_INITIALIZE_ORDER.length; i++) {
 
 // Initialize the VLC module if configured
 let VideoLANConnector;
-const { vlcUrl, vlcBaseUrl, vlcUsername, vlcPassword, vlcPort } = config.local as Partial<VlcConfig>;
-if (vlcUrl && vlcBaseUrl) {
-	VideoLANConnector = new VLCSingleton({
-		url: vlcUrl,
-		baseURL: vlcBaseUrl,
+const { vlcUrl, vlcUsername, vlcPassword, vlcPort } = config.local as Partial<VlcConfig>;
+if (vlcUrl) {
+	VideoLANConnector = new VlcConnector({
+		host: vlcUrl,
 		port: vlcPort ?? 8080,
 		username: vlcUsername ?? "",
 		password: vlcPassword ?? "",

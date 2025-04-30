@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 /**
  * VLC client based on the `node-vlc-http` client as created by @ldubos.
  * Rewritten to Javascript, with various changes.
@@ -8,7 +9,11 @@ import http from "node:http";
 import querystring from "node:querystring";
 import EventEmitter from "node:events";
 import { SupiDate } from "supi-core";
-import getLinkParser from "../utils/link-parser.js";
+
+import type { VlcPlaylistNode, VlcPlaylistRoot, VlcStatus, VlcTopPlaylist } from "./vlc-types.js";
+import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
+
+const { SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
 const get = (options: http.RequestOptions) => new Promise((resolve, reject) => {
 	http.get(options, response => {
@@ -43,98 +48,6 @@ const CommandScope = {
 } as const;
 type Scope = (typeof CommandScope)[keyof typeof CommandScope];
 
-type Information = {
-	chapter: number;
-	chapters: number[];
-	title: number;
-	category: Category;
-	titles: number[];
-};
-type Category = {
-	meta: Meta;
-	[flux: string]: { [key: string]: string } | Meta;
-};
-type Audiofilters = {
-	[filter: string]: string;
-};
-type Meta = {
-	encoded_by: string;
-	filename: string;
-};
-type VideoEffects = {
-	hue: number;
-	saturation: number;
-	contrast: number;
-	brightness: number;
-	gamma: number;
-};
-
-type Stats = { [key: string]: number };
-type State = "paused" | "playing" | "stopped";
-type AspectRatio = "1:1" | "4:3" | "5:4" | "16:9" | "16:10" | "221:100" | "235:100" | "239:100";
-
-type StatusBase = {
-	fullscreen: boolean;
-	stats: Stats | null;
-	aspectratio: AspectRatio | null;
-	audiodelay: number;
-	apiversion: number;
-	currentplid: number;
-	time: number;
-	volume: number;
-	length: number;
-	random: boolean;
-	audiofilters: Audiofilters;
-	rate: number;
-	videoeffects: VideoEffects;
-	state: State;
-	loop: boolean;
-	version: string;
-	position: number;
-	information: Information;
-	repeat: boolean;
-	subtitledelay: number;
-	equalizer: unknown[];
-};
-type StatusPaused = StatusBase & {
-	stats: Stats;
-	aspectratio: AspectRatio;
-	state: "paused";
-};
-type StatusPlaying = StatusBase & {
-	stats: Stats;
-	aspectratio: AspectRatio;
-	state: "playing";
-};
-type StatusStopped = StatusBase & {
-	stats: null;
-	aspectratio: null;
-	state: "stopped";
-};
-type Status = StatusPaused | StatusPlaying | StatusStopped;
-
-type Node = {
-	id: string;
-	name: string;
-	ro: "rw" | "ro";
-	current?: string;
-	duration?: number;
-	type?: "node" | "leaf";
-	uri?: string;
-};
-type Root = Node & {
-	children: Node[];
-	name: "Playlist";
-	type: "node";
-	ro: "ro";
-}
-type TopPlaylist = Root & {
-	children: [
-		Root & { name: "Playlist"; },
-		Root & { name: "Media library"; }
-	];
-};
-
 type ConstructorOptions = {
 	host: string;
 	port?: number;
@@ -155,21 +68,22 @@ type Video = {
 	Name: string;
 	Notes: string | null;
 	Start_Time: number | null;
+	Started: SupiDate;
 	Status: "Current" | "Inactive" | "Pending";
 	User_Alias: number;
 	VLC_ID: number;
 	Video_Type: number;
 };
 
-interface VlcEvents {
+interface VlcClient {
 	on (event: "tick", callback: () => void): this;
-	on (event: "statuschange", callback: (status: Status) => void): this;
-	on (event: "playlistchange", callback: (playlist: Root) => void): this;
-	on (event: "update", callback: (status: Status, playlist: Root) => void): this;
+	on (event: "statuschange", callback: (previous: VlcStatus, current: VlcStatus) => void): this;
+	on (event: "playlistchange", callback: (previous: VlcTopPlaylist, current: VlcTopPlaylist) => void): this;
+	on (event: "update", callback: (status: VlcStatus, playlist: VlcPlaylistRoot) => void): this;
 	on (event: "error", callback: (error: Error) => void): this;
 }
 
-class VlcClient extends EventEmitter implements VlcEvents {
+class VlcClient extends EventEmitter {
 	private readonly host: string;
 	private readonly port: number;
 	private readonly authorization: string;
@@ -180,10 +94,10 @@ class VlcClient extends EventEmitter implements VlcEvents {
 	private readonly longWaitMs: number;
 
 	private running: boolean;
-	private status: Status | null = null;
-	private playlist: Root | null = null;
+	private status: VlcStatus | null = null;
+	private playlist: VlcTopPlaylist | null = null;
 
-	constructor (options: ConstructorOptions) {
+	public constructor (options: ConstructorOptions) {
 		super();
 
 		this.host = options.host;
@@ -216,6 +130,13 @@ class VlcClient extends EventEmitter implements VlcEvents {
 	public stopRunning () { this.running = false; }
 	public isRunning () { return this.running; }
 
+	public getPlaylist () { return this.playlist; }
+	public getStatus () { return this.status; }
+
+	public async addToQueue (uri: string) {
+		return await this.sendCommand(CommandScope.STATUS, "in_enqueue", { input: uri });
+	}
+
 	public async addToQueueAndPlay (uri: string, option?: "noaudio" | "novideo") {
 		const options = {
 			input: uri,
@@ -245,25 +166,16 @@ class VlcClient extends EventEmitter implements VlcEvents {
 		return await this.sendCommand(CommandScope.STATUS, "volume", { val: volume });
 	}
 
-	public async getNormalizedPlaylist () {
-		return await core.Query.getRecordset<Video[]>(rs => rs
-			.select("*")
-			.select(`
-				(CASE 
-					WHEN (Start_Time IS NOT NULL AND End_Time IS NOT NULL) THEN (End_Time - Start_Time)
-					WHEN (Start_Time IS NOT NULL AND End_Time IS NULL) THEN (Length - Start_Time)
-					WHEN (Start_Time IS NULL AND End_Time IS NOT NULL) THEN (End_Time)
-					ELSE Length
-					END
-				) AS Duration
-			`)
-			.from("chat_data", "Song_Request")
-			.where("Status <> %s", "Inactive")
-		);
+	public async seek (time: string | number) {
+		return await this.sendCommand(CommandScope.STATUS, "seek", { val: time });
+	}
+
+	public async stop () {
+		return await this.sendCommand(CommandScope.STATUS, "pl_stop");
 	}
 
 	public async updateStatus () {
-		const status = await this.sendCommand(CommandScope.STATUS) as Status;
+		const status = await this.sendCommand(CommandScope.STATUS) as VlcStatus;
 
 		if (this.changeEvents && !equal(status, this.status)) {
 			try {
@@ -280,7 +192,7 @@ class VlcClient extends EventEmitter implements VlcEvents {
 	}
 
 	public async updatePlaylist () {
-		const playlist = await this.sendCommand(CommandScope.PLAYLIST) as TopPlaylist;
+		const playlist = await this.sendCommand(CommandScope.PLAYLIST) as VlcTopPlaylist;
 
 		if (this.changeEvents && !equal(playlist, this.playlist)) {
 			try {
@@ -357,20 +269,28 @@ class VlcClient extends EventEmitter implements VlcEvents {
 	}
 }
 
+const matchParent = (list: VlcPlaylistNode[], targetID: number) => {
+	for (const track of list) {
+		const ID = Number(track.id);
+		if (targetID === ID) {
+			return track;
+		}
+		else if (track.children && matchParent(track.children, targetID)) {
+			return track;
+		}
+	}
+
+	return null;
+};
+
 export class VlcConnector {
-	readonly client: VlcClient;
+	public readonly client: VlcClient;
 
-	private readonly baseURL: string;
-	private readonly videoQueue: unknown[];
-	private readonly requestsID: unknown;
-	private readonly seekValues: {
-		start: number | null;
-		end: number | null;
-	};
+	private readonly seekValues: { start: number | null; end: number | null; } = { start: null, end: null };
 
-	constructor (options: ConstructorOptions) {
-		this.client = new VLCClient({
-			host: options.url,
+	public constructor (options: ConstructorOptions) {
+		this.client = new VlcClient({
+			host: options.host,
 			port: options.port,
 			username: options.username,
 			password: options.password,
@@ -379,167 +299,13 @@ export class VlcConnector {
 			tickLengthMs: 250
 		});
 
-		this.baseURL = options.baseURL;
-		this.videoQueue = [];
-		this.requestsID = {};
-		this.seekValues = {
-			start: null,
-			end: null
-		};
-
 		this.initListeners();
-	}
-
-	initListeners () {
-		const client = this.client;
-
-		client.on("update", async (status) => {
-			const item = this.currentPlaylistItem;
-			if (item !== null) {
-				if (this.seekValues.start !== null && Object.keys(status.information.category).length > 1) {
-					// Since the VLC API does not support seeking to milliseconds parts when using ISO8601 or seconds,
-					// a percentage needs to be calculated, since that (for whatever reason) works using decimals.
-					const percentage = core.Utils.round(this.seekValues.start / status.length, 5) * 100;
-					await client.seek(`${percentage}%`);
-
-					this.seekValues.start = null;
-				}
-
-				else if (this.seekValues.end !== null && status.time >= this.seekValues.end) {
-					const queue = this.currentPlaylist.length;
-					if (queue < 2) {
-						await client.stop();
-					}
-					else {
-						await client.playlistNext();
-					}
-
-					this.seekValues.end = null;
-				}
-			}
-		});
-
-		client.on("statuschange", async (before, after) => {
-			const currentPauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
-			if (currentPauseStatus && after.state === "playing") {
-				await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, false);
-			}
-			else if (!currentPauseStatus && after.state === "paused") {
-				await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, true);
-			}
-
-			const previous = before.currentplid;
-			const next = after.currentplid;
-
-			if (previous !== next) {
-				const { children } = await this.playlist();
-				client.emit("videochange", previous, next, children);
-			}
-		});
-
-		client.on("videochange", async (previousID, nextID, playlist) => {
-			const previousTrack = this.matchParent(playlist, previousID);
-			const nextTrack = this.matchParent(playlist, nextID);
-			if (previousTrack === nextTrack) {
-				return;
-			}
-
-			if (previousTrack) {
-				// Finalize the previous video, if it exists (might not exist because of playlist being started)
-				const ID = Number(previousTrack.id);
-				await core.Query.getRecordUpdater(rs => rs
-					.update("chat_data", "Song_Request")
-					.set("Status", "Inactive")
-					.set("Ended", new sb.Date())
-					.where("Status = %s", "Current")
-					.where("VLC_ID = %n", ID)
-				);
-
-				await client.playlistDelete(ID);
-			}
-			if (nextTrack) {
-				const ID = await core.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("chat_data", "Song_Request")
-					.where("VLC_ID = %n", Number(nextTrack.id))
-					.where("Status = %s", "Queued")
-					.single()
-					.flat("ID")
-				);
-
-				// This happens when no video is in queue, and the addition happens earlier than the song request
-				// object being inserted in the database (from the song request command)
-				if (!ID) {
-					return;
-				}
-
-				const row = await core.Query.getRow("chat_data", "Song_Request");
-				await row.load(ID);
-
-				row.setValues({
-					Status: "Current",
-					Started: new sb.Date()
-				});
-
-				this.seekValues.start = row.values.Start_Time ?? null;
-				this.seekValues.end = row.values.End_Time ?? null;
-
-				// Assign the status and started timestamp to the video, because it just started playing.
-				await row.save();
-			}
-		});
-
-		client.on("playlistchange", async (prev, next) => {
-			// @todo convert to Set intersection methods when available
-			const previousIDs = prev.children[0].children.map(i => Number(i.id));
-			const nextIDs = new Set(next.children[0].children.map(i => Number(i.id)));
-
-			const missingIDs = previousIDs.filter(id => !nextIDs.has(id));
-			if (missingIDs.length > 0) {
-				const noUpdateIDs = [];
-				for (const item of prev.children[0].children) {
-					if (item.duration !== -1 || !item.uri?.includes("youtu")) {
-						continue;
-					}
-
-					// Pseudo-heuristic to prevent inadvertent playlist request deletion caused by
-					// VLC creating a new request after loading a YouTube video.
-					// E.g. YouTube video is added as ID 30, and when it plays, VLC fetches the actual video data,
-					// creating a new request with ID 31, causing the ID 30 (the real video) to be deleted.
-					await core.Query.getRecordUpdater(ru => ru
-						.update("chat_data", "Song_Request")
-						.set("VLC_ID", Number(item.id) + 1)
-						.where("VLC_ID = %n", Number(item.id))
-						.where("Status IN %s+", ["Queued", "Current"])
-					);
-					noUpdateIDs.push(item.id);
-				}
-
-				const filteredMissingIDs = missingIDs.filter(i => !noUpdateIDs.includes(i));
-				await core.Query.getRecordUpdater(rs => rs
-					.update("chat_data", "Song_Request")
-					.set("Status", "Inactive")
-					.where("VLC_ID IN %n+", filteredMissingIDs)
-					.where("Status IN %s+", ["Queued", "Current"])
-				);
-			}
-		});
-
-		client.on("error", (err) => {
-			console.error(err);
-			client.stopRunning();
-		});
 	}
 
 	/**
 	 * Adds a video to the playlist queue.
-	 * @param {string} link
-	 * @param {Object} options={}
-	 * @param {number} [options.startTime] Automatic seek to a given position after start, if queued to a empty playlist
-	 * @param {number} [options.endTime] Automatic seek to a given position while run ning, if queued to a empty playlist
-	 * @returns {Promise<number>}
 	 */
-	async add (link: string, options: { startTime?: number; endTime?: number; } = {}) {
+	public async add (link: string, options: { startTime?: number; endTime?: number; } = {}) {
 		const status = await this.client.updateStatus();
 		if (status.currentplid === -1) {
 			await this.client.addToQueueAndPlay(link);
@@ -552,7 +318,7 @@ export class VlcConnector {
 			}
 		}
 		else {
-			await this.getStatus("in_enqueue", { input: link });
+			await this.client.addToQueue(link);
 		}
 
 		const topPlaylistData = await this.client.updatePlaylist();
@@ -562,80 +328,41 @@ export class VlcConnector {
 		return Math.max(...ids);
 	}
 
-	async currentlyPlaying () {
-		const status = await this.status();
-		if (!status.information) {
-			return null;
-		}
-		else {
-			return status.information;
-		}
+	public async getNormalizedPlaylist () {
+		return await core.Query.getRecordset<Video[]>(rs => rs
+			.select("*")
+			.select(`
+				(CASE 
+					WHEN (Start_Time IS NOT NULL AND End_Time IS NOT NULL) THEN (End_Time - Start_Time)
+					WHEN (Start_Time IS NOT NULL AND End_Time IS NULL) THEN (Length - Start_Time)
+					WHEN (Start_Time IS NULL AND End_Time IS NOT NULL) THEN (End_Time)
+					ELSE Length
+					END
+				) AS Duration
+			`)
+			.from("chat_data", "Song_Request")
+			.where("Status <> %s", "Inactive")
+		);
 	}
 
-	async currentlyPlayingData () {
-		let status;
-		try {
-			status = await this.status();
-		}
-		catch (e) {
-			if (e.message === "ETIMEDOUT") {
-				return null;
-			}
-			else {
-				throw e;
-			}
+	public get currentPlaylist () {
+		const playlist = this.client.getPlaylist();
+		if (!playlist) {
+			return [];
 		}
 
-		if (status.currentplid === -1 || status.length === -1) {
-			return null;
-		}
-
-		const linkParser = await getLinkParser();
-		const targetURL = linkParser.parseLink(status.information.category.meta.url);
-		return this.videoQueue.find(songData => {
-			try {
-				const songURL = linkParser.parseLink(songData.link);
-				return songURL === targetURL;
-			}
-			catch {
-				return songData.link === targetURL;
-			}
-		});
+		const mediaPlaylist = playlist.children[0];
+		return mediaPlaylist.children;
 	}
 
-
-	matchParent (list, targetID) {
-		for (const track of list) {
-			const ID = Number(track.id);
-			if (targetID === ID) {
-				return track;
-			}
-			else if (track.children && this.matchParent(track.children, targetID)) {
-				return track;
-			}
-		}
-
-		return null;
-	}
-
-	async getDataByName (name, link) {
-		const playlist = await this.playlist();
-		return playlist.children.find(i => i.name === name || i.name === link);
-	}
-
-	get currentPlaylist () {
-		return this.client.playlist?.children?.[0]?.children ?? [];
-	}
-
-	get currentPlaylistItem () {
+	public get currentPlaylistItem () {
 		const list = [...this.currentPlaylist];
-		while (list.length > 0) {
-			const item = list.shift();
+		for (const item of list) {
 			if (item.current === "current") {
 				return item;
 			}
 
-			if (Array.isArray(item.children)) {
+			if (item.children) {
 				list.unshift(...item.children);
 			}
 		}
@@ -643,11 +370,150 @@ export class VlcConnector {
 		return null;
 	}
 
-	get modulePath () { return "vlc-connector"; }
+	private initListeners () {
+		const client = this.client;
 
-	destroy () {
-		this.client.removeAllListeners();
-		this.client = null;
+		client.on("update", (status) => void this.onUpdate(status));
+		client.on("statuschange", (previous, current) => void this.onStatusChange(previous, current));
+		client.on("playlistchange", (previous, current) => void this.onPlaylistChange(previous, current));
+
+		client.on("error", (err) => {
+			console.error(err);
+			client.stopRunning();
+		});
+	}
+
+	private async onUpdate (status: VlcStatus) {
+		const item = this.currentPlaylistItem;
+		if (item === null) {
+			return;
+		}
+
+		if (this.seekValues.start !== null && Object.keys(status.information.category).length > 1) {
+			// Since the VLC API does not support seeking to milliseconds parts when using ISO8601 or seconds,
+			// a percentage needs to be calculated, since that (for whatever reason) works using decimals.
+			const percentage = core.Utils.round(this.seekValues.start / status.length, 5) * 100;
+			await this.client.seek(`${percentage}%`);
+
+			this.seekValues.start = null;
+		}
+		else if (this.seekValues.end !== null && status.time >= this.seekValues.end) {
+			const queueLength = this.currentPlaylist.length;
+			if (queueLength < 2) {
+				await this.client.stop();
+			}
+			else {
+				await this.client.playlistNext();
+			}
+
+			this.seekValues.end = null;
+		}
+	}
+
+	private async onStatusChange (before: VlcStatus, after: VlcStatus) {
+		const currentPauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		if (currentPauseStatus && after.state === "playing") {
+			await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, false);
+		}
+		else if (!currentPauseStatus && after.state === "paused") {
+			await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, true);
+		}
+
+		const previous = before.currentplid;
+		const next = after.currentplid;
+
+		if (previous !== next) {
+			const playlist = this.currentPlaylist;
+			await this.onVideoChange(previous, next, playlist);
+		}
+	}
+
+	private async onVideoChange (previousId: number, nextId: number, playlist: VlcPlaylistNode[]) {
+		const previousTrack = matchParent(playlist, previousId);
+		const nextTrack = matchParent(playlist, nextId);
+		if (previousTrack === nextTrack) {
+			return;
+		}
+
+		if (previousTrack) {
+			// Finalize the previous video, if it exists (might not exist because of playlist being started)
+			const ID = Number(previousTrack.id);
+			await core.Query.getRecordUpdater(rs => rs
+				.update("chat_data", "Song_Request")
+				.set("Status", "Inactive")
+				.set("Ended", new SupiDate())
+				.where("Status = %s", "Current")
+				.where("VLC_ID = %n", ID)
+			);
+
+			await this.client.playlistDelete(ID);
+		}
+		if (nextTrack) {
+			const ID = await core.Query.getRecordset<Video["ID"] | undefined>(rs => rs
+				.select("ID")
+				.from("chat_data", "Song_Request")
+				.where("VLC_ID = %n", Number(nextTrack.id))
+				.where("Status = %s", "Queued")
+				.single()
+				.flat("ID")
+			);
+
+			// This happens when no video is in queue, and the addition happens earlier than the song request
+			// object being inserted in the database (from the song request command)
+			if (!ID) {
+				return;
+			}
+
+			const row = await core.Query.getRow<Video>("chat_data", "Song_Request");
+			await row.load(ID);
+
+			row.setValues({
+				Status: "Current",
+				Started: new SupiDate()
+			});
+
+			this.seekValues.start = row.values.Start_Time ?? null;
+			this.seekValues.end = row.values.End_Time ?? null;
+
+			// Assign the status and started timestamp to the video, because it just started playing.
+			await row.save();
+		}
+	}
+
+	private async onPlaylistChange (previous: VlcTopPlaylist, current: VlcTopPlaylist) {
+		// @todo convert to Set intersection methods when available
+		const previousIDs = previous.children[0].children.map(i => Number(i.id));
+		const nextIDs = new Set(current.children[0].children.map(i => Number(i.id)));
+
+		const missingIDs = previousIDs.filter(id => !nextIDs.has(id));
+		if (missingIDs.length > 0) {
+			const noUpdateIDs: number[] = [];
+			for (const item of previous.children[0].children) {
+				if (item.duration !== -1 || !item.uri?.includes("youtu")) {
+					continue;
+				}
+
+				// Pseudo-heuristic to prevent inadvertent playlist request deletion caused by
+				// VLC creating a new request after loading a YouTube video.
+				// E.g. YouTube video is added as ID 30, and when it plays, VLC fetches the actual video data,
+				// creating a new request with ID 31, causing the ID 30 (the real video) to be deleted.
+				await core.Query.getRecordUpdater(ru => ru
+					.update("chat_data", "Song_Request")
+					.set("VLC_ID", Number(item.id) + 1)
+					.where("VLC_ID = %n", Number(item.id))
+					.where("Status IN %s+", ["Queued", "Current"])
+				);
+
+				noUpdateIDs.push(Number(item.id));
+			}
+
+			const filteredMissingIDs = missingIDs.filter(i => !noUpdateIDs.includes(i));
+			await core.Query.getRecordUpdater(rs => rs
+				.update("chat_data", "Song_Request")
+				.set("Status", "Inactive")
+				.where("VLC_ID IN %n+", filteredMissingIDs)
+				.where("Status IN %s+", ["Queued", "Current"])
+			);
+		}
 	}
 };
-
