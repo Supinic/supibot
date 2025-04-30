@@ -11,6 +11,13 @@ export default {
 	Params: null,
 	Whitelist_Response: "Only available in channels with VLC API configured!",
 	Code: (async function when (context) {
+		if (!sb.VideoLANConnector) {
+			return {
+				success: false,
+				reply: "VLC connector is not available! Check configuration if this is required."
+			};
+		}
+
 		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
 		if (state !== "vlc") {
 			return {
@@ -54,7 +61,14 @@ export default {
 			loopItem = queue[++index];
 		}
 
-		const status = await sb.VideoLANConnector.status();
+		const status = await sb.VideoLANConnector.client.getStatus();
+		if (!status) {
+			return {
+				success: false,
+				reply: "VLC is not currently "
+			};
+		}
+
 		const current = queue.find(i => i.Status === "Current");
 		if (status && current) {
 			const endTime = current.End_Time ?? status.time;

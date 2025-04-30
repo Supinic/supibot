@@ -8,7 +8,7 @@
 import http from "node:http";
 import querystring from "node:querystring";
 import EventEmitter from "node:events";
-import { SupiDate } from "supi-core";
+import { SupiDate, SupiError } from "supi-core";
 
 import type { VlcPlaylistNode, VlcPlaylistRoot, VlcStatus, VlcTopPlaylist } from "./vlc-types.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
@@ -131,7 +131,15 @@ class VlcClient extends EventEmitter {
 	public isRunning () { return this.running; }
 
 	public getPlaylist () { return this.playlist; }
-	public getStatus () { return this.status; }
+	public getStatus () {
+		if (!this.status) {
+			throw new SupiError({
+			    message: "Assert error: VLC queried for status before it could be established"
+			});
+		}
+
+		return this.status;
+	}
 
 	public async addToQueue (uri: string) {
 		return await this.sendCommand(CommandScope.STATUS, "in_enqueue", { input: uri });

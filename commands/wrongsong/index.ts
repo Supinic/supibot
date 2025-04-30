@@ -9,6 +9,13 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function wrongSong (context, target) {
+		if (!sb.VideoLANConnector) {
+			return {
+			    success: false,
+			    reply: "VLC connector is not available! Check configuration if this is required."
+			};
+		}
+
 		let targetID: number | undefined;
 		if (target) {
 			targetID = Number(target);
@@ -75,7 +82,7 @@ export default {
 			}
 			else {
 				action = "skipped, and the playlist stopped";
-				await sb.VideoLANConnector.actions.stop();
+				await sb.VideoLANConnector.client.stop();
 			}
 		}
 		else if (userRequest.Status === "Queued") {
