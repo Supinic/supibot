@@ -23,10 +23,10 @@ function parsePrimitiveTag (input: string, type: "string"): string;
 function parsePrimitiveTag (input: string, type: PrimitiveTag): number | string | boolean;
 function parsePrimitiveTag (input: string, type: PrimitiveTag): number | string | boolean {
 	if (type === "string") {
-		return String(type);
+		return String(input);
 	}
 	else if (type === "number") {
-		return Number(type);
+		return Number(input);
 	}
 	else {
 		return (input === "true");
