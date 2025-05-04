@@ -79,10 +79,10 @@ export default {
 				}
 
 				if (value === "vlc") {
-					sb.VideoLANConnector.client.startRunning();
+					sb.VideoLANConnector.startClient();
 				}
 				else {
-					sb.VideoLANConnector.client.stopRunning();
+					sb.VideoLANConnector.stopClient();
 				}
 
 				await core.Cache.setByPrefix(SONG_REQUESTS_STATE, value);

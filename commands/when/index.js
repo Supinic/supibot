@@ -61,7 +61,7 @@ export default {
 			loopItem = queue[++index];
 		}
 
-		const status = await sb.VideoLANConnector.client.getStatus();
+		const status = await sb.VideoLANConnector.status;
 		if (!status) {
 			return {
 				success: false,

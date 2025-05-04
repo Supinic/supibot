@@ -126,7 +126,7 @@ export default {
 		}
 		else if (state === "vlc") {
 			// Simply make sure the VLC client is running if a song is being requested into it
-			sb.VideoLANConnector.client.startRunning();
+			sb.VideoLANConnector.startClient();
 		}
 
 		// Determine the user's and global limits - both duration and video amount

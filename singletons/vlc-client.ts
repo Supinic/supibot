@@ -292,7 +292,7 @@ const matchParent = (list: VlcPlaylistNode[], targetID: number) => {
 };
 
 export class VlcConnector {
-	public readonly client: VlcClient;
+	private readonly client: VlcClient;
 
 	private readonly seekValues: { start: number | null; end: number | null; } = { start: null, end: null };
 
@@ -351,6 +351,30 @@ export class VlcConnector {
 			.from("chat_data", "Song_Request")
 			.where("Status <> %s", "Inactive")
 		);
+	}
+
+	public async removeFromPlaylist (id: number) {
+		await this.client.playlistDelete(id);
+	}
+
+	public async stopPlaying () {
+		await this.client.stop();
+	}
+
+	public async playNext () {
+		await this.client.playlistNext();
+	}
+
+	public startClient () {
+		this.client.startRunning();
+	}
+
+	public stopClient () {
+		this.client.stopRunning();
+	}
+
+	public get status () {
+		return this.client.getStatus();
 	}
 
 	public get currentPlaylist () {

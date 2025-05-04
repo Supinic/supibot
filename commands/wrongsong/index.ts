@@ -78,16 +78,16 @@ export default {
 
 			if (requestsAhead > 0) {
 				action = "skipped";
-				await sb.VideoLANConnector.client.playlistNext();
+				await sb.VideoLANConnector.playNext();
 			}
 			else {
 				action = "skipped, and the playlist stopped";
-				await sb.VideoLANConnector.client.stop();
+				await sb.VideoLANConnector.stopPlaying();
 			}
 		}
 		else if (userRequest.Status === "Queued") {
 			action = "deleted from the playlist";
-			await sb.VideoLANConnector.client.playlistDelete(userRequest.VLC_ID);
+			await sb.VideoLANConnector.removeFromPlaylist(userRequest.VLC_ID);
 		}
 
 		return {
