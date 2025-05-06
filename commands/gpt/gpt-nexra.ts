@@ -31,8 +31,6 @@ type NexraSuccess = {
 type PartialData<T> = NexraPendingData | NexraFailure | T;
 
 const NO_YAPPING_PREFIX = "Answer briefly and do not go on any tangents.";
-const STRONG_NO_YAPPING_PREFIX = "Answer very briefly and only what you are being asked for! Do not repeat your answer! Do not go on any tangents.";
-
 const getHistoryEntries = async (context: GptContext) => {
 	const { historyMode } = await getHistoryMode(context);
 	return (historyMode === "enabled")
@@ -152,13 +150,9 @@ export const GptNexraComplements = {
 
 	async execute (context: GptContext, query: string, modelData: ModelData) {
 		const messages = await getHistoryEntries(context);
-		const isYappingModel = Boolean(modelData.flags?.yapping);
-
 		messages.push({
 			role: "user",
-			content: (isYappingModel)
-				? `${STRONG_NO_YAPPING_PREFIX} ${query}`
-				: `${NO_YAPPING_PREFIX} ${query}`
+			content: `${NO_YAPPING_PREFIX} ${query}`
 		});
 
 		const initResponse = await core.Got.get("GenericAPI")<NexraInitial>({
@@ -169,8 +163,7 @@ export const GptNexraComplements = {
 			json: {
 				messages,
 				model: modelData.url,
-				markdown: false,
-				websearch: isYappingModel
+				markdown: false
 			}
 		});
 
@@ -188,11 +181,6 @@ export const GptNexraComplements = {
 				success: false,
 				reply: `Nexra API returned an invalid response! Try again later.`
 			};
-		}
-
-		if (isYappingModel) {
-			const cleanupArray = response.body.message.split(/ {2,}/);
-			response.body.message = cleanupArray[0];
 		}
 
 		return {

@@ -29,9 +29,6 @@ export type ModelData = {
 	noSystemRole?: boolean;
 	usesCompletionTokens?: boolean;
 	search?: boolean;
-	flags?: {
-		yapping?: boolean;
-	}
 };
 
 const models = GptConfig.models as Record<ModelName, ModelData>;
