@@ -5,6 +5,7 @@ const sessionNames = {
 	SecondPractice: "Second practice",
 	ThirdPractice: "Third practice",
 	Qualifying: "Qualifying",
+	SprintQualifying: "Sprint qualifying",
 	Sprint: "Sprint race"
 };
 
