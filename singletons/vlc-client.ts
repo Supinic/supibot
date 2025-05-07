@@ -6,7 +6,6 @@
  */
 
 import http from "node:http";
-import querystring from "node:querystring";
 import EventEmitter from "node:events";
 import { SupiDate, SupiError } from "supi-core";
 
@@ -146,10 +145,10 @@ class VlcClient extends EventEmitter {
 	}
 
 	public async addToQueueAndPlay (uri: string, option?: "noaudio" | "novideo") {
-		const options = {
-			input: uri,
-			option
-		};
+		type Options = { input: string; option?: string; };
+		const options: Options = (option)
+			? { input: uri, option }
+			: { input: uri };
 
 		return await this.sendCommand(CommandScope.STATUS, "in_play", options);
 	}
@@ -163,7 +162,7 @@ class VlcClient extends EventEmitter {
 	}
 
 	public async playlistDelete (id: number) {
-		return await this.sendCommand(CommandScope.STATUS, "pl_delete", { id });
+		return await this.sendCommand(CommandScope.STATUS, "pl_delete", { id: String(id) });
 	}
 
 	public async playlistEmpty () {
@@ -171,11 +170,11 @@ class VlcClient extends EventEmitter {
 	}
 
 	public async setVolume (volume: number | string) {
-		return await this.sendCommand(CommandScope.STATUS, "volume", { val: volume });
+		return await this.sendCommand(CommandScope.STATUS, "volume", { val: String(volume) });
 	}
 
 	public async seek (time: string | number) {
-		return await this.sendCommand(CommandScope.STATUS, "seek", { val: time });
+		return await this.sendCommand(CommandScope.STATUS, "seek", { val: String(time) });
 	}
 
 	public async stop () {
@@ -216,15 +215,12 @@ class VlcClient extends EventEmitter {
 		return playlist;
 	}
 
-	private async sendCommand (scope: Scope, command?: string | null, options: Record<string, string | number | undefined> = {}) {
-		let query = null;
-		if (command) {
-			query = querystring.stringify({ command, ...options });
-		}
-		else {
-			query = querystring.stringify(options);
-		}
+	private async sendCommand (scope: Scope, command?: string | null, options: Record<string, string> = {}) {
+		const searchParams = (command)
+			? new URLSearchParams({ command, ...options })
+			: new URLSearchParams(options);
 
+		const query = searchParams.toString();
 		return get({
 			host: this.host,
 			port: this.port,
