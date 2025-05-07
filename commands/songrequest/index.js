@@ -441,7 +441,7 @@ export default {
 		await row.save();
 
 		let when = "right now";
-		const status = await sb.VideoLANConnector.status();
+		const status = await sb.VideoLANConnector.getUpdatedStatus();
 		if (queue.length > 0) {
 			const current = queue.find(i => i.Status === "Current");
 			const { time: currentVideoPosition, length } = status;

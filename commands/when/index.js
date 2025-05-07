@@ -61,14 +61,7 @@ export default {
 			loopItem = queue[++index];
 		}
 
-		const status = await sb.VideoLANConnector.status;
-		if (!status) {
-			return {
-				success: false,
-				reply: "VLC is not currently "
-			};
-		}
-
+		const status = sb.VideoLANConnector.getCurrentStatus();
 		const current = queue.find(i => i.Status === "Current");
 		if (status && current) {
 			const endTime = current.End_Time ?? status.time;

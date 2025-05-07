@@ -39,21 +39,7 @@ export default {
 			};
 		}
 
-		let status = null;
-		try {
-			status = await sb.VideoLANConnector.status();
-		}
-		catch (e) {
-			if (e.message === "ETIMEDOUT") {
-				return {
-					reply: "VLC is not available right now!"
-				};
-			}
-			else {
-				throw e;
-			}
-		}
-
+		const status = sb.VideoLANConnector.getCurrentStatus();
 		const total = data.reduce((acc, cur) => acc + cur.Duration, 0);
 		const current = data.find(i => i.Status === "Current");
 

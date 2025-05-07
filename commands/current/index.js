@@ -128,7 +128,7 @@ export default {
 			}
 
 			const userData = await sb.User.get(playing.User);
-			const { length, time } = await sb.VideoLANConnector.status();
+			const { length, time } = await sb.VideoLANConnector.getCurrentStatus();
 
 			let currentPosition = time;
 			let segmentLength = length;

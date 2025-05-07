@@ -332,6 +332,14 @@ export class VlcConnector {
 		return Math.max(...ids);
 	}
 
+	public getCurrentStatus () {
+		return this.client.getStatus();
+	}
+
+	public async getUpdatedStatus () {
+		return await this.client.updateStatus();
+	}
+
 	public async getNormalizedPlaylist () {
 		return await core.Query.getRecordset<Video[]>(rs => rs
 			.select("*")
@@ -367,10 +375,6 @@ export class VlcConnector {
 
 	public stopClient () {
 		this.client.stopRunning();
-	}
-
-	public get status () {
-		return this.client.getStatus();
 	}
 
 	public get currentPlaylist () {
