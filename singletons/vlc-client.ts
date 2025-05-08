@@ -513,39 +513,44 @@ export class VlcConnector {
 	}
 
 	private async onPlaylistChange (previous: VlcTopPlaylist, current: VlcTopPlaylist) {
-		// @todo convert to Set intersection methods when available
-		const previousIDs = previous.children[0].children.map(i => Number(i.id));
+		const previousIDs = new Set(previous.children[0].children.map(i => Number(i.id)));
 		const nextIDs = new Set(current.children[0].children.map(i => Number(i.id)));
 
-		const missingIDs = previousIDs.filter(id => !nextIDs.has(id));
-		if (missingIDs.length > 0) {
-			const noUpdateIDs: number[] = [];
-			for (const item of previous.children[0].children) {
-				if (item.duration !== -1 || !item.uri?.includes("youtu")) {
-					continue;
-				}
+		const missingIDs = previousIDs.difference(nextIDs);
+		if (missingIDs.size === 0) {
+			return;
+		}
 
-				// Pseudo-heuristic to prevent inadvertent playlist request deletion caused by
-				// VLC creating a new request after loading a YouTube video.
-				// E.g. YouTube video is added as ID 30, and when it plays, VLC fetches the actual video data,
-				// creating a new request with ID 31, causing the ID 30 (the real video) to be deleted.
-				await core.Query.getRecordUpdater(ru => ru
-					.update("chat_data", "Song_Request")
-					.set("VLC_ID", Number(item.id) + 1)
-					.where("VLC_ID = %n", Number(item.id))
-					.where("Status IN %s+", ["Queued", "Current"])
-				);
-
-				noUpdateIDs.push(Number(item.id));
+		const noUpdateIDs: Set<number> = new Set();
+		for (const item of previous.children[0].children) {
+			if (item.duration !== -1 || !item.uri?.includes("youtu")) {
+				continue;
 			}
 
-			const filteredMissingIDs = missingIDs.filter(i => !noUpdateIDs.includes(i));
-			await core.Query.getRecordUpdater(rs => rs
+			// Pseudo-heuristic to prevent inadvertent playlist request deletion caused by
+			// VLC creating a new request after loading a YouTube video.
+			// E.g. YouTube video is added as ID 30, and when it plays, VLC fetches the actual video data,
+			// creating a new request with ID 31, causing the ID 30 (the real video) to be deleted.
+			await core.Query.getRecordUpdater(ru => ru
 				.update("chat_data", "Song_Request")
-				.set("Status", "Inactive")
-				.where("VLC_ID IN %n+", filteredMissingIDs)
+				.set("VLC_ID", Number(item.id) + 1)
+				.where("VLC_ID = %n", Number(item.id))
 				.where("Status IN %s+", ["Queued", "Current"])
 			);
+
+			noUpdateIDs.add(Number(item.id));
 		}
+
+		const filteredMissingIDs = missingIDs.difference(noUpdateIDs);
+		if (filteredMissingIDs.size === 0) {
+			return;
+		}
+
+		await core.Query.getRecordUpdater(rs => rs
+			.update("chat_data", "Song_Request")
+			.set("Status", "Inactive")
+			.where("VLC_ID IN %n+", [...filteredMissingIDs]) // @todo change to raw Set when Recordset allows it
+			.where("Status IN %s+", ["Queued", "Current"])
+		);
 	}
 };
