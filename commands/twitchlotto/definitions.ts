@@ -3,7 +3,7 @@ import type { Context } from "../../classes/command.js";
 export { default as detections } from "./detections.json" with { type: "json" };
 
 export const scoreThreshold = 0.5;
-export const maxRetries = 0.5;
+export const maxRetries = 10;
 export const taggingGuide = [
 	"The main idea of tagging TwitchLotto pictures is to only tag them when they contain NSFW content.",
 	"E.g. the \"Anime\" tag should not be used unless the image contains NSFW content related to Anime",
