@@ -2,7 +2,6 @@ import getLinkParser from "../../utils/link-parser.js";
 import type { default as LinkParser } from "track-link-parser";
 
 import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
-import CytubeIntegration from "./cytube-integration.js";
 
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 import { type User } from "../../classes/user.js";
@@ -108,9 +107,6 @@ export default {
 			return {
 				reply: `Song requests are currently read-only. You can check what's playing with the "current" command, but not queue anything.`
 			};
-		}
-		else if (state === "cytube") {
-			return await CytubeIntegration.queue(args.join(" "));
 		}
 		else if (state === "vlc") {
 			// Simply make sure the VLC client is running if a song is being requested into it

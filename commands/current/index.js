@@ -41,41 +41,6 @@ export default {
 				reply: `Currently playing: ${leaf.name}`
 			};
 		}
-		else if (state === "cytube") {
-			const platform = sb.Platform.get("cytube");
-			const channelData = sb.Channel.get(49);
-
-			const client = platform.clients.get(channelData.ID);
-			const playing = client.currentlyPlaying ?? client.playlistData[0];
-
-			if (!playing) {
-				return {
-					reply: "Nothing is currently playing on Cytube."
-				};
-			}
-
-			const media = playing.media;
-			const prefix = await core.Query.getRecordset(rs => rs
-				.select("Link_Prefix")
-				.from("data", "Video_Type")
-				.where("Type = %s", media.type)
-				.limit(1)
-				.single()
-				.flat("Link_Prefix")
-			);
-
-			const link = prefix.replace(linkSymbol, media.id);
-			if (context.params.linkOnly) {
-				return {
-					reply: link
-				};
-			}
-
-			const requester = playing.user ?? playing.queueby ?? "(unknown)";
-			return {
-				reply: `Currently playing on Cytube: ${media.title} ${link} (${media.duration}), queued by ${requester}`
-			};
-		}
 
 		let type = (context.invocation === "current")
 			? "current"

@@ -7,7 +7,7 @@ const {
 	SONG_REQUESTS_STATE
 } = cacheKeys;
 
-const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
+const AVAILABLE_SONG_REQUEST_STATES = new Set(["vlc", "vlc-read", "off"]);
 
 export default {
 	Name: "stream",
