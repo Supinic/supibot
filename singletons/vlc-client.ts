@@ -57,18 +57,18 @@ type ConstructorOptions = {
 	password?: string;
 	running?: boolean;
 };
-type Video = {
+export type DatabaseVideo = {
 	Added: SupiDate;
-	Duration: number;
+	Duration: number | null;
 	End_Time: number | null;
 	ID: number;
-	Length: number;
+	Length: number | null;
 	Link: string;
 	Name: string;
 	Notes: string | null;
 	Start_Time: number | null;
 	Started: SupiDate;
-	Status: "Current" | "Inactive" | "Pending";
+	Status: "Current" | "Inactive" | "Queued";
 	User_Alias: number;
 	VLC_ID: number;
 	Video_Type: number;
@@ -309,7 +309,7 @@ export class VlcConnector {
 	/**
 	 * Adds a video to the playlist queue.
 	 */
-	public async add (link: string, options: { startTime?: number; endTime?: number; } = {}) {
+	public async add (link: string, options: { startTime?: number | null; endTime?: number | null; } = {}) {
 		const status = await this.client.updateStatus();
 		if (status.currentplid === -1) {
 			await this.client.addToQueueAndPlay(link);
@@ -341,7 +341,7 @@ export class VlcConnector {
 	}
 
 	public async getNormalizedPlaylist () {
-		return await core.Query.getRecordset<Video[]>(rs => rs
+		return await core.Query.getRecordset<DatabaseVideo[]>(rs => rs
 			.select("*")
 			.select(`
 				(CASE 
@@ -481,7 +481,7 @@ export class VlcConnector {
 			await this.client.playlistDelete(ID);
 		}
 		if (nextTrack) {
-			const ID = await core.Query.getRecordset<Video["ID"] | undefined>(rs => rs
+			const ID = await core.Query.getRecordset<DatabaseVideo["ID"] | undefined>(rs => rs
 				.select("ID")
 				.from("chat_data", "Song_Request")
 				.where("VLC_ID = %n", Number(nextTrack.id))
@@ -496,7 +496,7 @@ export class VlcConnector {
 				return;
 			}
 
-			const row = await core.Query.getRow<Video>("chat_data", "Song_Request");
+			const row = await core.Query.getRow<DatabaseVideo>("chat_data", "Song_Request");
 			await row.load(ID);
 
 			row.setValues({

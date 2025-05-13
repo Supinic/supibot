@@ -9,7 +9,7 @@ type Category = {
 	meta: Meta;
 	[P: string]: { [key: string]: string } | Meta;
 };
-type Audiofilters = {
+type AudioFilters = {
 	[filter: string]: string;
 };
 type Meta = {
@@ -40,7 +40,7 @@ type StatusBase = {
 	volume: number;
 	length: number;
 	random: boolean;
-	audiofilters: Audiofilters;
+	audiofilters: AudioFilters;
 	rate: number;
 	videoeffects: VideoEffects;
 	state: State;

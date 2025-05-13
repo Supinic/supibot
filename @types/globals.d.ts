@@ -91,3 +91,37 @@ type BannedIvrUserData = BaseIvrUserData & {
     banReason: "TOS_INDEFINITE" | "TOS_TEMPORARY" | "DMCA" | "DEACTIVATED";
 };
 export type IvrUserData = NormaIvrUserData | BannedIvrUserData;
+
+export type IvrClipData = {
+    clipKey: string | null;
+    clip: {
+      durationSeconds: number;
+      id: string;
+      title: string;
+      slug: string;
+      url: string;
+      tiny: string;
+      small: string;
+      medim: string;
+      createdAt: string;
+      viewCount: number;
+      game: {
+          id: string;
+          name: string;
+      };
+      broadcaster: {
+          id: string;
+          displayName: string;
+      };
+      curator: {
+          id: string;
+          displayName: string;
+      };
+      videoQualities: {
+          frameRate: number;
+          quality: string;
+          sourceURL: string;
+      }[];
+    };
+}
+
