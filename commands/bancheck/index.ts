@@ -54,7 +54,7 @@ export default {
 		}
 
 		if (targetChannel.Banphrase_API_URL && targetChannel.Banphrase_API_Type === "Pajbot") {
-			let data = null;
+			let data;
 			try {
 				data = await sb.Banphrase.executeExternalAPI(
 					message,
