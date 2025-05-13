@@ -1,25 +1,27 @@
+import { CommandDefinition } from "../../classes/command.js";
+
 export default {
 	Name: "beefact",
 	Aliases: null,
-	Author: "supinic",
-	Cooldown: 10000,
+	Cooldown: 10_000,
 	Description: "Posts a random fact about bees.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function beeFact () {
-		const fact = await core.Query.getRecordset(rs => rs
+		const fact = await core.Query.getRecordset<string>(rs => rs
 			.select("Text")
 			.from("data", "Fun_Fact")
 			.where("Tag = %s", "Bees")
 			.orderBy("RAND()")
 			.limit(1)
+			.flat("Text")
 			.single()
 		);
 
 		return {
-			reply: `🐝 ${fact.Text}`
+			reply: `🐝 ${fact}`
 		};
 	}),
 	Dynamic_Description: null
-};
+} satisfies CommandDefinition;
