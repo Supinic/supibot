@@ -27,7 +27,7 @@ export default {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
-	Flags: ["developer","mention","pipe","whitelist"],
+	Flags: ["developer", "mention", "pipe", "whitelist"],
 	Params: params,
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
 	Code: (async function current (context: Context<typeof params>, ...args) {
