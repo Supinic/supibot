@@ -1,8 +1,25 @@
 import { VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+import { CommandDefinition, Context } from "../../classes/command.js";
 
 const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
-const ALLOWED_SONG_CHECKS = new Set(["current", "previous", "next"]);
+
+type SongCheckType = "current" | "previous" | "next";
+const ALLOWED_SONG_CHECKS: Set<unknown> = new Set(["current", "previous", "next"]);
+const isAllowedSongCheck = (input: unknown): input is SongCheckType => ALLOWED_SONG_CHECKS.has(input);
+
+const introductionStrings = {
+	current: "Previously played",
+	previous: "Currently playing",
+	next: "Playing next"
+} as const;
+const includePositionsType = {
+	current: true,
+	previous: false,
+	next: false
+} as const;
+
+const params = [{ name: "linkOnly", type: "boolean" }] as const;
 
 export default {
 	Name: "current",
@@ -10,17 +27,21 @@ export default {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
-	Flags: ["developer","mention","pipe","whitelist"],
-	Params: [
-		{ name: "linkOnly", type: "boolean" }
-	],
+	Flags: ["developer", "mention", "pipe", "whitelist"],
+	Params: params,
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
-	Code: (async function current (context, ...args) {
-		const linkSymbol = VIDEO_TYPE_REPLACE_PREFIX;
-		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
+	Code: (async function current (context: Context<typeof params>, ...args) {
+		if (!sb.VideoLANConnector) {
+			return {
+				success: false,
+				reply: "VLC connector is not available! Check configuration if this is required."
+			};
+		}
 
+		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE) as string | undefined;
 		if (!state || state === "off") {
 			return {
+				success: false,
 				reply: "Song requests are currently turned off."
 			};
 		}
@@ -28,12 +49,13 @@ export default {
 			const item = sb.VideoLANConnector.currentPlaylistItem;
 			if (!item) {
 				return {
+					success: false,
 					reply: "Nothing is currently playing."
 				};
 			}
 
 			let leaf = item;
-			while (leaf.type !== "leaf" && leaf.children.length > 0) {
+			while (leaf.type !== "leaf" && leaf.children && leaf.children.length > 0) {
 				leaf = leaf.children[0];
 			}
 
@@ -41,54 +63,28 @@ export default {
 				reply: `Currently playing: ${leaf.name}`
 			};
 		}
-		else if (state === "cytube") {
-			const platform = sb.Platform.get("cytube");
-			const channelData = sb.Channel.get(49);
 
-			const client = platform.clients.get(channelData.ID);
-			const playing = client.currentlyPlaying ?? client.playlistData[0];
-
-			if (!playing) {
-				return {
-					reply: "Nothing is currently playing on Cytube."
-				};
-			}
-
-			const media = playing.media;
-			const prefix = await core.Query.getRecordset(rs => rs
-				.select("Link_Prefix")
-				.from("data", "Video_Type")
-				.where("Type = %s", media.type)
-				.limit(1)
-				.single()
-				.flat("Link_Prefix")
-			);
-
-			const link = prefix.replace(linkSymbol, media.id);
-			if (context.params.linkOnly) {
-				return {
-					reply: link
-				};
-			}
-
-			const requester = playing.user ?? playing.queueby ?? "(unknown)";
-			return {
-				reply: `Currently playing on Cytube: ${media.title} ${link} (${media.duration}), queued by ${requester}`
-			};
-		}
-
-		let type = (context.invocation === "current")
-			? "current"
-			: (args.shift() ?? "current");
-
-		if (!ALLOWED_SONG_CHECKS.has(type)) {
+		let type: SongCheckType;
+		if (context.invocation === "current") {
 			type = "current";
 		}
+		else {
+			const firstArg = args.at(0);
+			type = (isAllowedSongCheck(firstArg)) ? firstArg : "current";
+		}
 
-		let includePosition = false;
-		let introductionString = null;
+		type PlayingResult = {
+			Name: string;
+			VLC_ID: number;
+			Link: string;
+			User: number;
+			Prefix: string;
+			VTID: number;
+			Start_Time: number | null;
+			End_Time: number | null;
+		};
 
-		const playing = await core.Query.getRecordset(rs => {
+		const playing = await core.Query.getRecordset<PlayingResult | undefined>(rs => {
 			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time")
 				.select("Video_Type.ID AS VTID", "Video_Type.Link_Prefix AS Prefix")
 				.from("chat_data", "Song_Request")
@@ -101,17 +97,13 @@ export default {
 				.single();
 
 			if (type === "previous") {
-				introductionString = "Previously played:";
 				rs.where("Status = %s", "Inactive");
 				rs.orderBy("Song_Request.ID DESC");
 			}
 			else if (type === "current") {
-				includePosition = true;
-				introductionString = "Currently playing:";
 				rs.where("Status = %s", "Current");
 			}
-			else if (type === "next") {
-				introductionString = "Playing next:";
+			else {
 				rs.where("Status = %s", "Queued");
 				rs.orderBy("Song_Request.ID ASC");
 			}
@@ -120,15 +112,16 @@ export default {
 		});
 
 		if (playing) {
-			const link = playing.Prefix.replace(linkSymbol, playing.Link);
+			const link = playing.Prefix.replace(VIDEO_TYPE_REPLACE_PREFIX, playing.Link);
 			if (context.params.linkOnly) {
 				return {
+					success: true,
 					reply: link
 				};
 			}
 
 			const userData = await sb.User.get(playing.User);
-			const { length, time } = await sb.VideoLANConnector.status();
+			const { length, time } = await sb.VideoLANConnector.getUpdatedStatus();
 
 			let currentPosition = time;
 			let segmentLength = length;
@@ -138,6 +131,7 @@ export default {
 			}
 
 			let position = "";
+			const includePosition = includePositionsType[type];
 			if (includePosition) {
 				if (currentPosition === -1) {
 					position = "The song is currently being queued, but hasn't started playing yet.";
@@ -152,12 +146,14 @@ export default {
 				? "The song request is paused at the moment."
 				: "";
 
+			const requesterUsername = userData?.Name ?? "(N/A)";
+			const introductionString = introductionStrings[type];
 			if (playing.VTID === 15) {
 				return {
 					reply: core.Utils.tag.trim `
 						${introductionString}
 						${playing.Name}
-						(ID ${playing.VLC_ID}) - requested by ${userData.Name}.
+						(ID ${playing.VLC_ID}) - requested by ${requesterUsername}.
 						${position}
 						${pauseString}
 					`
@@ -166,9 +162,9 @@ export default {
 
 			return {
 				reply: core.Utils.tag.trim `
-					${introductionString}
+					${introductionString}:
 					${playing.Name}
-					(ID ${playing.VLC_ID}) - requested by ${userData.Name}.
+					(ID ${playing.VLC_ID}) - requested by ${requesterUsername}.
 					${position}
 					${link}
 					${pauseString}
@@ -183,7 +179,7 @@ export default {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		`Checks the currently playing song on Supinic's channel/stream`,
 		``,
 
@@ -202,5 +198,5 @@ export default {
 		`<code>${prefix}song next</code>`,
 		`Playing next: (link)`,
 		``
-	])
-};
+	]
+} satisfies CommandDefinition;

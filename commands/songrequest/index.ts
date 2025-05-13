@@ -1,55 +1,26 @@
 import getLinkParser from "../../utils/link-parser.js";
+import type { default as LinkParser } from "track-link-parser";
+
 import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
-import CytubeIntegration from "./cytube-integration.js";
 
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+import { type User } from "../../classes/user.js";
+import { type DatabaseVideo } from "../../singletons/vlc-client.js";
+import { Context, type CommandDefinition } from "../../classes/command.js";
+import { SupiDate, SupiError } from "supi-core";
+import type { IvrClipData } from "../../@types/globals.js";
 const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
 const REQUEST_TIME_LIMIT = 900;
 const REQUEST_AMOUNT_LIMIT = 10;
 
-const fetchVimeoData = async (query) => {
-	if (!process.env.API_VIMEO_KEY) {
-		throw new sb.Error({
-			message: "No Vimeo key configured (API_VIMEO_KEY)"
-		});
-	}
-
-	const response = await core.Got.get("GenericAPI")({
-		url: "https://api.vimeo.com/videos",
-		throwHttpErrors: false,
-		headers: {
-			Authorization: `Bearer ${process.env.API_VIMEO_KEY}`
-		},
-		searchParams: {
-			query,
-			per_page: "1",
-			sort: "relevant",
-			direction: "desc"
-		}
-	});
-
-	if (!response.ok) {
-		return {
-			success: false,
-			reply: `Vimeo API failed with code ${response.statusCode}! Try again later.`
-		};
-	}
-	else {
-		return {
-			success: true,
-			data: response.body.data ?? []
-		};
-	}
-};
-
-const checkLimits = (userData, playlist) => {
+const checkLimits = (userData: User, playlist: DatabaseVideo[]) => {
 	const userRequests = playlist.filter(i => i.User_Alias === userData.ID);
 	if (userRequests.length >= REQUEST_AMOUNT_LIMIT) {
 		return {
 			canRequest: false,
 			reason: `Maximum amount of videos queued! (${userRequests.length}/${REQUEST_AMOUNT_LIMIT})`
-		};
+		} as const;
 	}
 
 	let totalTime = 0;
@@ -66,11 +37,11 @@ const checkLimits = (userData, playlist) => {
 		reason: null,
 		time: REQUEST_TIME_LIMIT,
 		amount: REQUEST_AMOUNT_LIMIT
-	};
+	} as const;
 };
 
 const ARBITRARY_MAX_YOUTUBE_TIMESTAMP = 2e12;
-const parseTimestamp = (linkParser, string) => {
+const parseTimestamp = (linkParser: LinkParser, string: string) => {
 	const type = linkParser.autoRecognize(string);
 	if (type !== "youtube") {
 		return;
@@ -90,27 +61,43 @@ const parseTimestamp = (linkParser, string) => {
 	return value;
 };
 
+const params = [
+	{ name: "start", type: "string" },
+	{ name: "end", type: "string" },
+	{ name: "type", type: "string" }
+] as const;
+
 export default {
 	Name: "songrequest",
 	Aliases: ["sr"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
 	Flags: ["mention","pipe","whitelist"],
-	Params: [
-		{ name: "start", type: "string" },
-		{ name: "end", type: "string" },
-		{ name: "type", type: "string" }
-	],
+	Params: params,
 	Whitelist_Response: "Only available in supinic's channel.",
-	Code: (async function songRequest (context, ...args) {
+	Code: (async function songRequest (context: Context<typeof params>, ...args) {
+		if (!sb.VideoLANConnector) {
+			return {
+				success: false,
+				reply: "VLC connector is not available! Check configuration if this is required."
+			};
+		}
+
 		if (args.length === 0) {
+			// @todo merge $current into $songrequest as an alias and have it work here
+			const currentCommand = sb.Command.get("current");
+			if (!currentCommand) {
+				throw new SupiError({
+				    message: "No link to $current available"
+				});
+			}
+
 			// If we got no args, just redirect to $current 4HEad
-			return await sb.Command.get("current").execute(context);
+			return currentCommand.execute(context);
 		}
 
 		// Figure out whether song request are available, and where specifically
-		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
+		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE) as string | null;
 		if (!state || state === "off") {
 			return {
 				reply: "Song requests are currently turned off."
@@ -121,12 +108,9 @@ export default {
 				reply: `Song requests are currently read-only. You can check what's playing with the "current" command, but not queue anything.`
 			};
 		}
-		else if (state === "cytube") {
-			return await CytubeIntegration.queue(args.join(" "));
-		}
 		else if (state === "vlc") {
 			// Simply make sure the VLC client is running if a song is being requested into it
-			sb.VideoLANConnector.client.startRunning();
+			sb.VideoLANConnector.startClient();
 		}
 
 		// Determine the user's and global limits - both duration and video amount
@@ -139,7 +123,6 @@ export default {
 		}
 
 		// Determine requested video segment, if provided via the `start` and `end` parameters
-		/** @type {number|null} */
 		let startTime = (context.params.start) ? core.Utils.parseVideoDuration(context.params.start) : null;
 		if (startTime !== null && (!Number.isFinite(startTime) || startTime > 2 ** 32)) {
 			return {
@@ -148,7 +131,6 @@ export default {
 			};
 		}
 
-		/** @type {number|null} */
 		let endTime = (context.params.end) ? core.Utils.parseVideoDuration(context.params.end) : null;
 		if (endTime !== null && (!Number.isFinite(endTime) || endTime > 2 ** 32)) {
 			return {
@@ -158,7 +140,7 @@ export default {
 		}
 
 		// Determine the video URL, based on the type of link provided
-		let url = args.join(" ");
+		let url: string | null = args.join(" ");
 		const linkParser = await getLinkParser();
 		const type = context.params.type ?? "youtube";
 		const potentialTimestamp = parseTimestamp(linkParser, url);
@@ -167,24 +149,35 @@ export default {
 			startTime = potentialTimestamp;
 		}
 
-		let parsedURL;
+		let parsedURL: URL | null;
 		try {
 			parsedURL = new URL(url);
 		}
 		catch {
-			parsedURL = {};
+			parsedURL = null;
 		}
 
 		let data = null;
-
-		if (parsedURL.host === "supinic.com" && parsedURL.pathname.includes("/track/detail")) {
-			const songID = Number(parsedURL.pathname.match(/(\d+)/)[1]);
-			if (!songID) {
-				return { reply: "Invalid link!" };
+		if (parsedURL && parsedURL.host === "supinic.com" && parsedURL.pathname.includes("/track/detail")) {
+			const matchSongId = parsedURL.pathname.match(/(\d+)/);
+			if (!matchSongId) {
+				return {
+				    success: false,
+				    reply: "Invalid supinic.com track link provided!"
+				};
 			}
 
-			let songData = await core.Query.getRecordset(rs => rs
-				.select("Available", "Link", "Name", "Duration")
+			const songID = Number(matchSongId[1]);
+			if (!songID) {
+				return {
+					success: false,
+					reply: "Invalid link!"
+				};
+			}
+
+			type SongData = { ID: number; Available: boolean; Link: string; Name: string; Duration: number; Prefix: string; };
+			let songData = await core.Query.getRecordset<SongData | undefined>(rs => rs
+				.select("Track.ID", "Available", "Link", "Name", "Duration")
 				.select("Video_Type.Link_Prefix AS Prefix")
 				.from("music", "Track")
 				.join("data", "Video_Type")
@@ -194,8 +187,8 @@ export default {
 			);
 
 			if (!songData) {
-				let targetID = null;
-				const main = await core.Query.getRecordset(rs => rs
+				let targetID: number | null = null;
+				const main = await core.Query.getRecordset<SongData | undefined>(rs => rs
 					.select("Track.ID", "Available", "Link", "Name", "Duration")
 					.select("Video_Type.Link_Prefix AS Prefix")
 					.from("music", "Track")
@@ -211,7 +204,7 @@ export default {
 
 				targetID = main?.ID ?? songID;
 
-				songData = await core.Query.getRecordset(rs => rs
+				songData = await core.Query.getRecordset<SongData | undefined>(rs => rs
 					.select("Track.ID", "Available", "Link", "Name", "Duration")
 					.select("Video_Type.Link_Prefix AS Prefix")
 					.from("music", "Track")
@@ -237,7 +230,8 @@ export default {
 			}
 		}
 
-		if (linkParser.autoRecognize(url)) {
+		let videoType: number | null = null;
+		if (url && linkParser.autoRecognize(url)) {
 			data = await linkParser.fetchData(url);
 
 			if (!data) {
@@ -253,11 +247,21 @@ export default {
 				};
 			}
 		}
-		else if (parsedURL.host) {
+		else if (url && parsedURL && parsedURL.host) {
 			if (parsedURL.host === "clips.twitch.tv") {
 				// `find(Boolean)` is meant to take the first non-empty string in the resulting split-array
-				const slug = parsedURL.path.split("/").find(Boolean);
-				const response = await core.Got.get("IVR")(`v2/twitch/clip/${slug}`);
+				const slug = parsedURL.pathname.split("/").find(Boolean);
+				if (!slug) {
+					return {
+					    success: false,
+					    reply: "Invalid Twitch clip link provided!"
+					};
+				}
+
+				const response = await core.Got.get("IVR")<IvrClipData>({
+					url: `v2/twitch/clip/${slug}`
+				});
+
 				if (!response.ok) {
 					return {
 						success: false,
@@ -268,23 +272,32 @@ export default {
 				const { clip, clipKey = "" } = response.body;
 				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
 
+				videoType = 19;
 				data = {
 					name: clip.title,
 					ID: `https://clips.twitch.tv/${clip.slug}`,
 					link: `${bestQuality.sourceURL}${clipKey}`,
-					duration: clip.durationSeconds,
-					videoType: { ID: 19 }
+					duration: clip.durationSeconds
 				};
 			}
 			else {
-				const name = decodeURIComponent(parsedURL.pathname.split("/").pop());
+				const lastPathSegment = parsedURL.pathname.split("/").at(-1);
+				if (!lastPathSegment) {
+					return {
+					    success: false,
+					    reply: "Could not parse provided URL!"
+					};
+				}
+
+				const name = decodeURIComponent(lastPathSegment);
 				const encoded = encodeURI(decodeURI(url));
+
+				videoType = 19;
 				data = {
 					name,
 					ID: encoded,
 					link: encoded,
-					duration: null,
-					videoType: { ID: 19 }
+					duration: null
 				};
 			}
 		}
@@ -292,17 +305,7 @@ export default {
 		// If no data have been extracted from a link, attempt a search query on Youtube/Vimeo
 		if (!data) {
 			let lookup = null;
-			if (type === "vimeo") {
-				const result = await fetchVimeoData(args.join(" "));
-				if (!result.success) {
-					return result;
-				}
-				else if (result.data.length > 0) {
-					const link = result.data[0].uri.split("/").pop();
-					lookup = { link };
-				}
-			}
-			else if (type === "youtube") {
+			if (type === "youtube") {
 				const data = await searchYoutube(args.join(" "), {
 					filterShortsHeuristic: true
 				});
@@ -324,13 +327,27 @@ export default {
 				};
 			}
 			else {
-				data = await linkParser.fetchData(lookup.link, type);
+				const youtubeData = await linkParser.fetchData(lookup.link, type);
+				if (!youtubeData) {
+					throw new SupiError({
+					    message: "Assert error: Searched Youtube video ID is not fetchable"
+					});
+				}
+
+				data = youtubeData;
 			}
 		}
 
 		// Put together the total length of the video, for logging purposes
-		const length = data.duration ?? data.length;
-		if (startTime < 0) {
+		const length = data.duration;
+		if (length === null && (startTime !== null || endTime !== null)) {
+			return {
+				success: false,
+				reply: "Can't specify a start or end time for a video that doesn't have a set duration!"
+			};
+		}
+
+		if (length !== null && startTime !== null && startTime < 0) {
 			startTime = length + startTime;
 			if (startTime < 0) {
 				return {
@@ -339,7 +356,7 @@ export default {
 				};
 			}
 		}
-		if (endTime < 0) {
+		if (length !== null && endTime !== null && endTime < 0) {
 			endTime = length + endTime;
 			if (endTime < 0) {
 				return {
@@ -371,7 +388,7 @@ export default {
 		}
 
 		const authorString = (data.author) ? ` by ${data.author}` : "";
-		const segmentLength = (endTime ?? length) - (startTime ?? 0);
+		const segmentLength = (endTime ?? length ?? 0) - (startTime ?? 0);
 
 		let bonusString = "";
 		const bonusLimit = await context.user.getDataProperty("supinicStreamSongRequestExtension") ?? 0;
@@ -416,13 +433,26 @@ export default {
 			};
 		}
 
-		const videoType = data.videoType ?? await core.Query.getRecordset(rs => rs
-			.select("ID")
-			.from("data", "Video_Type")
-			.where("Parser_Name = %s", data.type)
-			.limit(1)
-			.single()
-		);
+		const videoTypeName = data.type;
+		if (!videoType && videoTypeName) {
+			const dbVideoType = await core.Query.getRecordset<number | undefined>(rs => rs
+				.select("ID")
+				.from("data", "Video_Type")
+				.where("Parser_Name = %s", videoTypeName)
+				.limit(1)
+				.flat("ID")
+				.single()
+			);
+
+			if (!dbVideoType) {
+				throw new SupiError({
+				    message: "Assert error: Unknown video type coming from track-link-parser",
+					args: { videoTypeName }
+				});
+			}
+
+			videoType = dbVideoType;
+		}
 
 		// Log the request into database
 		const row = await core.Query.getRow("chat_data", "Song_Request");
@@ -430,10 +460,10 @@ export default {
 			VLC_ID: id,
 			Link: data.ID,
 			Name: core.Utils.wrapString(data.name, 100),
-			Video_Type: videoType.ID,
+			Video_Type: videoType,
 			Length: (data.duration) ? Math.ceil(data.duration) : null,
 			Status: (queue.length === 0) ? "Current" : "Queued",
-			Started: (queue.length === 0) ? new sb.Date() : null,
+			Started: (queue.length === 0) ? new SupiDate() : null,
 			User_Alias: context.user.ID,
 			Start_Time: startTime ?? null,
 			End_Time: endTime ?? null
@@ -441,20 +471,20 @@ export default {
 		await row.save();
 
 		let when = "right now";
-		const status = await sb.VideoLANConnector.status();
+		const status = await sb.VideoLANConnector.getUpdatedStatus();
 		if (queue.length > 0) {
 			const current = queue.find(i => i.Status === "Current");
 			const { time: currentVideoPosition, length } = status;
 			const endTime = current?.End_Time ?? length;
 
-			const playingDate = new sb.Date().addSeconds(endTime - currentVideoPosition);
+			const playingDate = new SupiDate().addSeconds(endTime - currentVideoPosition);
 			const inQueue = queue.filter(i => i.Status === "Queued");
 
-			for (const { Duration: length } of inQueue) {
-				playingDate.addSeconds(length ?? 0);
+			for (const item of inQueue) {
+				playingDate.addSeconds(item.Duration ?? 0);
 			}
 
-			if (playingDate <= sb.Date.now()) {
+			if (playingDate.valueOf() <= SupiDate.now()) {
 				when = "right now";
 			}
 			else {
@@ -490,7 +520,7 @@ export default {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Request a song (video) to play on Supinic's stream.",
 		"Supports YouTube, Vimeo, Soundcloud links. Furthermore, all custom media (raw links) are supported as well.",
 		"",
@@ -518,5 +548,5 @@ export default {
 		"If either <code>start</code> or <code>end</code> are negative numbers, they signify the length from the end of the video.",
 		"E.g.: if the video is 5 minutes long, <code>start:-10</code> will start the video 10 seconds from the end, at 04:50.",
 		"Any combination of negative and positive numbers between the parameters is accepted. It just has to make sense - so that the end is not earlier than the start."
-	])
-};
+	]
+} satisfies CommandDefinition;

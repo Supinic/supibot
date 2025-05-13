@@ -17,7 +17,7 @@ import Banphrase from "./classes/banphrase.js";
 import Channel from "./classes/channel.js";
 import Reminder from "./classes/reminder.js";
 import { ChatModule, ChatModuleDefinition } from "./classes/chat-module.js";
-import VLCSingleton from "./singletons/vlc-connector.js";
+import { VlcConnector } from "./singletons/vlc-client.js";
 
 import Logger from "./singletons/logger.js";
 import { Platform } from "./platforms/template.js";
@@ -56,7 +56,7 @@ interface GlobalSb {
 	Platform: typeof Platform;
 	Reminder: typeof Reminder;
 	User: typeof User;
-	VideoLANConnector: typeof VLCSingleton;
+	VideoLANConnector: VlcConnector | null;
 }
 interface GlobalCore {
 	Got: typeof supiCore.Got;
@@ -72,6 +72,14 @@ declare global {
 	// eslint-disable-next-line no-var
 	var core: GlobalCore;
 }
+
+type VlcConfig = {
+	vlcBaseUrl: string | null;
+	vlcPassword: string | null;
+	vlcPort: number | null;
+	vlcUrl: string | null;
+	vlcUsername: string | null;
+};
 
 function filterModuleDefinitions <T extends "name" | "Name", U extends { [K in T]: string; }> (
 	property: T,
@@ -196,6 +204,23 @@ for (let i = 0; i < MODULE_INITIALIZE_ORDER.length; i++) {
 	await Promise.all(promises);
 }
 
+// Initialize the VLC module if configured
+let VideoLANConnector;
+const { vlcUrl, vlcUsername, vlcPassword, vlcPort } = config.local as Partial<VlcConfig>;
+if (vlcUrl) {
+	VideoLANConnector = new VlcConnector({
+		host: vlcUrl,
+		port: vlcPort ?? 8080,
+		username: vlcUsername ?? "",
+		password: vlcPassword ?? "",
+		running: true
+	});
+}
+else {
+	console.debug("Missing VLC configuration (vlcUrl and/or vlcBaseUrl), module creation skipped");
+	VideoLANConnector = null;
+}
+
 globalThis.sb = {
 	...sb,
 
@@ -211,9 +236,7 @@ globalThis.sb = {
 	ChatModule,
 
 	Logger: new Logger(),
-	// @todo after VLCSingleton is TS, properly use initialize() code here
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	VideoLANConnector: VLCSingleton.initialize(), // @todo move code from `initialize` here
+	VideoLANConnector,
 
 	API: initializeInternalApi()
 };

@@ -33,7 +33,7 @@ export default {
 
 		// Don't auto-request in an unsupported song-request state
 		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
-		if (state !== "vlc" && state !== "cytube") {
+		if (state !== "vlc") {
 			return;
 		}
 
@@ -50,10 +50,6 @@ export default {
 				.limit(repeatAmount)
 				.flat("Link")
 			);
-		}
-		else if (state === "cytube") {
-			repeatsArray = repeats;
-			isQueueEmpty = (cytube.clients.get(cytubeChannelData.ID).playlistData.length === 0);
 		}
 
 		// Don't auto-request if the queue is not empty

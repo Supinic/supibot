@@ -7,7 +7,7 @@ const {
 	SONG_REQUESTS_STATE
 } = cacheKeys;
 
-const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
+const AVAILABLE_SONG_REQUEST_STATES = new Set(["vlc", "vlc-read", "off"]);
 
 export default {
 	Name: "stream",
@@ -79,10 +79,10 @@ export default {
 				}
 
 				if (value === "vlc") {
-					sb.VideoLANConnector.client.startRunning();
+					sb.VideoLANConnector.startClient();
 				}
 				else {
-					sb.VideoLANConnector.client.stopRunning();
+					sb.VideoLANConnector.stopClient();
 				}
 
 				await core.Cache.setByPrefix(SONG_REQUESTS_STATE, value);
