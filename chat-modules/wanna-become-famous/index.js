@@ -17,7 +17,7 @@ export default {
 		}
 
 		let reason = "";
-		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
+		const msg = core.Utils.removeAccents(context.message).toLowerCase();
 		if (msg.includes("become famous?")) {
 			reason = "becoming famous";
 		}
@@ -42,7 +42,8 @@ export default {
 
 		/** @type {TwitchPlatform} */
 		const platform = channelData.Platform;
-		const emote = await channelData.getBestAvailableEmote(
+		const emote = await platform.getBestAvailableEmote(
+			channelData,
 			["NOIDONTTHINKSO", "forsenSmug", "supiniNOIDONTTHINKSO", "RarePepe"],
 			"😅",
 			{ shuffle: true }
@@ -58,7 +59,7 @@ export default {
 			return;
 		}
 
-		const messageCount = await sb.Query.getRecordset(rs => rs
+		const messageCount = await core.Query.getRecordset(rs => rs
 			.select("Message_Count")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("Channel = %n", context.channel.ID)

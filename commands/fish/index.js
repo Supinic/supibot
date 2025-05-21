@@ -54,7 +54,7 @@ export default {
 			"",
 
 			"This command only exists as a collaborative effort of the following amazing people:",
-			sb.Utils.tag.trim `
+			core.Utils.tag.trim `
 				<ul>
 					<li><code>techno_______ (2547techno)</code></li> 
 						Original alias creator. Basically re-created a StreamElements command within Supibot.

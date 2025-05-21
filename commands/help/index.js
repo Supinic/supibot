@@ -69,7 +69,7 @@ export default {
 			}
 
 			const aliases = (command.Aliases.length === 0) ? "" : (` (${command.Aliases.map(i => prefix + i).join(", ")})`);
-			const cooldownString = `${sb.Utils.round(command.Cooldown / 1000, 1)} seconds cooldown.`;
+			const cooldownString = `${core.Utils.round(command.Cooldown / 1000, 1)} seconds cooldown.`;
 			const cooldownModifier = sb.Filter.getCooldownModifiers({
 				command,
 				invocation: identifier,
@@ -81,13 +81,13 @@ export default {
 			let modifierString = "";
 			if (cooldownModifier) {
 				const type = (cooldownModifier.Data.multiplier) ? "multiplier" : "override";
-				const modified = sb.Utils.round(cooldownModifier.applyData(command.Cooldown) / 1000, 1);
+				const modified = core.Utils.round(cooldownModifier.applyData(command.Cooldown) / 1000, 1);
 
 				modifierString = `(cooldown ${type}: ${modified}s)`;
 			}
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${prefix}${command.Name}${aliases}:
 					${command.Description ?? "(no description)"}
 					${filteredResponse}

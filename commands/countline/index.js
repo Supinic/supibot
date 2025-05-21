@@ -29,7 +29,7 @@ export default {
 
 		let lines;
 		if ([7, 8, 46].includes(context.channel.ID)) {
-			lines = await sb.Query.getRecordset(rs => rs
+			lines = await core.Query.getRecordset(rs => rs
 				.select("SUM(Message_Count) AS Total")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", user.ID)
@@ -39,7 +39,7 @@ export default {
 			);
 		}
 		else {
-			lines = await sb.Query.getRecordset(rs => rs
+			lines = await core.Query.getRecordset(rs => rs
 				.select("Message_Count AS Total")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", user.ID)
@@ -56,7 +56,7 @@ export default {
 
 		const who = (user.ID === context.user.ID) ? "You have" : "That user has";
 		return {
-			reply: `${who} sent ${sb.Utils.groupDigits(lines)} chat lines in this channel so far.`
+			reply: `${who} sent ${core.Utils.groupDigits(lines)} chat lines in this channel so far.`
 		};
 	}),
 	Dynamic_Description: null

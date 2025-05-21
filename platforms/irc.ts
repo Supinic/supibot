@@ -3,7 +3,7 @@ import { Client as IrcClient } from "irc-framework";
 import { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
-import { Platform, BaseConfig, PrepareMessageOptions, PlatformVerification } from "./template.js";
+import { Platform, BaseConfig, PrepareMessageOptions } from "./template.js";
 import { User } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
@@ -221,7 +221,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			return;
 		}
 
-		const userVerificationData = (await userData.getDataProperty("platformVerification") ?? {}) as Record<number, PlatformVerification>;
+		const userVerificationData = await userData.getDataProperty("platformVerification") ?? {};
 		userVerificationData[this.ID] ??= {};
 
 		const isSelf = (userData.Name === this.selfName);

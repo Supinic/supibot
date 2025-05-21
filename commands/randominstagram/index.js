@@ -41,7 +41,7 @@ export default {
 			}
 
 			try {
-				response = await sb.Got.get("FakeAgent")({
+				response = await core.Got.get("FakeAgent")({
 					url: `https://i.instagram.com/api/v1/users/web_profile_info`,
 					searchParams: {
 						username: user
@@ -100,7 +100,7 @@ export default {
 			};
 		}
 
-		const post = sb.Utils.randArray(posts).node;
+		const post = core.Utils.randArray(posts).node;
 		const description = post.accessibility_caption;
 		const commentCount = post.edge_media_to_comment.count ?? 0;
 		const likeCount = post.edge_liked_by.count ?? 0;
@@ -129,10 +129,10 @@ export default {
 
 			const relevantDetections = nsfwData.detections.filter(i => !i.name.includes("Covered"));
 			if (nsfwData.score > 0.25 || relevantDetections.length > 0) {
-				const score = sb.Utils.round(nsfwData.score * 100, 2);
+				const score = core.Utils.round(nsfwData.score * 100, 2);
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						This post from "${post.owner.username}" was deemed to be too NSFW for this channel!
 						NSFW score: ${score}%,
 						detections: ${relevantDetections.length}

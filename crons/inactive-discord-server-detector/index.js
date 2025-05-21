@@ -32,7 +32,7 @@ export default {
 			}
 
 			const channelIDs = guildChannels.map(i => i.ID);
-			const lastCommandExecuted = await sb.Query.getRecordset(rs => rs
+			const lastCommandExecuted = await core.Query.getRecordset(rs => rs
 				.select("IFNULL(MAX(Last_Command_Posted), 0) AS Last")
 				.from("chat_data", "Meta_Channel_Command")
 				.where("Channel IN %n+", channelIDs)
@@ -46,7 +46,7 @@ export default {
 				continue;
 			}
 
-			const lastMessagePosted = await sb.Query.getRecordset(rs => rs
+			const lastMessagePosted = await core.Query.getRecordset(rs => rs
 				.select("MAX(Last_Message_Posted) AS Last_Message_Executed")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("Channel IN %n+", channelIDs)
@@ -74,7 +74,7 @@ export default {
 		}
 
 		let message;
-		const suggestion = await sb.Query.getRow("data", "Suggestion");
+		const suggestion = await core.Query.getRow("data", "Suggestion");
 
 		if (result.length === 0) {
 			message = "No Discord guilds were found to be inactive this week :)";

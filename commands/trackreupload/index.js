@@ -12,7 +12,7 @@ export default {
 	Code: (async function trackReload (extra, existingID, reuploadLink) {
 		existingID = Number(existingID);
 
-		if (!sb.Utils.isValidInteger(existingID)) {
+		if (!core.Utils.isValidInteger(existingID)) {
 			return { reply: "First argument must be positive finite integer!" };
 		}
 		else if (!reuploadLink) {
@@ -20,8 +20,8 @@ export default {
 		}
 
 		const reuploadCheck = Number(reuploadLink);
-		if (sb.Utils.isValidInteger(reuploadCheck)) {
-			const row = await sb.Query.getRecordset(rs => rs
+		if (core.Utils.isValidInteger(reuploadCheck)) {
+			const row = await core.Query.getRecordset(rs => rs
 				.select("Link")
 				.select("Link_Prefix")
 				.from("music", "Track")
@@ -37,7 +37,7 @@ export default {
 			reuploadLink = row.Link_Prefix.replace(VIDEO_TYPE_REPLACE_PREFIX, row.Link);
 		}
 
-		const result = await sb.Got.get("Supinic")({
+		const result = await core.Got.get("Supinic")({
 			method: "POST",
 			url: "track/reupload",
 			searchParams: { reuploadLink, existingID }

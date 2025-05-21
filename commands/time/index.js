@@ -144,7 +144,7 @@ export default {
 		}
 
 		if (coordinates === null) {
-			const { results: [geoData] } = await sb.Got.get("Google")({
+			const { results: [geoData] } = await core.Got.get("Google")({
 				url: "geocode/json",
 				searchParams: {
 					address: place,
@@ -209,7 +209,7 @@ export default {
 		const totalOffset = (timeData.rawOffset + timeData.dstOffset);
 		const symbol = (totalOffset >= 0 ? "+" : "-");
 		const hours = Math.trunc(Math.abs(totalOffset) / 3600);
-		const minutes = sb.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
+		const minutes = core.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
 
 		const offset = `${symbol}${hours}:${minutes}`;
 		const time = new sb.Date();
@@ -232,7 +232,7 @@ export default {
 		const locationDateTime = time.format("H:i (Y-m-d)");
 		if (skipLocation) {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					(location hidden) is using UTC${offset},
 					and it's ${locationDateTime} there right now.
 				 `
@@ -240,7 +240,7 @@ export default {
 		}
 		else {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${place} is currently observing ${timeData.timeZoneName}, 
 					which is UTC${offset},
 					and it's ${locationDateTime} there right now.

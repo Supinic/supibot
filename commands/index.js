@@ -6,7 +6,6 @@ import AddBetweenCommand from "./addbetween/index.js";
 import AfkCommand from "./afk/index.js";
 import AliasCommand from "./alias/index.js";
 import AliasBuildingBlockCommand from "./aliasbuildingblock/index.js";
-import AtopCommand from "./atop/index.js";
 import BadAppleRenditionCommand from "./badapplerendition/index.js";
 import BanCommand from "./ban/index.js";
 import BanCheckCommand from "./bancheck/index.js";
@@ -204,7 +203,6 @@ export default [
 	AfkCommand,
 	AliasCommand,
 	AliasBuildingBlockCommand,
-	AtopCommand,
 	BadAppleRenditionCommand,
 	BanCommand,
 	BanCheckCommand,

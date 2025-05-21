@@ -91,8 +91,7 @@ export default {
 				};
 			}
 			else if (commandData === this) {
-				// @todo remove type cast by properly overloading the getEmote method
-				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅") as string;
+				const emote = await context.randomEmote("PepeLaugh", "pepeLaugh", "4Head", "😅");
 				return {
 					success: false,
 					reply: `You can't ${invocation} the ${commandData.Name} command! ${emote}`
@@ -110,8 +109,7 @@ export default {
 				};
 			}
 			else if (commandData === this) {
-				// @todo remove type cast by properly overloading the getEmote method
-				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅") as string;
+				const emote = await context.randomEmote("PepeLaugh", "pepeLaugh", "4Head", "😅");
 				return {
 					success: false,
 					reply: `You can't ${invocation} the ${commandData.Name} command's invocation! ${emote}`
@@ -237,13 +235,19 @@ export default {
 			userData = await sb.User.get(options.User_Alias);
 		}
 
-		const filterResult = sb.Filter.getLocals(type, {
+		const rawFilterResult = sb.Filter.getLocals(type, {
 			channel: channelData,
 			user: userData,
 			command: options.Command,
 			invocation: options.Invocation,
 			includeInactive: true
 		});
+
+		const filterResult = rawFilterResult.filter(i => (
+			(i.Channel === (channelData?.ID ?? null))
+			&& (i.User_Alias === (userData?.ID ?? null))
+			&& (i.Command === options.Command)
+		));
 
 		if (filterResult.length !== 0) {
 			const [existing] = filterResult;

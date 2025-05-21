@@ -2,20 +2,24 @@ import EventEmitter from "node:events";
 import { SupiError, SupiDate } from "supi-core";
 
 import {
-	type GetEmoteOptions,
 	Platform,
 	Like as PlatformLike,
 	GenericSendOptions,
 	PrepareMessageOptions
 } from "../platforms/template.js";
+
+import {
+	type ChannelDataProperty,
+	type ChannelDataPropertyMap,
+	type GenericFetchData,
+	fetchChannelDataProperty,
+	isCachedChannelProperty,
+	saveChannelDataProperty
+} from "./custom-data-properties.js";
+
 import { User } from "./user.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
-import {
-	GenericDataPropertyValue,
-	getGenericDataProperty,
-	setGenericDataProperty,
-	TemplateWithId
-} from "./template.js";
+import { TemplateWithId } from "./template.js";
 import { Emote } from "../@types/globals.js";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
@@ -67,9 +71,9 @@ export class Channel extends TemplateWithId {
 	Mode: Mode;
 	readonly Mention: boolean;
 	readonly Links_Allowed: boolean;
-	readonly Banphrase_API_Type: "Pajbot";
-	readonly Banphrase_API_URL: string;
-	readonly Banphrase_API_Downtime: BanphraseDowntimeBehaviour;
+	readonly Banphrase_API_Type: "Pajbot" | null;
+	readonly Banphrase_API_URL: string | null;
+	readonly Banphrase_API_Downtime: BanphraseDowntimeBehaviour | null;
 	readonly Message_Limit: number | null;
 	readonly NSFW: boolean;
 	readonly Logging: Set<LogType>;
@@ -80,7 +84,7 @@ export class Channel extends TemplateWithId {
 	readonly events: EventEmitter = new EventEmitter();
 
 	static redisPrefix = "sb-channel";
-	static dataCache: WeakMap<Channel, Map<string, GenericDataPropertyValue>> = new WeakMap();
+	static dataCache: WeakMap<Channel, Partial<ChannelDataPropertyMap>> = new WeakMap();
 	static uniqueIdentifier = "ID";
 	static data: Map<Platform, Map<Channel["Name"], Channel>> = new Map();
 
@@ -158,7 +162,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	async isUserAmbassador (userData: User): Promise<boolean> {
-		const ambassadors = (await this.getDataProperty("ambassadors") ?? []) as User["ID"][];
+		const ambassadors = await this.getDataProperty("ambassadors") ?? [];
 		return ambassadors.includes(userData.ID);
 	}
 
@@ -171,7 +175,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	async toggleAmbassador (userData: User): Promise<void> {
-		const ambassadors = (await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? []) as number[];
+		const ambassadors = await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? [];
 		if (ambassadors.includes(userData.ID)) {
 			const index = ambassadors.indexOf(userData.ID);
 			ambassadors.splice(index, 1);
@@ -226,59 +230,52 @@ export class Channel extends TemplateWithId {
 		await this.setCacheData("emotes", null);
 	}
 
-	// async getBestAvailableEmote (emotes: string[], fallbackEmote: string, options: GetStringEmoteOptions): Promise<string>;
-	// async getBestAvailableEmote (emotes: string[], fallbackEmote: string, options: GetObjectEmoteOptions): Promise<Emote>;
-	async getBestAvailableEmote <T extends string> (emotes: T[], fallbackEmote: T, options: GetEmoteOptions = {}): Promise<Emote | T> {
-		const availableEmotes = await this.fetchEmotes();
-		const emoteArray = (options.shuffle)
-			? core.Utils.shuffleArray(emotes)
-			: emotes;
-
-		const caseSensitive = options.caseSensitivity ?? true;
-		for (const emote of emoteArray) {
-			const lowerEmote = emote.toLowerCase();
-			const available = availableEmotes.find(i => (caseSensitive)
-				? (i.name === emote)
-				: (i.name.toLowerCase() === lowerEmote)
-			);
-
-			if (available && (typeof options.filter !== "function" || options.filter(available))) {
-				return (options.returnEmoteObject)
-					? available
-					: available.name as T;
-			}
-		}
-
-		return fallbackEmote;
-	}
-
 	async prepareMessage (message: string, options: PrepareMessageOptions = {}): Promise<string | false> {
 		return await this.Platform.prepareMessage(message, this, options);
 	}
 
-	async getDataProperty (propertyName: string, options = {}) {
-		return await getGenericDataProperty({
-			cacheMap: Channel.dataCache,
-			databaseProperty: "Channel",
-			databaseTable: "Channel_Data",
-			instance: this,
-			propertyContext: "Channel",
-			options,
-			propertyName
-		});
+	async getDataProperty <T extends ChannelDataProperty> (
+		propertyName: T,
+		options: GenericFetchData = {}
+	): Promise<ChannelDataPropertyMap[T]> {
+		if (!options.forceCacheReload && isCachedChannelProperty(propertyName)) {
+			const cache = Channel.dataCache.get(this);
+			if (cache && cache[propertyName]) {
+				return cache[propertyName];
+			}
+		}
+
+		const value = await fetchChannelDataProperty(propertyName, this.ID, options);
+		if (value === null) {
+			return null;
+		}
+
+		this.setPropertyCache(propertyName, value);
+
+		return value;
 	}
 
-	async setDataProperty (propertyName: string, value: GenericDataPropertyValue, options = {}) {
-		await setGenericDataProperty(this, {
-			cacheMap: Channel.dataCache,
-			databaseProperty: "Channel",
-			databaseTable: "Channel_Data",
-			instance: this,
-			propertyContext: "Channel",
-			propertyName,
-			options,
-			value
-		});
+	async setDataProperty <T extends ChannelDataProperty> (
+		propertyName: T,
+		value: ChannelDataPropertyMap[T] | null,
+		options: GenericFetchData = {}
+	) {
+		await saveChannelDataProperty(propertyName, value, this.ID, options);
+		this.setPropertyCache(propertyName, value);
+	}
+
+	private setPropertyCache <T extends ChannelDataProperty> (propertyName: T, value: ChannelDataPropertyMap[T]) {
+		if (!isCachedChannelProperty(propertyName)) {
+			return;
+		}
+
+		let cache = Channel.dataCache.get(this);
+		if (!cache) {
+			cache = {};
+			Channel.dataCache.set(this, cache);
+		}
+
+		cache[propertyName] = value;
 	}
 
 	getCacheKey () {
@@ -459,14 +456,7 @@ export class Channel extends TemplateWithId {
 		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs, ...filterChannelIDs]);
 		let channelsData = [...channelIDs].map(i => Channel.get(i)).filter(Boolean) as Channel[];
 		if (platform) {
-			const platformData = Platform.get(platform);
-			if (!platformData) {
-				throw new SupiError({
-					message: "Invalid platform provided"
-				});
-			}
-
-			channelsData = channelsData.filter(i => i.Platform === platformData);
+			channelsData = channelsData.filter(i => i.Platform === platform);
 		}
 
 		return channelsData;

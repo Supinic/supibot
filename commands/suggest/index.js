@@ -14,7 +14,7 @@ export default {
 	Code: (async function suggest (context, ...args) {
 		if (args.length === 0 || context.invocation === "suggestions") {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					No suggestion text provided!
 					Your suggestions here: https://supinic.com/data/suggestion/list?columnAuthor=${context.user.Name}
 				`,
@@ -23,7 +23,7 @@ export default {
 		}
 
 		const text = args.join(" ");
-		const row = await sb.Query.getRow("data", "Suggestion");
+		const row = await core.Query.getRow("data", "Suggestion");
 		if (context.params.amend) {
 			await row.load(context.params.amend, true);
 			if (!row.loaded) {
@@ -60,7 +60,7 @@ export default {
 			await row.save({ skipLoad: true });
 		}
 
-		const isSubscribed = await sb.Query.getRecordset(rs => rs
+		const isSubscribed = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
@@ -71,7 +71,7 @@ export default {
 
 		let subscribed = "";
 		if (!isSubscribed) {
-			const row = await sb.Query.getRow("data", "Event_Subscription");
+			const row = await core.Query.getRow("data", "Event_Subscription");
 			row.setValues({
 				Active: true,
 				Platform: context.platform.ID,

@@ -10,6 +10,7 @@ type HelixResponse = {
 };
 type EmoteJsonObject = {
 	timestamp: number;
+	changed: string[];
 	added: HelixResponse["data"];
 	deleted: HelixResponse["data"];
 };
@@ -30,13 +31,13 @@ const definition: CronDefinition = {
 	code: (async function globalEmoteAnnouncer (cron) {
 		const twitchPlatform = sb.Platform.get("twitch");
 		if (!twitchPlatform) {
-			cron.job.stop();
+			await cron.job.stop();
 			return;
 		}
 
 		const channelData = sb.Channel.get("supinic", twitchPlatform);
 		if (!channelData) {
-			cron.job.stop();
+			await cron.job.stop();
 			return;
 		}
 
@@ -80,11 +81,12 @@ const definition: CronDefinition = {
 		const json: EmoteJsonObject = {
 			timestamp: now.valueOf(),
 			added: [],
-			deleted: []
+			deleted: [],
+			changed: [...differentEmoteIds]
 		};
 
 		for (const emoteId of differentEmoteIds) {
-			const emote = previousEmotes.find(i => i.id === emoteId);
+			const emote = previousEmotes.find(i => i.id === emoteId) ?? newEmotes.find(i => i.id === emoteId);
 			if (!emote) {
 				continue;
 			}

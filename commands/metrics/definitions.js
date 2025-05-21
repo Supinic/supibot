@@ -9,7 +9,7 @@ export default [
 		],
 		type: "basic",
 		query: "sum(rate(supibot_command_executions_total[1h]))*60",
-		format: (result) => `Supibot is currently executing ${sb.Utils.round(result, 2)} commands per minute.`
+		format: (result) => `Supibot is currently executing ${core.Utils.round(result, 2)} commands per minute.`
 	},
 	{
 		name: "read-messages-per-minute",
@@ -21,7 +21,7 @@ export default [
 		],
 		type: "basic",
 		query: "sum(rate(supibot_messages_read_total[1h]))*60",
-		format: (result) => `Supibot is currently reading ${sb.Utils.round(result, 2)} messages per minute.`
+		format: (result) => `Supibot is currently reading ${core.Utils.round(result, 2)} messages per minute.`
 	},
 	{
 		name: "top-messages-channel",
@@ -33,6 +33,6 @@ export default [
 		],
 		type: "basic",
 		query: "topk(1, rate(supibot_messages_read_total[5m])) * 60",
-		format: (result, metric) => `Currently, the fastest channel with Supibot is ${metric.channel}, with ${sb.Utils.round(result, 2)} messages per minute.`
+		format: (result, metric) => `Currently, the fastest channel with Supibot is ${metric.channel}, with ${core.Utils.round(result, 2)} messages per minute.`
 	}
 ];

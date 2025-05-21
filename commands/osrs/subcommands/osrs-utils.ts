@@ -1,7 +1,27 @@
+import { SupiError } from "supi-core";
 import type { Context } from "../../../classes/command.js";
 import type { User } from "../../../classes/user.js";
 // import type { CheerioNode } from "supi-core";
+
 import GameData from "../game-data.json" with { type: "json" };
+import { typedEntries } from "../../../utils/ts-helpers.js";
+
+for (const item of GameData.activities) {
+	if (item.toLowerCase() !== item) {
+		throw new SupiError({
+		    message: "Assert error: Non-lowercase activity found",
+			args: { item }
+		});
+	}
+}
+for (const [alias, activity] of typedEntries(GameData.activityAliases)) {
+	if (alias.toLowerCase() !== alias || activity.toLowerCase() !== activity) {
+		throw new SupiError({
+		    message: "Assert error: Non-lowercase activity alias found",
+			args: { alias, activity }
+		});
+	}
+}
 
 // export type ActivityName = typeof GameData["activities"][number];
 // export type SkillName = typeof GameData["skills"][number]["name"];
@@ -249,7 +269,7 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		targetUser = userData;
 	}
 
-	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY) as null | string;
+	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY);
 	if (!gameUsername) {
 		const verb = (targetUser === context.user) ? "You" : "They";
 		return {

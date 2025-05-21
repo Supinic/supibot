@@ -11,7 +11,7 @@ const setOverloaded = () => {
 
 const check = (user, channel) => {
 	if (overloadedTimestamp > sb.Date.now()) {
-		const skippedTimePeriod = sb.Utils.timeDelta(overloadedTimestamp, true);
+		const skippedTimePeriod = core.Utils.timeDelta(overloadedTimestamp, true);
 		return {
 			success: false,
 			reply: `The API is currently overloaded! No requests will be attempted for ${skippedTimePeriod}.`

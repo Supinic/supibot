@@ -8,7 +8,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function randomSCP () {
-		const response = await sb.Got.gql({
+		const response = await core.Got.gql({
 			url: "https://api.crom.avn.sh/graphql",
 			query: `{
 				randomPage (filter: {
@@ -47,7 +47,7 @@ export default {
 		title += ":";
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				(${rating})
 				${title}
 				${url}

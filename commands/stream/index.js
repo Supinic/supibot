@@ -7,7 +7,7 @@ const {
 	SONG_REQUESTS_STATE
 } = cacheKeys;
 
-const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
+const AVAILABLE_SONG_REQUEST_STATES = new Set(["vlc", "vlc-read", "off"]);
 
 export default {
 	Name: "stream",
@@ -30,7 +30,7 @@ export default {
 		switch (type) {
 			case "tts": {
 				const value = (rest.shift() === "true");
-				await sb.Cache.setByPrefix(TTS_ENABLED, value);
+				await core.Cache.setByPrefix(TTS_ENABLED, value);
 
 				return {
 					reply: `Text to speech is now set to ${value}.`
@@ -45,7 +45,7 @@ export default {
 					};
 				}
 
-				await sb.Cache.setByPrefix(TTS_TIME_LIMIT, limit);
+				await core.Cache.setByPrefix(TTS_TIME_LIMIT, limit);
 				return {
 					reply: `Text to speech time limit is now set to ${limit} milliseconds.`
 				};
@@ -54,7 +54,7 @@ export default {
 			case "ttsmulti":
 			case "multitts": {
 				const value = (rest.shift() === "true");
-				await sb.Cache.setByPrefix(TTS_MULTIPLE_ENABLED, value);
+				await core.Cache.setByPrefix(TTS_MULTIPLE_ENABLED, value);
 				return {
 					reply: `Concurrent text to speech is now set to ${value}`
 				};
@@ -64,7 +64,7 @@ export default {
 			case "playsounds":
 			case "playsound": {
 				const value = (rest.shift() === "true");
-				await sb.Cache.setByPrefix(PLAYSOUNDS_ENABLED, value);
+				await core.Cache.setByPrefix(PLAYSOUNDS_ENABLED, value);
 				return {
 					reply: `Play sounds are now set to ${value}`
 				};
@@ -79,13 +79,13 @@ export default {
 				}
 
 				if (value === "vlc") {
-					sb.VideoLANConnector.client.startRunning();
+					sb.VideoLANConnector.startClient();
 				}
 				else {
-					sb.VideoLANConnector.client.stopRunning();
+					sb.VideoLANConnector.stopClient();
 				}
 
-				await sb.Cache.setByPrefix(SONG_REQUESTS_STATE, value);
+				await core.Cache.setByPrefix(SONG_REQUESTS_STATE, value);
 				return {
 					reply: `Song requests are now set to ${value}`
 				};

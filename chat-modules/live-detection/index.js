@@ -4,7 +4,7 @@ export default {
 	Description: "Sends out PMs to all users subbed to the live event, whenever a channel set up there goes live.",
 	Code: (async function liveDetection (context) {
 		const { channel } = context;
-		const subscriptions = await sb.Query.getRecordset(rs => rs
+		const subscriptions = await core.Query.getRecordset(rs => rs
 			.select("User_Alias", "Platform")
 			.from("data", "Event_Subscription")
 			.where("Active = %b", true)

@@ -1,12 +1,12 @@
 import { CronJob } from "cron";
 
 const fetchGamesData = async () => {
-	let lastUpdate = await sb.Cache.getByPrefix("latest-steam-games-update");
+	let lastUpdate = await core.Cache.getByPrefix("latest-steam-games-update");
 	if (!lastUpdate) {
 		lastUpdate = new sb.Date().addHours(-24).getTime() / 1000;
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: "https://api.steampowered.com/IStoreService/GetAppList/v1/",
 		throwHttpErrors: false,
 		searchParams: {
@@ -17,10 +17,10 @@ const fetchGamesData = async () => {
 		}
 	});
 
-	await sb.Cache.setByPrefix("latest-steam-games-update", sb.Date.now() / 1000);
+	await core.Cache.setByPrefix("latest-steam-games-update", sb.Date.now() / 1000);
 
 	for (const game of response.body.response.apps) {
-		const row = await sb.Query.getRow("data", "Steam_Game");
+		const row = await core.Query.getRow("data", "Steam_Game");
 		await row.load(game.appid, true);
 		if (row.loaded && game.name === row.values.Name) {
 			continue;
@@ -36,7 +36,7 @@ const fetchGamesData = async () => {
 };
 
 const fetchReviewData = async (gameId) => {
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: `https://store.steampowered.com/appreviews/${gameId}`,
 		searchParams: {
 			json: "1",
@@ -49,7 +49,7 @@ const fetchReviewData = async (gameId) => {
 	if (response.ok) {
 		const summary = response.body.query_summary;
 		if (summary.total_reviews > 0) {
-			const score = sb.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
+			const score = core.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
 			reviewsString = `Rating: ${summary.review_score_desc} (${score}% positive)`;
 		}
 		else {
@@ -66,7 +66,7 @@ const fetchReviewData = async (gameId) => {
 };
 
 const fetchRecommendationData = async (gameId) => {
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await core.Got.get("GenericAPI")({
 		url: `https://store.steampowered.com/appreviewhistogram/${gameId}`
 	});
 
@@ -88,7 +88,7 @@ const fetchRecommendationData = async (gameId) => {
 		down += item.recommendations_down;
 	}
 
-	const value = sb.Utils.round(up / (up + down) * 100, 2);
+	const value = core.Utils.round(up / (up + down) * 100, 2);
 	return {
 		result: `Rating: ${value}%`
 	};
@@ -136,7 +136,7 @@ export default {
 				gameId = Number(potentialUrlAppId[1]);
 			}
 			else {
-				const plausibleResults = await sb.Query.getRecordset(rs => {
+				const plausibleResults = await core.Query.getRecordset(rs => {
 					rs.select("ID", "Name");
 					rs.from("data", "Steam_Game");
 					rs.limit(25);
@@ -157,7 +157,7 @@ export default {
 				}
 
 				const plausibleNames = plausibleResults.map(i => i.Name);
-				const [bestMatch] = sb.Utils.selectClosestString(gameName, plausibleNames, {
+				const [bestMatch] = core.Utils.selectClosestString(gameName, plausibleNames, {
 					ignoreCase: true,
 					fullResult: true
 				});
@@ -166,7 +166,7 @@ export default {
 			}
 		}
 
-		const playerCountResponse = await sb.Got.get("GenericAPI")({
+		const playerCountResponse = await core.Got.get("GenericAPI")({
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			throwHttpErrors: false,
 			searchParams: {
@@ -182,7 +182,7 @@ export default {
 			};
 		}
 
-		const gameDataResponse = await sb.Got.get("GenericAPI")({
+		const gameDataResponse = await core.Got.get("GenericAPI")({
 			url: "https://store.steampowered.com/api/appdetails",
 			throwHttpErrors: false,
 			searchParams: {
@@ -218,10 +218,10 @@ export default {
 		const steamLink = `https://store.steampowered.com/app/${gameId}`;
 		const players = playerCountResponse.body.response.player_count;
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${gameData.name} ${publisher}
 				currently has
-				${sb.Utils.groupDigits(players)}
+				${core.Utils.groupDigits(players)}
 				players in-game.
 				${reviewsString}	
 				${steamLink}	

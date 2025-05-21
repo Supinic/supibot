@@ -11,6 +11,7 @@ import type { DiscordConfig, DiscordPlatform } from "./discord.js";
 import type { CytubeConfig, CytubePlatform } from "./cytube.js";
 import type { IrcConfig, IrcPlatform } from "./irc.js";
 
+import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
 import type { Emote } from "../@types/globals.d.ts";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
@@ -41,11 +42,8 @@ export type GetEmoteOptions = {
 	returnEmoteObject?: boolean;
 	filter?: (emote: Emote) => boolean;
 };
-export type PlatformVerification = {
-	active?: boolean;
-	notificationSent?: boolean;
-};
 
+export type PlatformVerification = UserDataPropertyMap["platformVerification"];
 export type PlatformVerificationStatus = "Active" | "Completed" | "Cancelled";
 
 export type MirrorOptions = PrepareMessageOptions & { commandUsed?: boolean; };
@@ -318,17 +316,37 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		await core.Cache.setByPrefix(key, null);
 	}
 
-	public async getBestAvailableEmote<T extends string> (
+	public async getBestAvailableEmote (
 		channelData: Channel | null,
-		emotes: T[],
-		fallbackEmote: T,
-		options: GetEmoteOptions = {}
-	): Promise<T | Emote> {
-		if (channelData) {
-			return channelData.getBestAvailableEmote(emotes, fallbackEmote, options);
-		}
+		emotes: readonly string[],
+		fallback: string,
+		options?: GetEmoteOptions & { returnEmoteObject?: false; }
+	): Promise<string>;
 
-		const availableEmotes = await this.fetchGlobalEmotes();
+	public async getBestAvailableEmote (
+		channelData: Channel | null,
+		emotes: readonly string[],
+		fallback: string,
+		options?: GetEmoteOptions & { returnEmoteObject: true }
+	): Promise<Emote | undefined>;
+
+	public async getBestAvailableEmote (
+		channelData: Channel | null,
+		emotes: readonly string[],
+		fallback: string,
+		options?: GetEmoteOptions
+	): Promise<string | Emote | undefined>;
+
+	public async getBestAvailableEmote (
+		channelData: Channel | null,
+		emotes: readonly string[],
+		fallback: string,
+		options: GetEmoteOptions = {}
+	): Promise<string | Emote | undefined> {
+		const availableEmotes = (channelData)
+			? await channelData.fetchEmotes()
+			: await this.fetchGlobalEmotes();
+
 		const emoteArray = (options.shuffle)
 			? core.Utils.shuffleArray(emotes)
 			: emotes;
@@ -344,11 +362,16 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			if (available && (typeof options.filter !== "function" || options.filter(available))) {
 				return (options.returnEmoteObject)
 					? available
-					: available.name as T;
+					: available.name;
 			}
 		}
 
-		return fallbackEmote;
+		if (options.returnEmoteObject) {
+			const emote = availableEmotes.find(i => i.name === fallback);
+			return emote;
+		}
+
+		return fallback;
 	}
 
 	/**
@@ -446,7 +469,13 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		return `#${name}_private_messages`;
 	}
 
-	public static get (identifier: Like, host?: string | null) {
+	public static get <T extends Platform> (identifier: T, host?: string): T;
+	public static get (identifier: "twitch"): TwitchPlatform | null;
+	public static get (identifier: "discord"): DiscordPlatform | null;
+	public static get (identifier: "cytube"): CytubePlatform | null;
+	public static get (identifier: "irc", host: string): IrcPlatform | null;
+	public static get (identifier: Like, host?: string): Platform | null;
+	public static get (identifier: Like, host?: string | null): Platform | null {
 		if (identifier instanceof Platform) {
 			return identifier;
 		}
@@ -472,6 +501,21 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 				return eligible[0];
 			}
 		}
+	}
+
+	public static getAsserted (identifier: "twitch"): TwitchPlatform;
+	public static getAsserted (identifier: "discord"): DiscordPlatform;
+	public static getAsserted (identifier: "cytube"): CytubePlatform;
+	public static getAsserted (identifier: "irc", host: string): IrcPlatform;
+	public static getAsserted (identifier: string | number) {
+		const platform = Platform.get(identifier);
+		if (!platform) {
+			throw new SupiError({
+				message: `Assert error: asserted Platform ${identifier} is not available`
+			});
+		}
+
+		return platform;
 	}
 
 	public static getList (): Platform[] {

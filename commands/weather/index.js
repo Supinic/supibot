@@ -205,7 +205,7 @@ export default {
 
 			let geoData = await this.getCacheData(geoKey);
 			if (!geoData) {
-				const response = await sb.Got.get("GenericAPI")({
+				const response = await core.Got.get("GenericAPI")({
 					url: "https://maps.googleapis.com/maps/api/geocode/json",
 					responseType: "json",
 					throwHttpErrors: false,
@@ -285,7 +285,7 @@ export default {
 		}
 
 		if (context.params.pollution) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/2.5/air_pollution",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -310,7 +310,7 @@ export default {
 				.join(", ");
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${place} current pollution index: ${index} ${icon}
 					Particles: ${componentsString}.				
 				`
@@ -320,7 +320,7 @@ export default {
 		const weatherKey = { type: "weather", coords: `${coords.lat}-${coords.lng}` };
 		let data = await this.getCacheData(weatherKey);
 		if (!data) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/3.0/onecall",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -357,7 +357,7 @@ export default {
 		if (context.params.alerts) {
 			if (!data.alerts || data.alerts.length === 0) {
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Weather alert summary for
 						${(skipLocation) ? "(location hidden)" : formattedAddress}
 						-
@@ -410,7 +410,7 @@ export default {
 					);
 
 					return {
-						reply: sb.Utils.tag.trim `
+						reply: core.Utils.tag.trim `
 							Weather alert summary for your hidden location: ${data.alerts.length} alerts.
 							I sent you a private message with the link to the full description.
 						`
@@ -424,7 +424,7 @@ export default {
 			}
 			else {
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Weather alert summary for
 						${(skipLocation) ? "(location hidden)" : formattedAddress}
 						- 
@@ -534,7 +534,7 @@ export default {
 				obj.precipitation = "No precipitation expected.";
 			}
 			else {
-				const percent = `${sb.Utils.round(target.pop * 100, 0)}%`;
+				const percent = `${core.Utils.round(target.pop * 100, 0)}%`;
 				const rain = target.rain?.["1h"] ?? target.rain ?? null;
 				const snow = target.snow?.["1h"] ?? target.snow ?? null;
 
@@ -579,7 +579,7 @@ export default {
 			}
 
 			if (sunTime !== 0) {
-				obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(sunTime * 1000)}.`;
+				obj.sun = `Sun ${verb}s ${core.Utils.timeDelta(sunTime * 1000)}.`;
 			}
 			else {
 				// Determine if the Sun is down or up based on UV index
@@ -595,7 +595,7 @@ export default {
 				}
 
 				if (time) {
-					obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(time * 1000)}.`;
+					obj.sun = `Sun ${verb}s ${core.Utils.timeDelta(time * 1000)}.`;
 				}
 				else {
 					obj.sun = `Sun does not ${verb} in the next 7 days.`;
@@ -676,7 +676,7 @@ export default {
 		}
 		else {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${obj.place} ${plusTime}:
 					${obj.icon}
 					${obj.temperature}

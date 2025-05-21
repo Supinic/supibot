@@ -60,6 +60,10 @@ export default {
 			}
 
 			case "command": {
+				await context.sendIntermediateMessage("ppCircle git pull ppCircle");
+				await shell("git pull");
+
+				await context.sendIntermediateMessage("ppCircle yarn build ppCircle");
 				await shell("yarn build");
 
 				const failures: string[] = [];
@@ -92,7 +96,7 @@ export default {
 				sb.Command.importSpecific(...definitions);
 				return {
 					success: true,
-					reply: `Reloaded ${definitions.length} commands, with ${failures.length} failures`
+					reply: `Reloaded ${definitions.length} commands, ${failures.length} errors.`
 				};
 			}
 			case "commands": {

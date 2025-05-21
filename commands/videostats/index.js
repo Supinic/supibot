@@ -16,7 +16,7 @@ export default {
 			};
 		}
 
-		const playedByData = await sb.Query.getRecordset(rs => rs
+		const playedByData = await core.Query.getRecordset(rs => rs
 			.select("COUNT(*) AS Count")
 			.select("User_Alias.Name AS Name")
 			.from("cytube", "Video_Request")
@@ -33,7 +33,7 @@ export default {
 		}
 
 		const total = playedByData.reduce((acc, cur) => (acc + cur.Count), 0);
-		const lastPlayedData = await sb.Query.getRecordset(rs => rs
+		const lastPlayedData = await core.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Name")
 			.select("Posted")
 			.from("cytube", "Video_Request")
@@ -56,10 +56,10 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				That video was queued ${total} times before.
 				Mostly by: ${top5.join("; ")}.
-				Last time it was queued ${sb.Utils.timeDelta(lastPlayedData.Posted)},
+				Last time it was queued ${core.Utils.timeDelta(lastPlayedData.Posted)},
 				by ${lastPlayedData.Name}
 			`
 		};

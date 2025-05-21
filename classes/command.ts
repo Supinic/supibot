@@ -6,7 +6,9 @@ import {
 	type Counter,
 	type Query,
 	type MetricConfiguration,
-	type MetricType
+	type MetricType,
+	type Histogram,
+	type Gauge
 } from "supi-core";
 import type { BaseMessageOptions } from "discord.js";
 
@@ -165,6 +167,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		return Filter.getMentionStatus({
 			user: this.user,
 			command: this.command,
+			invocation: this.invocation,
 			channel: this.channel ?? null,
 			platform: this.platform
 		});
@@ -188,7 +191,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const platformData = options.platform ?? this.platform;
 
 		const promises: (Promise<boolean | null> | null)[] = [
-			userData.getDataProperty("administrator") as Promise<boolean | null>
+			userData.getDataProperty("administrator")
 		];
 		if (channelData) {
 			promises.push(
@@ -225,18 +228,21 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		};
 	}
 
-	async getBestAvailableEmote <T extends string> (emotes: T[], fallback: T, options: BestEmoteOptions = {}): Promise<Emote | T> {
-		const channelData = options.channel ?? this.channel;
+	async getBestAvailableEmote (emotes: readonly string[], fallback: string, options?: BestEmoteOptions & { returnEmoteObject?: false; }): Promise<string>;
+	async getBestAvailableEmote (emotes: readonly string[], fallback: string, options: BestEmoteOptions & { returnEmoteObject: true; }): Promise<Emote | undefined>;
+	async getBestAvailableEmote (emotes: readonly string[], fallback: string, options?: BestEmoteOptions): Promise<string | Emote | undefined>;
+	async getBestAvailableEmote (
+		emotes: readonly string[],
+		fallback: string,
+		options: BestEmoteOptions = {}
+	): Promise<string | Emote | undefined> {
+		const channelData = options.channel ?? this.channel ?? null;
 		const platformData = options.platform ?? this.platform;
-		if (channelData) {
-			return await channelData.getBestAvailableEmote(emotes, fallback, options);
-		}
-		else {
-			return await platformData.getBestAvailableEmote(null, emotes, fallback, options);
-		}
+
+		return await platformData.getBestAvailableEmote(channelData, emotes, fallback, options);
 	}
 
-	async randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
+	async randomEmote <const T extends string[]> (...inputEmotes: T): Promise<T[number]> {
 		if (inputEmotes.length < 2) {
 			throw new SupiError({
 				message: "At least two emotes are required"
@@ -244,12 +250,12 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		}
 
 		const emotes = inputEmotes.slice(0, -1);
-		const fallback = inputEmotes.at(-1) as T; // Guaranteed because of the above condition checking for length >= 2
+		const fallback = inputEmotes.at(-1) as T[number];
 
 		return await this.getBestAvailableEmote(emotes, fallback, {
 			shuffle: true,
 			returnEmoteObject: false
-		}) as T;
+		});
 	}
 
 	get tee () { return this.append.tee; }
@@ -285,9 +291,9 @@ type ExecuteOptions = {
 };
 
 type CooldownObject = {
-	length?: number;
-	channel?: Channel["ID"],
-	user?: User["ID"]
+	length?: number | null;
+	channel?: Channel["ID"] | null,
+	user?: User["ID"] | null;
 	command?: Command["Name"];
 	ignoreCooldownFilters?: boolean;
 };
@@ -393,29 +399,23 @@ export class Command extends TemplateWithoutId {
 	}
 
 	getDetailURL (options: { useCodePath?: boolean } = {}) {
-		if (options.useCodePath) {
-			const baseURL = config.values.commandCodeUrlPrefix;
-			if (!baseURL) {
-				return "N/A";
-			}
+		const baseURL = (options.useCodePath)
+			? config.values.commandCodeUrlPrefix
+			: config.values.commandDetailUrlPrefix;
 
-			return `${baseURL}/${encodeURIComponent(this.Name)}/index.js`;
-		}
-		else {
-			const baseURL = config.values.commandDetailUrlPrefix;
-			if (!baseURL) {
-				return "N/A";
-			}
-
-			return `${baseURL}/${encodeURIComponent(this.Name)}`;
-		}
+		return (baseURL)
+			? `${baseURL}/${encodeURIComponent(this.Name)}`
+			: "N/A";
 	}
 
 	getCacheKey () {
 		return `sb-command-${this.Name}`;
 	}
 
-	registerMetric (type: MetricType, label: string, options: Partial<MetricConfiguration<string>>) {
+	registerMetric <T extends string> (type: "Counter", label: string, options: Partial<MetricConfiguration<T>>): Counter<T>;
+	registerMetric <T extends string> (type: "Gauge", label: string, options: Partial<MetricConfiguration<T>>): Gauge<T>;
+	registerMetric <T extends string> (type: "Histogram", label: string, options: Partial<MetricConfiguration<T>>): Histogram<T>;
+	registerMetric <T extends string> (type: MetricType, label: string, options: Partial<MetricConfiguration<T>>) {
 		const metricLabel = `supibot_command_${this.Name}_${label}`;
 		const metricOptions = {
 			...options,
@@ -689,6 +689,19 @@ export class Command extends TemplateWithoutId {
 
 		// If params parsing failed, filters were checked and none applied, return the failure result now
 		if (failedParamsParseResult) {
+			sb.Logger.logCommandExecution({
+				User_Alias: userData.ID,
+				Command: command.Name,
+				Platform: platformData.ID,
+				Executed: new SupiDate(),
+				Channel: channelData?.ID ?? null,
+				Success: false,
+				Invocation: identifier,
+				Arguments: JSON.stringify(args.filter(Boolean)),
+				Result: failedParamsParseResult.reply,
+				Execution_Time: null
+			});
+
 			Command.#cooldownManager.unsetPending(userData.ID);
 			return failedParamsParseResult;
 		}
@@ -929,6 +942,7 @@ export class Command extends TemplateWithoutId {
 			&& Filter.getMentionStatus({
 				user: userData,
 				command,
+				invocation: identifier,
 				channel: channelData,
 				platform: channelData.Platform
 			})
@@ -968,7 +982,7 @@ export class Command extends TemplateWithoutId {
 					? { length: cooldownData }
 					: cooldownData;
 
-				let { length = 0 } = cooldown;
+				let length = cooldown.length ?? 0;
 				const {
 					channel = channelID,
 					user = userData.ID,

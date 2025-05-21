@@ -15,7 +15,7 @@ export default {
 			const pronoun = (userData === context.user) ? "You" : "They";
 			const posPronoun = (userData === context.user) ? "Your" : "Their";
 			if (aliasName) {
-				const aliasData = await sb.Query.getRecordset(rs => rs
+				const aliasData = await core.Query.getRecordset(rs => rs
 					.select("ID", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", userData.ID)
@@ -38,7 +38,7 @@ export default {
 				}
 
 				/** @type {Object[]} */
-				const data = await sb.Query.getRecordset(rs => rs
+				const data = await core.Query.getRecordset(rs => rs
 					.select("Channel", "Invocation")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias <> %n OR User_Alias IS NULL", userData.ID)
@@ -67,14 +67,14 @@ export default {
 			else {
 				/** @type {[number[], number[]]} */
 				const data = await Promise.all([
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("COUNT(*) AS Count")
 						.from("data", "Custom_Command_Alias")
 						.where("User_Alias = %n", userData.ID)
 						.single()
 						.flat("Count")
 					),
-					sb.Query.getRecordset(rs => rs
+					core.Query.getRecordset(rs => rs
 						.select("Copy.User_Alias AS Copier")
 						.from("data", "Custom_Command_Alias")
 						.where("Custom_Command_Alias.User_Alias = %n", userData.ID)
@@ -93,7 +93,7 @@ export default {
 				const [who, whose] = (context.user === userData) ? ["You", "your"] : ["They", "their"];
 
 				return {
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						${who} currently have ${aliases} command aliases,
 						and ${users} distinct users have created ${copies} copies of ${whose} aliases.
 					`
@@ -102,20 +102,20 @@ export default {
 		}
 		else {
 			const [aliases, copies, users] = await Promise.all([
-				sb.Query.getRecordset(rs => rs
+				core.Query.getRecordset(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("data", "Custom_Command_Alias")
 					.single()
 					.flat("Count")
 				),
-				sb.Query.getRecordset(rs => rs
+				core.Query.getRecordset(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("data", "Custom_Command_Alias")
 					.where("Parent IS NOT NULL")
 					.single()
 					.flat("Count")
 				),
-				sb.Query.getRecordset(rs => rs
+				core.Query.getRecordset(rs => rs
 					.select("COUNT(DISTINCT User_Alias) AS Count")
 					.from("data", "Custom_Command_Alias")
 					.single()
@@ -124,7 +124,7 @@ export default {
 			]);
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${aliases} command aliases have been created so far
 					(out of which, ${copies} are direct copies of others),
 					used by ${users} users in total.

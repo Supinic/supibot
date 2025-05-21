@@ -10,7 +10,7 @@ export default {
 		const IDs = url.searchParams.getAll("ID").map(Number).filter(Boolean);
 		const result = await sb.AwayFromKeyboard.reloadSpecific(...IDs);
 
-		const [active, inactive] = sb.Utils.splitByCondition(IDs, i => sb.AwayFromKeyboard.get(i));
+		const [active, inactive] = core.Utils.splitByCondition(IDs, i => sb.AwayFromKeyboard.get(i));
 		return {
 			statusCode: 200,
 			data: {

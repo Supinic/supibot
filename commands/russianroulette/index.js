@@ -82,7 +82,7 @@ export default {
 				}
 			}
 
-			let outcome = sb.Utils.randArray(outcomes[timeoutMode]);
+			let outcome = core.Utils.randArray(outcomes[timeoutMode]);
 			if (timeoutMode === "nerf") {
 				outcome += ` (can't time out anyone if I'm not a moderator)`;
 			}

@@ -68,7 +68,7 @@ export default {
 			};
 		}
 
-		const linkData = await sb.Query.getRecordset(rs => rs
+		const linkData = await core.Query.getRecordset(rs => rs
 			.select("Data")
 			.from("data", "Twitch_Lotto")
 			.where("Link = %s", link)
@@ -107,14 +107,14 @@ export default {
 
 		// await shell(`wget https://i.imgur.com/${link} -P /tmp`);
 
-		const downloadStream = sb.Got.stream(`https://i.imgur.com/${link}`);
+		const downloadStream = core.Got.stream(`https://i.imgur.com/${link}`);
 		const writeStream = fs.createWriteStream(`/tmp/${link}`);
 		await pipeline(downloadStream, writeStream);
 
 		const colours = Object.keys(coloursData);
 		const params = data.detections.map((i, ind) => {
 			const coords = i.bounding_box;
-			return sb.Utils.tag.trim `
+			return core.Utils.tag.trim `
 				-strokewidth 7
 				-stroke '${colours[ind]}'
 				-fill 'none' 
@@ -148,7 +148,7 @@ export default {
 		}
 
 		data.explainLink = outputLink;
-		await sb.Query.getRecordUpdater(ru => ru
+		await core.Query.getRecordUpdater(ru => ru
 			.update("data", "Twitch_Lotto")
 			.set("Data", JSON.stringify(data))
 			.where("Link = %s", link)

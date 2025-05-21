@@ -58,13 +58,13 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			responseType: "text",
 			url: `https://www.astrology.com/horoscope/daily/${zodiacName}.html`
 		});
 
 		const html = response.body;
-		const $ = sb.Utils.cheerio(html);
+		const $ = core.Utils.cheerio(html);
 		const node = $(".horoscope-content-wrapper > #content");
 
 		if (node.length === 0) {
@@ -90,7 +90,7 @@ export default {
 		const trimmedText = trimmedArray.join(". ");
 		const prefix = (own) ? "Your" : "";
 		return {
-			reply: `${prefix} ${sb.Utils.capitalize(zodiacName)} horoscope for today: ${trimmedText}.`
+			reply: `${prefix} ${core.Utils.capitalize(zodiacName)} horoscope for today: ${trimmedText}.`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {

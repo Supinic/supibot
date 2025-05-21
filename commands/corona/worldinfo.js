@@ -3,7 +3,7 @@ const url = "https://www.worldometers.info/coronavirus";
 export default async () => {
 	let response = null;
 	try {
-		response = await sb.Got.get("FakeAgent")({
+		response = await core.Got.get("FakeAgent")({
 			url,
 			responseType: "text"
 		});
@@ -14,7 +14,7 @@ export default async () => {
 		};
 	}
 
-	const $ = sb.Utils.cheerio(response.body);
+	const $ = core.Utils.cheerio(response.body);
 	const nodes = $(".maincounter-number span");
 	const [total, deaths, recoveries] = [...nodes].map(i => {
 		const textNode = i.children[0].data;

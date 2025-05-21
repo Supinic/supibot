@@ -18,11 +18,11 @@ export const availableCommands = [
 ];
 
 export const precisionRound = (num, precision, direction) => (
-	Number(sb.Utils.round(num, precision, { direction }).toPrecision(precision + 1))
+	Number(core.Utils.round(num, precision, { direction }).toPrecision(precision + 1))
 );
 
 export const getAssetData = async (code) => {
-	const data = await sb.Query.getRecordset(rs => rs
+	const data = await core.Query.getRecordset(rs => rs
 		.select("Code", "Price")
 		.from("crypto_game", "Asset")
 		.where("Code = %s", code.toUpperCase())
@@ -34,7 +34,7 @@ export const getAssetData = async (code) => {
 };
 
 export const getPortfolioData = async (identifier) => {
-	const portfolioID = await sb.Query.getRecordset(rs => {
+	const portfolioID = await core.Query.getRecordset(rs => {
 		rs.select("ID")
 			.from("crypto_game", "Portfolio")
 			.where("Active = %b", true)
@@ -62,7 +62,7 @@ export const getPortfolioData = async (identifier) => {
 		return null;
 	}
 
-	const data = await sb.Query.getRecordset(rs => rs
+	const data = await core.Query.getRecordset(rs => rs
 		.select("Asset AS Code", "Amount")
 		.from("crypto_game", "Portfolio_Asset")
 		.where("Portfolio = %s", portfolioID)
@@ -72,7 +72,7 @@ export const getPortfolioData = async (identifier) => {
 		ID: portfolioID,
 		assets: data.map(i => ({
 			Code: i.Code,
-			Amount: sb.Utils.round(i.Amount, 6, { direction: "floor" })
+			Amount: core.Utils.round(i.Amount, 6, { direction: "floor" })
 		}))
 	};
 };
@@ -172,7 +172,7 @@ export const updatePortfolioAsset = async (portfolioData, assetData, amount) => 
 			});
 		}
 
-		const row = await sb.Query.getRow("crypto_game", "Portfolio_Asset");
+		const row = await core.Query.getRow("crypto_game", "Portfolio_Asset");
 		row.setValues({
 			Portfolio: portfolioData.ID,
 			Asset: assetData.Code,
@@ -187,7 +187,7 @@ export const updatePortfolioAsset = async (portfolioData, assetData, amount) => 
 			});
 		}
 
-		await sb.Query.getRecordUpdater(ru => ru
+		await core.Query.getRecordUpdater(ru => ru
 			.update("crypto_game", "Portfolio_Asset")
 			.set("Amount", {
 				useField: true,
@@ -200,7 +200,7 @@ export const updatePortfolioAsset = async (portfolioData, assetData, amount) => 
 };
 
 export const createTransferTransaction = async (sourcePortfolio, targetPortfolio, assetData, amount) => {
-	const row = await sb.Query.getRow("crypto_game", "Transaction");
+	const row = await core.Query.getRow("crypto_game", "Transaction");
 	row.setValues({
 		Source_Portfolio: sourcePortfolio.ID,
 		Source_Asset: assetData.Code,
@@ -229,7 +229,7 @@ export const createConvertTransaction = async (portfolioData, sourceAsset, targe
 		sourceAmount = checkAmount;
 	}
 
-	const row = await sb.Query.getRow("crypto_game", "Transaction");
+	const row = await core.Query.getRow("crypto_game", "Transaction");
 	row.setValues({
 		Source_Portfolio: portfolioData.ID,
 		Source_Asset: sourceAsset.Code,

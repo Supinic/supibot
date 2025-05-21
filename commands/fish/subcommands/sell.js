@@ -47,7 +47,7 @@ export default {
 				const types = itemTypeDefinitions.map(i => i.name).join(", ");
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						When selling all, you must provide a type!
 						You don't wanna sell all of your stuff by accident, right?
 						Use one of: ${types}
@@ -99,7 +99,7 @@ export default {
 			await context.user.setDataProperty("fishData", fishData);
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					You sold ${itemsSold} ${prefix}${itemTypeDefinition?.description ?? "items"} 
 					for a grand total of ${coinsGained}${COIN_EMOJI}
 					- now you have ${fishData.coins}${COIN_EMOJI}
@@ -133,7 +133,7 @@ export default {
 		if (Number.isNaN(requestedAmount)) {
 			requestedAmount = 1;
 		}
-		else if (!sb.Utils.isValidInteger(requestedAmount, 1)) {
+		else if (!core.Utils.isValidInteger(requestedAmount, 1)) {
 			return {
 				success: false,
 				reply: `You provided an invalid amount of items to sell! You need to use a positive integer (a whole number).`

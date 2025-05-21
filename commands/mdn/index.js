@@ -15,7 +15,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://developer.mozilla.org/api/v1/search",
 			searchParams: {
 				q: query,

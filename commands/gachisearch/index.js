@@ -25,9 +25,9 @@ export default {
 		}
 
 		const { invocation } = context;
-		const escaped = sb.Query.escapeLikeString(query);
+		const escaped = core.Query.escapeLikeString(query);
 		if (invocation === "gsa" || invocation === "gachiauthorseach") {
-			const data = await sb.Query.raw(sb.Utils.tag.trim `
+			const data = await core.Query.raw(core.Utils.tag.trim `
 				SELECT ID, Name
 				FROM music.Author
 				WHERE 
@@ -67,7 +67,7 @@ export default {
 			};
 		}
 
-		const directMatch = await sb.Query.getRecordset(rs => rs
+		const directMatch = await core.Query.getRecordset(rs => rs
 			.select("ID", "Name")
 			.from("music", "Track")
 			.where("Link = %s", query)
@@ -84,7 +84,7 @@ export default {
 			};
 		}
 
-		const data = await sb.Query.raw(sb.Utils.tag.trim `
+		const data = await core.Query.raw(core.Utils.tag.trim `
 			SELECT
 				ID,
 				Name,
@@ -136,7 +136,7 @@ export default {
 		else {
 			const params = data.map(i => `ID=${i.ID}`).join("&");
 			const listLink = `/track/lookup?${params}`;
-			const relay = await sb.Got.get("Supinic")({
+			const relay = await core.Got.get("Supinic")({
 				method: "POST",
 				url: "relay",
 				json: { url: listLink }

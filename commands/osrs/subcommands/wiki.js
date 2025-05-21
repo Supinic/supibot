@@ -16,7 +16,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://oldschool.runescape.wiki/w/Special:Search",
 			responseType: "text",
 			throwHttpErrors: false,
@@ -24,7 +24,7 @@ export default {
 		});
 
 		if (response.redirectUrls.length !== 0) {
-			const $ = sb.Utils.cheerio(response.body);
+			const $ = core.Utils.cheerio(response.body);
 			const summary = $($("#mw-content-text > div > p")[0]).text();
 			const url = $("link[rel='canonical']")?.attr("href")?.replace("oldschool.runescape.wiki", "osrs.wiki") ?? "(no link)";
 

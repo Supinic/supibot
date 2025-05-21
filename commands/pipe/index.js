@@ -156,7 +156,7 @@ export default {
 				argumentStartPosition = Number(context.params._pos);
 			}
 
-			if (argumentStartPosition !== null && !sb.Utils.isValidInteger(argumentStartPosition)) {
+			if (argumentStartPosition !== null && !core.Utils.isValidInteger(argumentStartPosition)) {
 				return {
 					success: false,
 					reply: "Invalid argument position provided!"
@@ -175,7 +175,7 @@ export default {
 			if (pipeCount > NESTED_PIPE_LIMIT) {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Your pipe cannot continue!
 						It causes more than ${NESTED_PIPE_LIMIT} pipe calls.
 						Please reduce the complexity first.
@@ -231,7 +231,7 @@ export default {
 							: "(no reply)";
 					}
 
-					const string = sb.Utils.wrapString(reply, RESULT_CHARACTER_LIMIT, {
+					const string = core.Utils.wrapString(reply, RESULT_CHARACTER_LIMIT, {
 						keepWhitespace: true
 					});
 
@@ -284,7 +284,7 @@ export default {
 				};
 			}
 			else {
-				const string = sb.Utils.wrapString(execution.reply, RESULT_CHARACTER_LIMIT, {
+				const string = core.Utils.wrapString(execution.reply, RESULT_CHARACTER_LIMIT, {
 					keepWhitespace: true
 				});
 

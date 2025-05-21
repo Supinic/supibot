@@ -14,7 +14,7 @@ export default {
 			};
 		}
 
-		const amount = await sb.Query.getRecordset(rs => rs
+		const amount = await core.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS TotalCount")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("Channel = %n", context.channel.ID)
@@ -30,7 +30,7 @@ export default {
 		}
 
 		return {
-			reply: `I have seen ${sb.Utils.groupDigits(amount)} messages in this channel so far.`
+			reply: `I have seen ${core.Utils.groupDigits(amount)} messages in this channel so far.`
 		};
 	}),
 	Dynamic_Description: null

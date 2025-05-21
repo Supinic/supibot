@@ -1,5 +1,5 @@
 const deactivate = async (sub, resultArray) => {
-	const row = await sb.Query.getRow("data", "Event_Subscription");
+	const row = await core.Query.getRow("data", "Event_Subscription");
 	await row.load(sub.ID);
 
 	row.values.Active = false;
@@ -17,7 +17,7 @@ export default {
 	description: "Removes bot event subscribers if they become inactive.",
 	code: (async function pruneInactiveEventSubscribers () {
 		const twitch = sb.Platform.get("twitch");
-		const subscriptions = await sb.Query.getRecordset(rs => rs
+		const subscriptions = await core.Query.getRecordset(rs => rs
 			.select("ID", "User_Alias")
 			.from("data", "Event_Subscription")
 			.where("Type NOT IN %s+", ["Suggestion", "Channel live"])

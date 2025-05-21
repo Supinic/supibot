@@ -18,7 +18,7 @@ export default function checkSafetyStatus (safeMode, blacklistedFlags, image) {
 			};
 		}
 		else if (image.Score > scoreThreshold) {
-			const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
+			const thresholdPercent = `${core.Utils.round(scoreThreshold * 100, 2)}%`;
 			return {
 				success: false,
 				reply: `Cannot post image! Its NSFW score (${imageNSFWScore}) is higher than the threshold (${thresholdPercent}).`

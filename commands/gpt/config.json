@@ -22,7 +22,7 @@
   },
   "models": {
     "mini": {
-      "url": "gpt-4o-mini",
+      "url": "gpt-4.1-mini",
       "type": "openai",
       "default": true,
       "inputLimit": 1500,
@@ -30,32 +30,41 @@
         "default": 150,
         "maximum": 500
       },
+      "pricePerMtoken": 0.42
+    },
+    "base": {
+      "url": "gpt-4.1",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "outputLimit": {
+        "default": 150,
+        "maximum": 500
+      },
+      "pricePerMtoken": 1.84
+    },
+    "nano": {
+      "url": "gpt-4.1-nano",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "outputLimit": {
+        "default": 150,
+        "maximum": 500
+      },
+      "pricePerMtoken": 0.12
+    },
+    "search": {
+      "url": "gpt-4o-mini-search-preview",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "outputLimit": {
+        "default": 150,
+        "maximum": 500
+      },
+      "search": true,
       "pricePerMtoken": 0.40
-    },
-    "nexra-4": {
-      "url": "gpt-4-32k",
-      "type": "nexra",
-      "default": false,
-      "inputLimit": 5000,
-      "outputLimit": {
-        "default": 5000,
-        "maximum": 5000
-      },
-      "pricePerMtoken": 0.05
-    },
-    "blackbox": {
-      "url": "blackbox",
-      "type": "nexra-complements",
-      "default": false,
-      "inputLimit": 5000,
-      "outputLimit": {
-        "default": 5000,
-        "maximum": 5000
-      },
-      "flags": {
-        "yapping": true
-      },
-      "pricePerMtoken": 0.05
     },
     "qwen": {
       "url": "qwen",
@@ -112,8 +121,7 @@
       },
       "pricePerMtoken": 0.08
     },
-    "o1-mini": {
-      "url": "o1-mini",
+    "o4-mini": {
       "type": "openai",
       "default": false,
       "subscriberOnly": true,
@@ -124,7 +132,7 @@
         "default": 200,
         "maximum": 500
       },
-      "pricePerMtoken": 7.00
+      "pricePerMtoken": 3.00
     }
   }
 }

@@ -28,7 +28,7 @@ export default {
 		const type = (context.params.type ?? "btc").toLowerCase();
 
 		if (type === "btc" || type === "bitcoin") {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: `https://blockchain.info/rawaddr/${address}`,
 				throwHttpErrors: false,
 				searchParams: {
@@ -48,7 +48,7 @@ export default {
 			symbol = "BTC";
 		}
 		else if (type === "eth" || type === "ether" || type === "ethereum") {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://api.etherscan.io/api",
 				searchParams: {
 					module: "account",
@@ -70,7 +70,7 @@ export default {
 			symbol = "ETH";
 		}
 
-		const exchange = await sb.Got.get("GenericAPI")({
+		const exchange = await core.Got.get("GenericAPI")({
 			url: "https://min-api.cryptocompare.com/data/price",
 			searchParams: {
 				fsym: symbol,
@@ -84,9 +84,9 @@ export default {
 			}
 		});
 
-		const crypto = sb.Utils.groupDigits(value);
-		const usd = sb.Utils.groupDigits(sb.Utils.round(value * exchange.body.USD, 3));
-		const eur = sb.Utils.groupDigits(sb.Utils.round(value * exchange.body.EUR, 3));
+		const crypto = core.Utils.groupDigits(value);
+		const usd = core.Utils.groupDigits(core.Utils.round(value * exchange.body.USD, 3));
+		const eur = core.Utils.groupDigits(core.Utils.round(value * exchange.body.EUR, 3));
 
 		return {
 			reply: `The current balance of this address (${address.slice(0, 8)}) is ${crypto} ${symbol} - or $${usd} / €${eur}.`

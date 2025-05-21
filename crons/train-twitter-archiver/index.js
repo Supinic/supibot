@@ -7,12 +7,12 @@ export default {
 			return;
 		}
 
-		const response = await sb.Got.get("Supinic")({
+		const response = await core.Got.get("Supinic")({
 			url: `twitter/timeline/trainwreckstv`
 		});
 
 		const tweets = response.body.data.timeline;
-		const existingTweetIDs = await sb.Query.getRecordset(rs => rs
+		const existingTweetIDs = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("twitter", "Tweet")
 			.where("ID IN %s+", tweets.map(i => i.id_str))
@@ -25,11 +25,11 @@ export default {
 				continue;
 			}
 
-			const row = await sb.Query.getRow("twitter", "Tweet");
+			const row = await core.Query.getRow("twitter", "Tweet");
 			row.setValues({
 				ID,
 				User: tweet.user_id_str,
-				Text: sb.Utils.fixHTML(tweet.full_text),
+				Text: core.Utils.fixHTML(tweet.full_text),
 				Created: new sb.Date(tweet.created_at),
 				Reply_Tweet: null,
 				Reply_User: null,

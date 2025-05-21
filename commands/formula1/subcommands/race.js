@@ -11,7 +11,9 @@ const getHighlights = async (race) => {
 		return [];
 	}
 
-	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`);
+	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`, {
+		filterShortsHeuristic: true
+	});
 };
 
 export default {
@@ -46,7 +48,7 @@ export default {
 			? new sb.Date(`${race.date} ${race.time}`)
 			: new sb.Date(race.date);
 
-		const delta = sb.Utils.timeDelta(raceDate);
+		const delta = core.Utils.timeDelta(raceDate);
 
 		const afterRaceDate = raceDate.clone().addHours(3);
 
@@ -95,7 +97,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Season ${race.season},
 				round ${race.round}:
 				${race.raceName}.

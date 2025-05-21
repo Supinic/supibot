@@ -16,7 +16,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function randomWord (context, number = 1) {
 		let repeats = Number(number);
-		if (!sb.Utils.isValidInteger(repeats) || repeats > MAXIMUM_WORD_AMOUNT) {
+		if (!core.Utils.isValidInteger(repeats) || repeats > MAXIMUM_WORD_AMOUNT) {
 			repeats = 1;
 		}
 
@@ -53,7 +53,7 @@ export default {
 
 		const words = [];
 		for (let i = 0; i < repeats; i++) {
-			words.push(sb.Utils.randArray(wordList));
+			words.push(core.Utils.randArray(wordList));
 		}
 
 		return {

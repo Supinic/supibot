@@ -3,7 +3,7 @@ export default {
 	aliases: ["activechatters"],
 	description: "Checks how many chatters are active in chat in the past 5 minutes.",
 	execute: async () => {
-		const amount = await sb.Query.getRecordset(rs => rs
+		const amount = await core.Query.getRecordset(rs => rs
 			.select("Amount")
 			.from("data", "Active_Chatter_Log")
 			.orderBy("Timestamp DESC")

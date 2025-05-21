@@ -76,12 +76,12 @@ export default {
 
 			const experience = (skill.experience === -1)
 				? "(unranked)"
-				: sb.Utils.groupDigits(skill.experience);
+				: core.Utils.groupDigits(skill.experience);
 
 			const level = (context.params.virtual) ? skill.virtualLevel : skill.level;
 			return {
-				reply: sb.Utils.tag.trim `
-					${sb.Utils.capitalize(accountType)} ${user}
+				reply: core.Utils.tag.trim `
+					${core.Utils.capitalize(accountType)} ${user}
 					${emoji} ${level} 
 					(XP: ${experience})
 				`
@@ -105,13 +105,13 @@ export default {
 
 		if (strings.length === 0) {
 			return {
-				reply: `${sb.Utils.capitalize(accountType)} ${user} exists, but none of their stats are being tracked.`
+				reply: `${core.Utils.capitalize(accountType)} ${user} exists, but none of their stats are being tracked.`
 			};
 		}
 		else {
 			const total = data.skills.find(i => i.name.toLowerCase() === "overall");
 			const totalXPString = (total)
-				? `XP: ${sb.Utils.groupDigits(total.experience)}`
+				? `XP: ${core.Utils.groupDigits(total.experience)}`
 				: "";
 
 			const combatLevelString = (data.combatLevel !== null)
@@ -119,7 +119,7 @@ export default {
 				: "";
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					Stats for ${accountType} ${user}:
 					${strings.join(" ")}
 					|

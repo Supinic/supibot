@@ -68,7 +68,7 @@ export default {
 		}
 
 		const [dataProperty, name] = typeProperty[leaderboardType];
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await core.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Username")
 			.select(`CONVERT(JSON_EXTRACT(Value, '$.${dataProperty}'), INT) AS Total`)
 			.select("RANK() OVER(ORDER BY Total DESC) AS Rank")
@@ -106,7 +106,7 @@ export default {
 
 		const userFishData = await context.user.getDataProperty("fishData");
 		if (userFishData && data.every(i => i.Username !== context.user.Name)) {
-			const [userStats] = await sb.Query.raw(`
+			const [userStats] = await core.Query.raw(`
 				SELECT Total, Rank
 				FROM (
 			    	SELECT

@@ -25,7 +25,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	initialize: async () => {
-		logTableExists = await sb.Query.isTablePresent("data", "Translate_Log");
+		logTableExists = await core.Query.isTablePresent("data", "Translate_Log");
 	},
 	Code: (async function translate (context, ...args) {
 		const query = args.join(" ");
@@ -63,12 +63,12 @@ export default {
 		const result = await engineData.execute(context, query);
 
 		if (logTableExists) {
-			const row = await sb.Query.getRow("data", "Translate_Log");
+			const row = await core.Query.getRow("data", "Translate_Log");
 			row.setValues({
 				User_Alias: context.user.ID,
 				Channel: context.channel?.ID ?? null,
 				Engine: engine,
-				Excerpt: sb.Utils.wrapString(query, 100),
+				Excerpt: core.Utils.wrapString(query, 100),
 				Input_Length: query.length,
 				Output_Length: result.text?.length ?? null,
 				Success: result.success,

@@ -48,7 +48,7 @@ export default {
 			}
 		}
 
-		const response = await sb.Got.get("IVR")({
+		const response = await core.Got.get("IVR")({
 			url: `v2/twitch/subage/${user}/${channel}`
 		});
 
@@ -64,7 +64,7 @@ export default {
 		}
 
 		const verb = (user.toLowerCase() === context.user.Name) ? "have" : "has";
-		const delta = sb.Utils.timeDelta(new sb.Date(followedAt), true, true);
+		const delta = core.Utils.timeDelta(new sb.Date(followedAt), true, true);
 		return {
 			reply: `${prefix} ${verb} been following ${suffix} for ${delta}.`
 		};

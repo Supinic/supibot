@@ -28,7 +28,7 @@ export default {
 		}
 
 		let limit = Number(rawLimit);
-		if (!sb.Utils.isValidInteger(limit)) {
+		if (!core.Utils.isValidInteger(limit)) {
 			limit = 10;
 		}
 		else if (limit > 100) {
@@ -41,7 +41,7 @@ export default {
 
 		const channelIDs = new Set([context.channel.ID]);
 		if (context.platform.Name === "twitch" && !context.params.currentOnly) {
-			const previousIDs = await sb.Query.getRecordset(rs => rs
+			const previousIDs = await core.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("chat_data", "Channel")
 				.where("ID <> %n", context.channel.ID)
@@ -61,7 +61,7 @@ export default {
 			}
 		}
 
-		const top = await sb.Query.getRecordset(rs => rs
+		const top = await core.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
 			.select("User_Alias.Name AS Name")
 			.from("chat_data", "Message_Meta_User_Alias")
@@ -74,7 +74,7 @@ export default {
 
 		const chatters = top.map((i, ind) => {
 			const name = `${i.Name[0]}\u{E0000}${i.Name.slice(1)}`;
-			return `#${ind + 1}: ${name} (${sb.Utils.groupDigits(i.Total)})`;
+			return `#${ind + 1}: ${name} (${core.Utils.groupDigits(i.Total)})`;
 		}).join(", ");
 
 		return {

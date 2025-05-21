@@ -13,7 +13,7 @@ export default {
 			return { reply: "No search text provided!" };
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://api.stackexchange.com/2.2/search/advanced",
 			searchParams: {
 				order: "desc",
@@ -33,13 +33,13 @@ export default {
 
 		const item = data.items[0];
 		return {
-			reply: sb.Utils.tag.trim `
-				${sb.Utils.fixHTML(item.title)},
+			reply: core.Utils.tag.trim `
+				${core.Utils.fixHTML(item.title)},
 				(score: ${item.score}, answers: ${item.answer_count})
 				asked by ${item.owner.display_name}
-				${sb.Utils.timeDelta(new sb.Date(item.creation_date * 1000))}
+				${core.Utils.timeDelta(new sb.Date(item.creation_date * 1000))}
 				and last active
-				${sb.Utils.timeDelta(new sb.Date(item.last_activity_date * 1000))}.
+				${core.Utils.timeDelta(new sb.Date(item.last_activity_date * 1000))}.
 				https://stackoverflow.com/questions/${item.question_id}
 			`
 		};

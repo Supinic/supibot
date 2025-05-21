@@ -26,7 +26,7 @@ export default {
 
 		let query = args.join(" ");
 		if (query.toLowerCase() === "random") {
-			const response = await sb.Got.get("FakeAgent")({
+			const response = await core.Got.get("FakeAgent")({
 				url: `https://${languageCode}.wikipedia.org/wiki/Special:Random`,
 				responseType: "text"
 			});
@@ -42,7 +42,7 @@ export default {
 			query = blobs[1];
 		}
 
-		const searchData = await sb.Got.get("GenericAPI")({
+		const searchData = await core.Got.get("GenericAPI")({
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: {
 				format: "json",
@@ -60,7 +60,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: {
 				format: "json",
@@ -88,7 +88,7 @@ export default {
 			params.append("format", "json");
 			params.append("url", idLink);
 
-			const shortenResponse = await sb.Got.get("GenericAPI")({
+			const shortenResponse = await core.Got.get("GenericAPI")({
 				method: "POST",
 				responseType: "json",
 				url: "https://meta.wikimedia.org/w/api.php",
@@ -121,7 +121,7 @@ export default {
 
 			const { extract, title } = data[key];
 			return {
-				reply: `${link} ${title}: ${sb.Utils.wrapString(extract, 500)}`
+				reply: `${link} ${title}: ${core.Utils.wrapString(extract, 500)}`
 			};
 		}
 	}),

@@ -34,7 +34,7 @@ const handleAmbassadors = async (type, context, ...args) => {
 	await channelData.toggleAmbassador(userData);
 
 	if (type === "set") {
-		const message = sb.Utils.tag.trim `
+		const message = core.Utils.tag.trim `
 					You are now a Supibot Ambassador in the channel ${channelData.Name}!
 					This means you can use some commands as if you were the channel owner, such as "ban" - check its help!
 					You should also notify @Supinic whenever there's an issue, or something needs to be fixed or done regarding the bot.

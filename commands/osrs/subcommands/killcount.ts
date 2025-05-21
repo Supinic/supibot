@@ -71,6 +71,8 @@ export default {
 			};
 		}
 
+		activity = activity.toLowerCase();
+
 		const { username } = parsedUserData;
 		const userStats = await fetchUserData(username, {
 			seasonal: Boolean(context.params.seasonal),

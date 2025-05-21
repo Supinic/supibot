@@ -21,7 +21,7 @@ export default {
 			};
 		}
 
-		const challengeID = await sb.Query.getRecordset(rs => rs
+		const challengeID = await core.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("chat_data", "User_Verification_Challenge")
 			.where("User_Alias = %n", context.user.ID)
@@ -40,7 +40,7 @@ export default {
 			};
 		}
 
-		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
+		const row = await core.Query.getRow("chat_data", "User_Verification_Challenge");
 		await row.load(challengeID);
 
 		const sourcePlatform = sb.Platform.get(row.values.Platform_From);

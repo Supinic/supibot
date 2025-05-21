@@ -11,7 +11,14 @@ export default {
 	Params: null,
 	Whitelist_Response: "Only available in channels with VLC API configured!",
 	Code: (async function when (context) {
-		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+		if (!sb.VideoLANConnector) {
+			return {
+				success: false,
+				reply: "VLC connector is not available! Check configuration if this is required."
+			};
+		}
+
+		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
 		if (state !== "vlc") {
 			return {
 				reply: "Song requests are currently off or not in VLC!"
@@ -54,17 +61,17 @@ export default {
 			loopItem = queue[++index];
 		}
 
-		const status = await sb.VideoLANConnector.status();
+		const status = sb.VideoLANConnector.getCurrentStatus();
 		const current = queue.find(i => i.Status === "Current");
 		if (status && current) {
 			const endTime = current.End_Time ?? status.time;
 			timeRemaining -= endTime;
 		}
 
-		const delta = sb.Utils.formatTime(Math.round(timeRemaining));
+		const delta = core.Utils.formatTime(Math.round(timeRemaining));
 		const bridge = (prepend) ? "Then," : "Your next video";
 
-		const pauseStatus = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		const pauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
 		const pauseString = (pauseStatus === true)
 			? "Song requests are paused at the moment."
 			: "";

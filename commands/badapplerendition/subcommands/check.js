@@ -26,7 +26,7 @@ export default {
 				processed.add(link);
 			}
 
-			const existing = await sb.Query.getRecordset(rs => rs
+			const existing = await core.Query.getRecordset(rs => rs
 				.select("ID", "Device", "Link", "Timestamp")
 				.from("data", "Bad_Apple")
 				.where(`Link = %s OR JSON_SEARCH(Reuploads, "one", %s) IS NOT NULL`, link, link)
@@ -38,7 +38,7 @@ export default {
 				const timestamp = (existing.Timestamp) ? `?t=${existing.Timestamp}` : "";
 				results.push({
 					input,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						Link is in the list already:
 						https://supinic.com/data/bad-apple/detail/${existing.ID}
 						Bad Apple!! on ${existing.Device}
@@ -60,7 +60,7 @@ export default {
 				continue;
 			}
 
-			const row = await sb.Query.getRow("data", "Bad_Apple");
+			const row = await core.Query.getRow("data", "Bad_Apple");
 			row.setValues({
 				Link: link,
 				Device: data.name,

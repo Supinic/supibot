@@ -49,7 +49,7 @@ export default {
 		}
 
 		if (context.params.summary) {
-			const response = await sb.Got.get("TwitchGQL")({
+			const response = await core.Got.get("TwitchGQL")({
 				body: JSON.stringify([{
 					operationName: "HomeShelfGames",
 					extensions: {
@@ -86,7 +86,7 @@ export default {
 			};
 		}
 
-		const streamResponse = await sb.Got.get("Helix")({
+		const streamResponse = await core.Got.get("Helix")({
 			url: "streams",
 			searchParams: {
 				user_id: channelID
@@ -104,7 +104,7 @@ export default {
 		let vodEnd;
 		const [stream] = streamResponse.body.data;
 
-		const vodResponse = await sb.Got.get("Helix")({
+		const vodResponse = await core.Got.get("Helix")({
 			url: "videos",
 			searchParams: {
 				user_id: channelID
@@ -137,7 +137,7 @@ export default {
 
 			/** @type {HelixVideo | undefined} */
 			const data = vod.data[0];
-			const vodDurationSeconds = sb.Utils.parseDuration(data.duration, { target: "sec" });
+			const vodDurationSeconds = core.Utils.parseDuration(data.duration, { target: "sec" });
 			vodTitle = data.title;
 			vodEnd = new sb.Date(data.created_at).addSeconds(vodDurationSeconds);
 
@@ -154,7 +154,7 @@ export default {
 		}
 
 		if (!stream) {
-			const broadcasterResponse = await sb.Got.get("IVR")({
+			const broadcasterResponse = await core.Got.get("IVR")({
 				url: "v2/twitch/user",
 				searchParams: {
 					id: channelID
@@ -188,7 +188,7 @@ export default {
 				}
 				else {
 					return {
-						reply: sb.Utils.tag.trim `
+						reply: core.Utils.tag.trim `
 							Channel is ${status} - never streamed before.
 							However, lately Twitch doesn't always show the proper date of last stream.
 							Check the official link, maybe it will work there: 
@@ -210,7 +210,7 @@ export default {
 			}
 
 			const title = vodTitle ?? lastBroadcast.title ?? "(no title)";
-			const delta = sb.Utils.timeDelta(start);
+			const delta = core.Utils.timeDelta(start);
 			return {
 				reply: `Channel is ${status} - last streamed ${delta} - title: ${title} ${vodString}`
 			};
@@ -221,7 +221,7 @@ export default {
 				const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
 				const searchParams = new URLSearchParams(paramsIterable);
 
-				const response = await sb.Got.get("Helix")({
+				const response = await core.Got.get("Helix")({
 					url: "tags/streams",
 					searchParams
 				});
@@ -230,7 +230,7 @@ export default {
 				tags.push(...tagDescriptions);
 			}
 
-			const started = sb.Utils.timeDelta(new sb.Date(stream.started_at));
+			const started = core.Utils.timeDelta(new sb.Date(stream.started_at));
 			const viewersSuffix = (stream.viewer_count === 1) ? "" : "s";
 			const broadcast = (stream.game_name)
 				? `playing ${stream.game_name}`
@@ -240,10 +240,10 @@ export default {
 				: `Current tags: ${tags.join(", ")}`;
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					${targetChannel} is ${broadcast}, 
 					since ${started} 
-					for ${sb.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
+					for ${core.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
 					Title: ${stream.title} 
 					${tagString}
 					https://twitch.tv/${targetChannel.toLowerCase()}

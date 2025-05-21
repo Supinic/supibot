@@ -358,7 +358,7 @@ const catchMessages = {
 	]
 };
 
-export const getCatchMessage = (type) => sb.Utils.randArray(catchMessages[type]);
+export const getCatchMessage = (type) => core.Utils.randArray(catchMessages[type]);
 
 /**
  * @param {string|null} [bait]

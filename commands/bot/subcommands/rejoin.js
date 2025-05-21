@@ -26,7 +26,7 @@ export default {
 		if (inactiveReason === "bot-banned" && subcommand !== "i-will-not-ban-supibot-again") {
 			return {
 				success: false,
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					I have been banned in channel "${channelData.Name}" for too long!
 					You must use this command instead → $bot i-will-not-ban-supibot-again channel:${channelData.Name}
 				`
@@ -46,7 +46,7 @@ export default {
 			await channelData.saveProperty("Mode", offlineConfiguration.mode ?? "Write");
 
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					I rejoined channel "${channelData.Name}" immediately.
 					It was in read-only mode because someone used "$bot disable" before.
 					Next time, you can just do "$bot enable".

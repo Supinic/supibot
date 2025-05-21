@@ -62,7 +62,7 @@ export default [
 				};
 			}
 
-			const exists = await sb.Query.getRecordset(rs => rs
+			const exists = await core.Query.getRecordset(rs => rs
 				.select("Link", "Adult_Flags")
 				.from("data", "Twitch_Lotto")
 				.where("Link = %s", match[4])
@@ -77,7 +77,7 @@ export default [
 			}
 
 			if (exists.Adult_Flags === null) {
-				const channels = await sb.Query.getRecordset(rs => rs
+				const channels = await core.Query.getRecordset(rs => rs
 					.select("Channel")
 					.from("data", "Twitch_Lotto")
 					.where("Link = %s", exists.Link)
@@ -85,7 +85,7 @@ export default [
 				);
 
 				for (const channel of channels) {
-					const row = await sb.Query.getRow("data", "Twitch_Lotto_Channel");
+					const row = await core.Query.getRow("data", "Twitch_Lotto_Channel");
 					await row.load(channel);
 					if (row.values.Scored !== null) {
 						row.values.Scored += 1;
@@ -94,7 +94,7 @@ export default [
 				}
 			}
 
-			await sb.Query.getRecordUpdater(ru => ru
+			await core.Query.getRecordUpdater(ru => ru
 				.update("data", "Twitch_Lotto")
 				.set("Adult_Flags", flags.sort())
 				.where("Link = %s", match[4])
@@ -152,7 +152,7 @@ export default [
 			}
 
 			/** @type {string|undefined} */
-			const parsedLink = await sb.Query.getRecordset(rs => rs
+			const parsedLink = await core.Query.getRecordset(rs => rs
 				.select("Link")
 				.from("data", "Twitch_Lotto")
 				.where("Link = %s", match[4])
@@ -168,7 +168,7 @@ export default [
 				};
 			}
 
-			const row = await sb.Query.getRow("data", "Twitch_Lotto_Description");
+			const row = await core.Query.getRow("data", "Twitch_Lotto_Description");
 			await row.load({
 				Link: parsedLink,
 				User_Alias: context.user.ID

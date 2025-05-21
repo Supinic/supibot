@@ -20,7 +20,7 @@ export default {
 
 		// Possible future reference:
 		// POST method with FormData (name: "image") is also possible if working with files
-		const { statusCode, body: data } = await sb.Got.get("GenericAPI")({
+		const { statusCode, body: data } = await core.Got.get("GenericAPI")({
 			url: "https://api.trace.moe/search",
 			searchParams: {
 				url: link
@@ -51,7 +51,7 @@ export default {
 		const showKey = { type: "show", id: result.anilist };
 		let show = await this.getCacheData(showKey);
 		if (!show) {
-			const response = await sb.Got.gql({
+			const response = await core.Got.gql({
 				url: "https://trace.moe/anilist",
 				query: `query ($ids: [Int]) {
 					Page (page: 1, perPage: 1) {
@@ -76,21 +76,21 @@ export default {
 
 		const name = show.title.english ?? show.title.romaji ?? show.title.native;
 
-		const time = sb.Utils.formatTime(Math.trunc(result.from), true);
-		const similarity = sb.Utils.round(result.similarity * 100, 2);
+		const time = core.Utils.formatTime(Math.trunc(result.from), true);
+		const similarity = core.Utils.round(result.similarity * 100, 2);
 
 		const descriptor = [];
 		if (result.season) {
-			descriptor.push(`S${sb.Utils.zf(result.season, 2)}`);
+			descriptor.push(`S${core.Utils.zf(result.season, 2)}`);
 		}
 		if (result.episode) {
-			descriptor.push(`E${sb.Utils.zf(result.episode, 2)}`);
+			descriptor.push(`E${core.Utils.zf(result.episode, 2)}`);
 		}
 
 		const videoLinkKey = { type: "video-link", url: result.video };
 		let videoLink = await this.getCacheData(videoLinkKey);
 		if (!videoLink) {
-			const videoData = await sb.Got.get("GenericAPI")({
+			const videoData = await core.Got.get("GenericAPI")({
 				url: result.video,
 				responseType: "buffer",
 				throwHttpErrors: false
@@ -115,7 +115,7 @@ export default {
 		}
 
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Best match for your picture:
 				${name.trim()} ${adult}
 				${descriptor.join("")}

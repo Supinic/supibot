@@ -23,7 +23,7 @@ export default {
 		}
 
 		const cacheKey = getCooldownKey(context.user, context.channel);
-		const cooldownKeyExists = await sb.Cache.getByPrefix(cacheKey);
+		const cooldownKeyExists = await core.Cache.getByPrefix(cacheKey);
 		if (cooldownKeyExists) {
 			return {
 				success: false,
@@ -37,7 +37,7 @@ export default {
 			eligibleUsernames.splice(botIndex, 1);
 		}
 
-		const exemptUsernames = await sb.Query.getRecordset(rs => rs
+		const exemptUsernames = await core.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Username")
 			.from("chat_data", "User_Alias_Data")
 			.join("chat_data", "User_Alias")
@@ -67,12 +67,12 @@ export default {
 			};
 		}
 
-		await sb.Cache.setByPrefix(cacheKey, true, {
+		await core.Cache.setByPrefix(cacheKey, true, {
 			expiry: 10_000
 		});
 
 		return {
-			reply: sb.Utils.randArray(usernames)
+			reply: core.Utils.randArray(usernames)
 		};
 	}
 };

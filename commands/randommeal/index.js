@@ -11,14 +11,14 @@ export default {
 		let data;
 
 		if (args.length === 0) {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://www.themealdb.com/api/json/v1/1/random.php"
 			});
 
 			data = response.body;
 		}
 		else {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				url: "https://www.themealdb.com/api/json/v1/1/search.php",
 				searchParams: {
 					s: args.join(" ")
@@ -35,7 +35,7 @@ export default {
 			}
 		}
 
-		const meal = sb.Utils.randArray(data.meals);
+		const meal = core.Utils.randArray(data.meals);
 		const ingredients = [];
 		for (const [key, value] of Object.entries(meal)) {
 			if (!/ingredient\d+/i.test(key) || !value) {

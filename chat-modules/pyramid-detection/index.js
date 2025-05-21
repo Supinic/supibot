@@ -42,9 +42,10 @@ export default {
 			pyramid.level--;
 		}
 
+		const platform = channel.Platform;
 		if (previousLevel !== pyramid.level && !pyramid.ascending && pyramid.level === 1) {
 			if (pyramid.maxLevel >= threshold) {
-				const emote = await channel.getBestAvailableEmote(["PagMan", "PagChomp", "Pog", "ShoopDaWhoop"], "🥳", { shuffle: true });
+				const emote = await platform.getBestAvailableEmote(channel, ["PagMan", "PagChomp", "Pog", "ShoopDaWhoop"], "🥳", { shuffle: true });
 				await channel.send(`${user.Name} finished a ${pyramid.maxLevel} tall pyramid ${emote} Clap`);
 			}
 
@@ -55,7 +56,7 @@ export default {
 		}
 		else if (previousLevel === pyramid.level) {
 			if (pyramid.maxLevel >= threshold) {
-				const emote = await channel.getBestAvailableEmote(["Weirdga", "PepeLaugh", "FeelsWeirdMan"], "🥴", { shuffle: true });
+				const emote = await platform.getBestAvailableEmote(channel, ["PagMan", "PagChomp", "Pog", "ShoopDaWhoop"], "🥳", { shuffle: true });
 				await channel.send(`${user.Name} ruined a ${pyramid.maxLevel} tall pyramid ${emote} Clap`);
 			}
 

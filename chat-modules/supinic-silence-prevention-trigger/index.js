@@ -12,10 +12,10 @@ export default {
 			return;
 		}
 
-		if (context.event === "offline" && cron.job.running) {
+		if (context.event === "offline" && cron.job.isActive) {
 			cron.job.stop();
 		}
-		else if (context.event === "online" && !cron.job.running) {
+		else if (context.event === "online" && !cron.job.isActive) {
 			cron.job.start();
 		}
 	}),

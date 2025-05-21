@@ -82,7 +82,7 @@ const decode = (input, codeWord) => {
 		for (let i = 0; i < word.length; i++) {
 			const isUpperCase = (word[i] === word[i].toUpperCase());
 			if (codeWord.length === 6 && bit === 32) {
-				const normalizedStringArray = [...word[i].normalize("NKFD")];
+				const normalizedStringArray = [...word[i].normalize("NFKD")];
 				const hasDiaeresis = (normalizedStringArray[1] === DIAERESIS);
 				if (!hasDiaeresis) {
 					value += bit;

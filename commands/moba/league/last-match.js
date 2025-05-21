@@ -56,20 +56,20 @@ export default {
 		}
 
 		const gameEnd = new sb.Date(info.gameEndTimestamp);
-		const gameEndString = `Played ${sb.Utils.timeDelta(gameEnd)}`;
+		const gameEndString = `Played ${core.Utils.timeDelta(gameEnd)}`;
 		const gameResultString = (player.win) ? "won as" : "lost as";
 		const gameLengthMinutes = Math.floor(info.gameDuration / 60);
 		const gameLengthString = `in ${gameLengthMinutes}min`;
 
 		const creepScore = player.totalMinionsKilled + player.neutralMinionsKilled;
-		const creepsPerMinute = sb.Utils.round(creepScore / gameLengthMinutes, 1);
+		const creepsPerMinute = core.Utils.round(creepScore / gameLengthMinutes, 1);
 
 		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
 		const gameType = gameQueue.shortName;
 
 		const champName = NON_STANDARD_CHAMPION_NAMES[player.championName] ?? player.championName;
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${playerName} ${gameResultString} ${champName} ${position}
 				in ${gameType} ${gameLengthString}.	
 				KDA: ${player.kills}/${player.deaths}/${player.assists},

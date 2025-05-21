@@ -53,7 +53,7 @@ export default {
 		if (permissions.flag === sb.User.permissions.regular) {
 			return {
 				success: false,
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					You're not authorized to do that in channel "${channelData.Name}"!
 					You should ask the broadcaster or an ambassador to do this instead.
 					If you want a different channel, use the channel:channel_name parameter.

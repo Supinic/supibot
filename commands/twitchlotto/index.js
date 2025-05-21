@@ -26,7 +26,7 @@ export default {
 	Whitelist_Response: "This command can't be executed here!",
 	Code: (async function twitchLotto (context, channel) {
 		if (!this.data.channels) {
-			this.data.channels = await sb.Query.getRecordset(rs => rs
+			this.data.channels = await core.Query.getRecordset(rs => rs
 				.select("LOWER(Name) AS Name")
 				.from("data", "Twitch_Lotto_Channel")
 				.flat("Name")
@@ -54,7 +54,7 @@ export default {
 			let availableChannels = this.data.channels.filter(i => !excludedChannels.has(i));
 
 			if (context.params.forceUnscored) {
-				const eligibleChannels = await sb.Query.getRecordset(rs => rs
+				const eligibleChannels = await core.Query.getRecordset(rs => rs
 					.select("LOWER(Name) AS Name")
 					.from("data", "Twitch_Lotto_Channel")
 					.where("Amount > Scored")
@@ -71,7 +71,7 @@ export default {
 				};
 			}
 
-			channel = sb.Utils.randArray(availableChannels);
+			channel = core.Utils.randArray(availableChannels);
 		}
 
 		if (channel) {
@@ -82,7 +82,7 @@ export default {
 
 				let eligibleChannels = this.data.channels;
 				if (context.params.forceUnscored) {
-					eligibleChannels = await sb.Query.getRecordset(rs => rs
+					eligibleChannels = await core.Query.getRecordset(rs => rs
 						.select("LOWER(Name) AS Name")
 						.from("data", "Twitch_Lotto_Channel")
 						.where("Amount > Scored")
@@ -90,7 +90,7 @@ export default {
 					);
 				}
 
-				channel = sb.Utils.randArray(eligibleChannels);
+				channel = core.Utils.randArray(eligibleChannels);
 			}
 
 			if (!this.data.channels.includes(channel)) {
@@ -104,7 +104,7 @@ export default {
 		// Preparation work that does not need to run more than once, so it is placed before the loop below.
 		if (!this.data.counts) {
 			let total = 0;
-			const countData = await sb.Query.getRecordset(rs => rs
+			const countData = await core.Query.getRecordset(rs => rs
 				.select("Name", "Amount")
 				.from("data", "Twitch_Lotto_Channel")
 			);
@@ -139,7 +139,7 @@ export default {
 		let failedTries = 0;
 		while (image === null) {
 			if (safeMode) {
-				image = await sb.Query.getRecordset(rs => rs
+				image = await core.Query.getRecordset(rs => rs
 					.select("*")
 					.from("data", "Twitch_Lotto")
 					.where({ condition: Boolean(channel) }, "Channel = %s", channel)
@@ -172,7 +172,7 @@ export default {
 					};
 				}
 
-				image = await sb.Query.getRecordset(rs => rs
+				image = await core.Query.getRecordset(rs => rs
 					.select("*")
 					.from("data", "Twitch_Lotto")
 					.where("Channel = %s", channel)
@@ -209,7 +209,7 @@ export default {
 			}
 			else if (channel) {
 				const roll = randomInt(1, this.data.counts[channel]) - 1;
-				image = await sb.Query.getRecordset(rs => rs
+				image = await core.Query.getRecordset(rs => rs
 					.select("*")
 					.from("data", "Twitch_Lotto")
 					.where("Channel = %s", channel)
@@ -220,7 +220,7 @@ export default {
 			}
 			else {
 				const roll = randomInt(1, this.data.counts.total);
-				const link = await sb.Query.getRecordset(rs => rs
+				const link = await core.Query.getRecordset(rs => rs
 					.select("Link")
 					.from("data", "Twitch_Lotto")
 					.orderBy("Link ASC")
@@ -230,7 +230,7 @@ export default {
 					.flat("Link")
 				);
 
-				image = await sb.Query.getRecordset(rs => rs
+				image = await core.Query.getRecordset(rs => rs
 					.select("*")
 					.from("data", "Twitch_Lotto")
 					.where("Link = %s", link)
@@ -244,7 +244,7 @@ export default {
 				image = null;
 			}
 			else if (image.Available === null) {
-				const { statusCode } = await sb.Got.get("GenericAPI")({
+				const { statusCode } = await core.Got.get("GenericAPI")({
 					method: "HEAD",
 					throwHttpErrors: false,
 					followRedirect: false,
@@ -252,7 +252,7 @@ export default {
 				});
 
 				if (statusCode !== 200) {
-					await sb.Query.getRecordUpdater(ru => ru
+					await core.Query.getRecordUpdater(ru => ru
 						.update("data", "Twitch_Lotto")
 						.set("Available", false)
 						.where("Link = %s", image.Link)
@@ -307,14 +307,14 @@ export default {
 			}
 
 			const json = JSON.stringify({ detections: data.detections, nsfw_score: data.score });
-			await sb.Query.getRecordUpdater(ru => ru
+			await core.Query.getRecordUpdater(ru => ru
 				.update("data", "Twitch_Lotto")
 				.set("Score", data.score)
 				.set("Data", json)
 				.where("Link = %s", image.Link)
 			);
 
-			const channels = await sb.Query.getRecordset(rs => rs
+			const channels = await core.Query.getRecordset(rs => rs
 				.select("Channel")
 				.from("data", "Twitch_Lotto")
 				.where("Link = %s", image.Link)
@@ -322,7 +322,7 @@ export default {
 			);
 
 			for (const channel of channels) {
-				const row = await sb.Query.getRow("data", "Twitch_Lotto_Channel");
+				const row = await core.Query.getRow("data", "Twitch_Lotto_Channel");
 				await row.load(channel);
 				if (row.values.Scored !== null) {
 					row.values.Scored += 1;
@@ -331,7 +331,7 @@ export default {
 			}
 
 			image.Data = json;
-			image.Score = sb.Utils.round(data.score, 4);
+			image.Score = core.Utils.round(data.score, 4);
 
 			const legalityCheck = checkSafety(safeMode, blacklistedFlags, image);
 			if (legalityCheck.success === false) {
@@ -358,7 +358,7 @@ export default {
 
 		let channelString = "";
 		if (!channel || randomRoll || excludedInput) {
-			const channels = await sb.Query.getRecordset(rs => rs
+			const channels = await core.Query.getRecordset(rs => rs
 				.select("Channel")
 				.from("data", "Twitch_Lotto")
 				.where("Link = %s", image.Link)
@@ -368,7 +368,7 @@ export default {
 			channelString = `Posted in channel(s): ${channels.join(", ")}`;
 		}
 
-		const descriptionData = await sb.Query.getRecordset(rs => rs
+		const descriptionData = await core.Query.getRecordset(rs => rs
 			.select("Text")
 			.from("data", "Twitch_Lotto_Description")
 			.where("Link = %s", image.Link)
@@ -389,7 +389,7 @@ export default {
 		const scoreThresholdExceeded = ((image.Score === null) || (image.Score > 0.5 && detections.length > 0) || (image.Score > 0.75));
 		return {
 			removeEmbeds: (context.channel && !context.channel.NSFW && scoreThresholdExceeded),
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				NSFW score: ${formatScore(image.Score)}
 				Detections: ${detectionsString.length === 0 ? "N/A" : detectionsString.join(", ")}
 				${flagsString}
@@ -401,19 +401,19 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
-		const countData = await sb.Query.getRecordset(rs => rs
+		const thresholdPercent = `${core.Utils.round(scoreThreshold * 100, 2)}%`;
+		const countData = await core.Query.getRecordset(rs => rs
 			.select("Name", "Amount", "LEAST(Amount, Scored) AS Scored")
 			.from("data", "Twitch_Lotto_Channel")
 			.orderBy("Amount DESC")
 		);
 
-		const data = countData.map(i => sb.Utils.tag.trim `
+		const data = countData.map(i => core.Utils.tag.trim `
 			<tr>
 				<td>${i.Name}</td>
-				<td data-order=${i.Amount}>${sb.Utils.groupDigits(i.Amount)}</td>
-				<td data-order=${i.Scored}>${sb.Utils.groupDigits(i.Scored)}</td>
-				<td>${sb.Utils.round(100 * i.Scored / i.Amount, 2)}%</td>
+				<td data-order=${i.Amount}>${core.Utils.groupDigits(i.Amount)}</td>
+				<td data-order=${i.Scored}>${core.Utils.groupDigits(i.Scored)}</td>
+				<td>${core.Utils.round(100 * i.Scored / i.Amount, 2)}%</td>
 			</tr>
 		`).join("\n");
 
@@ -424,7 +424,7 @@ export default {
 				...wrong.map(i => `<li>Wrong: ${i}</li>`)
 			];
 
-			return sb.Utils.tag.trim `
+			return core.Utils.tag.trim `
 				<li>
 					<code>${name}</code> - ${description}
 					<ul>

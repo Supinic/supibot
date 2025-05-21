@@ -21,7 +21,7 @@ export default {
 			};
 		}
 
-		const data = (await sb.Query.getRecordset(rs => rs
+		const data = (await core.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
@@ -36,7 +36,7 @@ export default {
 
 		const who = (context.user.ID === userData.ID) ? "You have" : "That user has";
 		return {
-			reply: `${who} sent ${sb.Utils.groupDigits(data.Total)} chat lines across all tracked channels so far.`
+			reply: `${who} sent ${core.Utils.groupDigits(data.Total)} chat lines across all tracked channels so far.`
 		};
 	}),
 	Dynamic_Description: null

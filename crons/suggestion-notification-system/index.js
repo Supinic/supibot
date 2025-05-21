@@ -8,8 +8,8 @@ export default {
 	code: (async function notifyOnSuggestionChange (cron) {
 		if (typeof isTableAvailable === "undefined") {
 			const [subscription, suggestion] = await Promise.all([
-				sb.Query.isTablePresent("data", "Event_Subscription"),
-				sb.Query.isTablePresent("data", "Suggestion")
+				core.Query.isTablePresent("data", "Event_Subscription"),
+				core.Query.isTablePresent("data", "Suggestion")
 			]);
 
 			isTableAvailable = (subscription && suggestion);
@@ -20,7 +20,7 @@ export default {
 			return;
 		}
 
-		const subscriptions = await sb.Query.getRecordset(rs => rs
+		const subscriptions = await core.Query.getRecordset(rs => rs
 			.select("User_Alias", "Platform")
 			.from("data", "Event_Subscription")
 			.where("Active = %b", true)
@@ -28,7 +28,7 @@ export default {
 		);
 		const users = subscriptions.map(i => i.User_Alias);
 
-		const suggestions = await sb.Query.getRecordset(rs => rs
+		const suggestions = await core.Query.getRecordset(rs => rs
 			.select("ID", "User_Alias", "Status")
 			.from("data", "Suggestion")
 			.where("Status IS NULL OR Status NOT IN %s+", ["Dismissed by author", "Quarantined"])

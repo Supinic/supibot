@@ -24,7 +24,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function randomGachi (context) {
-		const prefixRow = await sb.Query.getRow("data", "Video_Type");
+		const prefixRow = await core.Query.getRow("data", "Video_Type");
 		await prefixRow.load(1);
 
 		const targetUserFavourite = context.params.fav ?? null;
@@ -42,7 +42,7 @@ export default {
 		const allowedTypes = (context.params.type) ? context.params.type.split(/\W/) : ["youtube"];
 		const typeIDs = allowedTypes.map(i => VIDEO_TYPE_IDS[i] ?? null).filter(Boolean);
 
-		const data = await sb.Query.getRecordset(rs => {
+		const data = await core.Query.getRecordset(rs => {
 			rs.select("Track.ID AS TrackID, Track.Name AS TrackName, Track.Link AS TrackLink")
 				.select("GROUP_CONCAT(Author.Name SEPARATOR ',') AS Authors")
 				.from("music", "Track")

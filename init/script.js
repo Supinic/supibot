@@ -13,7 +13,6 @@ const config = {
 		"chat_data/tables/Chat_Module",
 		"chat_data/tables/Channel_Chat_Module",
 		"chat_data/tables/User_Alias",
-		"chat_data/tables/Custom_Data_Property",
 		"chat_data/tables/Channel_Data",
 		"chat_data/tables/User_Alias_Data",
 		"chat_data/tables/Command_Execution",
@@ -28,9 +27,7 @@ const config = {
 		"chat_data/triggers/add_missing_first_channel_command_after_insert",
 		"chat_data/triggers/add_missing_first_message_data_after_insert"
 	],
-	initialDataFilePaths: [
-		"chat_data/Custom_Data_Property"
-	],
+	initialDataFilePaths: [],
 	meta: {
 		dataPath: path.join(import.meta.dirname, "initial-data"),
 		definitionPath: path.join(import.meta.dirname, "definitions"),

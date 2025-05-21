@@ -81,9 +81,9 @@ const getMatchIdsKey = (summonerId) => `moba-league-match-ids-${summonerId}`;
 const getMatchDataKey = (matchId) => `moba-league-match-data-${matchId}`;
 
 export const getQueueDescription = async (queueId) => {
-	let queueData = await sb.Cache.getByPrefix(QUEUE_DATA_CACHE_KEY);
+	let queueData = await core.Cache.getByPrefix(QUEUE_DATA_CACHE_KEY);
 	if (!queueData) {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://static.developer.riotgames.com/docs/lol/queues.json"
 		});
 
@@ -94,7 +94,7 @@ export const getQueueDescription = async (queueId) => {
 				: null
 		}));
 
-		await sb.Cache.setByPrefix(QUEUE_DATA_CACHE_KEY, queueData, {
+		await core.Cache.setByPrefix(QUEUE_DATA_CACHE_KEY, queueData, {
 			expiry: 14 * 864e5 // 14 days
 		});
 	}
@@ -123,9 +123,9 @@ export const getPlatform = (identifier) => {
 
 export const getPUUIDByName = async (gameName, tagLine) => {
 	const key = getPUUIdCacheKey(gameName, tagLine);
-	let puuid = await sb.Cache.getByPrefix(key);
+	let puuid = await core.Cache.getByPrefix(key);
 	if (!puuid) {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
 			throwHttpErrors: false,
 			headers: {
@@ -147,7 +147,7 @@ export const getPUUIDByName = async (gameName, tagLine) => {
 
 		puuid = response.body.puuid;
 
-		await sb.Cache.setByPrefix(key, puuid, {
+		await core.Cache.setByPrefix(key, puuid, {
 			expiry: 30 * 864e5 // 30 days
 		});
 	}
@@ -157,9 +157,9 @@ export const getPUUIDByName = async (gameName, tagLine) => {
 
 export const getSummonerId = async (platform, puuid) => {
 	const summonerKey = getSummonerIdCacheKey(puuid);
-	let summonerId = await sb.Cache.getByPrefix(summonerKey);
+	let summonerId = await core.Cache.getByPrefix(summonerKey);
 	if (!summonerId) {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
 			throwHttpErrors: false,
 			headers: {
@@ -180,7 +180,7 @@ export const getSummonerId = async (platform, puuid) => {
 		}
 
 		summonerId = response.body.id;
-		await sb.Cache.setByPrefix(summonerKey, summonerId, {
+		await core.Cache.setByPrefix(summonerKey, summonerId, {
 			expiry: 30 * 864e5 // 30 days
 		});
 	}
@@ -190,9 +190,9 @@ export const getSummonerId = async (platform, puuid) => {
 
 export const getLeagueEntries = async (platform, summonerId) => {
 	const key = getLeagueEntriesCacheKey(platform, summonerId);
-	let data = await sb.Cache.getByPrefix(key);
+	let data = await core.Cache.getByPrefix(key);
 	if (!data) {
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
@@ -200,7 +200,7 @@ export const getLeagueEntries = async (platform, summonerId) => {
 		});
 
 		data = response.body;
-		await sb.Cache.setByPrefix(key, data, {
+		await core.Cache.setByPrefix(key, data, {
 			expiry: 300_000 // 5 minutes
 		});
 	}
@@ -298,14 +298,14 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
  */
 export const getMatchIds = async (platform, puuid, options = {}) => {
 	const summonerMatchKey = getMatchIdsKey(puuid);
-	let matchIds = await sb.Cache.getByPrefix(summonerMatchKey);
+	let matchIds = await core.Cache.getByPrefix(summonerMatchKey);
 	if (!matchIds) {
 		const searchParams = new URLSearchParams({
 			count: options.count ?? 20
 		});
 
 		const region = REGIONS[platform];
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
 			throwHttpErrors: false,
 			headers: {
@@ -324,7 +324,7 @@ export const getMatchIds = async (platform, puuid, options = {}) => {
 		}
 
 		matchIds = response.body;
-		await sb.Cache.setByPrefix(summonerMatchKey, matchIds, {
+		await core.Cache.setByPrefix(summonerMatchKey, matchIds, {
 			expiry: 300_000 // 5 minutes
 		});
 	}
@@ -334,10 +334,10 @@ export const getMatchIds = async (platform, puuid, options = {}) => {
 
 export const getMatchData = async (platform, matchId) => {
 	const matchDataKey = getMatchDataKey(matchId);
-	let matchData = await sb.Cache.getByPrefix(matchDataKey);
+	let matchData = await core.Cache.getByPrefix(matchDataKey);
 	if (!matchData) {
 		const region = REGIONS[platform];
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://${region}.api.riotgames.com/lol/match/v5/matches/${matchId}`,
 			throwHttpErrors: false,
 			headers: {
@@ -358,7 +358,7 @@ export const getMatchData = async (platform, matchId) => {
 
 		// Only cache matches that are finished
 		if (matchData.info.endOfGameResult === GAME_RESULT.END) {
-			await sb.Cache.setByPrefix(matchDataKey, matchData, {
+			await core.Cache.setByPrefix(matchDataKey, matchData, {
 				expiry: 30 * 864e5 // 30 days
 			});
 		}

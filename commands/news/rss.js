@@ -3,7 +3,7 @@ import { parseRSS } from "../../utils/command-utils.js";
 import definitions from "./definitions.json" with { type: "json" };
 const rssCacheKey = "command-news-rss-cache";
 
-const sanitize = (string) => sb.Utils.fixHTML(sb.Utils.removeHTML(string)).replaceAll(/\s+/g, " ");
+const sanitize = (string) => core.Utils.fixHTML(core.Utils.removeHTML(string)).replaceAll(/\s+/g, " ");
 
 export default {
 	isCountryCode: (code) => /[A-Z]{2}/.test(code),
@@ -29,17 +29,17 @@ export default {
 			throw new sb.Error({ message: "Extra news code does not exist" });
 		}
 
-		const source = sb.Utils.randArray(news.sources);
+		const source = core.Utils.randArray(news.sources);
 		const cacheKey = `${rssCacheKey}-${news.code}-${source.name}`;
 
-		let articles = await sb.Cache.get(cacheKey);
+		let articles = await core.Cache.get(cacheKey);
 		if (!articles) {
-			const endpoint = sb.Utils.randArray(source.endpoints);
+			const endpoint = core.Utils.randArray(source.endpoints);
 			const url = [source.url, source.path, endpoint].filter(Boolean).join("/");
 
 			let feed;
 			try {
-				const xml = await sb.Got.get("GenericAPI")({
+				const xml = await core.Got.get("GenericAPI")({
 					url,
 					headers: {
 						"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/602.1 (KHTML, like Gecko) QuiteRss/0.19.4 Version/10.0 Safari/602.1"
@@ -77,7 +77,7 @@ export default {
 				published: new sb.Date(i.pubDate).valueOf()
 			}));
 
-			await sb.Cache.set({
+			await core.Cache.set({
 				key: cacheKey,
 				value: articles,
 				expiry: 36e5
@@ -102,7 +102,7 @@ export default {
 			article = resultArticles.sort((a, b) => b.published - a.published)[0];
 		}
 		else {
-			article = sb.Utils.randArray(resultArticles);
+			article = core.Utils.randArray(resultArticles);
 		}
 
 		if (!article) {
@@ -117,7 +117,7 @@ export default {
 		const includeLink = context.params.link ?? Boolean(source.includeLink);
 
 		const delta = (published)
-			? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
+			? `(published ${core.Utils.timeDelta(new sb.Date(published))})`
 			: "";
 
 		let result;

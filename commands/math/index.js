@@ -23,7 +23,7 @@ export default {
 		};
 
 		if (context.params.precision) {
-			if (!sb.Utils.isValidInteger(context.params.precision)) {
+			if (!core.Utils.isValidInteger(context.params.precision)) {
 				return {
 					success: false,
 					reply: "Provided precision must be a positive integer!"
@@ -37,7 +37,7 @@ export default {
 			parameters.expr = `format((${parameters.expr}), { notation: "fixed" })`;
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,

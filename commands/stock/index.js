@@ -30,7 +30,7 @@ export default {
 			? args[0]
 			: findPopularSymbol(input) ?? args[0];
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			retry: {
 				limit: 0
 			},
@@ -55,13 +55,13 @@ export default {
 		const data = {};
 		for (const rawKey of Object.keys(rawData)) {
 			const fixedKey = rawKey.replace(/^\d+\.\s+/, "");
-			const key = sb.Utils.convertCase(fixedKey, "text", "camel");
+			const key = core.Utils.convertCase(fixedKey, "text", "camel");
 			data[key] = rawData[rawKey];
 		}
 
 		const changeSymbol = (Number(data.changePercent.replace("%", "")) >= 0) ? "+" : "";
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				${data.symbol}: Current price: $${data.price}, change: ${changeSymbol}${data.changePercent}.
 				Close price: $${data.previousClose}.
 				Open price: $${data.open}.

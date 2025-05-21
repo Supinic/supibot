@@ -7,7 +7,7 @@ export default {
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`
 	],
 	execute: async function (context, ...args) {
-		const alias = await sb.Query.getRecordset(rs => rs
+		const alias = await core.Query.getRecordset(rs => rs
 			.select("Name")
 			.from("osrs", "Item")
 			.where(`JSON_SEARCH(Aliases, "one", %s) IS NOT NULL`, args.join(" ").toLowerCase())
@@ -17,7 +17,7 @@ export default {
 		);
 
 		const query = (alias ?? args.join(" ")).toLowerCase();
-		const data = await sb.Query.getRecordset(rs => {
+		const data = await core.Query.getRecordset(rs => {
 			rs.select("Game_ID", "Name", "Value")
 				.from("osrs", "Item");
 
@@ -35,7 +35,7 @@ export default {
 			};
 		}
 
-		const bestMatch = sb.Utils.selectClosestString(query, data.map(i => i.Name), { ignoreCase: true });
+		const bestMatch = core.Utils.selectClosestString(query, data.map(i => i.Name), { ignoreCase: true });
 		const item = (bestMatch !== null)
 			? data.find(i => i.Name.toLowerCase() === bestMatch.toLowerCase())
 			: data[0];
@@ -47,7 +47,7 @@ export default {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 			throwHttpErrors: false,
 			searchParams: {
@@ -75,7 +75,7 @@ export default {
 				return price;
 			}
 			else {
-				return sb.Utils.formatSI(price, "", 3, true).replace("G", "B");
+				return core.Utils.formatSI(price, "", 3, true).replace("G", "B");
 			}
 		};
 
@@ -84,13 +84,13 @@ export default {
 			? `${formatPrice(low)} gp`
 			: `${formatPrice(low)} gp - ${formatPrice(high)} gp`;
 
-		// const lowDelta = sb.Utils.timeDelta(new sb.Date(itemData.lowTime * 1000));
-		// const highDelta = sb.Utils.timeDelta(new sb.Date(itemData.highTime * 1000));
+		// const lowDelta = core.Utils.timeDelta(new sb.Date(itemData.lowTime * 1000));
+		// const highDelta = core.Utils.timeDelta(new sb.Date(itemData.highTime * 1000));
 
 		const highAlchValue = formatPrice(Math.floor(item.Value * 0.6));
 		const wiki = `https://prices.runescape.wiki/osrs/item/${item.Game_ID}`;
 		return {
-			reply: sb.Utils.tag.trim `
+			reply: core.Utils.tag.trim `
 				Current price range of ${item.Name}: ${priceString};
 				HA value: ${highAlchValue} gp
 				${wiki}

@@ -176,7 +176,7 @@ export const patterns = [
 		name: "numbers",
 		pattern: (context, data) => {
 			const target = Number(data.args[0]);
-			if (!sb.Utils.isValidInteger(target)) {
+			if (!core.Utils.isValidInteger(target)) {
 				return {
 					success: false,
 					reply: "You must provide a proper number to roll the number slots!"

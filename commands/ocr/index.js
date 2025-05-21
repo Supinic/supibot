@@ -93,7 +93,7 @@ export default {
 			statusCode = cacheData.statusCode;
 		}
 		else {
-			const response = await sb.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")({
 				method: "GET",
 				responseType: "json",
 				throwHttpErrors: false,

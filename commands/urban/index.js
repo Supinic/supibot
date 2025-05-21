@@ -26,7 +26,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function urban (context, ...args) {
 		if (args.length === 0 || args[0] === "random") {
-			const randomResponse = await sb.Got.get("GenericAPI")({
+			const randomResponse = await core.Got.get("GenericAPI")({
 				url: "https://api.urbandictionary.com/v0/random"
 			});
 
@@ -41,7 +41,7 @@ export default {
 		}
 
 		const term = args.join(" ").toLowerCase();
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
 				api_key: URBAN_FAUX_ACCESS_KEY,
@@ -57,7 +57,7 @@ export default {
 		});
 
 		if (response.statusCode === 500) {
-			const autocompleteResponse = await sb.Got.get("GenericAPI")({
+			const autocompleteResponse = await core.Got.get("GenericAPI")({
 				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
 				searchParams: {
 					api_key: URBAN_FAUX_ACCESS_KEY,
@@ -80,7 +80,7 @@ export default {
 			else {
 				return {
 					success: false,
-					reply: sb.Utils.tag.trim `
+					reply: core.Utils.tag.trim `
 						For whatever reason, UrbanDictionary cannot process this word! 
 						Check it for yourself: https://api.urbandictionary.com/v0/define?term=${term}
 					`

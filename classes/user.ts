@@ -1,13 +1,15 @@
-import { SupiDate, SupiError, type CacheValue, type Batch, type Row } from "supi-core";
-import {
-	TemplateWithIdString,
-	getGenericDataProperty,
-	setGenericDataProperty,
-	type GenericDataPropertyObject,
-	type GenericDataPropertyValue
-} from "./template.js";
+import { SupiDate, SupiError, type Batch, type Row } from "supi-core";
+import { TemplateWithIdString } from "./template.js";
 
 import config from "../config.json" with { type: "json" };
+import {
+	type UserDataProperty,
+	type UserDataPropertyMap,
+	type GenericFetchData,
+	fetchUserDataProperty,
+	isCachedUserProperty,
+	saveUserDataProperty
+} from "./custom-data-properties.js";
 
 type ConstructorData = {
 	ID: User["ID"];
@@ -20,7 +22,6 @@ type UserCacheData = ConstructorData & {
 	Started_Using: number | null;
 };
 
-type GenericFetchData = GenericDataPropertyObject<User>["options"];
 type GetOptions = Partial<Pick<ConstructorData, "Twitch_ID" | "Discord_ID">>;
 
 export type Like = User | User["Name"] | User["ID"];
@@ -44,7 +45,7 @@ export class User extends TemplateWithIdString {
 	static readonly mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
 	static data: Map<string, User> = new Map();
-	static readonly dataCache: WeakMap<User, Map<string, GenericDataPropertyValue>> = new WeakMap();
+	static readonly dataCache: WeakMap<User, Partial<UserDataPropertyMap>> = new WeakMap();
 	static readonly pendingNewUsers: Map<User["Name"], Promise<User> | null> = new Map();
 
 	static readonly permissions = {
@@ -87,32 +88,51 @@ export class User extends TemplateWithIdString {
 		await User.populateCaches(this);
 	}
 
-	async getDataProperty (propertyName: string, options: GenericFetchData = {}) {
-		return await getGenericDataProperty({
-			cacheMap: User.dataCache,
-			databaseProperty: "User_Alias",
-			databaseTable: "User_Alias_Data",
-			instance: this,
-			propertyContext: "User",
-			options,
-			propertyName
-		});
+	async getDataProperty <T extends UserDataProperty> (
+		propertyName: T,
+		options: GenericFetchData = {}
+	): Promise<UserDataPropertyMap[T]> {
+		if (!options.forceCacheReload && isCachedUserProperty(propertyName)) {
+			const cache = User.dataCache.get(this);
+			if (cache && cache[propertyName]) {
+				return cache[propertyName];
+			}
+		}
+
+		const value = await fetchUserDataProperty(propertyName, this.ID, options);
+		if (value === null) {
+			return null;
+		}
+
+		this.setPropertyCache(propertyName, value);
+
+		return value;
 	}
 
-	async setDataProperty (propertyName: string, value: CacheValue, options: GenericFetchData = {}) {
-		await setGenericDataProperty(this, {
-			cacheMap: User.dataCache,
-			databaseProperty: "User_Alias",
-			databaseTable: "User_Alias_Data",
-			instance: this,
-			propertyContext: "User",
-			propertyName,
-			options,
-			value
-		});
+	async setDataProperty <T extends UserDataProperty> (
+		propertyName: T,
+		value: UserDataPropertyMap[T],
+		options: GenericFetchData = {}
+	) {
+		await saveUserDataProperty(propertyName, value, this.ID, options);
+		this.setPropertyCache(propertyName, value);
 	}
 
-	getCacheProperties (): UserCacheData {
+	private setPropertyCache <T extends UserDataProperty> (propertyName: T, value: UserDataPropertyMap[T]) {
+		if (!isCachedUserProperty(propertyName)) {
+			return;
+		}
+
+		let cache = User.dataCache.get(this);
+		if (!cache) {
+			cache = {};
+			User.dataCache.set(this, cache);
+		}
+
+		cache[propertyName] = value;
+	}
+
+	private getCacheProperties (): UserCacheData {
 		return {
 			ID: this.ID,
 			Name: this.Name,

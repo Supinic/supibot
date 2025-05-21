@@ -30,7 +30,7 @@ export default {
 			query = `100g of ${query}`;
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")({
 			method: "POST",
 			url: "https://trackapi.nutritionix.com/v2/natural/nutrients",
 			headers: {
@@ -72,7 +72,7 @@ export default {
 				? ""
 				: `(${food.serving_weight_grams}g)`;
 
-			const start = sb.Utils.tag.trim `
+			const start = core.Utils.tag.trim `
 				${food.serving_qty}${food.serving_unit} of ${food.food_name}
 				${specificWeight}
 				contains
@@ -88,13 +88,13 @@ export default {
 					return `${data.value}${nutrient.unit} of ${nutrient.name}`;
 				});
 
-				foodstuffs.push(sb.Utils.tag.trim `
+				foodstuffs.push(core.Utils.tag.trim `
 					${start}
 					${nutrientList.filter(Boolean).join(", ")}.					
 				`);
 			}
 			else {
-				foodstuffs.push(sb.Utils.tag.trim `
+				foodstuffs.push(core.Utils.tag.trim `
 					${start}
 					${food.nf_calories} kcal,
 					${food.nf_total_fat}g of fat (${food.nf_saturated_fat ?? 0}g saturated),

@@ -34,7 +34,7 @@ type ConstructorData = {
 type DatabaseConstructorData = ConstructorData & { Active: boolean; };
 
 type NewAfkData = ConstructorData & {
-	Interrupted_ID?: AwayFromKeyboard["ID"];
+	Interrupted_ID?: AwayFromKeyboard["ID"] | null;
 };
 
 export class AwayFromKeyboard extends TemplateWithId {

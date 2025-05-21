@@ -29,7 +29,7 @@ export default {
 		const { reason, success, statusCode } = await addChannel(channelID);
 		if (success) {
 			return {
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					Successfully added this channel to the Rustlog service!
 					The $rl command should be enabled within approximately one minute.
 				`

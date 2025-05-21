@@ -15,7 +15,7 @@ export default {
 			};
 		}
 
-		const lastAFK = (await sb.Query.getRecordset(rs => rs
+		const lastAFK = (await core.Query.getRecordset(rs => rs
 			.select("ID", "Text", "Started", "Ended", "Status", "Interrupted_ID")
 			.from("chat_data", "AFK")
 			.where("User_Alias = %n", context.user.ID)
@@ -58,7 +58,7 @@ export default {
 			Status: lastAFK.Status
 		});
 
-		const oldAFK = await sb.Query.getRow("chat_data", "AFK");
+		const oldAFK = await core.Query.getRow("chat_data", "AFK");
 		await oldAFK.load(lastAFK.ID);
 
 		oldAFK.setValues({

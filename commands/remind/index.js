@@ -73,7 +73,7 @@ export default {
 			args.shift();
 		}
 
-		const spotted = await sb.Query.getRecordset(rs => rs
+		const spotted = await core.Query.getRecordset(rs => rs
 			.select("1")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", targetUser.ID)
@@ -145,7 +145,7 @@ export default {
 				const totalOffset = (timeData.rawOffset + timeData.dstOffset);
 				const symbol = (totalOffset >= 0 ? "+" : "-");
 				const hours = Math.trunc(Math.abs(totalOffset) / 3600);
-				const minutes = sb.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
+				const minutes = core.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
 				const prettyOffset = `${symbol}${hours}:${minutes}`;
 
 				chronoValue += ` UTC${prettyOffset}`;
@@ -172,11 +172,11 @@ export default {
 			}
 
 			targetReminderDate.milliseconds = now.milliseconds;
-			delta = sb.Utils.round(targetReminderDate - now, -3);
+			delta = core.Utils.round(targetReminderDate - now, -3);
 		}
 		else if (timedRegex.test(reminderText)) {
 			reminderText = reminderText.replaceAll(/\bhr\b/g, "hour");
-			const timeData = sb.Utils.parseDuration(reminderText, { returnData: true });
+			const timeData = core.Utils.parseDuration(reminderText, { returnData: true });
 
 			if (timeData.ranges.length > 0) {
 				const continueRegex = /^((\s*and\s*)|[\s\W]+)$/;
@@ -227,10 +227,10 @@ export default {
 		if (targetReminderDate) {
 			if (typeof targetReminderDate === "number") {
 				targetReminderDate = new sb.Date(targetReminderDate);
-				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate, true);
+				targetReminderDelta = core.Utils.timeDelta(targetReminderDate, true);
 			}
 			else {
-				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate, true);
+				targetReminderDelta = core.Utils.timeDelta(targetReminderDate, true);
 			}
 
 			const comparison = new sb.Date(now.valueOf() + delta);
@@ -256,7 +256,7 @@ export default {
 			else if ((sb.Date.now() + delta) > MAXIMUM_SQL_TIMESTAMP) {
 				const description = (Number.isFinite(comparison.valueOf()))
 					? `the date ${comparison.format("Y-m-d")}`
-					: `approximately ${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
+					: `approximately ${core.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
 
 				return {
 					success: false,
@@ -268,7 +268,7 @@ export default {
 		else if (targetUser === context.user) {
 			return {
 				success: false,
-				reply: sb.Utils.tag.trim `
+				reply: core.Utils.tag.trim `
 					To remind yourself, you must use the word "in"!
 					Such as: "in 5 minutes".
 				    You can also use the "on", "at" or "after" parameters
@@ -298,7 +298,7 @@ export default {
 
 		const type = (chronoType === "after") ? "Deferred" : "Reminder";
 		const message = (reminderText)
-			? sb.Utils.wrapString(reminderText, MESSAGE_LIMIT)
+			? core.Utils.wrapString(reminderText, MESSAGE_LIMIT)
 			: "(no message)";
 
 		const result = await sb.Reminder.create({
