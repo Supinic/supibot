@@ -40,7 +40,7 @@ const routeDefinitions = {
 	platform: PlatformDefinition,
 	reminder: ReminderDefinition,
 	user: UserDefinition
-} as const;
+};
 const routes = Object.keys(routeDefinitions);
 
 const isValidRoute = (input: string): input is keyof typeof routeDefinitions => routes.includes(input);
@@ -104,7 +104,7 @@ async function handler (req: http.IncomingMessage, res: http.ServerResponse, bas
 
 export default function initialize () {
 	const { api } = config;
-	if (!api || !api.port || typeof api.secure !== "boolean") {
+	if (!api.port || typeof api.secure !== "boolean") {
 		console.warn("Internal API port/security is not configured - internal API will not start");
 		return;
 	}
@@ -113,9 +113,11 @@ export default function initialize () {
 	const protocol = (api.secure) ? "https" : "http";
 	const baseURL = `${protocol}://localhost:${port}`;
 
+	const server = (api.secure)
+		? https.createServer((req, res) => void handler(req, res, baseURL))
+		: http.createServer((req, res) => void handler(req, res, baseURL));
 
-
-	const httpInterface = (api.secure) ? https : http;
+	/*
 	const server = httpInterface.createServer(async (req, res) => {
 		const url = new URL(req.url, baseURL);
 		const path = url.pathname.split("/").filter(Boolean);
@@ -168,6 +170,7 @@ export default function initialize () {
 			}));
 		}
 	});
+*/
 
 	server.listen(port);
 
