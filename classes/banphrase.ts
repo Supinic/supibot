@@ -290,7 +290,7 @@ export class Banphrase extends TemplateWithId {
 
 		if (options.skipBanphraseAPI || !channelData?.Banphrase_API_Type || !channelData.Banphrase_API_URL) {
 			return {
-				string: message,
+				string: resultMessage,
 				passed: true
 			};
 		}
