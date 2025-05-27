@@ -16,6 +16,7 @@ type EmoteJsonObject = {
 };
 type EmoteDescriptor = { name: string; id: string; };
 
+const SANITY_EMOTE_AMOUNT = 25;
 const cacheKey = "twitch-global-emotes";
 const fetchTwitchGlobalEmotes = () => core.Got.get("Helix")<HelixResponse>({
 	url: "chat/emotes/global",
@@ -77,6 +78,15 @@ const definition: CronDefinition = {
 		const newEmoteIds = new Set(newEmotes.map(i => i.id));
 		const differentEmoteIds = previousEmoteIds.symmetricDifference(newEmoteIds);
 		if (differentEmoteIds.size === 0) {
+			return;
+		}
+		else if (differentEmoteIds.size > SANITY_EMOTE_AMOUNT) {
+			console.warn("Too many emotes changed within the `global-emote-announcer` cron", {
+				amount: differentEmoteIds.size,
+				newEmoteIds: [...newEmoteIds],
+				previousEmoteIds: [...previousEmoteIds]
+			});
+
 			return;
 		}
 
