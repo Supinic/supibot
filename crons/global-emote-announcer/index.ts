@@ -48,6 +48,10 @@ const definition: CronDefinition = {
 				if (!response.ok) {
 					return;
 				}
+				else if (response.body.data.length === 0) {
+					console.warn("No Helix emote data received!", { body: response.body });
+					return;
+				}
 
 				data = response.body.data.map(i => ({
 					id: i.id,
