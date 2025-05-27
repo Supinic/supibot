@@ -98,6 +98,29 @@ const TWITCH_SUBSCRIPTION_PLANS = {
 	Prime: "Prime"
 } as const;
 
+type MessageRejectionRow = {
+	Timestamp: SupiDate;
+	Channel: Channel["ID"] | null;
+	Status: number;
+	Error: string | null;
+	Error_Message: string | null;
+	Chat_Message: string;
+};
+let messageRejectionTableExists: boolean | null = null;
+const logMessageRejection = async (data: Omit<MessageRejectionRow, "Timestamp">) => {
+	messageRejectionTableExists ??= await core.Query.isTablePresent("data", "Message_Rejection_Log");
+	if (!messageRejectionTableExists) {
+		return;
+	}
+
+	const row = await core.Query.getRow<MessageRejectionRow>("data", "Message_Rejection_Log");
+	row.setValues({
+		...data,
+		Timestamp: new SupiDate()
+	});
+	await row.save({ skipLoad: true });
+};
+
 type UserLookupResponse = {
 	data: {
 		id: string;
@@ -510,12 +533,13 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		if (!response.ok) {
-			console.warn("HTTP not sent!", {
-				status: response.statusCode,
-				body: response.body,
-				message,
-				channel: channelData.Name,
-				options
+			const errorResponse = response.body as unknown as { message: string; error: string; }; // @todo type error case properly
+			void logMessageRejection({
+				Channel: channelData.ID,
+				Chat_Message: message,
+				Status: response.statusCode,
+				Error: errorResponse.error,
+				Error_Message: errorResponse.message
 			});
 
 			return;
@@ -523,6 +547,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		const replyData = response.body.data[0];
 		if (!replyData.is_sent) {
+			void logMessageRejection({
+				Channel: channelData.ID,
+				Chat_Message: message,
+				Status: response.statusCode,
+				Error: replyData.drop_reason.code,
+				Error_Message: replyData.drop_reason.message
+			});
+
 			console.warn("JSON not sent!", {
 				time: new SupiDate().format("Y-m-d H:i:s"),
 				channel: {
