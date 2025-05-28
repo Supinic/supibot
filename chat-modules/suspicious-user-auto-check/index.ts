@@ -154,13 +154,15 @@ export default {
 			const json = JSON.stringify({ description, raw, reply: messageData.reply }, null, 4);
 			await sb.Logger.log(
 				"Twitch.Other",
-				`Automatic suspicious user resolution: ${json}`,
+				`TEST! Automatic suspicious user resolution: ${json}`,
 				channel,
 				null
 			);
 
+			replyIdUserMap.delete(raw.user);
 			await sb.User.invalidateUserCache(raw.user);
-			await channel.send(`Success 🥳 Make sure to try a command before you leave to confirm everything is okay`);
+			// await channel.send(`Success 🥳 Make sure to try a command before you leave to confirm everything is okay`);
+			await channel.send(`Debug: Name=${raw.user} ID=${raw.userId} Description=${description}`);
 		}
 	}),
 	Global: false,
