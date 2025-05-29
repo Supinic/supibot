@@ -47,7 +47,11 @@ export default {
 		}));
 
 		const article = (context.params.latest)
-			? articles.sort((a, b) => b.published - a.published)[0]
+			? articles.reduce((acc, article) => {
+				(article.published > acc.published)
+				? article
+				: acc
+			})
 			: core.Utils.randArray(articles);
 
 		const { content, title, published } = article;
