@@ -58,8 +58,12 @@ export default {
 
 		let result;
 		const dashlessTitle = title.replaceAll("-", "").replaceAll(/\s+/g, " ");
-		if (dashlessTitle.includes(content) || content.includes(dashlessTitle)) {
+		const dashlessContent = content.replaceAll("-", "").replaceAll(/\s+/g, " ");
+		if (dashlessTitle.includes(dashlessContent)) {
 			result = `${title ?? ""} ${delta}`;
+		}
+		else if (dashlessContent.includes(dashlessTitle)) {
+			result = `${content ?? ""} ${delta}`;
 		}
 		else {
 			result = `${title ?? ""}${separator}${content ?? ""} ${delta}`;
