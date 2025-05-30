@@ -32,6 +32,7 @@ type NameObject = {
 
 const HIGH_LOAD_CACHE_PREFIX = "sb-user-high-load";
 const HIGH_LOAD_CACHE_EXPIRY = 60_000;
+const pendingUserAdditionPromises: Map<User["Name"], Promise<User | null>> = new Map();
 
 export class User extends TemplateWithIdString {
 	readonly ID: number;
@@ -205,10 +206,20 @@ export class User extends TemplateWithIdString {
 			}
 			// 4. If strict mode is off, create the user and return the instance immediately
 			else if (!strict) {
-				const newlyAddedUserData = await User.add(username, {
+				// Prevent duplicate additions while the same username is pending in database
+				const existingPromise = pendingUserAdditionPromises.get(username);
+				if (existingPromise) {
+					return existingPromise;
+				}
+
+				const newUserDataPromise = User.add(username, {
 					Discord_ID: options.Discord_ID ?? null,
 					Twitch_ID: options.Twitch_ID ?? null
 				});
+				pendingUserAdditionPromises.set(username, newUserDataPromise);
+
+				const newlyAddedUserData = await newUserDataPromise;
+				pendingUserAdditionPromises.delete(username);
 
 				// 4-1. If high-load (batching) or critical-load (no inserts) are enabled,
 				// don't populate caches and immediately return `null`.
