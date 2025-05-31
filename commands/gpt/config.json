@@ -24,7 +24,7 @@
     "mini": {
       "url": "gpt-4.1-mini",
       "type": "openai",
-      "default": true,
+      "default": false,
       "inputLimit": 1500,
       "outputLimit": {
         "default": 150,
@@ -69,7 +69,7 @@
     "qwen": {
       "url": "qwen",
       "type": "nexra-complements",
-      "default": false,
+      "default": true,
       "inputLimit": 5000,
       "outputLimit": {
         "default": 5000,

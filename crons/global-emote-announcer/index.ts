@@ -122,7 +122,7 @@ const definition: CronDefinition = {
 		}
 
 		previousEmotes = newEmotes.map(i => ({ id: i.id, name: i.name }));
-		await core.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
+		await core.Cache.setByPrefix(cacheKey, previousEmotes, {
 			expiry: 7 * 864e5 // 7 days
 		});
 
