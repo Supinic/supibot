@@ -960,7 +960,7 @@ export class Command extends TemplateWithoutId {
 		// If the `hasPrefix` condition is met (we want the external prefix to be added), we check two more conditions:
 		// a) Either the command succeeded and the prefix isn't skipped, or
 		// b) The prefix is forced no matter the command's success status.
-		// The "channel alias" prefix takes precedence before teh "external input" one.
+		// The "channel alias" prefix takes precedence before the "external input" one.
 		const hasPrefix = Boolean(!options.partialExecute && execution.hasExternalInput);
 		if (execution.isChannelAlias) {
 			execution.reply = `#⃣  ${execution.reply}`;
