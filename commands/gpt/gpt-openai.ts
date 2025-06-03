@@ -26,7 +26,7 @@ type OpenAiResponse = {
 		prompt_tokens: number;
 		total_tokens: number;
 	}
-}
+};
 type OpenAiPayload = {
 	model: string;
 	messages: unknown[];
@@ -72,8 +72,9 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 	}
 };
 
-const gptLinkRegex = /\[.+?]\((.+)[?&]utm_source=openai\)/gi;
-const removeMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "$1");
+const gptLinkRegex = /\(?\[.+?]\((.+)[?&]utm_source=openai\)\)?/gi;
+const trimMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "$1").trim();
+const removeMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "").trim();
 
 export const GptOpenAI = {
 	async execute (context: GptContext, query: string, modelData: ModelData) {
@@ -168,9 +169,14 @@ export const GptOpenAI = {
 	},
 	extractMessage (context, response: GotResponse<OpenAiResponse>) {
 		const message = response.body.choices[0].message.content.trim();
-		return (context.platform.name === "twitch")
-			? removeMarkdownLinks(message)
-			: message;
+		if (context.platform.name === "twitch") {
+			return (context.append.pipe)
+				? trimMarkdownLinks(message)
+				: removeMarkdownLinks(message);
+		}
+		else {
+			return message;
+		}
 	},
 
 	async setHistory (context: GptContext, query: string, reply: string) {
