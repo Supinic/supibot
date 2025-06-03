@@ -1,3 +1,25 @@
+import type { Context } from "../../../classes/command.js";
+
+const formatPrice = (price: number) => {
+	if (price < 1000) {
+		return String(price);
+	}
+	else {
+		return core.Utils.formatSI(price, "", 3, true).replace("G", "B");
+	}
+};
+
+type WikiPriceData<T extends string | number> = {
+	data: {
+		[K in T]?: {
+			high: number;
+			highTime: number;
+			low: number;
+			lowTime: number;
+		};
+	};
+};
+
 export default {
 	name: "price",
 	title: "Item prices",
@@ -6,10 +28,10 @@ export default {
 		`<code>$osrs price (item)</code>`,
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`
 	],
-	execute: async function (context, ...args) {
-		const alias = await core.Query.getRecordset(rs => rs
+	execute: async function (context: Context, ...args: string[]) {
+		const alias = await core.Query.getRecordset<string | undefined>(rs => rs
 			.select("Name")
-			.from("osrs", "Item")
+			.from("data", "OSRS_Item")
 			.where(`JSON_SEARCH(Aliases, "one", %s) IS NOT NULL`, args.join(" ").toLowerCase())
 			.single()
 			.limit(1)
@@ -17,9 +39,13 @@ export default {
 		);
 
 		const query = (alias ?? args.join(" ")).toLowerCase();
-		const data = await core.Query.getRecordset(rs => {
+
+		type ItemData = { Game_ID: number; Name: string; Value: number; };
+		const data = await core.Query.getRecordset<ItemData[]>(rs => {
 			rs.select("Game_ID", "Name", "Value")
-				.from("osrs", "Item");
+				.from("data", "OSRS_Item")
+				.orderBy("Priority DESC")
+				.orderBy("Game_ID ASC");
 
 			for (const word of query.split(" ")) {
 				rs.where("Name %*like*", word);
@@ -47,7 +73,7 @@ export default {
 			};
 		}
 
-		const response = await core.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")<WikiPriceData<typeof item.Game_ID>>({
 			url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 			throwHttpErrors: false,
 			searchParams: {
@@ -69,15 +95,6 @@ export default {
 				reply: `${item.Name} cannot be traded!`
 			};
 		}
-
-		const formatPrice = (price) => {
-			if (price < 1000) {
-				return price;
-			}
-			else {
-				return core.Utils.formatSI(price, "", 3, true).replace("G", "B");
-			}
-		};
 
 		const { low, high } = itemData;
 		const priceString = (low === high)
