@@ -58,6 +58,8 @@ export default {
 			}
 		}
 		else if (context.event === "offline") {
+			await core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
+
 			// No stream data - stream is already offline
 			// Try and find an unfinished stream - look up by date and look for unfinished ones (End IS NULL)
 			const yesterday = new sb.Date().discardTimeUnits("h", "m", "s", "ms").addDays(-1);
@@ -80,7 +82,6 @@ export default {
 			}
 
 			// Clear all pending song requests, set song request status to "off"
-			await core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			await core.Query.getRecordUpdater(ru => ru
 				.update("chat_data", "Song_Request")
 				.set("Status", "Inactive")
