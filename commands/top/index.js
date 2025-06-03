@@ -54,13 +54,6 @@ export default {
 			}
 		}
 
-		const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
-		if (group) {
-			for (const channelID of group) {
-				channelIDs.add(channelID);
-			}
-		}
-
 		const top = await core.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
 			.select("User_Alias.Name AS Name")

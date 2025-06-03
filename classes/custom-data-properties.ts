@@ -119,6 +119,9 @@ const userDataSchema = {
 		};
 	},
 	customDeveloperData: {} as SimpleGenericData,
+	// Specifically declared as `string` instead of `ModelName`, because the GPT model definitions can change
+	// over time, and declaring it as a looser definition forces to check if it's currently valid.
+	defaultGptModel: "string",
 	defaultUserLanguage: {} as {
 		code: string;
 		name: string;
