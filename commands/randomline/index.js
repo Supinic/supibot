@@ -1,9 +1,7 @@
 import DatabaseLogs from "./db-randomline.js";
 import { getRandomChannelLine, getRandomUserLine, isSupported } from "./rustlog.js";
-import connectionData from "./connected-channels.json" with { type: "json" };
 import config from "../../config.json" with { type: "json" };
 
-const { connectedChannelGroups } = connectionData;
 const { instances } = config.rustlog;
 
 export default {
@@ -42,13 +40,7 @@ export default {
 
 			const channelID = context.channel.Specific_ID;
 			const isChannelSupported = await isSupported(channelID);
-			if (isChannelSupported === null) {
-				return {
-					success: false,
-					reply: `The logging service is currently unavailable! Please try again later.`
-				};
-			}
-			else if (isChannelSupported === false) {
+			if (isChannelSupported === false) {
 				let addendum = "";
 				const hadLogs = await context.channel.getDataProperty("logsRemovedReason");
 				if (hadLogs) {
@@ -92,33 +84,23 @@ export default {
 				result = await getRandomChannelLine(channelID);
 			}
 		}
-		else if (user) {
-			const targetUser = await sb.User.get(user);
-			if (!targetUser) {
-				return {
-					success: false,
-					reply: "I have not seen that user before, so you cannot check their random lines!"
-				};
-			}
-			else if (context.params.userID) {
-				return {
-					success: false,
-					reply: "Cannot fetch logs by user ID in this channel!"
-				};
-			}
-
-			const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
-			if (group) {
-				result = await DatabaseLogs.fetchGroupUserRandomLine(group, targetUser);
-			}
-			else {
-				result = await DatabaseLogs.fetchUserRandomLine(targetUser, context.channel);
-			}
-		}
 		else {
-			const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
-			if (group) {
-				result = await DatabaseLogs.fetchGroupChannelRandomLine(group);
+			if (user) {
+				const targetUser = await sb.User.get(user);
+				if (!targetUser) {
+					return {
+						success: false,
+						reply: "I have not seen that user before, so you cannot check their random lines!"
+					};
+				}
+				else if (context.params.userID) {
+					return {
+						success: false,
+						reply: "Cannot fetch logs by user ID in this channel!"
+					};
+				}
+
+				result = await DatabaseLogs.fetchUserRandomLine(targetUser, context.channel);
 			}
 			else {
 				result = await DatabaseLogs.fetchChannelRandomLine(context.channel);
