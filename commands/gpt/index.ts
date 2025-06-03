@@ -39,8 +39,8 @@ if (!defaultModelEntry) {
 	});
 }
 
-const [defaultModelName, defaultModel] = defaultModelEntry;
-const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
+const [defaultModelName] = defaultModelEntry;
+export const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
 
 const handlerMap = {
 	openai: GptOpenAI,
@@ -104,13 +104,23 @@ export default {
 			modelName = paramsModelName;
 		}
 		else {
-			modelName = defaultModelName;
+			const userDefaultModel = await context.user.getDataProperty("defaultGptModel");
+			if (userDefaultModel) {
+				if (!isModelName(userDefaultModel)) {
+					return {
+					    success: false,
+					    reply: `Your saved model ${userDefaultModel} is no longer valid! Change it to a currently available one.`
+					};
+				}
+
+				modelName = userDefaultModel;
+			}
+			else {
+				modelName = defaultModelName;
+			}
 		}
 
-		const modelData: ModelData = (context.params.model)
-			? models[modelName]
-			: defaultModel;
-
+		const modelData = models[modelName];
 		if (modelData.disabled) {
 			return {
 				success: false,
