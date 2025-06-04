@@ -3,6 +3,8 @@ import GptCache from "./cache-control.js";
 import { process as processMetrics } from "./metrics.js";
 import { check as checkModeration } from "./moderation.js";
 
+import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
+
 import { determineOutputLimit, GptTemplate, handleHistoryCommand } from "./gpt-template.js";
 import { GptOpenAI } from "./gpt-openai.js";
 import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
@@ -334,6 +336,11 @@ export default {
 			`<code>${prefix}gpt model:(name) (your query)</code>`,
 			`<code>${prefix}gpt model:turbo What should I name my goldfish?</code>`,
 			"Queries ChatGPT with your selected model.",
+			"",
+
+			"<h5>Default model</h5>",
+			`If you find yourself using a specific model a lot, you can set it as your "default model", which will then be used whenever you don't provide another model to be used.`,
+			`For more info, see the <a href="/bot/command/detail/set">${prefix}set ${setDefaultModelSubcommand.name}</a> command.`,
 			"",
 
 			"<h5>Temperature</h5>",
