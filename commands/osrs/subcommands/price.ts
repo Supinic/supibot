@@ -1,4 +1,7 @@
 import type { Context } from "../../../classes/command.js";
+import extraItemData from "./extra-item-data.json" with { type: "json" };
+const { aliases, priorities } = extraItemData;
+
 
 const formatPrice = (price: number) => {
 	if (price < 1000) {
@@ -8,6 +11,32 @@ const formatPrice = (price: number) => {
 		return core.Utils.formatSI(price, "", 3, true).replace("G", "B");
 	}
 };
+
+const cacheKey = "osrs-item-data";
+type WikiItemData = {
+	id: number;
+	name: string;
+};
+
+const fetchItemData = (query: string) => {
+	let data = await core.Cache.getByPrefix(cacheKey);
+	if (!data) {
+		const response = await core.Got.get("GenericAPI")<WikiItemData[]>({
+			url: "https://prices.runescape.wiki/api/v1/osrs/mapping"
+		});
+
+		data = response.body.map(i => ({
+			id: i.id,
+			name: i.name
+		}));
+
+		await sb.Cache.setByPrefix(cacheKey, data, {
+			expiry: 7 * 864e5 // 7 days
+		});
+	}
+
+
+}
 
 type WikiPriceData<T extends string | number> = {
 	data: {
@@ -29,6 +58,9 @@ export default {
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`
 	],
 	execute: async function (context: Context, ...args: string[]) {
+		const query =
+		if (aliases)
+
 		const alias = await core.Query.getRecordset<string | undefined>(rs => rs
 			.select("Name")
 			.from("data", "OSRS_Item")
