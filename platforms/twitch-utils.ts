@@ -767,6 +767,7 @@ const emitRawUserMessageEvent = (username: string, userId: string, channelName: 
 			user: null,
 			channel: channelData,
 			platform,
+			messageData: message,
 			raw: {
 				user: username,
 				userId
