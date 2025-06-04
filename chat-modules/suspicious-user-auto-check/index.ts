@@ -115,7 +115,7 @@ export default {
 			}
 		}
 		else if (isMessageCheckReply(raw.user, messageData.reply)) {
-			const lower = message.toLowerCase();
+			const lower = message.toLowerCase().replace(/^\s*@\w+\s*/, "");
 			if (lower !== "me" && lower !== "not me") {
 				await channel.send(`Please reply to the original message with specifically "me" or "not me"!`);
 				return;
