@@ -244,6 +244,7 @@ export type MessageData = {
 	color: MessageNotification["payload"]["event"]["color"];
 	animationId: MessageNotification["payload"]["event"]["channel_points_animation_id"];
 	rewardId: MessageNotification["payload"]["event"]["channel_points_custom_reward_id"];
+	reply: MessageNotification["payload"]["event"]["reply"];
 };
 
 type ConnectOptions = {
@@ -739,7 +740,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			badges,
 			color,
 			animationId,
-			rewardId
+			rewardId,
+			reply
 		};
 
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
