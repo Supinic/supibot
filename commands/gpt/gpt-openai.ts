@@ -3,7 +3,7 @@ import { checkInputLimits, determineOutputLimit, getHistoryMode, getTemperature,
 import GptHistory from "./history-control.js";
 import { GptContext, ModelData } from "./index.js";
 
-const DEFAULT_SYSTEM_MESSAGE = "Keep the response as short and concise as possible. Don't include URLs and other links in the response unless explicitly asked.";
+const DEFAULT_SYSTEM_MESSAGE = "Be extremely concise. Do not add URLs to the response.";
 
 type OpenAiMessage = {
 	annotations: unknown[];
