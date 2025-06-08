@@ -2,7 +2,6 @@ import type { Context } from "../../../classes/command.js";
 import extraItemData from "./extra-item-data.json" with { type: "json" };
 const { aliases, priorities } = extraItemData;
 
-
 const formatPrice = (price: number) => {
 	if (price < 1000) {
 		return String(price);
@@ -18,8 +17,8 @@ type WikiItemData = {
 	name: string;
 };
 
-const fetchItemData = (query: string) => {
-	let data = await core.Cache.getByPrefix(cacheKey);
+const fetchItemId = async (query: string) => {
+	let data = await core.Cache.getByPrefix(cacheKey) as WikiItemData[] | null;
 	if (!data) {
 		const response = await core.Got.get("GenericAPI")<WikiItemData[]>({
 			url: "https://prices.runescape.wiki/api/v1/osrs/mapping"
@@ -30,11 +29,15 @@ const fetchItemData = (query: string) => {
 			name: i.name
 		}));
 
-		await sb.Cache.setByPrefix(cacheKey, data, {
+		await core.Cache.setByPrefix(cacheKey, data, {
 			expiry: 7 * 864e5 // 7 days
 		});
 	}
 
+	const bestMatch = core.Utils.selectClosestString(query, data.map(i => i.name), {
+		ignoreCase: true,
+		fullResult: true,
+	});
 
 }
 
@@ -58,9 +61,6 @@ export default {
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`
 	],
 	execute: async function (context: Context, ...args: string[]) {
-		const query =
-		if (aliases)
-
 		const alias = await core.Query.getRecordset<string | undefined>(rs => rs
 			.select("Name")
 			.from("data", "OSRS_Item")
