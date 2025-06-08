@@ -7,7 +7,7 @@
     "maximum": 100
   },
   "lengthLimitExceededMessage": {
-    "history": "Maximum history length exceeded for this model! Shorten your query, or clear your history with \"$gpt history:clear\" instead.",
+    "history": "Maximum input + history length exceeded for this model! Shorten your query, or clear your history with \"$gpt history:clear\" instead.",
     "regular": "Maximum query length exceeded for this model! Shorten your query instead."
   },
   "userTokenLimits": {
@@ -46,7 +46,7 @@
     "nano": {
       "url": "gpt-4.1-nano",
       "type": "openai",
-      "default": false,
+      "default": true,
       "inputLimit": 1500,
       "outputLimit": {
         "default": 150,
@@ -58,18 +58,18 @@
       "url": "gpt-4o-mini-search-preview",
       "type": "openai",
       "default": false,
-      "inputLimit": 1500,
+      "inputLimit": 250,
       "outputLimit": {
-        "default": 150,
-        "maximum": 500
+        "default": 100,
+        "maximum": 300
       },
       "search": true,
-      "pricePerMtoken": 0.40
+      "pricePerMtoken": 1.00
     },
     "qwen": {
       "url": "qwen",
       "type": "nexra-complements",
-      "default": true,
+      "default": false,
       "inputLimit": 5000,
       "outputLimit": {
         "default": 5000,
