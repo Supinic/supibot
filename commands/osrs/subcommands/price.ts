@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import type { Context } from "../../../classes/command.js";
 import extraItemData from "./extra-item-data.json" with { type: "json" };
 const { aliases, priorities } = extraItemData;
@@ -11,14 +12,19 @@ const formatPrice = (price: number) => {
 	}
 };
 
-const cacheKey = "osrs-item-data";
+const osrsItemDataCacheKey = "osrs-item-data";
 type WikiItemData = {
 	id: number;
 	name: string;
+	value: number;
+	highalch: number;
 };
 
+const isAliasName = (input: string): input is keyof typeof aliases => Object.keys(aliases).includes(input);
+const hasPriority = (input: string): input is keyof typeof priorities => Object.keys(priorities).includes(input);
+
 const fetchItemId = async (query: string) => {
-	let data = await core.Cache.getByPrefix(cacheKey) as WikiItemData[] | null;
+	let data = await core.Cache.getByPrefix(osrsItemDataCacheKey) as WikiItemData[] | null;
 	if (!data) {
 		const response = await core.Got.get("GenericAPI")<WikiItemData[]>({
 			url: "https://prices.runescape.wiki/api/v1/osrs/mapping"
@@ -26,20 +32,68 @@ const fetchItemId = async (query: string) => {
 
 		data = response.body.map(i => ({
 			id: i.id,
-			name: i.name
+			name: i.name,
+			value: i.value,
+			highalch: i.highalch
 		}));
 
-		await core.Cache.setByPrefix(cacheKey, data, {
+		await core.Cache.setByPrefix(osrsItemDataCacheKey, data, {
 			expiry: 7 * 864e5 // 7 days
 		});
 	}
 
-	const bestMatch = core.Utils.selectClosestString(query, data.map(i => i.name), {
-		ignoreCase: true,
-		fullResult: true,
-	});
+	query = query.toLowerCase();
 
-}
+	let item: WikiItemData;
+	if (isAliasName(query)) {
+		const itemId = aliases[query];
+		const itemMatch = data.find(i => i.id === itemId);
+		if (!itemMatch) {
+			throw new SupiError({
+			    message: "Assert error: Alias item ID not found in data set"
+			});
+		}
+
+		item = itemMatch;
+	}
+	else {
+		const matches = core.Utils.selectClosestString(query, data.map(i => i.name), {
+			ignoreCase: true,
+			fullResult: true
+		});
+
+		if (!matches) {
+			return null;
+		}
+
+		const regexLikeQuery = query.replaceAll(/\s+/g, ".*");
+		const regex = new RegExp(`^.*${regexLikeQuery}.*$`, "i");
+
+		const likelyMatches = matches
+			.filter(i => i.includes || regex.test(i.string))
+			.sort((a, b) => {
+				if (a.score !== b.score) {
+					return (b.score - a.score);
+				}
+
+				const priorityA = (hasPriority(a.string)) ? priorities[a.string] : 0;
+				const priorityB = (hasPriority(b.string)) ? priorities[b.string] : 0;
+				return (priorityB - priorityA);
+			});
+
+		const bestMatch = data.find(i => i.name === likelyMatches[0].original);
+		if (!bestMatch) {
+			throw new SupiError({
+			    message: "Assert error: Item ID not found from the same set",
+				args: { match: matches[0] }
+			});
+		}
+
+		item = bestMatch;
+	}
+
+	return item;
+};
 
 type WikiPriceData<T extends string | number> = {
 	data: {
@@ -61,55 +115,20 @@ export default {
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`
 	],
 	execute: async function (context: Context, ...args: string[]) {
-		const alias = await core.Query.getRecordset<string | undefined>(rs => rs
-			.select("Name")
-			.from("data", "OSRS_Item")
-			.where(`JSON_SEARCH(Aliases, "one", %s) IS NOT NULL`, args.join(" ").toLowerCase())
-			.single()
-			.limit(1)
-			.flat("Name")
-		);
-
-		const query = (alias ?? args.join(" ")).toLowerCase();
-
-		type ItemData = { Game_ID: number; Name: string; Value: number; };
-		const data = await core.Query.getRecordset<ItemData[]>(rs => {
-			rs.select("Game_ID", "Name", "Value")
-				.from("data", "OSRS_Item")
-				.orderBy("Priority DESC")
-				.orderBy("Game_ID ASC");
-
-			for (const word of query.split(" ")) {
-				rs.where("Name %*like*", word);
-			}
-
-			return rs;
-		});
-
-		if (data.length === 0) {
+		const query = args.join(" ");
+		const item = await fetchItemId(query);
+		if (item === null) {
 			return {
 				success: false,
 				reply: `No items found for given query!`
 			};
 		}
 
-		const bestMatch = core.Utils.selectClosestString(query, data.map(i => i.Name), { ignoreCase: true });
-		const item = (bestMatch !== null)
-			? data.find(i => i.Name.toLowerCase() === bestMatch.toLowerCase())
-			: data[0];
-
-		if (!item) {
-			return {
-				success: false,
-				reply: "Could not match item!"
-			};
-		}
-
-		const response = await core.Got.get("GenericAPI")<WikiPriceData<typeof item.Game_ID>>({
+		const response = await core.Got.get("GenericAPI")<WikiPriceData<typeof item.id>>({
 			url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 			throwHttpErrors: false,
 			searchParams: {
-				id: item.Game_ID
+				id: item.id
 			}
 		});
 
@@ -120,27 +139,24 @@ export default {
 			};
 		}
 
-		const itemData = response.body.data[item.Game_ID];
-		if (!itemData) {
+		const itemPriceData = response.body.data[item.id];
+		if (!itemPriceData) {
 			return {
 				success: false,
-				reply: `${item.Name} cannot be traded!`
+				reply: `${item.name} cannot be traded!`
 			};
 		}
 
-		const { low, high } = itemData;
+		const { low, high } = itemPriceData;
 		const priceString = (low === high)
-			? `${formatPrice(low)} gp`
-			: `${formatPrice(low)} gp - ${formatPrice(high)} gp`;
+			? `Current price of ${item.name}: ${formatPrice(low)} gp`
+			: `Current price range of ${item.name}: ${formatPrice(low)} gp - ${formatPrice(high)} gp`;
 
-		// const lowDelta = core.Utils.timeDelta(new sb.Date(itemData.lowTime * 1000));
-		// const highDelta = core.Utils.timeDelta(new sb.Date(itemData.highTime * 1000));
-
-		const highAlchValue = formatPrice(Math.floor(item.Value * 0.6));
-		const wiki = `https://prices.runescape.wiki/osrs/item/${item.Game_ID}`;
+		const highAlchValue = formatPrice(item.highalch);
+		const wiki = `https://prices.runescape.wiki/osrs/item/${item.id}`;
 		return {
 			reply: core.Utils.tag.trim `
-				Current price range of ${item.Name}: ${priceString};
+				${priceString};
 				HA value: ${highAlchValue} gp
 				${wiki}
 			`
