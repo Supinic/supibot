@@ -1,7 +1,7 @@
 import { SupiError } from "supi-core";
 import type { Context } from "../../../classes/command.js";
 import extraItemData from "./extra-item-data.json" with { type: "json" };
-const { aliases, priorities } = extraItemData;
+const { aliases /* , priorities */ } = extraItemData;
 
 const formatPrice = (price: number) => {
 	if (price < 1000) {
@@ -21,7 +21,7 @@ type WikiItemData = {
 };
 
 const isAliasName = (input: string): input is keyof typeof aliases => Object.keys(aliases).includes(input);
-const hasPriority = (input: string): input is keyof typeof priorities => Object.keys(priorities).includes(input);
+// const hasPriority = (input: string): input is keyof typeof priorities => Object.keys(priorities).includes(input);
 
 const fetchItemId = async (query: string) => {
 	let data = await core.Cache.getByPrefix(osrsItemDataCacheKey) as WikiItemData[] | null;
@@ -76,12 +76,15 @@ const fetchItemId = async (query: string) => {
 					return (b.score - a.score);
 				}
 
-				const priorityA = (hasPriority(a.string)) ? priorities[a.string] : 0;
-				const priorityB = (hasPriority(b.string)) ? priorities[b.string] : 0;
-				return (priorityB - priorityA);
+				return b.string.localeCompare(a.string);
 			});
 
-		const bestMatch = data.find(i => i.name === likelyMatches[0].original);
+		const bestLikelyMatch = likelyMatches.at(0);
+		if (!bestLikelyMatch) {
+			return null;
+		}
+
+		const bestMatch = data.find(i => i.name === bestLikelyMatch.original);
 		if (!bestMatch) {
 			throw new SupiError({
 			    message: "Assert error: Item ID not found from the same set",
@@ -120,7 +123,7 @@ export default {
 		if (item === null) {
 			return {
 				success: false,
-				reply: `No items found for given query!`
+				reply: "Your query matches no items tradeable on the Grand Exchange!"
 			};
 		}
 
@@ -143,7 +146,7 @@ export default {
 		if (!itemPriceData) {
 			return {
 				success: false,
-				reply: `${item.name} cannot be traded!`
+				reply: `${item.name} cannot be traded on the Grand Exchange!`
 			};
 		}
 
