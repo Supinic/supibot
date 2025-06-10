@@ -1,4 +1,4 @@
-import { GptNexraComplements } from "../gpt/gpt-nexra.js";
+import { GptDeepInfra } from "../gpt/gpt-deepinfra.js";
 import gptConfig from "../gpt/config.json" with { type: "json" };
 
 import { check as checkModeration } from "../gpt/moderation.js";
@@ -7,7 +7,8 @@ import { GptContext, ModelData } from "../gpt/index.js";
 import { SupiDate, SupiError } from "supi-core";
 
 const { models } = gptConfig;
-const summaryModel = models.qwen as ModelData;
+const summaryModel = models.maverick as ModelData;
+const DEFAULT_LOG_AMOUNT = 50;
 
 const RAW_TEXT_REGEX = /^\[(?<date>[\d-\s:]+)]\s+#\w+\s+(?<username>\w+):\s+(?<message>.+?)$/;
 
@@ -18,7 +19,7 @@ const RUSTLOG_RESPONSES = {
 	default: "Unspecified error occured! Try again later."
 };
 
-const getLocalLogs = async (channel: string, limit: number = 50) => {
+const getLocalLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT) => {
 	const twitch = sb.Platform.getAsserted("twitch");
 	const channelData = sb.Channel.get(channel, twitch);
 	if (!channelData) {
@@ -62,7 +63,7 @@ const getLocalLogs = async (channel: string, limit: number = 50) => {
 	};
 };
 
-const getRustlogLogs = async (channel: string, limit: number = 50) => {
+const getRustlogLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT) => {
 	const twitch = sb.Platform.getAsserted("twitch");
 	const channelId = await twitch.getUserID(channel);
 	if (!channelId) {
@@ -129,7 +130,7 @@ const getRustlogLogs = async (channel: string, limit: number = 50) => {
 
 const params = [{ name: "type", type: "string" }] as const;
 
-const BASE_QUERY = "Reply only in English. Concisely summarize the following messages from an online chatroom %CHANNEL_NAME% (ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)";
+const BASE_QUERY = "Briefly summarize the following messages from a chatroom. Ignore chat bots replying to users' commands. Assume unfamiliar words to be emotes";
 const queries = {
 	base: BASE_QUERY,
 	topical: `${BASE_QUERY} into a numbered list of discussion topics (maximum of 5)`,
@@ -190,7 +191,7 @@ export default {
 		const contextQuery = addQueryContext(query, channel);
 		const fakeContext = context as unknown as GptContext;
 
-		const nexraExecution = await GptNexraComplements.execute(fakeContext, `${contextQuery}\n\n${logsResult.text}`, summaryModel);
+		const nexraExecution = await GptDeepInfra.execute(fakeContext, `${contextQuery}\n\n${logsResult.text}`, summaryModel);
 		if (!nexraExecution.success) {
 			return nexraExecution;
 		}
@@ -200,11 +201,11 @@ export default {
 		if (!response.ok) {
 			return {
 				success: false,
-				reply: GptNexraComplements.getRequestErrorMessage()
+				reply: GptDeepInfra.getRequestErrorMessage()
 			};
 		}
 
-		const message = GptNexraComplements.extractMessage(fakeContext, response);
+		const message = GptDeepInfra.extractMessage(fakeContext, response);
 		const modCheck = await checkModeration(fakeContext, message);
 		if (!modCheck.success) {
 			return modCheck;
