@@ -66,17 +66,6 @@
       "search": true,
       "pricePerMtoken": 1.00
     },
-    "qwen": {
-      "url": "qwen",
-      "type": "nexra-complements",
-      "default": false,
-      "inputLimit": 5000,
-      "outputLimit": {
-        "default": 5000,
-        "maximum": 5000
-      },
-      "pricePerMtoken": 0.05
-    },
     "mixtral": {
       "url": "mistralai/Mixtral-8x22B-Instruct-v0.1",
       "type": "deepinfra",
@@ -121,18 +110,16 @@
       },
       "pricePerMtoken": 0.08
     },
-    "o4-mini": {
-      "type": "openai",
+    "maverick": {
+      "url": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+      "type": "deepinfra",
       "default": false,
-      "subscriberOnly": true,
-      "noSystemRole": true,
-      "usesCompletionTokens": true,
       "inputLimit": 1000,
       "outputLimit": {
-        "default": 200,
-        "maximum": 500
+        "default": 500,
+        "maximum": 1000
       },
-      "pricePerMtoken": 3.00
+      "pricePerMtoken": 0.25
     }
   }
 }
