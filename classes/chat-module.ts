@@ -6,8 +6,13 @@ import { User } from "./user.js";
 
 import { Platform } from "../platforms/template.js";
 import type { SimpleGenericData, XOR } from "../@types/globals.d.ts";
+import type { TwitchPlatform } from "../platforms/twitch.js";
+import type { MessageNotification as TwitchMessageNotification } from "../platforms/twitch-utils.js";
+
+type TwitchMessageData = TwitchMessageNotification["payload"]["event"];
 
 export type ChatModuleDefinition = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
+	Description: string | null;
 	Platform: Platform["ID"] | null;
 };
 
@@ -26,15 +31,33 @@ export type Descriptor = {
 };
 export type Like = number | string | ChatModule;
 
-type SubscriptionEventData = {
+type BaseMessageEventData = {
 	event: "message";
 	message: string;
 	user: User | null;
 	channel: Channel | null;
 	platform: Platform;
-	raw?: { user: string; };
+	raw?: { user: string; userId: string; };
 };
-type EventData = SubscriptionEventData;
+type KnownUserMessageEventData = BaseMessageEventData & {
+	user: User;
+	raw: never;
+};
+type RawUserMessageEventData = BaseMessageEventData & {
+	user: null;
+	raw: { user: string; userId: string; };
+};
+
+export type GenericMessageEventData = RawUserMessageEventData | KnownUserMessageEventData;
+export type TwitchMessageEventData = GenericMessageEventData & {
+	platform: TwitchPlatform;
+	messageData: {
+		reply: TwitchMessageData["reply"];
+		reward: TwitchMessageData["channel_points_custom_reward_id"];
+	};
+};
+
+type EventData = GenericMessageEventData | TwitchMessageEventData; // @todo expand for other event types
 
 type PlatformLike = number | string | Platform; // @todo move to Platform
 type PlatformOption = {

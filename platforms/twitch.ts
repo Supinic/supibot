@@ -1,5 +1,6 @@
 import WebSocket from "ws";
 import { randomBytes } from "node:crypto";
+import { setTimeout as wait } from "node:timers/promises";
 
 import { Platform, BaseConfig } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
@@ -243,6 +244,7 @@ export type MessageData = {
 	color: MessageNotification["payload"]["event"]["color"];
 	animationId: MessageNotification["payload"]["event"]["channel_points_animation_id"];
 	rewardId: MessageNotification["payload"]["event"]["channel_points_custom_reward_id"];
+	reply: MessageNotification["payload"]["event"]["reply"];
 };
 
 type ConnectOptions = {
@@ -465,9 +467,16 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	 * @param [options.meAction] If `true`, adds a ".me" at the start of the message to create a "me action".
 	 * If not `true`, will escape all leading command characters (period "." or slash "/") by doubling them up.
 	 */
-	async send (message: string, channelData: Channel, options: { meAction?: boolean; } = {}) {
+	async send (
+		message: string,
+		channelData: Channel,
+		options: { meAction?: boolean; } = {}
+	): Promise<
+		| { success: false; }
+		| { success: true; messageId: string; }
+	> {
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
-			return;
+			return { success: false } as const;
 		}
 
 		const baseMessage = message;
@@ -485,8 +494,12 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			const now = SupiDate.now();
 			const { length = 0, time = 0 } = this.previousMessageMeta.get(channelData.ID) ?? {};
 			if (time + WRITE_MODE_MESSAGE_DELAY > now) {
-				setTimeout(() => void this.send(message, channelData), now - time);
-				return;
+				this.previousMessageMeta.set(channelData.ID, {
+					length: message.length,
+					time: now + time
+				});
+
+				await wait(now - time);
 			}
 
 			// Ad-hoc figuring out whether the message about to be sent is the same as the previous message.
@@ -542,7 +555,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				Error_Message: errorResponse.message
 			});
 
-			return;
+			return { success: false } as const;
 		}
 
 		const replyData = response.body.data[0];
@@ -568,13 +581,19 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			if (MESSAGE_MODERATION_CODES.has(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
 				await this.send(BAD_MESSAGE_RESPONSE, channelData);
 			}
+
+			return { success: false } as const;
 		}
-		else {
-			this.previousMessageMeta.set(channelData.ID, {
-				length: message.length,
-				time: SupiDate.now()
-			});
-		}
+
+		this.previousMessageMeta.set(channelData.ID, {
+			length: message.length,
+			time: SupiDate.now()
+		});
+
+		return {
+			success: true,
+			messageId: replyData.message_id
+		} as const;
 	}
 
 	async me (message: string, channel: Channel) {
@@ -721,13 +740,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			badges,
 			color,
 			animationId,
-			rewardId
+			rewardId,
+			reply
 		};
 
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
 
 		if (!userData) {
-			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, this, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, senderUserId, channelName, this, messageData);
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
@@ -794,7 +814,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				}
 			}
 
-			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, this, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, senderUserId, channelName, this, messageData);
 
 			return;
 		}
@@ -884,7 +904,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		// If the handled message is a reply to another, append its content at the end.
-		// This is so that a possible command execution can be handled with the reply's message as input..
+		// This is so that a possible command execution can be handled with the reply's message as input.
 		let targetMessage = messageData.text;
 		if (reply) {
 			// The original message starts with the thread author's username mention, so replace that first

@@ -747,7 +747,7 @@ const fetchToken = async () => {
 };
 
 type MessageData = MessageNotification["payload"]["event"]["message"];
-const emitRawUserMessageEvent = (username: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
+const emitRawUserMessageEvent = (username: string, userId: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
 	if (!username || !channelName) {
 		throw new SupiError({
 			message: "No username or channel name provided for raw event",
@@ -767,8 +767,10 @@ const emitRawUserMessageEvent = (username: string, channelName: string, platform
 			user: null,
 			channel: channelData,
 			platform,
+			messageData: message,
 			raw: {
-				user: username
+				user: username,
+				userId
 			}
 		});
 	}

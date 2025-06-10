@@ -166,8 +166,8 @@ export class Channel extends TemplateWithId {
 		return ambassadors.includes(userData.ID);
 	}
 
-	send (message: string, options: GenericSendOptions = {}): Promise<void> {
-		return this.Platform.send(message, this, options);
+	async send (message: string, options: GenericSendOptions = {}): Promise<void> {
+		await this.Platform.send(message, this, options);
 	}
 
 	async isLive (): Promise<boolean | null> {
