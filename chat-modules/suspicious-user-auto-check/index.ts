@@ -159,10 +159,12 @@ export default {
 				null
 			);
 
-			replyIdUserMap.delete(raw.user);
-			await sb.User.invalidateUserCache(raw.user);
-			// await channel.send(`Success 🥳 Make sure to try a command before you leave to confirm everything is okay`);
-			await channel.send(`Debug: Name=${raw.user} ID=${raw.userId} Description=${description}`);
+			await channel.send(`Debug: Name=${raw.user} ID=${raw.userId} Change=${description}`);
+
+			// await row.save({ skipLoad: true });
+			// await sb.User.invalidateUserCache(raw.user);
+			// await channel.send(`Success 🥳 Make sure to try using a command before you leave to confirm everything is okay.`);
+			// replyIdUserMap.delete(raw.user);
 		}
 	}),
 	Global: false,
