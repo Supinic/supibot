@@ -25,23 +25,23 @@ const staticNumberedLinkMap = {
 
 		return `https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed${padded}.jpg`;
 	},
-	sneaker: () => {
-		const id = randomInt(1, 2000);
-		const params = [
-			randomInt(1, 5),
-			randomInt(1, 5),
-			randomInt(1, 3)
-		];
-
-		return `https://thissneakerdoesnotexist.com/wp-content/plugins/sneaker-plugin/imsout2/${params[0]}-${params[1]}-${params[2]}-${id}.jpg`;
-	},
+	// sneaker: () => {
+	// 	const id = randomInt(1, 2000);
+	// 	const params = [
+	// 		randomInt(1, 5),
+	// 		randomInt(1, 5),
+	// 		randomInt(1, 3)
+	// 	];
+	//
+	// 	return `https://thissneakerdoesnotexist.com/wp-content/plugins/sneaker-plugin/imsout2/${params[0]}-${params[1]}-${params[2]}-${id}.jpg`;
+	// },
 	waifu: () => `https://www.thiswaifudoesnotexist.net/example-${randomInt(1, 1e5)}.jpg`,
 	wojak: () => `https://archive.org/download/thiswojakdoesnotexist.com/img/${randomInt(1, 1576)}.png`
 };
 
 const staticNumberedLinkMapSummary = {
 	anime: () => `https://thisanimedoesnotexist.ai/slider.html?seed=${randomInt(10000, 99999)}`,
-	sneaker: () => `https://thissneakerdoesnotexist.com/editor/?seed=${randomInt(1, 2000)}`
+	// sneaker: () => `https://thissneakerdoesnotexist.com/editor/?seed=${randomInt(1, 2000)}`
 };
 
 export default [
@@ -139,7 +139,7 @@ export default [
 	},
 	{
 		method: "rolls a random number for a static link",
-		types: ["anime", "fursona", "sneaker", "waifu", "wojak"],
+		types: ["anime", "fursona", "waifu", "wojak"],
 		descriptions: [
 			`<code>fursona</code> - <a href="https://thisfursonadoesnotexist.com/">This fursona does not exist</a>`
 		],
@@ -154,7 +154,7 @@ export default [
 	{
 		method: "rolls a random number for a static link - posting a summary rather than a single link",
 		parameter: "summary",
-		types: ["anime", "sneaker"],
+		types: ["anime"],
 		descriptions: [
 			`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a> - supports <code>summary</code> parameter`,
 			`<code>wojak</code> - <a href="https://thiswojakdoesnotexist.com//">This wojak does not exist</a> - supports <code>summary</code> parameter`
