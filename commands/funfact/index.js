@@ -7,7 +7,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Fetches a random fun fact. Absolutely not guaranteed to be fun or fact.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function funFact () {
 		const { year } = new sb.Date();

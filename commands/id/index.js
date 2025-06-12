@@ -10,7 +10,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Checks your (or someone else's) ID in the database of users - the lower the number, the earlier the user was first spotted.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function id (context, user) {
 		const targetUser = (user)

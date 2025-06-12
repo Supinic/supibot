@@ -120,7 +120,7 @@ export default {
 	Cooldown: 5000,
 	Description: "For a provided game, shows how long it takes to beat based on the https://howlongtobeat.com website's data.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function howLongToBeat (context, ...args) {
 		if (args.length === 0) {

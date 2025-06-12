@@ -18,7 +18,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Plays a sound on Supinic's stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
 	Flags: ["developer","mention","pipe","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: `You can't use the command here, but here's a list of supported playsounds: ${playsoundListUrl}`,
 	initialize: function () {
 		if (!listenerAddress || !listenerPort) {

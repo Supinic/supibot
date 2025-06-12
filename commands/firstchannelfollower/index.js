@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Fetches the first user that follows you or someone else on Twitch.",
 	Flags: ["mention","non-nullable","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	initialize: function () {
 		this.data.requestHeaders = {

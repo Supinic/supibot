@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Posts a Markov chain-generated GDQ speedrun donation message.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function speedrun () {
 		const { comment } = await core.Got.get("IVR")("gdq").json();

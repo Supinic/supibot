@@ -7,7 +7,7 @@ export default {
 	Cooldown: 30000,
 	Description: "Checks your horoscope, if you have set your birthday within Supibot.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function horoscope (context, inputZodiacName) {
 		let zodiacName = null;

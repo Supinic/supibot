@@ -5,7 +5,7 @@ export default {
 	Cooldown: 30000,
 	Description: "Shouts out a given streamer (Twitch only), and posts the last game they played as well.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function shoutout (context, target) {
 		if (!target) {

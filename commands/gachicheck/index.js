@@ -9,7 +9,7 @@ export default {
 	Cooldown: 2500,
 	Description: "Checks if a given gachi link exists in the database, if not, adds it to the to-do list to be processed later.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function gachiCheck (context, ...args) {
 		if (args.length === 0) {

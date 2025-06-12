@@ -8,7 +8,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Checks if a given message would be banphrased in a given channel. Only works for channels that I am in, plus the result isn't 100% guaranteed!",
 	Flags: ["mention", "non-nullable", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function banCheck (context, channel, ...rest) {
 		if (!channel) {

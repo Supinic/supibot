@@ -7,7 +7,7 @@ export default {
 	Cooldown: 30000,
 	Description: "Takes a Twitch clip name or link, and sends a download link to it into private messages.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function downloadClip (context, input) {
 		if (!input) {

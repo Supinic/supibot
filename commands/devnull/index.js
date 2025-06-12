@@ -5,7 +5,7 @@ export default {
 	Cooldown: 0,
 	Description: "Discards all output. Only usable in pipes.",
 	Flags: ["non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function devnull (context) {
 		if (!context.append.pipe) {

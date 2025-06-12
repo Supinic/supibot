@@ -12,7 +12,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Randomly creates fake news headlines from existing presets. These are not real, and are supposed to be light-hearted and just a joke. Don't take them seriously.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function fakeNews () {
 		const eligibleHeadlines = headlines.filter(i => !headlinesRepeatArray.includes(i));

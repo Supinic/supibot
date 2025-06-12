@@ -28,7 +28,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Fetches a random Twitch-related copypasta.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function copypasta () {
 		let copypasta;

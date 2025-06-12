@@ -28,7 +28,7 @@ export default {
 	Cooldown: 10_000,
 	Description: "Similar to 4chan, posts the ID of your message as a number. Then, it checks it for dubs and higher.",
 	Flags: ["mention", "pipe", "skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: function checkEm (context: Context<[]>) {
 		if (!context.channel) {

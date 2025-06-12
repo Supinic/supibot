@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Searches for a meal recipe by its name, or fetches a random one, if no search query was provided.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomMeal (context, ...args) {
 		let data;

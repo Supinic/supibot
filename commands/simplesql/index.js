@@ -5,7 +5,7 @@ export default {
 	Cooldown: 0,
 	Description: "Executes a quick SQL query, and returns its (simple) result.",
 	Flags: ["mention","pipe","system","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function simpleSQL (context, ...args) {
 		let query = args.join(" ");

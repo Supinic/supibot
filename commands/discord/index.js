@@ -5,7 +5,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Posts the link to the current channel's Discord. Can be set up with the $set command.",
 	Flags: ["external-input","mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function discord (context) {
 		if (context.privateMessage) {

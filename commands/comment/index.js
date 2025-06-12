@@ -5,7 +5,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Fetches a random comment from a set of 10 thousand randomly generated YouTube videos.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function comment () {
 		const response = await core.Got.get("FakeAgent")({

@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Searches the MDN website for a given term, then returns the article link.",
 	Flags: ["developer","mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function mdn (context, ...args) {
 		const query = args.join(" ");

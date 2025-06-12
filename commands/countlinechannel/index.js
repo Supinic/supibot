@@ -5,7 +5,7 @@ export default {
 	Cooldown: 60000,
 	Description: "Fetches the number of chat lines in the current channel.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function countLineChannel (context) {
 		if (!context.channel) {

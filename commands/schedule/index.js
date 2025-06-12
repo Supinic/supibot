@@ -5,7 +5,7 @@ export default {
 	Cooldown: 30000,
 	Description: "Posts the channel's stream schedule.",
 	Flags: ["external-input","mention","non-nullable","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function schedule (context, channel) {
 		let channelName = null;

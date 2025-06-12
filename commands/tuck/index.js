@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Tucks target user to bed.",
 	Flags: ["block","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function tuck (context, user, ...args) {
 		user ??= context.user.Name;

@@ -7,7 +7,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Posts either: a short list of all commands, or a description of a specific command if you specify it.",
 	Flags: ["mention", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function help (context, ...args) {
 		const { prefix } = sb.Command;

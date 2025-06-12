@@ -6,7 +6,7 @@ export default {
 	Cooldown: 10_000,
 	Description: "Posts a random fact about bees.",
 	Flags: ["mention", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function beeFact () {
 		const fact = await core.Query.getRecordset<string>(rs => rs

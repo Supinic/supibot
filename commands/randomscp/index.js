@@ -5,7 +5,7 @@ export default {
 	Cooldown: 7500,
 	Description: "Fetches a random SCP.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomSCP () {
 		const response = await core.Got.gql({

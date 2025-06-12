@@ -7,7 +7,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Kisses target user.",
 	Flags: ["opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function kiss (context, user, emote) {
 		if (!user || user.toLowerCase() === context.user.Name) {

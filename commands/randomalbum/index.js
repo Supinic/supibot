@@ -12,7 +12,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Posts a random music album.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomAlbum () {
 		let data;

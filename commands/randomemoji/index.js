@@ -34,7 +34,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Fetches a random emoji. If a number is provided, rolls that many emojis.",
 	Flags: ["pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomEmoji (context, number = 1) {
 		let repeats = Number(number);

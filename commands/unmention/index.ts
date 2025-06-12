@@ -9,7 +9,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Makes a specific command (or, in advanced mode, a combination of command/channel/platform, or global) not mention you by removing the \"username,\" part at the beginning.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function unmention (this: Command, context: Context<[]>, ...args: string[]) {
 		const parse = await parseGenericFilterOptions("Unmention", context.params, args, {

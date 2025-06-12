@@ -5,7 +5,7 @@ export default {
 	Cooldown: 1000,
 	Description: "Usable in pipe only - turns the response into a private message.",
 	Flags: [],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function whisper (context, ...args) {
 		if (!context.append.pipe) {

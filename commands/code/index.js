@@ -5,7 +5,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Posts a link to a specific command's code definition on GitHub.",
 	Flags: ["developer","mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function code (context, commandString) {
 		if (!commandString) {

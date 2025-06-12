@@ -5,7 +5,7 @@ export default {
 	Cooldown: 120000,
 	Description: "Resumes your AFK status, if used within 5 minutes of coming back from AFK. This command can only be used once every 2 minutes (!) globally.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function resumeAFK (context) {
 		if (context.privateMessage) {

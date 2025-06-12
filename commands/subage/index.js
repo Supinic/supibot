@@ -17,7 +17,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Fetches the subscription data for a given user on a given channel on Twitch.",
 	Flags: ["mention", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function subAge (context, user, channel) {
 		const platform = sb.Platform.get("twitch");

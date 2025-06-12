@@ -7,7 +7,7 @@ export default {
 	Cooldown: 60000,
 	Description: "Creates a pyramid in chat. Only usable in chats where Supibot is a VIP or a Moderator.",
 	Flags: ["developer","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function pyramid (context, emote, size) {
 		if (!context.channel) {

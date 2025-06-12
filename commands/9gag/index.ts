@@ -19,7 +19,7 @@ export default {
 	Cooldown: 10_000,
 	Description: "Searches 9gag for posts that fit your search text, or a random featured one if you don't provide anything.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function nineGag (context, ...args) {
 		const options = (args.length === 0)

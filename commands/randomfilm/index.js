@@ -5,7 +5,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Fetches a random movie.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomFilm () {
 		const html = await core.Got.get("FakeAgent")({

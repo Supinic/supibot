@@ -23,7 +23,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Ping!",
 	Flags: ["pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	/**
 	 * @param {Context} context

@@ -7,7 +7,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Rolls a random percentage between 0 and 100%.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function percent () {
 		const number = randomInt(0, 10_000);

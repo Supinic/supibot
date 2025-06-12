@@ -8,7 +8,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Aggregate command for anything regarding the Bad Apple!! rendition list on the website.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function badAppleRendition (context, commandName, ...args) {
 		if (!commandName) {

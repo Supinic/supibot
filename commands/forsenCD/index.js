@@ -10,7 +10,7 @@ export default {
 	Cooldown: 5000,
 	Description: "A random quote from the two time! 1993, 1994 back to back blockbuster video game champion, Guy \"DrDisrespect\" Beahm.",
 	Flags: ["pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function forsenCD (context) {
 		const eligibleTweets = beahmData.tweets.filter(i => !previousPosts.includes(i));

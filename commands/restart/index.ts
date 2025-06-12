@@ -34,7 +34,7 @@ export default {
 	Cooldown: 10_000,
 	Description: "Restarts the bot. Optionally, also pulls git changes and/or upgrades packages via yarn.",
 	Flags: ["system", "whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: "Only available to administrators or helpers!",
 	Code: async function restart (context, ...commands) {
 		for (const name of commands) {

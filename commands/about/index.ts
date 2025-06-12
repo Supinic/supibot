@@ -7,7 +7,7 @@ export default {
 	Cooldown: 30_000,
 	Description: "Posts a summary of what Supibot does, and what it is. Also, mentions how long it's been in a channel, if applicable.",
 	Flags: ["mention", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function about (context) {
 		let presentSinceString = "";

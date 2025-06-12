@@ -29,7 +29,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Checks your question against the fortune-telling 8-ball.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (function _8ball () {
 		return {

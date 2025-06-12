@@ -5,7 +5,7 @@ export default {
 	Cooldown: 30000,
 	Description: "Gets a smol description of a meme from Know Your Meme, it's just the summary.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function knowYourMeme (context, ...args) {
 		if (args.length === 0) {

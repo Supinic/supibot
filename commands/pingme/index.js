@@ -13,7 +13,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Sets a self-notification in the current channel when the target user is spotted in a different channel.",
 	Flags: ["block","mention","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function pingMe (context, user, ...args) {
 		if (!user) {

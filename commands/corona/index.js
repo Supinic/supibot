@@ -8,7 +8,7 @@ export default {
 	Cooldown: 7500,
 	Description: "Checks the current number of infected/deceased people from the Coronavirus spread that started in October-December 2019.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function corona () {
 		let data = await this.getCacheData("global-corona");

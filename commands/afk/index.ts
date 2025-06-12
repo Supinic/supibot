@@ -22,7 +22,7 @@ export default {
 	Cooldown: 10_000,
 	Description: "Flags you as AFK. Supports a custom AFK message.",
 	Flags: ["pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function afk (context, ...args) {
 		if (context.privateMessage && sb.AwayFromKeyboard.get(context.user)) {
