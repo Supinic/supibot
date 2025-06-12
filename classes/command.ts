@@ -261,17 +261,16 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	get tee () { return this.append.tee; }
 }
 
-export interface CommandDefinition extends TemplateDefinition {
+export interface CommandDefinition <T extends ParameterDefinitions = ParameterDefinitions> extends TemplateDefinition {
 	Name: Command["Name"];
 	Aliases: Command["Aliases"] | null;
 	Description: Command["Description"];
 	Cooldown: Command["Cooldown"];
 	Flags: Command["Flags"];
-	Params: Command["Params"] | null;
+	Params: T;
 	Whitelist_Response: Command["Whitelist_Response"];
-	Code: Command["Code"];
+	Code: (this: Command, context: Context<T>, ...args: string[]) => StrictResult | Promise<StrictResult>;
 	Dynamic_Description: Command["Dynamic_Description"];
-
 	initialize?: CustomInitFunction;
 	destroy?: CustomDestroyFunction;
 }
@@ -335,7 +334,7 @@ export class Command extends TemplateWithoutId {
 		this.Whitelist_Response = data.Whitelist_Response ?? null;
 
 		this.Flags = Object.freeze(data.Flags);
-		this.Params = data.Params ?? [];
+		this.Params = data.Params;
 
 		this.Code = data.Code;
 		this.Dynamic_Description = data.Dynamic_Description ?? null;
@@ -1343,3 +1342,5 @@ export class Command extends TemplateWithoutId {
 		return COMMAND_PREFIX;
 	}
 }
+
+export const declare = <T extends ParameterDefinitions> (def: CommandDefinition<T>) => def;
