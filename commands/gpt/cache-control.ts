@@ -165,9 +165,9 @@ export const checkLimits = async (userData: User) => {
 };
 
 export const addUsageRecord = async (userData: User, value: number, modelData: ModelData) => {
-	const { pricePerMtoken } = modelData;
+	const { pricePerMtoken, flatCost = 0 } = modelData;
 	const cacheKey = createCacheKey(userData.ID);
-	const normalizedValue = core.Utils.round(value * pricePerMtoken, 2);
+	const normalizedValue = core.Utils.round(value * pricePerMtoken, 2) + flatCost;
 
 	await core.Cache.server.zadd(cacheKey, SupiDate.now(), normalizedValue);
 };

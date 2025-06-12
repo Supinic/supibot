@@ -27,6 +27,7 @@ export type ModelData = {
 		maximum: number;
 	};
 	pricePerMtoken: number;
+	flatCost?: number;
 	subscriberOnly?: boolean;
 	noSystemRole?: boolean;
 	usesCompletionTokens?: boolean;

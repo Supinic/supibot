@@ -58,13 +58,14 @@
       "url": "gpt-4o-mini-search-preview",
       "type": "openai",
       "default": false,
-      "inputLimit": 250,
+      "inputLimit": 1000,
       "outputLimit": {
-        "default": 100,
-        "maximum": 300
+        "default": 250,
+        "maximum": 500
       },
       "search": true,
-      "pricePerMtoken": 1.00
+      "pricePerMtoken": 0.12,
+      "flatCost": 3000
     },
     "mixtral": {
       "url": "mistralai/Mixtral-8x22B-Instruct-v0.1",
