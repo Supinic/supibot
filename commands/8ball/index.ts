@@ -1,4 +1,4 @@
-import { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
 const EIGHT_BALL_RESPONSES = [
 	"😃 It is certain.",
@@ -23,7 +23,7 @@ const EIGHT_BALL_RESPONSES = [
 	"😦 Very doubtful."
 ];
 
-export default {
+export default declare({
 	Name: "8ball",
 	Aliases: null,
 	Cooldown: 10000,
@@ -51,4 +51,4 @@ export default {
 			`<ul>${list}</ul>`
 		];
 	})
-} satisfies CommandDefinition;
+});

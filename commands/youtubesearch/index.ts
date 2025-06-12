@@ -1,7 +1,8 @@
 import { SupiDate, SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
+
 import { searchYoutube } from "../../utils/command-utils.js";
 import getLinkParser from "../../utils/link-parser.js";
-import { CommandDefinition, Context } from "../../classes/command.js";
 
 const RESULTS_PER_SEARCH = 25;
 const DAILY_SEARCHES_CAP = 2000;
@@ -16,22 +17,19 @@ const getClosestPacificMidnight = () => {
 	return result.valueOf();
 };
 
-const params = [
-	{ name: "index", type: "number" },
-	{ name: "linkOnly", type: "boolean" }
-] as const;
-
-export default {
+export default declare({
 	Name: "youtubesearch",
 	Aliases: ["ys"],
 	Cooldown: 10000,
 	Description: "Searches YouTube for video(s) with your query. Only a certain number of uses are available daily.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: params,
+	Params: [
+		{ name: "index", type: "number" },
+		{ name: "linkOnly", type: "boolean" }
+	] as const,
 	Whitelist_Response: null,
-	Code: (async function youtubeSearch (context: Context<typeof params>, ...args) {
+	Code: (async function youtubeSearch (context, ...args) {
 		const query = args.join(" ");
-
 		if (!query) {
 			return {
 				success: false,
@@ -150,4 +148,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

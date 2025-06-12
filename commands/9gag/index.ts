@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
 type NineGagData = {
 	data: {
@@ -13,7 +13,7 @@ type NineGagData = {
 	};
 };
 
-export default {
+export default declare({
 	Name: "9gag",
 	Aliases: ["gag"],
 	Cooldown: 10_000,
@@ -63,4 +63,4 @@ export default {
 		`<code>${prefix}9gag (query)</code>`,
 		"Fetches a recent random 9gag post that matches your query."
 	]
-} satisfies CommandDefinition;
+});

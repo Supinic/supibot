@@ -1,8 +1,8 @@
 import { linkRegex } from "../../utils/regexes.js";
 import { GenericRequestError } from "supi-core";
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "bancheck",
 	Aliases: ["bc"],
 	Cooldown: 10000,
@@ -133,4 +133,4 @@ export default {
 		}
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

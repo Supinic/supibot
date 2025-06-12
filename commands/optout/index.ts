@@ -1,25 +1,23 @@
+import { declare } from "../../classes/command.js";
 import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
 import { Filter } from "../../classes/filter.js";
-import type { Command, Context } from "../../classes/command.js";
 
-const params = [
-	{ name: "command", type: "string" },
-	{ name: "channel", type: "string" },
-	{ name: "id", type: "number" },
-	{ name: "invocation", type: "string" },
-	{ name: "platform", type: "string" }
-] as const;
-
-export default {
+export default declare({
 	Name: "optout",
 	Aliases: ["unoptout"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Makes it so you cannot be the target of a command - the command will not be executed at all. For detailed usage, please check the extended help.",
 	Flags: ["mention", "skip-banphrase"],
-	Params: params,
+	Params: [
+		{ name: "command", type: "string" },
+		{ name: "channel", type: "string" },
+		{ name: "id", type: "number" },
+		{ name: "invocation", type: "string" },
+		{ name: "platform", type: "string" }
+	] as const,
 	Whitelist_Response: null,
-	Code: (async function optOut (this: Command, context: Context<typeof params>, ...args: string[]) {
+	Code: (async function optOut (context, ...args) {
 		const parse = await parseGenericFilterOptions("Opt-out", context.params, args, {
 			argsOrder: ["command"],
 			requiredCommandFlag: "opt-out",
@@ -124,4 +122,4 @@ export default {
 			</ul>`,
 		""
 	])
-};
+});

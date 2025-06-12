@@ -1,7 +1,7 @@
 import { SupiDate, SupiError } from "supi-core";
-import { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "about",
 	Aliases: null,
 	Cooldown: 30_000,
@@ -48,4 +48,4 @@ export default {
 		};
 	},
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

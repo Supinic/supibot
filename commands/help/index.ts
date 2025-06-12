@@ -1,7 +1,7 @@
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 import { isCooldownData } from "../../classes/filter.js";
 
-export default {
+export default declare({
 	Name: "help",
 	Aliases: ["commands", "helpgrep"],
 	Cooldown: 5000,
@@ -129,4 +129,4 @@ export default {
 		"Searches for commands that have the keyword(s) in their names or descriptions.",
 		"This is useful if you vaguely know what the command does, but aren't sure about its name."
 	])
-} satisfies CommandDefinition;
+});

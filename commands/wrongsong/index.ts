@@ -1,12 +1,12 @@
-import { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "wrongsong",
 	Aliases: ["ws"],
 	Cooldown: 5000,
 	Description: "If you have at least one song playing or in the queue, this command will skip the first one. You can also add an ID to skip a specific song.",
 	Flags: ["developer", "mention", "pipe", "whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function wrongSong (context, target) {
 		if (!sb.VideoLANConnector) {
@@ -106,4 +106,4 @@ export default {
 		`<code>${prefix}ws (ID)</code>`,
 		"Skips your request with given ID. Fails if it's not your request."
 	]
-} satisfies CommandDefinition;
+});

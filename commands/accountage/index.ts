@@ -1,8 +1,8 @@
 import { SupiDate } from "supi-core";
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 import type { IvrUserData } from "../../@types/globals.js";
 
-export default {
+export default declare({
 	Name: "accountage",
 	Aliases: ["accage"],
 	Author: "supinic",
@@ -42,4 +42,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

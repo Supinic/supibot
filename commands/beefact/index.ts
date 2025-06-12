@@ -1,6 +1,6 @@
-import { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "beefact",
 	Aliases: null,
 	Cooldown: 10_000,
@@ -24,4 +24,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

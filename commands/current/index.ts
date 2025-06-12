@@ -1,6 +1,6 @@
 import { VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-import { CommandDefinition, Context } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
 const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
@@ -19,18 +19,15 @@ const includePositionsType = {
 	next: false
 } as const;
 
-const params = [{ name: "linkOnly", type: "boolean" }] as const;
-
-export default {
+export default declare({
 	Name: "current",
 	Aliases: ["song"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
 	Flags: ["developer", "mention", "pipe", "whitelist"],
-	Params: params,
+	Params: [{ name: "linkOnly", type: "boolean" }] as const,
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
-	Code: (async function current (context: Context<typeof params>, ...args) {
+	Code: (async function current (context, ...args) {
 		if (!sb.VideoLANConnector) {
 			return {
 				success: false,
@@ -199,4 +196,4 @@ export default {
 		`Playing next: (link)`,
 		``
 	]
-} satisfies CommandDefinition;
+});

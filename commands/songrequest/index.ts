@@ -1,14 +1,14 @@
-import getLinkParser from "../../utils/link-parser.js";
+import { declare } from "../../classes/command.js";
+import { SupiDate, SupiError } from "supi-core";
 import type { default as LinkParser } from "track-link-parser";
-
-import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
-
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+
+import type { IvrClipData } from "../../@types/globals.js";
+import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
+import getLinkParser from "../../utils/link-parser.js";
+
 import { type User } from "../../classes/user.js";
 import { type DatabaseVideo } from "../../singletons/vlc-client.js";
-import { Context, type CommandDefinition } from "../../classes/command.js";
-import { SupiDate, SupiError } from "supi-core";
-import type { IvrClipData } from "../../@types/globals.js";
 const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
 const REQUEST_TIME_LIMIT = 900;
@@ -61,21 +61,19 @@ const parseTimestamp = (linkParser: LinkParser, string: string) => {
 	return value;
 };
 
-const params = [
-	{ name: "start", type: "string" },
-	{ name: "end", type: "string" },
-	{ name: "type", type: "string" }
-] as const;
-
-export default {
+export default declare({
 	Name: "songrequest",
 	Aliases: ["sr"],
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
 	Flags: ["mention","pipe","whitelist"],
-	Params: params,
+	Params: [
+		{ name: "start", type: "string" },
+		{ name: "end", type: "string" },
+		{ name: "type", type: "string" }
+	] as const,
 	Whitelist_Response: "Only available in supinic's channel.",
-	Code: (async function songRequest (context: Context<typeof params>, ...args) {
+	Code: (async function songRequest (context, ...args) {
 		if (!sb.VideoLANConnector) {
 			return {
 				success: false,
@@ -549,4 +547,4 @@ export default {
 		"E.g.: if the video is 5 minutes long, <code>start:-10</code> will start the video 10 seconds from the end, at 04:50.",
 		"Any combination of negative and positive numbers between the parameters is accepted. It just has to make sense - so that the end is not earlier than the start."
 	]
-} satisfies CommandDefinition;
+});

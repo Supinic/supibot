@@ -1,10 +1,10 @@
 import { SupiDate, SupiError } from "supi-core";
-import type { Context, CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 import type { IvrUserData } from "../../@types/globals.js";
 
 const omittedBanReasons = new Set(["TOS_TEMPORARY", "TOS_INDEFINITE"]);
 
-export default {
+export default declare({
 	Name: "stalk",
 	Aliases: null,
 	Cooldown: 5000,
@@ -12,7 +12,7 @@ export default {
 	Flags: ["block","external-input","mention","opt-out","pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function stalk (context: Context<[]>, user) {
+	Code: (async function stalk (context, user) {
 		if (!user) {
 			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
 			return {
@@ -127,4 +127,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});
