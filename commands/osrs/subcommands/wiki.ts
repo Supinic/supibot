@@ -1,7 +1,10 @@
-export default {
+import { bindOsrsSubcommand } from "../index.js";
+
+export default bindOsrsSubcommand({
 	name: "wiki",
 	title: "Search the Wiki",
 	aliases: ["search"],
+	default: true,
 	description: [
 		"<u>Search the Wiki</u>",
 		`<code>$osrs search (query)</code>`,
@@ -26,6 +29,7 @@ export default {
 		if (response.redirectUrls.length !== 0) {
 			const $ = core.Utils.cheerio(response.body);
 			const summary = $($("#mw-content-text > div > p")[0]).text();
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			const url = $("link[rel='canonical']")?.attr("href")?.replace("oldschool.runescape.wiki", "osrs.wiki") ?? "(no link)";
 
 			return {
@@ -38,4 +42,4 @@ export default {
 			};
 		}
 	}
-};
+});

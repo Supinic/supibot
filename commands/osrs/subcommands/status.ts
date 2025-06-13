@@ -1,4 +1,10 @@
-export default {
+import { bindOsrsSubcommand } from "../index.js";
+
+type StatusData = {
+	psa?: string;
+};
+
+export default bindOsrsSubcommand({
 	name: "status",
 	title: "Game status",
 	aliases: [],
@@ -9,7 +15,7 @@ export default {
 		"If there is a Jagex Launcher status (e.g. worlds going down, etc.), this command will tell you about it."
 	],
 	execute: async function () {
-		const response = await core.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")<StatusData>({
 			url: "https://files.publishing.production.jxp.jagex.com/osrs.json"
 		});
 
@@ -34,4 +40,4 @@ export default {
 			};
 		}
 	}
-};
+});

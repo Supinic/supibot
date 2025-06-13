@@ -298,6 +298,22 @@ type CooldownObject = {
 };
 type CooldownDefinition = number | null | CooldownObject;
 
+export interface SubcommandDefinition<T extends CommandDefinition = CommandDefinition> {
+	name: string;
+	title?: string;
+	aliases: string[];
+	description: string | string[];
+	default?: boolean;
+	flags?: Record<string, boolean>;
+	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
+}
+
+export const createSubcommandBinding = <
+	T extends CommandDefinition
+> () => <
+	D extends SubcommandDefinition<T>
+> (def: D) => def;
+
 export class Command extends TemplateWithoutId {
 	readonly Name: string;
 	readonly Aliases: string[];

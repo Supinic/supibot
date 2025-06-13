@@ -3,7 +3,10 @@ import type { Context } from "../../../classes/command.js";
 import type { User } from "../../../classes/user.js";
 // import type { CheerioNode } from "supi-core";
 
-import GameData from "../game-data.json" with { type: "json" };
+import GameData from "./game-data.json" with { type: "json" };
+import extraItemData from "./extra-item-data.json" with { type: "json" };
+export const { aliases /* , priorities */ } = extraItemData;
+
 import { typedEntries } from "../../../utils/ts-helpers.js";
 
 for (const item of GameData.activities) {
@@ -52,7 +55,7 @@ type FetchOptions = {
 type FetchData = {
 	skills: Skill[];
 	activities: Activity[];
-	combatLevel: number;
+	combatLevel: number | null; // @todo check if this can be `null`
 	seasonal: boolean;
 	ironman: {
 		regular: boolean;
@@ -102,9 +105,95 @@ type GameWorld = {
 	activity: string | null;
 	flagEmoji: string;
 };
-type GameWorlds = Record<string, GameWorld>;
+export type GameWorlds = Record<string, GameWorld>;
 
 export const OSRS_GAME_USERNAME_KEY = "osrsGameUsername";
+
+const osrsItemDataCacheKey = "osrs-item-data";
+type WikiItemData = {
+	id: number;
+	name: string;
+	value: number;
+	highalch: number;
+};
+
+const isAliasName = (input: string): input is keyof typeof aliases => Object.keys(aliases).includes(input);
+// const hasPriority = (input: string): input is keyof typeof priorities => Object.keys(priorities).includes(input);
+
+export const fetchItemId = async (query: string) => {
+	let data = await core.Cache.getByPrefix(osrsItemDataCacheKey) as WikiItemData[] | null;
+	if (!data) {
+		const response = await core.Got.get("GenericAPI")<WikiItemData[]>({
+			url: "https://prices.runescape.wiki/api/v1/osrs/mapping"
+		});
+
+		data = response.body.map(i => ({
+			id: i.id,
+			name: i.name,
+			value: i.value,
+			highalch: i.highalch
+		}));
+
+		await core.Cache.setByPrefix(osrsItemDataCacheKey, data, {
+			expiry: 7 * 864e5 // 7 days
+		});
+	}
+
+	query = query.toLowerCase();
+
+	let item: WikiItemData;
+	if (isAliasName(query)) {
+		const itemId = aliases[query];
+		const itemMatch = data.find(i => i.id === itemId);
+		if (!itemMatch) {
+			throw new SupiError({
+				message: "Assert error: Alias item ID not found in data set"
+			});
+		}
+
+		item = itemMatch;
+	}
+	else {
+		const matches = core.Utils.selectClosestString(query, data.map(i => i.name), {
+			ignoreCase: true,
+			fullResult: true
+		});
+
+		if (!matches) {
+			return null;
+		}
+
+		const regexLikeQuery = query.replaceAll(/\s+/g, ".*");
+		const regex = new RegExp(`^.*${regexLikeQuery}.*$`, "i");
+
+		const likelyMatches = matches
+			.filter(i => i.includes || regex.test(i.string))
+			.sort((a, b) => {
+				if (a.score !== b.score) {
+					return (b.score - a.score);
+				}
+
+				return b.string.localeCompare(a.string);
+			});
+
+		const bestLikelyMatch = likelyMatches.at(0);
+		if (!bestLikelyMatch) {
+			return null;
+		}
+
+		const bestMatch = data.find(i => i.name === bestLikelyMatch.original);
+		if (!bestMatch) {
+			throw new SupiError({
+				message: "Assert error: Item ID not found from the same set",
+				args: { match: matches[0] }
+			});
+		}
+
+		item = bestMatch;
+	}
+
+	return item;
+};
 
 export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 	let data = await core.Cache.getByPrefix("osrs-worlds-data") as GameWorlds | null;

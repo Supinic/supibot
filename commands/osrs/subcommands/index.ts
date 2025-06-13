@@ -1,3 +1,9 @@
+import type { SubcommandDefinition } from "../../../classes/command.js";
+export interface DefaultedSubcommand extends SubcommandDefinition {
+	description: string[]; // @todo remove `string` in standard subcommands type
+	default: boolean;
+}
+
 import ItemIdSubcommand from "./item-id.js";
 import KillcountSubcommand from "./killcount.js";
 import PriceSubcommand from "./price.js";
@@ -16,4 +22,4 @@ export default [
 	StatusSubcommand,
 	TearsOfGuthixSubcommand,
 	WikiSubcommand
-];
+] satisfies DefaultedSubcommand[];
