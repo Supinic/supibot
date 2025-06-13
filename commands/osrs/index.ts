@@ -1,8 +1,6 @@
 import { SupiError } from "supi-core";
 import { declare, createSubcommandBinding } from "../../classes/command.js";
-
-// @todo remove this type cast once all subcommands are finished
-import subcommands from "./subcommands/index.js";
+import { subcommands } from "./subcommands/index.js";
 
 import gameData from "./subcommands/game-data.json" with { type: "json" };
 const { activities, activityAliases, skills } = gameData;

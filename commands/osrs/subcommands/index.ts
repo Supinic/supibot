@@ -13,7 +13,7 @@ import StatusSubcommand from "./status.js";
 import TearsOfGuthixSubcommand from "./tears-of-guthix.js";
 import WikiSubcommand from "./wiki.js";
 
-export default [
+export const subcommands: DefaultedSubcommand[] = [
 	ItemIdSubcommand,
 	KillcountSubcommand,
 	PriceSubcommand,
@@ -22,4 +22,4 @@ export default [
 	StatusSubcommand,
 	TearsOfGuthixSubcommand,
 	WikiSubcommand
-] satisfies DefaultedSubcommand[];
+];

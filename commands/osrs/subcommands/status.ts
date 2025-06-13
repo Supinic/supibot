@@ -1,7 +1,14 @@
 import { bindOsrsSubcommand } from "../index.js";
 
 type StatusData = {
-	psa?: string;
+	playDisabled: boolean;
+	psaEnabled: boolean;
+	psaMessage: string;
+	loadRemoteBanner: boolean;
+	loadRemoteLogo: boolean;
+	remoteBannerFilename: string;
+	remoteBannerLinkUrl: string;
+	remoteLogoFileName: string;
 };
 
 export default bindOsrsSubcommand({
@@ -16,7 +23,7 @@ export default bindOsrsSubcommand({
 	],
 	execute: async function () {
 		const response = await core.Got.get("GenericAPI")<StatusData>({
-			url: "https://files.publishing.production.jxp.jagex.com/osrs.json"
+			url: "https://files.publishing.production.jxp.jagex.com/osrs/osrs.json"
 		});
 
 		if (!response.ok) {
@@ -26,8 +33,8 @@ export default bindOsrsSubcommand({
 			};
 		}
 
-		const { psa } = response.body;
-		if (!psa) {
+		const { psaEnabled, psaMessage } = response.body;
+		if (!psaEnabled) {
 			return {
 				success: true,
 				reply: "No game events detected at the moment."
@@ -36,7 +43,7 @@ export default bindOsrsSubcommand({
 		else {
 			return {
 				success: true,
-				reply: `Game event detected: ${psa}`
+				reply: `Game event detected: ${psaMessage}`
 			};
 		}
 	}
