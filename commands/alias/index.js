@@ -108,6 +108,7 @@ export default {
 			case "code":
 			case "check":
 			case "list":
+			case "show":
 			case "spy": {
 				let user;
 				let aliasName;
@@ -1396,6 +1397,7 @@ export default {
 		`<code>${prefix}alias check</code>`,
 		`<code>${prefix}alias spy</code>`,
 		`<code>${prefix}alias code</code>`,
+		`<code>${prefix}alias show</code>`,
 		`<code>${prefix}alias check (alias)</code>`,
 		`<code>${prefix}alias check (user)</code>`,
 		`<code>${prefix}alias check (user) (alias)</code>`,
