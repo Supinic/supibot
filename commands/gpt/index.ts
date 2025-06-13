@@ -274,11 +274,15 @@ export default {
 			const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
 			const searchableEmoji = (modelData.search === true) ? "✔" : "❌";
 
+			let priceString = String(modelData.pricePerMtoken);
+			if (modelData.flatCost) {
+				priceString += `+ flat ${modelData.flatCost}`;
+			}
 			return core.Utils.tag.trim `
 				<tr>
 					<td>${name}</td>
 					<td>${modelData.type}</td>
-					<td>${modelData.pricePerMtoken}</td>
+					<td>${priceString}</td>
 					<td>${isDefaultEmoji}</td>
 					<td>${isSubscriberOnlyEmoji}</td>
 					<td>${searchableEmoji}</td>
