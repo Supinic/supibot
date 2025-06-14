@@ -99,7 +99,7 @@ export default {
 					`Weird suspicious case: ${JSON.stringify({ data, assumedUserID })}`
 				);
 
-				await channel.send(`It seems like @${raw.user} is not suspicious at all...! Something probably went wrong, check Log ID ${logID} please`);
+				await channel.send(`It seems like @${raw.user} is not suspicious at all...! Something probably went wrong. @Supinic check Log ID ${logID} pleae`);
 				return;
 			}
 
@@ -115,7 +115,12 @@ export default {
 			}
 		}
 		else if (isMessageCheckReply(raw.user, messageData.reply)) {
-			const lower = message.toLowerCase().replace(/^\s*@\w+\s*/, "");
+			const lower = message
+				.toLowerCase()
+				.replace(/^\s*@\w+\s*/, "") // Replaces any @ mentions at the start of the message
+				.replaceAll(/[^a-z ]/g, "") // Removes all non-letter (+ space) characters
+				.trim();
+
 			if (lower !== "me" && lower !== "not me") {
 				await channel.send(`Please reply to the original message with specifically "me" or "not me"!`);
 				return;
@@ -159,12 +164,13 @@ export default {
 				null
 			);
 
-			await channel.send(`Debug: Name=${raw.user} ID=${raw.userId} Change=${description}`);
+			// await channel.send(`Debug: Name=${raw.user} ID=${raw.userId} Change=${description}`);
 
-			// await row.save({ skipLoad: true });
-			// await sb.User.invalidateUserCache(raw.user);
-			// await channel.send(`Success 🥳 Make sure to try using a command before you leave to confirm everything is okay.`);
-			// replyIdUserMap.delete(raw.user);
+			await row.save({ skipLoad: true });
+			await sb.User.invalidateUserCache(raw.user);
+
+			await channel.send(`Success 🥳 Make sure to try using a command before you leave to confirm everything is okay!`);
+			replyIdUserMap.delete(raw.user);
 		}
 	}),
 	Global: false,
