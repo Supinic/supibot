@@ -142,7 +142,6 @@ export default {
 				});
 			}
 
-			// load original user_alias row
 			const row = await core.Query.getRow<UserAliasRow>("chat_data", "User_Alias");
 			await row.load(userId);
 
@@ -164,12 +163,10 @@ export default {
 				null
 			);
 
-			// await channel.send(`Debug: Name=${raw.user} ID=${raw.userId} Change=${description}`);
-
 			await row.save({ skipLoad: true });
 			await sb.User.invalidateUserCache(raw.user);
 
-			await channel.send(`Success 🥳 Make sure to try using a command before you leave to confirm everything is okay!`);
+			await channel.send(`Success 🥳 Make sure to try using a command before you leave to confirm everything is okay.`);
 			replyIdUserMap.delete(raw.user);
 		}
 	}),
