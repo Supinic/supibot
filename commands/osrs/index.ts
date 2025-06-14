@@ -15,10 +15,9 @@ if (!defaultSubcommand) {
 const osrsCommandDefinition = declare({
 	Name: "osrs",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Aggregate command for whatever regarding Old School Runescape.",
-	Flags: ["mention","non-nullable","pipe"],
+	Description: "Aggregate command for anything regarding Old School Runescape.",
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "activity", type: "string" },
 		{ name: "boss", type: "string" },
