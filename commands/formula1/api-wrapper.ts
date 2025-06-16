@@ -1,3 +1,8 @@
+import { SupiDate, SupiError } from "supi-core";
+import type formulaOneCommandDefinition from "./index.js";
+import { ExtractContext } from "../../classes/command.js";
+import { Coordinates } from "../../@types/globals.js";
+
 export const url = "https://api.jolpi.ca/ergast/f1/";
 const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying", "Sprint"];
 const sessionNames = {
@@ -16,18 +21,64 @@ const BACKUP_RACE_DATA = {
 	}
 };
 
-let jolpicaGotInstance;
-const jolpicaGot = (...args) => {
+type GotInstance = NonNullable<ReturnType<typeof core.Got.get>>;
+type ExtendedGot = NonNullable<ReturnType<GotInstance["extend"]>>;
+
+let jolpicaGotInstance: ExtendedGot | undefined;
+const jolpicaGot = <T> (url: string) => {
 	jolpicaGotInstance ??= core.Got.get("GenericAPI").extend({
 		https: {
 			rejectUnauthorized: false
 		}
 	});
 
-	return jolpicaGotInstance(...args);
+	return jolpicaGotInstance<T>(url);
 };
 
-export const getWeather = async (context, sessionStart, coordinates) => {
+type Session = { date: string; time: string; };
+type BaseRace = {
+	season: string;
+	round: string;
+	url: string;
+	raceName: string;
+	Circuit: {
+		circuitId: string;
+		circuitName: string;
+		url: string;
+		Location: {
+			lat: string;
+			long: string;
+			locality: string;
+			country: string;
+		};
+	}
+	date: string;
+	time: string;
+	Qualifying: Session;
+};
+type RegularRace = BaseRace & {
+	FirstPractice: Session;
+	SecondPractice: Session;
+	ThirdPractice: Session;
+};
+type SprintRace = BaseRace & {
+	FirstPractice: Session;
+	Sprint: Session;
+	SprintQualifying: Session;
+};
+type Race = RegularRace | SprintRace;
+
+type YearResponse = {
+	MRData: {
+		RaceTable: {
+			season: string;
+			Races: Race[];
+		};
+	};
+};
+
+type CommandContext = ExtractContext<typeof formulaOneCommandDefinition>;
+export const getWeather = async (context: CommandContext, sessionStart: number, coordinates: Coordinates) => {
 	const weatherCommand = sb.Command.get("weather");
 	if (!weatherCommand) {
 		return "Weather checking is not available!";
@@ -35,15 +86,17 @@ export const getWeather = async (context, sessionStart, coordinates) => {
 
 	const fakeWeatherContext = sb.Command.createFakeContext(weatherCommand, {
 		user: context.user,
+		platform: context.platform,
+		platformSpecificData: context.platformSpecificData,
 		params: {
-			latitude: Number(coordinates.latitude),
-			longitude: Number(coordinates.longitude),
+			latitude: Number(coordinates.lat),
+			longitude: Number(coordinates.lng),
 			format: "icon,temperature,precipitation"
 		},
 		invocation: "weather"
 	});
 
-	const now = sb.Date.now();
+	const now = SupiDate.now();
 	const hourDifference = Math.floor((sessionStart - now) / 36e5);
 	if (hourDifference <= 1) {
 		const result = await weatherCommand.execute(fakeWeatherContext);
@@ -63,24 +116,29 @@ export const getWeather = async (context, sessionStart, coordinates) => {
 	}
 };
 
-export const fetchRace = async (year, searchType, searchValue) => {
-	const response = await jolpicaGot(`${url}${year}.json`);
-	const races = response.body.MRData?.RaceTable?.Races ?? [];
+export async function fetchRace (year: number, searchType: "current"): Promise<Race | null>;
+export async function fetchRace (year: number, searchType: "index", searchValue: number): Promise<Race | null>;
+export async function fetchRace (year: number, searchType: "name", searchValue: string): Promise<Race | null>;
+export async function fetchRace (year: number, searchType: string, searchValue?: string | number) {
+	const response = await core.Got.get("GenericAPI")<YearResponse>({
+		url: `${url}${year}.json`
+	});
+
+	const races = response.body.MRData.RaceTable.Races;
 	if (races.length === 0) {
-		return {
-			success: false,
-			reply: `This season has no races!`
-		};
+		throw new SupiError({
+		    message: "Assert error: Formula 1 season has no races!"
+		});
 	}
 
 	if (searchType === "current") {
-		const now = new sb.Date();
+		const now = new SupiDate();
 		let resultRace;
 
 		for (const race of races) {
 			const raceDate = (race.time)
-				? new sb.Date(`${race.date} ${race.time}`)
-				: new sb.Date(race.date);
+				? new SupiDate(`${race.date} ${race.time}`)
+				: new SupiDate(race.date);
 
 			// Add 2 hours to compensate for the race being underway
 			raceDate.addHours(2);
@@ -99,7 +157,7 @@ export const fetchRace = async (year, searchType, searchValue) => {
 	}
 	else if (searchType === "name") {
 		let resultRace;
-		const lower = searchValue.toLowerCase();
+		const lower = String(searchValue).toLowerCase();
 
 		for (const race of races) {
 			const raceName = race.raceName.toLowerCase();
@@ -116,32 +174,102 @@ export const fetchRace = async (year, searchType, searchValue) => {
 		return resultRace ?? null;
 	}
 	else {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Invalid search type provided",
 			args: { searchType, searchValue }
 		});
 	}
 };
 
-export const fetchQualifyingResults = async (year, round) => {
-	const response = await jolpicaGot(`${url}${year}/${round}/qualifying.json`);
-	return response.body.MRData?.RaceTable?.Races?.[0]?.QualifyingResults ?? [];
+type Driver = {
+	driverId: string;
+	permanentNumber: string;
+	code: string;
+	url: string;
+	givenName: string;
+	familyName: string;
+	dateOfBirth: string;
+	nationality: string;
+};
+type Constructor = {
+	constructorId: string;
+	url: string;
+	name: string;
+	nationality: string;
 };
 
-export const fetchRaceResults = async (year, round) => {
-	const response = await jolpicaGot(`${url}${year}/${round}/results.json`);
-	return response.body.MRData?.RaceTable?.Races?.[0]?.Results ?? [];
+type QualifyingResult = {
+	number: string;
+	position: string;
+	driver: Driver;
+	constructor: Constructor;
+	Q1: string;
+	Q2?: string;
+	Q3?: string;
+}
+type QualifyingResponse = YearResponse & {
+	MRData: {
+		RaceTable: {
+			Races: (Race & {
+				QualifyingResults: QualifyingResult[];
+			})[];
+		}
+	}
+};
+export const fetchQualifyingResults = async (year: number, round: number) => {
+	const response = await core.Got.get("GenericAPI")<QualifyingResponse>({
+		url: `${url}${year}/${round}/qualifying.json`
+	});
+
+	return response.body.MRData.RaceTable.Races[0].QualifyingResults;
 };
 
-export const fetchNextRaceDetail = async (context) => {
-	const { month, year } = new sb.Date();
+type RaceResult = {
+	number: string;
+	position: string;
+	positionText: string;
+	points: string;
+	driver: Driver;
+	constructor: Constructor;
+	grid: string;
+	laps: string;
+	status: string;
+	Time: {
+		millis: string;
+		time: string;
+	};
+	FastestLap: {
+		rank: string;
+		lap: string;
+		Time: { time: string; };
+	};
+};
+type RaceDetailResponse = YearResponse & {
+	MRData: {
+		RaceTable: {
+			Races: (Race & {
+				Results: RaceResult[];
+			})[];
+		};
+	};
+};
+export const fetchRaceResults = async (year: number, round: number) => {
+	const response = await core.Got.get("GenericAPI")<RaceDetailResponse>({
+		url: `${url}${year}/${round}/results.json`
+	});
+
+	return response.body.MRData.RaceTable.Races[0].Results;
+};
+
+export const fetchNextRaceDetail = async (context: CommandContext) => {
+	const { month, year } = new SupiDate();
 	const race = await fetchRace(year, "current");
-	if (!race || race.success === false) {
+	if (!race) {
 		// Bump season year only if we are in Nov/Dec, keep the same year otherwise
 		const nextSeason = (month >= 11) ? (year + 1) : year;
 		const backupRace = BACKUP_RACE_DATA[nextSeason];
 		if (backupRace) {
-			const delta = core.Utils.timeDelta(new sb.Date(backupRace.date));
+			const delta = core.Utils.timeDelta(new SupiDate(backupRace.date));
 			return {
 				success: true,
 				reply: core.Utils.tag.trim `
@@ -158,13 +286,13 @@ export const fetchNextRaceDetail = async (context) => {
 		};
 	}
 
-	const coordinates = {
-		latitude: race.Circuit.Location.lat,
-		longitude: race.Circuit.Location.long
+	const coordinates: Coordinates = {
+		lat: race.Circuit.Location.lat,
+		lng: race.Circuit.Location.long
 	};
 
-	const now = new sb.Date();
-	const raceStart = new sb.Date(`${race.date} ${race.time}`);
+	const now = new SupiDate();
+	const raceStart = new SupiDate(`${race.date} ${race.time}`);
 	const raceEnd = raceStart.clone().addHours(2); // Compensate for the race being underway
 
 	let nextSessionString = "";
@@ -178,7 +306,7 @@ export const fetchNextRaceDetail = async (context) => {
 			continue;
 		}
 
-		const sessionStart = new sb.Date(`${race[session].date} ${race[session].time}`);
+		const sessionStart = new SupiDate(`${race[session].date} ${race[session].time}`);
 		if (now <= sessionStart && sessionStart < nextSessionStart) {
 			nextSessionType = session;
 			nextSessionStart = sessionStart;

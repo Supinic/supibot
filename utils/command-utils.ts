@@ -9,6 +9,7 @@ import type { Command, Context as CommandContext, Flag as CommandFlag } from "..
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import type { Platform } from "../platforms/template.js";
+import type { Coordinates } from "../@types/globals.js";
 
 type CommandContextParams = CommandContext["params"];
 
@@ -54,7 +55,6 @@ export const randomInt = (min: number, max: number): number => {
 	return (min + roll);
 };
 
-type Coordinates = { lat: number; lng: number; };
 /**
  * Fetches time data for given GPS coordinates and timestamp, if provided.
  */

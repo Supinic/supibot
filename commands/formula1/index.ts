@@ -1,7 +1,8 @@
-import subcommands from "./subcommands/index.js";
+import { declare, createSubcommandBinding } from "../../classes/command.js";
+import { subcommands } from "./subcommands/index.js";
 const SUBCOMMAND_NAMES = subcommands.map(i => i.name).join(", ");
 
-export default {
+const formulaOneCommandDefinition = declare({
 	Name: "formula1",
 	Aliases: ["f1"],
 	Author: "supinic",
@@ -15,8 +16,8 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function formula1 (context, ...args) {
-		const type = (args[0] ?? "race");
-		const subcommand = subcommands.find(i => i.name === type || i.aliases?.includes(type));
+		const type = args[0] ?? "race";
+		const subcommand = subcommands.find(i => i.name === type || i.aliases.includes(type));
 		if (!subcommand) {
 			return {
 				success: false,
@@ -27,7 +28,7 @@ export default {
 		const rest = args.slice(1);
 		return await subcommand.execute(context, type, ...rest);
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (prefix) => {
 		const subcommandDescriptions = subcommands.map(cmd => cmd.description.join("<br>")).join("<br><br>");
 		return [
 			"All things F1-related in a single command.",
@@ -41,5 +42,8 @@ export default {
 
 			subcommandDescriptions
 		];
-	})
-};
+	}
+});
+
+export const formulaOneBinding = createSubcommandBinding<typeof formulaOneCommandDefinition>();
+export default formulaOneCommandDefinition;

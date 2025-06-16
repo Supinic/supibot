@@ -1,8 +1,11 @@
+import { formulaOneBinding } from "../index.js";
 import { fetchConstructorStandings } from "../api-wrapper.js";
+import { SupiDate } from "supi-core";
 
-export default {
+export const asdf = formulaOneBinding({
 	name: "constructorStandings",
 	aliases: ["wcc"],
+	default: false,
 	description: [
 		`<code>$f1 wcc</code>`,
 		`<code>$f1 constructorStandings</code>`,
@@ -11,7 +14,7 @@ export default {
 		"Posts a summary for the season's WCC - constructor standings."
 	],
 	execute: async (context) => {
-		const year = context.params.season ?? context.params.year ?? new sb.Date().year;
+		const year = context.params.season ?? context.params.year ?? new SupiDate().year;
 		const standings = await fetchConstructorStandings(year);
 		if (standings.length === 0) {
 			return {
@@ -28,4 +31,5 @@ export default {
 			reply: `Constructor standings for season ${year}: ${string}`
 		};
 	}
-};
+});
+

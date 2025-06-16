@@ -4,7 +4,7 @@ import DriverStandingsSubcommand from "./driver-standings.js";
 import KimiSubcommand from "./kimi.js";
 import RaceSubcommand from "./race.js";
 
-export default [
+export const subcommands = [
 	ConstructorStandingsSubcommand,
 	CopypastaSubcommand,
 	DriverStandingsSubcommand,

@@ -1,4 +1,4 @@
-import { fetchDriverStandings } from "../api-wrapper.js";
+import { fetchDriverStandings } from "../api-wrapper.ts";
 
 export default {
 	name: "driverStandings",

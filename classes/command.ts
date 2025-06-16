@@ -298,6 +298,8 @@ type CooldownObject = {
 };
 type CooldownDefinition = number | null | CooldownObject;
 
+export type ExtractContext <T extends CommandDefinition> = Context<T["Params"]>;
+
 export interface SubcommandDefinition<T extends CommandDefinition = CommandDefinition> {
 	name: string;
 	title?: string;

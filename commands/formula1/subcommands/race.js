@@ -4,7 +4,7 @@ import {
 	fetchNextRaceDetail,
 	fetchQualifyingResults,
 	fetchRaceResults
-} from "../api-wrapper.js";
+} from "../api-wrapper.ts";
 
 const getHighlights = async (race) => {
 	if (!process.env.API_GOOGLE_YOUTUBE) {
