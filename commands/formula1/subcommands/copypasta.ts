@@ -3,9 +3,9 @@ import copypastaList from "./copypasta.json" with { type: "json" };
 import type { Channel } from "../../../classes/channel.js";
 
 const MAXIMUM_COPYPASTA_REPEATS = 10;
-
 const repeatedPastas: Map<Channel["ID"] | "whispers", string[]> = new Map();
-export const asdf = formulaOneBinding({
+
+export default formulaOneBinding({
 	name: "copypasta",
 	aliases: [],
 	description: [

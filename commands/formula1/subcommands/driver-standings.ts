@@ -2,7 +2,7 @@ import { formulaOneBinding } from "../index.js";
 import { fetchDriverStandings } from "../api-wrapper.js";
 import { SupiDate } from "supi-core";
 
-export const asdf = formulaOneBinding({
+export default formulaOneBinding({
 	name: "driverStandings",
 	aliases: ["wdc"],
 	description: [

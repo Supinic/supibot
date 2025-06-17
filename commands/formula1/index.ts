@@ -26,7 +26,7 @@ const formulaOneCommandDefinition = declare({
 		}
 
 		const rest = args.slice(1);
-		return await subcommand.execute(context, type, ...rest);
+		return await subcommand.execute.call(this, context, type, ...rest);
 	}),
 	Dynamic_Description: (prefix) => {
 		const subcommandDescriptions = subcommands.map(cmd => cmd.description.join("<br>")).join("<br><br>");

@@ -8,7 +8,7 @@ import { Coordinates } from "../../@types/globals.js";
 export const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
 const sprintSessionTypes = ["FirstPractice", "SprintQualifying", "Sprint", "Qualifying"] as const;
-const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "SprintQualifying", "Qualifying", "Sprint"] as const;
+type SessionType = (typeof regularSessionTypes)[number] | (typeof sprintSessionTypes)[number];
 
 const sessionNames = {
 	FirstPractice: "First practice",
@@ -268,7 +268,7 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 	let nextSessionString = "";
 	let nextSessionStart: SupiDate | number = Infinity;
 	let nextSessionEnd: SupiDate | undefined;
-	let nextSessionType: (typeof sessionTypes)[number] | undefined;
+	let nextSessionType: SessionType | undefined;
 
 	// Find the first upcoming session that is still scheduled.
 	if (isSprintRace(race)) {

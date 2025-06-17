@@ -3,9 +3,9 @@ import quoteList from "./kimi.json" with { type: "json" };
 import type { Channel } from "../../../classes/channel.js";
 
 const MAXIMUM_QUOTE_REPEATS = 10;
-
 const repeatedQuotes: Map<Channel["ID"] | "whispers", string[]> = new Map();
-export const asdf = formulaOneBinding({
+
+export default formulaOneBinding({
 	name: "kimi",
 	aliases: ["gimi"],
 	description: [

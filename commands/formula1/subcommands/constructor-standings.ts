@@ -2,7 +2,7 @@ import { formulaOneBinding } from "../index.js";
 import { fetchConstructorStandings } from "../api-wrapper.js";
 import { SupiDate } from "supi-core";
 
-export const asdf = formulaOneBinding({
+export default formulaOneBinding({
 	name: "constructorStandings",
 	aliases: ["wcc"],
 	default: false,

@@ -8,7 +8,7 @@ import {
 } from "../api-wrapper.js";
 import { SupiDate } from "supi-core";
 
-export const asdf = formulaOneBinding({
+export default formulaOneBinding({
 	name: "race",
 	aliases: [],
 	description: [
