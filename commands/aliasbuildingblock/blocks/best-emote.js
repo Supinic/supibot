@@ -16,6 +16,8 @@ export default {
 
 		const bestMatch = await context.getBestAvailableEmote(args.slice(0, -1), args.at(-1));
 		return {
+			success: true,
+			hasExternalInput: true,
 			reply: bestMatch
 		};
 	}

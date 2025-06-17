@@ -47,6 +47,8 @@ export default {
 		}
 		else if (range[0] <= args.length && args.length <= range[1]) {
 			return {
+				success: true,
+				hasExternalInput: true,
 				reply: args.join(" ")
 			};
 		}
