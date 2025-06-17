@@ -9,7 +9,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Attempts to convert a specified amount of one currency to another. Only supports 3-letter ISO codes. Example: 100 USD to EUR.",
 	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function currency (context, ...args) {
 		if (!process.env.API_OPEN_EXCHANGE_RATES) {

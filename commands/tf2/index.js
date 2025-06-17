@@ -12,7 +12,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Aggregate command for everything related to Team Fortress 2.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function teamFortress2 (context, subcommand, ...args) {
 		if (!subcommand) {

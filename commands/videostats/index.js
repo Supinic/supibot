@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Post the statistics about a given bare video link (means, just the ID and not the entire link) in a given CyTube room.",
 	Flags: ["mention","non-nullable","pipe","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: "Video statistics are only available in Cytube rooms.",
 	Code: (async function videoStats (context, link) {
 		if (!link) {

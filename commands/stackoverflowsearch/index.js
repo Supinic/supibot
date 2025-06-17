@@ -5,7 +5,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Searches SO for relevant questions and answers.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function stackOverflowSearch (context, ...args) {
 		const message = args.join(" ");

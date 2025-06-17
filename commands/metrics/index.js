@@ -10,7 +10,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Shows off various metrics related to Supibot - e.g. current commands per minute.",
 	Flags: [],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function metrics (context, type) {
 		if (!type) {

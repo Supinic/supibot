@@ -9,7 +9,7 @@ export default {
 	Cooldown: 10000,
 	Description: "For a given day, posts a random historic event that happened on that day. If not provided, uses today's date.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomHistoricEvent (context, ...args) {
 		const date = (args.length > 0)

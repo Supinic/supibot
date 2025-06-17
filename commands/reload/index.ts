@@ -2,24 +2,21 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { randomBytes } from "node:crypto";
 import { exec } from "node:child_process";
-
+import { declare, type CommandDefinition } from "../../classes/command.js";
 import config from "../../config.json" with { type: "json" };
-import type { CommandDefinition, Context } from "../../classes/command.js";
 
 const shell = promisify(exec);
 const BASE_PATH = config.basePath;
 
-const params = [{ name: "skipUpgrade", type: "boolean" }] as const;
-
-export default {
+export default declare({
 	Name: "reload",
 	Aliases: null,
 	Cooldown: 0,
 	Description: "Reloads a database definition or hotloads an updated script",
 	Flags: ["pipe", "skip-banphrase", "system", "whitelist"],
-	Params: params,
+	Params: [{ name: "skipUpgrade", type: "boolean" }] as const,
 	Whitelist_Response: null,
-	Code: (async function reload (context: Context<typeof params>, command, ...rest) {
+	Code: (async function reload (context, command, ...rest) {
 		switch (command) {
 			case "banphrase": {
 				const ids = rest.map(Number).filter(i => !Number.isNaN(i));
@@ -160,4 +157,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

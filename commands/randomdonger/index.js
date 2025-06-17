@@ -7,7 +7,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Raise your dongers.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomDonger () {
 		return {

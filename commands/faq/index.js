@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Posts the link to Supibot's FAQ on the supinic.com website.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function faq (context, ...args) {
 		if (args.length > 0) {

@@ -5,7 +5,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Inspires you. Randomly.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function inspireMe () {
 		const response = await core.Got.get("GenericAPI")({

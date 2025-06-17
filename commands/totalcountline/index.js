@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Fetches the total amount of a user's (or yours, if nobody was specified) chat lines in all tracked channels summed together.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function totalCountLines (context, target) {
 		if (!target) {

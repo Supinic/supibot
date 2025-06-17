@@ -5,7 +5,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Gifts a certain something to someone else. Right now, supported parameters are: \"cookie\" - gifts your cooldown for a cookie to someone else!",
 	Flags: ["developer","mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function gift (/* context, type, target */) {
 		return {

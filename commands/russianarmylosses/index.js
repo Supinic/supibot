@@ -8,7 +8,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Fetches the latest losses of the Russian Army in Ukraine, as provided by the General Staff of Ukraine.",
 	Flags: ["mention", "non-nullable", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function russianArmyLosses (context, ...args) {
 		const response = await core.Got.get("GenericAPI")({

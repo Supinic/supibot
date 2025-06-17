@@ -7,7 +7,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Checks if a website is currently down or if it's just you.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function isDown (context, input) {
 		const fixedInput = domainToASCII(input) || input; // domainToASCII returns empty string for invalid input - hence ||

@@ -1,4 +1,6 @@
-import { fetchWorldsData } from "./osrs-utils.js";
+import { SupiDate } from "supi-core";
+import { bindOsrsSubcommand } from "../index.js";
+import { fetchWorldsData, type GameWorlds } from "./osrs-utils.js";
 
 /**
  * Each star tier lasts 7 minutes flat after the latest update on 2023-10-25:
@@ -8,25 +10,40 @@ import { fetchWorldsData } from "./osrs-utils.js";
 const TIME_PER_TIER = 420_000;
 const activityRegex = /(pvp|high risk|skill total)/i;
 
-const getRemaining = (star) => {
+type StarData = {
+	world: number;
+	location: number;
+	calledBy: string;
+	calledLocation: string;
+	calledAt: number;
+	minTime: number;
+	maxTime: number;
+	tier: number;
+};
+type AdjustedStarData = StarData & {
+	remains: number;
+};
+
+const getRemaining = (star: StarData) => {
 	const fullTime = TIME_PER_TIER * (star.tier - 1);
-	const elapsedTime = sb.Date.now() - (star.calledAt * 1000);
+	const elapsedTime = SupiDate.now() - (star.calledAt * 1000);
 	return (fullTime - elapsedTime);
 };
-const formatStar = (star, worldsData) => {
+const formatStar = (star: AdjustedStarData, worldsData: GameWorlds) => {
 	const delta = core.Utils.formatTime(star.remains / 1000, true);
 	const world = worldsData[star.world];
-	const activityString = activityRegex.test(world.activity)
+	const activityString = (world.activity && activityRegex.test(world.activity))
 		? ` (${world.activity})`
 		: "";
 
 	return `${world.flagEmoji} W${star.world}${activityString}: T${star.tier} ${star.calledLocation} (${delta})`;
 };
 
-export default {
+export default bindOsrsSubcommand({
 	name: "stars",
 	title: "Shooting Stars",
 	aliases: ["star"],
+	default: true,
 	description: [
 		"<u>Shooting Stars</u>",
 		`<code>$osrs stars</code>`,
@@ -35,15 +52,22 @@ export default {
 		`Powered by the <a href="https://map.starminers.site/">Starminers API</a>.`
 	],
 	execute: async function () {
-		const response = await core.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")<StarData[]>({
 			url: "https://map.starminers.site/data2",
 			searchParams: {
-				timestamp: sb.Date.now()
+				timestamp: SupiDate.now()
 			}
 		});
 
 		const worlds = await fetchWorldsData();
-		const stars = response.body
+		if (!worlds) {
+			return {
+			    success: false,
+			    reply: "OSRS worlds data is currently unavailable! Try again later."
+			};
+		}
+
+		const stars: AdjustedStarData[] = response.body
 			.filter(i => worlds[i.world].type !== "free")
 			.map(i => ({ ...i, remains: getRemaining(i) }))
 			.sort((a, b) => b.remains - a.remains);
@@ -54,4 +78,4 @@ export default {
 			reply: `Top 3 stars: ${string}`
 		};
 	}
-};
+});

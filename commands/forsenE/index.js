@@ -10,7 +10,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Posts a random forsenE tweet.",
 	Flags: ["pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function forsenE (context) {
 		const eligibleLines = forsenData.lines.filter(i => !previousLines.includes(i));

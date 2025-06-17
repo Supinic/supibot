@@ -5,7 +5,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Alphabetically sorts the message provided to this command.",
 	Flags: ["non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function sort (context, ...args) {
 		if (args.length < 2) {

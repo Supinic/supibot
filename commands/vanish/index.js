@@ -5,7 +5,7 @@ export default {
 	Cooldown: 60000,
 	Description: "Times out the user for 1 second. Only works if Supibot is a Twitch moderator.",
 	Flags: ["skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function vanish (context) {
 		if (context.platform.Name !== "twitch") {

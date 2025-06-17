@@ -5,7 +5,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Posts the link to Supinic's stream game list on the website.",
 	Flags: ["developer","mention","pipe","system","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function streamGames () {
 		return {

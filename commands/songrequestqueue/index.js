@@ -8,7 +8,7 @@ export default {
 	Cooldown: 30000,
 	Description: "Posts the summary of the song request queue.",
 	Flags: ["mention","pipe","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequestQueue (context) {
 		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);

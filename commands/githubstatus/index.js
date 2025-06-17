@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Checks current GitHub status as a short summary.",
 	Flags: ["developer","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function githubStatus () {
 		const response = await core.Got.get("GenericAPI")({

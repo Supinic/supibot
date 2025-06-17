@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
 type NineGagData = {
 	data: {
@@ -13,13 +13,13 @@ type NineGagData = {
 	};
 };
 
-export default {
+export default declare({
 	Name: "9gag",
 	Aliases: ["gag"],
 	Cooldown: 10_000,
 	Description: "Searches 9gag for posts that fit your search text, or a random featured one if you don't provide anything.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function nineGag (context, ...args) {
 		const options = (args.length === 0)
@@ -63,4 +63,4 @@ export default {
 		`<code>${prefix}9gag (query)</code>`,
 		"Fetches a recent random 9gag post that matches your query."
 	]
-} satisfies CommandDefinition;
+});

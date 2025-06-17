@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Fetches the followage for a given user and a channel. If no channel is provided, checks the current one. If no user is provided either, checks yourself.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function followAge (context, user, channel) {
 		if (!channel && user) {

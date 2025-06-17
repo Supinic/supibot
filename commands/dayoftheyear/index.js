@@ -5,7 +5,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Checks what kind of international day (or month) it is today (or this month). Also accepts specific dates.",
 	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function percent (context, ...args) {
 		if (!process.env.API_DAYS_OF_THE_YEAR) {

@@ -1,18 +1,17 @@
+import { SupiError } from "supi-core";
+import { declare, type Context } from "../../classes/command.js";
+import { typedEntries } from "../../utils/ts-helpers.js";
+
 import GptConfig from "./config.json" with { type: "json" };
 import GptCache from "./cache-control.js";
-import { process as processMetrics } from "./metrics.js";
-import { check as checkModeration } from "./moderation.js";
-
-import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
-
 import { determineOutputLimit, GptTemplate, handleHistoryCommand } from "./gpt-template.js";
 import { GptOpenAI } from "./gpt-openai.js";
 import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
 import { GptDeepInfra } from "./gpt-deepinfra.js";
+import { process as processMetrics } from "./metrics.js";
+import { check as checkModeration } from "./moderation.js";
 
-import { type Context, type CommandDefinition } from "../../classes/command.js";
-import { SupiError } from "supi-core";
-import { typedEntries } from "../../utils/ts-helpers.js";
+import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
 
 export type ModelName = keyof typeof GptConfig.models;
 export type ModelData = {
@@ -63,7 +62,7 @@ const params = [
 ] as const;
 export type GptContext = Context<typeof params>;
 
-export default {
+export default declare({
 	Name: "gpt",
 	Aliases: ["chatgpt"],
 	Cooldown: 15000,
@@ -74,7 +73,7 @@ export default {
 	initialize: async function () {
 		isLogTablePresent = await core.Query.isTablePresent("data", "ChatGPT_Log");
 	},
-	Code: (async function chatGPT (context: GptContext, ...args) {
+	Code: (async function chatGPT (context, ...args) {
 		const query = args.join(" ").trim();
 		const historyCommandResult = await handleHistoryCommand(context, query);
 		if (historyCommandResult) {
@@ -399,4 +398,4 @@ export default {
 			"<b>Warning!</b> This limit only applies to ChatGPT's <b>output</b>! You must control the length of your input query yourself."
 		];
 	}
-} satisfies CommandDefinition;
+});

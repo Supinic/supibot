@@ -8,7 +8,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Uses supinic's API to fetch general info about a link, which is then posted to a Pastebin post.",
 	Flags: ["developer","mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function getVideoData (context, link) {
 		const linkParser = await getLinkParser();

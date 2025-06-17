@@ -1,8 +1,8 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
+import { declare } from "../../classes/command.js";
 
 import config from "../../config.json" with { type: "json" };
-import type { CommandDefinition } from "../../classes/command.js";
 
 const shell = promisify(exec);
 const { basePath } = config;
@@ -28,13 +28,13 @@ const isRestartMethod = (input: string): input is keyof typeof restartMethods =>
 	Object.keys(restartMethods).includes(input)
 );
 
-export default {
+export default declare({
 	Name: "restart",
 	Aliases: null,
 	Cooldown: 10_000,
 	Description: "Restarts the bot. Optionally, also pulls git changes and/or upgrades packages via yarn.",
 	Flags: ["system", "whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: "Only available to administrators or helpers!",
 	Code: async function restart (context, ...commands) {
 		for (const name of commands) {
@@ -88,4 +88,4 @@ export default {
 		"<code>$restart bot all</code>",
 		"Combination of all commands in this order: pull, prod-update, build, exit."
 	]
-} satisfies CommandDefinition;
+});

@@ -1,4 +1,5 @@
 import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
 
 import {
 	isArgumentsData,
@@ -7,7 +8,6 @@ import {
 	type Type as FilterType
 } from "../../classes/filter.js";
 
-import type { Context, CommandDefinition, StrictResult } from "../../classes/command.js";
 import type { Channel } from "../../classes/channel.js";
 import type { User } from "../../classes/user.js";
 
@@ -28,29 +28,27 @@ const NO_RESPONSE_FILTER_TYPES: Set<FilterType> = new Set([
 
 const isFilterType = (input: string): input is FilterType => AVAILABLE_BAN_FILTER_TYPES.includes(input);
 
-const paramsDefinition = [
-	{ name: "all", type: "boolean" },
-	{ name: "channel", type: "string" },
-	{ name: "clear", type: "boolean" },
-	{ name: "command", type: "string" },
-	{ name: "index", type: "number" },
-	{ name: "invocation", type: "string" },
-	{ name: "multiplier", type: "number" },
-	{ name: "noResponse", type: "boolean" },
-	{ name: "type", type: "string" },
-	{ name: "string", type: "string" },
-	{ name: "user", type: "string" }
-] as const;
-
-export default {
+export default declare({
 	Name: "ban",
 	Aliases: ["unban"],
 	Cooldown: 5000,
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by channel owners and Supibot ambassadors.",
 	Flags: ["mention"],
-	Params: paramsDefinition,
+	Params: [
+		{ name: "all", type: "boolean" },
+		{ name: "channel", type: "string" },
+		{ name: "clear", type: "boolean" },
+		{ name: "command", type: "string" },
+		{ name: "index", type: "number" },
+		{ name: "invocation", type: "string" },
+		{ name: "multiplier", type: "number" },
+		{ name: "noResponse", type: "boolean" },
+		{ name: "type", type: "string" },
+		{ name: "string", type: "string" },
+		{ name: "user", type: "string" }
+	] as const,
 	Whitelist_Response: null,
-	Code: (async function ban (context: Context<typeof paramsDefinition>): Promise<StrictResult> {
+	Code: (async function ban (context) {
 		const { invocation } = context;
 		const type = core.Utils.capitalize(context.params.type ?? "Blacklist");
 		if (!isFilterType(type)) {
@@ -566,4 +564,4 @@ export default {
 			""
 		];
 	})
-} satisfies CommandDefinition;
+});

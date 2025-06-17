@@ -261,17 +261,16 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	get tee () { return this.append.tee; }
 }
 
-export interface CommandDefinition extends TemplateDefinition {
+export interface CommandDefinition <T extends ParameterDefinitions = ParameterDefinitions> extends TemplateDefinition {
 	Name: Command["Name"];
 	Aliases: Command["Aliases"] | null;
 	Description: Command["Description"];
 	Cooldown: Command["Cooldown"];
 	Flags: Command["Flags"];
-	Params: Command["Params"] | null;
+	Params: T;
 	Whitelist_Response: Command["Whitelist_Response"];
-	Code: Command["Code"];
+	Code: (this: Command, context: Context<T>, ...args: string[]) => StrictResult | Promise<StrictResult>;
 	Dynamic_Description: Command["Dynamic_Description"];
-
 	initialize?: CustomInitFunction;
 	destroy?: CustomDestroyFunction;
 }
@@ -298,6 +297,24 @@ type CooldownObject = {
 	ignoreCooldownFilters?: boolean;
 };
 type CooldownDefinition = number | null | CooldownObject;
+
+export type ExtractContext <T extends CommandDefinition> = Context<T["Params"]>;
+
+export interface SubcommandDefinition<T extends CommandDefinition = CommandDefinition> {
+	name: string;
+	title?: string;
+	aliases: string[];
+	description: string | string[];
+	default?: boolean;
+	flags?: Record<string, boolean>;
+	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
+}
+
+export const createSubcommandBinding = <
+	T extends CommandDefinition
+> () => <
+	D extends SubcommandDefinition<T>
+> (def: D) => def;
 
 export class Command extends TemplateWithoutId {
 	readonly Name: string;
@@ -335,7 +352,7 @@ export class Command extends TemplateWithoutId {
 		this.Whitelist_Response = data.Whitelist_Response ?? null;
 
 		this.Flags = Object.freeze(data.Flags);
-		this.Params = data.Params ?? [];
+		this.Params = data.Params;
 
 		this.Code = data.Code;
 		this.Dynamic_Description = data.Dynamic_Description ?? null;
@@ -1343,3 +1360,5 @@ export class Command extends TemplateWithoutId {
 		return COMMAND_PREFIX;
 	}
 }
+
+export const declare = <T extends ParameterDefinitions> (def: CommandDefinition<T>) => def;

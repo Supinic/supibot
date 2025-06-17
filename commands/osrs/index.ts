@@ -1,15 +1,23 @@
-import subcommands from "./subcommands/index.js";
-import gameData from "./game-data.json" with { type: "json" };
+import { SupiError } from "supi-core";
+import { declare, createSubcommandBinding } from "../../classes/command.js";
+import { subcommands } from "./subcommands/index.js";
 
+import gameData from "./subcommands/game-data.json" with { type: "json" };
 const { activities, activityAliases, skills } = gameData;
 
-export default {
+const defaultSubcommand = subcommands.find(i => i.default);
+if (!defaultSubcommand) {
+	throw new SupiError({
+	    message: "Assert error: No default $osrs subcommand found"
+	});
+}
+
+const osrsCommandDefinition = declare({
 	Name: "osrs",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Aggregate command for whatever regarding Old School Runescape.",
-	Flags: ["mention","non-nullable","pipe"],
+	Description: "Aggregate command for anything regarding Old School Runescape.",
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "activity", type: "string" },
 		{ name: "boss", type: "string" },
@@ -18,19 +26,19 @@ export default {
 		{ name: "seasonal", type: "boolean" },
 		{ name: "skill", type: "string" },
 		{ name: "virtual", type: "boolean" }
-	],
+	] as const,
 	Whitelist_Response: null,
 	Code: (async function osrs (context, first, ...args) {
-		const input = (first) ? first.toLowerCase() : null;
+		const input = (first) ? first.toLowerCase() : "";
 		let subcommand = subcommands.find(i => i.name === input || i.aliases.includes(input));
 		if (!subcommand) {
 			args.unshift(first);
-			subcommand = subcommands.find(i => i.default === true);
+			subcommand = defaultSubcommand;
 		}
 
 		return await subcommand.execute.call(this, context, ...args);
 	}),
-	Dynamic_Description: (async function (prefix) {
+	Dynamic_Description: function (prefix) {
 		const subcommandsDescription = subcommands.flatMap(i => [
 			`<h6>${i.title}</h6>`,
 			"",
@@ -38,7 +46,7 @@ export default {
 			""
 		]);
 
-		const aliases = [];
+		const aliases: { activity: string; alias: string; }[] = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
 			aliases.push({
 				activity: value,
@@ -91,5 +99,8 @@ export default {
 			"<h6>Supported activities</h6>",
 			`<ul>${activityList}<ul>`
 		];
-	})
-};
+	}
+});
+
+export const bindOsrsSubcommand = createSubcommandBinding<typeof osrsCommandDefinition>();
+export default osrsCommandDefinition;

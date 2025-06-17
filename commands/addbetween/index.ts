@@ -1,17 +1,15 @@
-import type { Context, CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-const params = [{ name: "sentences", type: "boolean" }] as const;
-
-export default {
+export default declare({
 	Name: "addbetween",
 	Aliases: ["ab"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Fills the message provided with the word (usually an emote) provided as the first argument.",
 	Flags: ["external-input","mention","pipe"],
-	Params: params,
+	Params: [{ name: "sentences", type: "boolean" }] as const,
 	Whitelist_Response: null,
-	Code: function addBetween (context: Context<typeof params>, word, ...args) {
+	Code: function addBetween (context, word, ...args) {
 		if (!word || args.length === 0) {
 			return {
 				success: false,
@@ -43,4 +41,4 @@ export default {
 		};
 	},
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

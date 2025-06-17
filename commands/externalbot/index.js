@@ -8,7 +8,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Makes Supibot execute a command of a different bot, and then the result will be that bot's command response. As such, this command can only be used in a pipe.",
 	Flags: ["external-input","mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	initialize: async () => {
 		if (!await core.Query.isTablePresent("bot_data", "Bot")) {

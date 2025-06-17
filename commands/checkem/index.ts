@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CommandDefinition, Context, ContextPlatformSpecificData } from "../../classes/command.js";
+import { declare, type ContextPlatformSpecificData } from "../../classes/command.js";
 import type { MessageData as TwitchMessageData } from "../../platforms/twitch.js";
 
 const platformHasMessageId = (input: ContextPlatformSpecificData): input is TwitchMessageData => {
@@ -22,15 +22,15 @@ const REPEATED_NUMBERS_NAMES = new Map([
 	[10, "decs"]
 ]);
 
-export default {
+export default declare({
 	Name: "checkem",
 	Aliases: ["CheckEm", "check'em"],
 	Cooldown: 10_000,
 	Description: "Similar to 4chan, posts the ID of your message as a number. Then, it checks it for dubs and higher.",
 	Flags: ["mention", "pipe", "skip-banphrase"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
-	Code: function checkEm (context: Context<[]>) {
+	Code: function checkEm (context) {
 		if (!context.channel) {
 			return {
 			    success: false,
@@ -92,4 +92,4 @@ export default {
 		};
 	},
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

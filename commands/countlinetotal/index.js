@@ -5,7 +5,7 @@ export default {
 	Cooldown: 30000,
 	Description: "Fetches the number of data lines from ALL the log tables Supibot uses, including the total size and a prediction of when the storage will run out.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function countLineTotal (context) {
 		const chatLineAmount = await core.Query.getRecordset(rs => rs

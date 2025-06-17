@@ -1,10 +1,11 @@
+import { declare } from "../../classes/command.js";
+import { SupiDate, SupiError } from "supi-core";
+
 import { GptDeepInfra } from "../gpt/gpt-deepinfra.js";
 import gptConfig from "../gpt/config.json" with { type: "json" };
 
 import { check as checkModeration } from "../gpt/moderation.js";
-import { CommandDefinition, Context } from "../../classes/command.js";
 import { GptContext, ModelData } from "../gpt/index.js";
-import { SupiDate, SupiError } from "supi-core";
 
 const { models } = gptConfig;
 const summaryModel = models.maverick as ModelData;
@@ -128,8 +129,6 @@ const getRustlogLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUN
 	};
 };
 
-const params = [{ name: "type", type: "string" }] as const;
-
 const BASE_QUERY = "Briefly summarize the following messages from a chatroom. Ignore chat bots replying to users' commands. Assume unfamiliar words to be emotes";
 const queries = {
 	base: BASE_QUERY,
@@ -142,15 +141,15 @@ const isQueryType = (input: string): input is keyof typeof queries => (
 	Object.keys(queries).includes(input)
 );
 
-export default {
+export default declare({
 	Name: "chatsummary",
 	Aliases: ["csum"],
 	Cooldown: 5000,
 	Description: "Summarizes the last couple of messages in the current (or provided) channel via GPT. This command applies a 30s cooldown to all users in the channel it is used in.",
 	Flags: ["mention","pipe"],
-	Params: params,
+	Params: [{ name: "type", type: "string" }] as const,
 	Whitelist_Response: null,
-	Code: async function chatSummary (context: Context<typeof params>, channelInput) {
+	Code: async function chatSummary (context, channelInput) {
 		if (!context.channel) {
 			return {
 			    success: false,
@@ -249,4 +248,4 @@ export default {
 			</li>
 		`
 	])
-} satisfies CommandDefinition;
+});

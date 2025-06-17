@@ -19,7 +19,7 @@ export default {
 	Cooldown: 10000,
 	Description: "For a given processed TwitchLotto link from $tl, creates a version where the detections are marked with boxes.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function twitchLotto (context, inputLink) {
 		const filtered = await sb.Filter.execute({

@@ -1,17 +1,16 @@
 import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
 import { Filter } from "../../classes/filter.js";
-import type { Command, Context } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "unmention",
 	Aliases: ["remention"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Makes a specific command (or, in advanced mode, a combination of command/channel/platform, or global) not mention you by removing the \"username,\" part at the beginning.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
-	Code: (async function unmention (this: Command, context: Context<[]>, ...args: string[]) {
+	Code: (async function unmention (context, ...args) {
 		const parse = await parseGenericFilterOptions("Unmention", context.params, args, {
 			argsOrder: ["command"]
 		});
@@ -110,4 +109,4 @@ export default {
 				</li>
 			</ul>`
 	])
-};
+});

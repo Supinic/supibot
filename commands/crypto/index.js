@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Fetches the latest price of a cryptocurrency. If none is provided, defaults to BTC.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function crypto (context, symbol = "BTC") {
 		if (!process.env.API_CRYPTO_COMPARE) {

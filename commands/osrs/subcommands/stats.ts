@@ -1,7 +1,9 @@
+import { bindOsrsSubcommand } from "../index.js";
 import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
-import GameData from "../game-data.json" with { type: "json" };
+import GameData from "./game-data.json" with { type: "json" };
+import { SupiError } from "supi-core";
 
-export default {
+export default bindOsrsSubcommand({
 	name: "stats",
 	title: "Skill levels",
 	aliases: [],
@@ -40,7 +42,7 @@ export default {
 			force: Boolean(context.params.force)
 		});
 
-		if (userStats.success === false) {
+		if (!userStats.success) {
 			return userStats;
 		}
 
@@ -51,7 +53,7 @@ export default {
 
 		if (context.params.skill) {
 			const skillName = context.params.skill.toLowerCase();
-			const skillData = GameData.skills.find(i => i.name === skillName || i.aliases?.includes(skillName));
+			const skillData = GameData.skills.find(i => i.name === skillName || i.aliases.includes(skillName));
 			if (!skillData) {
 				return {
 					success: false,
@@ -74,11 +76,14 @@ export default {
 				};
 			}
 
-			const experience = (skill.experience === -1)
+			const experience = (skill.experience === -1 || skill.experience === null)
 				? "(unranked)"
 				: core.Utils.groupDigits(skill.experience);
 
-			const level = (context.params.virtual) ? skill.virtualLevel : skill.level;
+			const level = (context.params.virtual)
+				? (skill.virtualLevel ?? "N/A")
+				: skill.level;
+
 			return {
 				reply: core.Utils.tag.trim `
 					${core.Utils.capitalize(accountType)} ${user}
@@ -92,11 +97,11 @@ export default {
 		for (const { emoji, name } of GameData.skills) {
 			const found = data.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
 			if (found && found.level !== null) {
-				let level = found.level;
+				let level = String(found.level);
 				if (context.params.virtual) {
 					level = (name === "overall")
 					 	? `${found.level} (virtual: ${found.virtualLevel})`
-						: (found.virtualLevel ?? found.level);
+						: String(found.virtualLevel ?? found.level);
 				}
 
 				strings.push(`${emoji} ${level}`);
@@ -110,7 +115,14 @@ export default {
 		}
 		else {
 			const total = data.skills.find(i => i.name.toLowerCase() === "overall");
-			const totalXPString = (total)
+			if (!total) {
+				throw new SupiError({
+				    message: "Assert error: Missing Total values",
+					args: { data }
+				});
+			}
+
+			const totalXPString = (total.experience !== null)
 				? `XP: ${core.Utils.groupDigits(total.experience)}`
 				: "";
 
@@ -130,4 +142,4 @@ export default {
 			};
 		}
 	}
-};
+});

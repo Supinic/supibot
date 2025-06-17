@@ -8,6 +8,9 @@ export type Emote = {
     guild?: string;
     zeroWidth?: boolean;
 };
+
+export type Coordinates = { lat: number; lng: number; } | { lat: string; lng: string; };
+
 export type Port = number;
 export type URL = string;
 export type Stringifiable = boolean | number | string;

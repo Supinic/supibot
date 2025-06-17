@@ -19,7 +19,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Checks for various max/min records of various sources.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function record (context, type, target) {
 		if (!type) {

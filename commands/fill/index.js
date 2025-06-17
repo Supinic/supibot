@@ -5,7 +5,7 @@ export default {
 	Cooldown: 20000,
 	Description: "Takes the input and scrambles it around randomly, filling the message. In live streams, there is less text and the cooldown is increased to reduce spam.",
 	Flags: ["pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function fill (context, ...words) {
 		if (words.length === 0) {

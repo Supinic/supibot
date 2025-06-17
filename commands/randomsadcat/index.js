@@ -10,7 +10,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Posts a random sad cat image SadCat",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomSadCat (context) {
 		const eligibleLinks = sadCats.filter(i => !previousPosts.includes(i));

@@ -1,4 +1,5 @@
 import { SupiError } from "supi-core";
+import { bindOsrsSubcommand } from "../index.js";
 import {
 	fetchUserData,
 	parseUserIdentifier,
@@ -9,23 +10,11 @@ import {
 
 import SetCommand from "../../set/subcommands/osrs-username.js";
 
-import type { Command, Context } from "../../../classes/command.js";
-
-// @todo remove and import instead once the top command is TS
-type OsrsCommandParams = [
-	{ name: "activity", type: "string" },
-	{ name: "boss", type: "string" },
-	{ name: "force", type: "boolean" },
-	{ name: "rude", type: "boolean" },
-	{ name: "seasonal", type: "boolean" },
-	{ name: "skill", type: "string" },
-	{ name: "virtual", type: "boolean" }
-];
-
-export default {
+export default bindOsrsSubcommand({
 	name: "kc",
 	title: "Kill count",
 	aliases: ["kill-count"],
+	default: false,
 	description: [
 		`<code>$osrs kc activity:"(activity name)" (username)</code>`,
 		`<code>$osrs kill-count activity:"(activity name)" (username)</code>`,
@@ -42,7 +31,7 @@ export default {
 		`<code>$osrs kc @Supinic Corrupted Gauntlet</code>`,
 		"Same as above, but if the target has their OSRS username set, you can use the command like this."
 	],
-	execute: async function (this: Command, context: Context<OsrsCommandParams>, ...args: string[]) {
+	execute: async function (context, ...args) {
 		let parsedUserData;
 		let activity;
 		if (!context.params.activity && !context.params.boss) {
@@ -115,4 +104,4 @@ export default {
 				: `${ironman} ${username}'s KC for ${name}: ${value} - rank #${rank}.`
 		};
 	}
-};
+});

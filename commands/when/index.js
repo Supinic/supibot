@@ -8,7 +8,7 @@ export default {
 	Cooldown: 15000,
 	Description: "Tells you when your command is going to be played next, approximately.",
 	Flags: ["mention","pipe","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: "Only available in channels with VLC API configured!",
 	Code: (async function when (context) {
 		if (!sb.VideoLANConnector) {

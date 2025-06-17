@@ -8,7 +8,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Toggles your role on Supinic's discord which determines if you get pinged by the #supibot-updates announcements.",
 	Flags: ["ping"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function supibotUpdate (context) {
 		if (context.platform.Name !== "discord") {

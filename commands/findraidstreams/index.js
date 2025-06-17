@@ -8,7 +8,7 @@ export default {
 	Cooldown: 0,
 	Description: "Iterates over eligible Twitch channels, finds online streams and posts a summary to Pastebin. Used to find a good raid after a stream is finished.",
 	Flags: ["developer","pipe","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function findRaidStreams () {
 		const twitch = sb.Platform.get("twitch");

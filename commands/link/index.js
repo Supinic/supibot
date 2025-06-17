@@ -5,7 +5,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Verifies your account linking challenge across platforms. You should only ever use this command if you are prompted to.",
 	Flags: ["developer","mention","system"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function link (context, challengeString) {
 		if (!context.privateMessage) {

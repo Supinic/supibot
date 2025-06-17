@@ -5,7 +5,7 @@ export default {
 	Cooldown: 5000,
 	Description: "Turns the output into a \"/me\" message. E.g.: [Supibot] slaps someone around a bit with a large trout",
 	Flags: [],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function me (context, ...args) {
 		if (!context.channel) {

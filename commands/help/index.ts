@@ -1,13 +1,13 @@
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 import { isCooldownData } from "../../classes/filter.js";
 
-export default {
+export default declare({
 	Name: "help",
 	Aliases: ["commands", "helpgrep"],
 	Cooldown: 5000,
 	Description: "Posts either: a short list of all commands, or a description of a specific command if you specify it.",
 	Flags: ["mention", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function help (context, ...args) {
 		const { prefix } = sb.Command;
@@ -129,4 +129,4 @@ export default {
 		"Searches for commands that have the keyword(s) in their names or descriptions.",
 		"This is useful if you vaguely know what the command does, but aren't sure about its name."
 	])
-} satisfies CommandDefinition;
+});

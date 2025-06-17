@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Posts the link of gachimuchi list on supinic.com",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function gachiList () {
 		return {

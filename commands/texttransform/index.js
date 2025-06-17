@@ -8,7 +8,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Transforms provided text into one of the provided types, such as \"vaporwave\", for example.",
 	Flags: ["external-input","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function textTransform (context, name, ...args) {
 		if (!name) {

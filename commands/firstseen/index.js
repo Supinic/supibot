@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "For a given user, this command tells you when they were first seen, based on Supibot's chat logs.",
 	Flags: ["block","mention","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function firstSeen (context, user) {
 		const userData = (user) ? await sb.User.get(user) : context.user;

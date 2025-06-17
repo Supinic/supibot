@@ -7,7 +7,7 @@ export default {
 	Cooldown: 10000,
 	Description: "What anime is it? For a given screenshot of an anime show, this command will attempt to recognize the show's name, episode and timestamp.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function whatAnimeIsIt (context, link) {
 		if (!link) {

@@ -5,7 +5,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Fetches the first channel you or someone else have ever followed on Twitch.",
 	Flags: ["mention","non-nullable","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	initialize: function () {
 		this.data.requestHeaders = {

@@ -1,4 +1,4 @@
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
 // Need to fetch a randomized hash to attach to the ~~api/search~~ ~~api/find~~ ~~api/lookup~~ ~~api/s~~ ~~api/ouch~~ api/seek endpoint
 // Reference: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/issues/25
@@ -114,13 +114,13 @@ type HltbData = {
 	userData: unknown[];
 };
 
-export default {
+export default declare({
 	Name: "howlongtobeat",
 	Aliases: ["hltb"],
 	Cooldown: 5000,
 	Description: "For a provided game, shows how long it takes to beat based on the https://howlongtobeat.com website's data.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: async function howLongToBeat (context, ...args) {
 		if (args.length === 0) {
@@ -220,4 +220,4 @@ export default {
 		};
 	},
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

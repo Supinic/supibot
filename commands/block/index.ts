@@ -1,16 +1,9 @@
+import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
+
 import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
 import { Filter } from "../../classes/filter.js";
 import { type User } from "../../classes/user.js";
-import type { Command, Context } from "../../classes/command.js";
-import { SupiError } from "supi-core";
-
-const params = [
-	{ name: "channel", type: "string" },
-	{ name: "command", type: "string" },
-	{ name: "id", type: "number" },
-	{ name: "platform", type: "string" },
-	{ name: "user", type: "string" }
-] as const;
 
 type HasVerbOptions = { enableVerb: string; disableVerb: string; };
 const fillUsernameProperties = async <T extends HasVerbOptions> (options: T, blockedUserId: User["ID"] | null): Promise<T> => {
@@ -35,16 +28,22 @@ const fillUsernameProperties = async <T extends HasVerbOptions> (options: T, blo
 	return options;
 };
 
-export default {
+export default declare({
 	Name: "block",
 	Aliases: ["unblock"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Blocks, or unblocks a specified user from using a specified command with you as the target. You can also set a channel, or platform for the block to be active on.",
 	Flags: ["mention"],
-	Params: params,
+	Params: [
+		{ name: "channel", type: "string" },
+		{ name: "command", type: "string" },
+		{ name: "id", type: "number" },
+		{ name: "platform", type: "string" },
+		{ name: "user", type: "string" }
+	] as const,
 	Whitelist_Response: null,
-	Code: (async function block (this: Command, context: Context<typeof params>, ...args: string[]) {
+	Code: (async function block (context, ...args) {
 		const parse = await parseGenericFilterOptions("Block", context.params, args, {
 			argsOrder: ["user", "command"],
 			requiredCommandFlag: "block",
@@ -168,4 +167,4 @@ export default {
 				</li>
 			</ul>`
 	])
-};
+});

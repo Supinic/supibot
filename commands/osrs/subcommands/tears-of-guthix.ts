@@ -1,9 +1,17 @@
+import { bindOsrsSubcommand } from "../index.js";
 import { fetchWorldsData } from "./osrs-utils.js";
 
-export default {
+type WorldTearsData = {
+	world_number: number;
+	hits: number;
+	stream_order: string;
+};
+
+export default bindOsrsSubcommand({
 	name: "guthix",
 	title: "Tears of Guthix",
 	aliases: ["tears", "tog"],
+	default: false,
 	description: [
 		"<u>Tears of Guthix</u>",
 		`<code>$osrs tog</code>`,
@@ -13,7 +21,7 @@ export default {
 		`Powered by <a href="https://github.com/jcarbelbide/tog-crowdsourcing-server">Tears of Guthix Crowdsourcing API</a>.`
 	],
 	execute: async function () {
-		const response = await core.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")<WorldTearsData[]>({
 			url: "https://www.togcrowdsourcing.com/worldinfo"
 		});
 
@@ -41,7 +49,7 @@ export default {
 		if (worldsData) {
 			string = idealWorlds.map(i => {
 				const country = worldsData[i.world_number];
-				const emoji = country?.flagEmoji ?? "";
+				const emoji = country.flagEmoji;
 
 				return `${emoji} W${i.world_number} (${i.hits} votes)`;
 			}).join(", ");
@@ -54,4 +62,4 @@ export default {
 			reply: `Ideal Tears of Guthix worlds (GGGBBB): ${string}`
 		};
 	}
-};
+});
