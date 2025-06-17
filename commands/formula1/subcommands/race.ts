@@ -1,22 +1,14 @@
-import { searchYoutube } from "../../../utils/command-utils.js";
+import { formulaOneBinding } from "../index.js";
 import {
 	fetchRace,
 	fetchNextRaceDetail,
 	fetchQualifyingResults,
-	fetchRaceResults
-} from "../api-wrapper.ts";
+	fetchRaceResults,
+	getHighlights
+} from "../api-wrapper.js";
+import { SupiDate } from "supi-core";
 
-const getHighlights = async (race) => {
-	if (!process.env.API_GOOGLE_YOUTUBE) {
-		return [];
-	}
-
-	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`, {
-		filterShortsHeuristic: true
-	});
-};
-
-export default {
+export const asdf = formulaOneBinding({
 	name: "race",
 	aliases: [],
 	description: [
@@ -33,7 +25,7 @@ export default {
 			return await fetchNextRaceDetail(context);
 		}
 
-		const now = new sb.Date();
+		const now = new SupiDate();
 		const year = context.params.season ?? context.params.year ?? now.year;
 		const query = rest.join(" ").toLowerCase();
 		const race = await fetchRace(year, "name", query);
@@ -45,25 +37,32 @@ export default {
 		}
 
 		const raceDate = (race.time)
-			? new sb.Date(`${race.date} ${race.time}`)
-			: new sb.Date(race.date);
+			? new SupiDate(`${race.date} ${race.time}`)
+			: new SupiDate(race.date);
 
 		const delta = core.Utils.timeDelta(raceDate);
 
 		const afterRaceDate = raceDate.clone().addHours(3);
 
-		const data = {};
+		const data = {
+			delta: "",
+			pole: "",
+			podium: "",
+			highlight: "",
+			wiki: ""
+		};
+
 		if (now > afterRaceDate) {
 			const [qualiResults, raceResults, highlights] = await Promise.all([
-				fetchQualifyingResults(race.season, race.round),
-				fetchRaceResults(race.season, race.round),
+				fetchQualifyingResults(Number(race.season), Number(race.round)),
+				fetchRaceResults(Number(race.season), Number(race.round)),
 				getHighlights(race)
 			]);
 
-			const pole = qualiResults[0];
+			const pole = qualiResults.at(0);
 			if (pole) {
 				const driver = `${pole.Driver.givenName.at(0)}. ${pole.Driver.familyName}`;
-				const time = pole.Q3 ?? pole.Q2 ?? pole.Q1 ?? "";
+				const time = pole.Q3 ?? pole.Q2 ?? pole.Q1;
 				const constructor = pole.Constructor.name;
 
 				data.pole = `Pole position: ${driver} (${constructor}) ${time}`;
@@ -101,12 +100,13 @@ export default {
 				Season ${race.season},
 				round ${race.round}:
 				${race.raceName}.
-				${data.delta ?? ""}						
-				${data.pole ?? ""}
-				${data.podium ?? ""}		
-				${data.highlight ?? ""}				
-				${data.wiki ?? ""}	
+				
+				${data.delta} 				
+				${data.pole}
+				${data.podium}
+				${data.highlight}			
+				${data.wiki}
 			`
 		};
 	}
-};
+});

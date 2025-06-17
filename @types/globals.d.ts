@@ -9,7 +9,7 @@ export type Emote = {
     zeroWidth?: boolean;
 };
 
-export type Coordinates = { lat: number; lng: number; };
+export type Coordinates = { lat: number; lng: number; } | { lat: string; lng: string; };
 
 export type Port = number;
 export type URL = string;

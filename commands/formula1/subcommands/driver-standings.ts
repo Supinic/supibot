@@ -1,6 +1,8 @@
-import { fetchDriverStandings } from "../api-wrapper.ts";
+import { formulaOneBinding } from "../index.js";
+import { fetchDriverStandings } from "../api-wrapper.js";
+import { SupiDate } from "supi-core";
 
-export default {
+export const asdf = formulaOneBinding({
 	name: "driverStandings",
 	aliases: ["wdc"],
 	description: [
@@ -11,7 +13,7 @@ export default {
 		"Posts a summary for the season's WDC - driver standings."
 	],
 	execute: async (context) => {
-		const year = context.params.season ?? context.params.year ?? new sb.Date().year;
+		const year = context.params.season ?? context.params.year ?? new SupiDate().year;
 		const standings = await fetchDriverStandings(year);
 		if (standings.length === 0) {
 			return {
@@ -28,4 +30,4 @@ export default {
 			reply: `Driver standings for season ${year}: ${string}`
 		};
 	}
-};
+});

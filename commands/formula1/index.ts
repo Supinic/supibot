@@ -13,7 +13,7 @@ const formulaOneCommandDefinition = declare({
 		{ name: "season", type: "number" },
 		{ name: "year", type: "number" },
 		{ name: "weather", type: "boolean" }
-	],
+	] as const,
 	Whitelist_Response: null,
 	Code: (async function formula1 (context, ...args) {
 		const type = args[0] ?? "race";

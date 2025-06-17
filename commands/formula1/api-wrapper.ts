@@ -1,10 +1,15 @@
 import { SupiDate, SupiError } from "supi-core";
 import type formulaOneCommandDefinition from "./index.js";
+import { searchYoutube } from "../../utils/command-utils.js";
+
 import { ExtractContext } from "../../classes/command.js";
 import { Coordinates } from "../../@types/globals.js";
 
 export const url = "https://api.jolpi.ca/ergast/f1/";
-const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying", "Sprint"];
+const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
+const sprintSessionTypes = ["FirstPractice", "SprintQualifying", "Sprint", "Qualifying"] as const;
+const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "SprintQualifying", "Qualifying", "Sprint"] as const;
+
 const sessionNames = {
 	FirstPractice: "First practice",
 	SecondPractice: "Second practice",
@@ -12,28 +17,7 @@ const sessionNames = {
 	Qualifying: "Qualifying",
 	SprintQualifying: "Sprint qualifying",
 	Sprint: "Sprint race"
-};
-
-const BACKUP_RACE_DATA = {
-	2025: {
-		name: "Australian Grand Prix",
-		date: "2025-03-16"
-	}
-};
-
-type GotInstance = NonNullable<ReturnType<typeof core.Got.get>>;
-type ExtendedGot = NonNullable<ReturnType<GotInstance["extend"]>>;
-
-let jolpicaGotInstance: ExtendedGot | undefined;
-const jolpicaGot = <T> (url: string) => {
-	jolpicaGotInstance ??= core.Got.get("GenericAPI").extend({
-		https: {
-			rejectUnauthorized: false
-		}
-	});
-
-	return jolpicaGotInstance<T>(url);
-};
+} as const;
 
 type Session = { date: string; time: string; };
 type BaseRace = {
@@ -67,6 +51,7 @@ type SprintRace = BaseRace & {
 	SprintQualifying: Session;
 };
 type Race = RegularRace | SprintRace;
+const isSprintRace = (input: Race): input is SprintRace => Object.hasOwn(input, "Sprint");
 
 type YearResponse = {
 	MRData: {
@@ -184,7 +169,7 @@ export async function fetchRace (year: number, searchType: string, searchValue?:
 type Driver = {
 	driverId: string;
 	permanentNumber: string;
-	code: string;
+	code?: string;
 	url: string;
 	givenName: string;
 	familyName: string;
@@ -201,8 +186,8 @@ type Constructor = {
 type QualifyingResult = {
 	number: string;
 	position: string;
-	driver: Driver;
-	constructor: Constructor;
+	Driver: Driver;
+	Constructor: Constructor;
 	Q1: string;
 	Q2?: string;
 	Q3?: string;
@@ -229,8 +214,8 @@ type RaceResult = {
 	position: string;
 	positionText: string;
 	points: string;
-	driver: Driver;
-	constructor: Constructor;
+	Driver: Driver;
+	Constructor: Constructor;
 	grid: string;
 	laps: string;
 	status: string;
@@ -262,24 +247,9 @@ export const fetchRaceResults = async (year: number, round: number) => {
 };
 
 export const fetchNextRaceDetail = async (context: CommandContext) => {
-	const { month, year } = new SupiDate();
+	const { year } = new SupiDate();
 	const race = await fetchRace(year, "current");
 	if (!race) {
-		// Bump season year only if we are in Nov/Dec, keep the same year otherwise
-		const nextSeason = (month >= 11) ? (year + 1) : year;
-		const backupRace = BACKUP_RACE_DATA[nextSeason];
-		if (backupRace) {
-			const delta = core.Utils.timeDelta(new SupiDate(backupRace.date));
-			return {
-				success: true,
-				reply: core.Utils.tag.trim `
-					The ${year - 1} season is finished.
-					The first race of the ${year} season is ${backupRace.name},
-					taking place ${delta}.
-				 `
-			};
-		}
-
 		return {
 			success: false,
 			reply: `No next F1 race is currently scheduled!`
@@ -296,25 +266,33 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 	const raceEnd = raceStart.clone().addHours(2); // Compensate for the race being underway
 
 	let nextSessionString = "";
-	let nextSessionStart = Infinity;
-	let nextSessionEnd;
-	let nextSessionType;
+	let nextSessionStart: SupiDate | number = Infinity;
+	let nextSessionEnd: SupiDate | undefined;
+	let nextSessionType: (typeof sessionTypes)[number] | undefined;
 
 	// Find the first upcoming session that is still scheduled.
-	for (const session of sessionTypes) {
-		if (!race[session]) {
-			continue;
+	if (isSprintRace(race)) {
+		for (const session of sprintSessionTypes) {
+			const sessionStart = new SupiDate(`${race[session].date} ${race[session].time}`);
+			if (now <= sessionStart && sessionStart.valueOf() < nextSessionStart.valueOf()) {
+				nextSessionType = session;
+				nextSessionStart = sessionStart;
+				nextSessionEnd = nextSessionStart.clone().addHours(2); // Compensate for the session being underway
+			}
 		}
-
-		const sessionStart = new SupiDate(`${race[session].date} ${race[session].time}`);
-		if (now <= sessionStart && sessionStart < nextSessionStart) {
-			nextSessionType = session;
-			nextSessionStart = sessionStart;
-			nextSessionEnd = nextSessionStart.clone().addHours(2); // Compensate for the session being underway
+	}
+	else {
+		for (const session of regularSessionTypes) {
+			const sessionStart = new SupiDate(`${race[session].date} ${race[session].time}`);
+			if (now <= sessionStart && sessionStart.valueOf() < nextSessionStart.valueOf()) {
+				nextSessionType = session;
+				nextSessionStart = sessionStart;
+				nextSessionEnd = nextSessionStart.clone().addHours(2); // Compensate for the session being underway
+			}
 		}
 	}
 
-	if (nextSessionStart && now < nextSessionEnd) {
+	if (nextSessionEnd && nextSessionType && now < nextSessionEnd) {
 		nextSessionString = `Next session: ${sessionNames[nextSessionType]}`;
 
 		if (now < nextSessionStart) {
@@ -325,21 +303,27 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 		}
 
 		if (context.params.weather) {
-			const weatherResult = await getWeather(context, nextSessionStart, coordinates);
+			const weatherResult = await getWeather(context, nextSessionStart.valueOf(), coordinates);
 			nextSessionString += ` ${weatherResult}`;
 		}
 	}
 
-	let raceString;
+	let raceString: string;
 	if (now < raceStart) {
 		raceString = `Race is scheduled ${core.Utils.timeDelta(raceStart)}.`;
 	}
 	else if (now < raceEnd) {
 		raceString = "Race is currently underway.";
 	}
+	else {
+		throw new SupiError({
+		    message: "Assert error: Unknown F1 race status",
+			args: { raceStart, raceEnd }
+		});
+	}
 
 	if (context.params.weather) {
-		const weatherResult = await getWeather(context, raceStart, coordinates);
+		const weatherResult = await getWeather(context, raceStart.valueOf(), coordinates);
 		raceString += ` ${weatherResult}`;
 	}
 
@@ -354,22 +338,67 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 	};
 };
 
-export const fetchDriverStandings = async (year) => {
-	const response = await jolpicaGot(`${url}${year}/driverStandings.json`);
-	return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings ?? [];
+type DriverStandingsResponse = {
+	MRData: {
+		StandingsTable: {
+			season: string;
+			round: string;
+			StandingsLists: {
+				season: string;
+				round: string;
+				DriverStandings: {
+					position: string;
+					positionText: string;
+					points: string;
+					wins: string;
+					Driver: Driver;
+					constructors: Constructor[];
+				}[];
+			}[];
+		};
+	};
+};
+export const fetchDriverStandings = async (year: number) => {
+	const response = await core.Got.get("GenericAPI")<DriverStandingsResponse>({
+		url: `${url}${year}/driverStandings.json`
+	});
+
+	return response.body.MRData.StandingsTable.StandingsLists[0].DriverStandings;
 };
 
-export const fetchConstructorStandings = async (year) => {
-	const response = await jolpicaGot(`${url}${year}/constructorStandings.json`);
-	return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings ?? [];
+type ConstructorStandingsResponse = {
+	MRData: {
+		StandingsTable: {
+			season: string;
+			round: string;
+			StandingsLists: {
+				season: string;
+				round: string;
+				ConstructorStandings: {
+					position: string;
+					positionText: string;
+					points: string;
+					wins: string;
+					Constructor: Constructor;
+				}[];
+			}[];
+		};
+	};
+};
+export const fetchConstructorStandings = async (year: number) => {
+	const response = await core.Got.get("GenericAPI")<ConstructorStandingsResponse>({
+		url: `${url}${year}/constructorStandings.json`
+	});
+
+	return response.body.MRData.StandingsTable.StandingsLists[0].ConstructorStandings;
 };
 
-export default {
-	url,
-	fetchDriverStandings,
-	fetchConstructorStandings,
-	fetchRace,
-	fetchQualifyingResults,
-	fetchRaceResults,
-	fetchNextRaceDetail
+export const getHighlights = async (race: Race) => {
+	if (!process.env.API_GOOGLE_YOUTUBE) {
+		return [];
+	}
+
+	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`, {
+		filterShortsHeuristic: true
+	});
 };

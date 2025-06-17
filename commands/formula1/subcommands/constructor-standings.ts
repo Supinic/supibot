@@ -28,8 +28,8 @@ export const asdf = formulaOneBinding({
 			.join(" ");
 
 		return {
+			success: true,
 			reply: `Constructor standings for season ${year}: ${string}`
 		};
 	}
 });
-
