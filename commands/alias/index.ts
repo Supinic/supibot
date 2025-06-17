@@ -1,17 +1,12 @@
+import { createSubcommandBinding, declare } from "../../classes/command.js";
+
 import config from "../../config.json" with { type: "json" };
-const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
+const bannedCommandCombinations = config.modules.commands.bannedCombinations;
+export const { prefix } = config.modules.commands;
 
-import AliasUtils from "./alias-utils.js";
-
-const NESTED_ALIAS_LIMIT = 10;
-const ALIAS_DESCRIPTION_LIMIT = 250;
-const ALIAS_NAME_REGEX = /^[-\w\u00A9\u00AE\u2000-\u3300\uD83C\uD000-\uDFFF\uD83D\uD000-\uDFFF\uD83E\uD000-\uDFFF]{2,30}$/;
-const ALIAS_INVALID_NAME_RESPONSE = "Your alias should only contain letters, numbers and be 2-30 characters long.";
-
-export default {
+const aliasCommandDefinition = declare({
 	Name: "alias",
 	Aliases: ["$"],
-	Author: "supinic",
 	Cooldown: 2500,
 	Description: "This command lets you create your own aliases (shorthands) for any other combination of commands and arguments. Check the extended help for step-by-step info.",
 	Flags: ["external-input","mention","pipe"],
@@ -38,225 +33,9 @@ export default {
 		type = type.toLowerCase();
 
 		switch (type) {
-			case "add":
-			case "addedit":
-			case "create":
-			case "upsert": {
-				const [name, command, ...rest] = args;
-				if (!name || !command) {
-					return {
-						success: false,
-						reply: `You didn't provide a name, or a command! Usage: alias add (name) (command) (...arguments)"`
-					};
-				}
-				else if (!ALIAS_NAME_REGEX.test(name)) {
-					return {
-						success: false,
-						reply: `Your alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
-					};
-				}
 
-				const alias = await core.Query.getRecordset(rs => rs
-					.select("ID", "Name", "Invocation", "Arguments")
-					.from("data", "Custom_Command_Alias")
-					.where("Channel IS NULL")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", name)
-					.single()
-					.limit(1)
-				);
 
-				if (alias && (type === "add" || type === "create")) {
-					return {
-						success: false,
-						reply: `Cannot ${type} alias "${name}" - you already have one! You can either "edit" its definition, "rename" it or "remove" it.`
-					};
-				}
 
-				const commandCheck = AliasUtils.parseCommandName(command);
-				if (!commandCheck) {
-					return {
-						success: false,
-						reply: `Cannot create alias! The command "${command}" does not exist.`
-					};
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				if (alias) {
-					await row.load(alias.ID);
-				}
-
-				row.setValues({
-					User_Alias: context.user.ID,
-					Channel: null,
-					Name: name,
-					Command: commandCheck.Name,
-					Invocation: command,
-					Arguments: (rest.length > 0) ? JSON.stringify(rest) : null,
-					Created: new sb.Date(),
-					Edited: null
-				});
-
-				await row.save({ skipLoad: true });
-				return {
-					reply: (type === "add" || type === "create")
-						? `Your alias "${name}" has been created successfully.`
-						: `Your alias "${name}" has been replaced successfully.`
-				};
-			}
-
-			case "code":
-			case "check":
-			case "list":
-			case "show":
-			case "spy": {
-				let user;
-				let aliasName;
-				let prefix;
-
-				const [firstName, secondName] = args;
-				if (!firstName && !secondName) {
-					const username = encodeURIComponent(context.user.Name);
-					return {
-						reply: `List of your aliases: https://supinic.com/bot/user/${username}/alias/list`
-					};
-				}
-				else if (firstName && !secondName) {
-					const aliases = await core.Query.getRecordset(rs => rs
-						.select("Name")
-						.from("data", "Custom_Command_Alias")
-						.where("Channel IS NULL")
-						.where("User_Alias = %n", context.user.ID)
-						.flat("Name")
-					);
-
-					let targetAliases = [];
-					const targetUser = await sb.User.get(firstName);
-					if (targetUser) {
-						targetAliases = await core.Query.getRecordset(rs => rs
-							.select("Name")
-							.from("data", "Custom_Command_Alias")
-							.where("Channel IS NULL")
-							.where("User_Alias = %n",targetUser.ID)
-							.flat("Name")
-						);
-					}
-
-					// Not a username nor current user's alias name - error out
-					if (targetAliases.length === 0 && !aliases.includes(firstName)) {
-						return {
-							success: false,
-							reply: `Could not match your input to username or any of your aliases!`
-						};
-					}
-					// Not a username, but current user has an alias with the provided name
-					else if (targetAliases.length === 0 && aliases.includes(firstName)) {
-						user = context.user;
-						aliasName = firstName;
-						prefix = "Your";
-					}
-					// Not current user's alias, but a username exists
-					else if (targetAliases.length > 0 && !aliases.includes(firstName)) { // Is a username
-						const who = (targetUser === context.user) ? "your" : "their";
-						const username = encodeURIComponent(targetUser.Name);
-						return {
-							reply: `List of ${who} aliases: https://supinic.com/bot/user/${username}/alias/list`
-						};
-					}
-					// Both current user's alias, and a username exists - print out special case with both links
-					else {
-						const username = encodeURIComponent(context.user.Name);
-						const escapedString = encodeURIComponent(firstName);
-						return {
-							reply: core.Utils.tag.trim `
-								Special case!
-								Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
-								List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
-							`
-						};
-					}
-				}
-				else {
-					user = await sb.User.get(firstName);
-					if (!user) {
-						return {
-							success: false,
-							reply: "Provided user does not exist!"
-						};
-					}
-
-					aliasName = secondName;
-					prefix = (context.user === user) ? "Your" : "Their";
-				}
-
-				/** @type {{ Command: string|null, Invocation: string|null, Arguments: string|null, Parent: number|null } | undefined} */
-				let alias = await core.Query.getRecordset(rs => rs
-					.select("Command", "Invocation", "Arguments", "Parent")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
-					.limit(1)
-					.single()
-				);
-
-				let appendix = "";
-				if (!alias) {
-					const who = (context.user === user) ? "You" : "They";
-					return {
-						success: false,
-						reply: `${who} don't have the "${aliasName}" alias!`
-					};
-				}
-				else if (alias.Command === null && alias.Parent !== null) {
-					// special case for linked aliases
-					alias = await core.Query.getRecordset(rs => rs
-						.select("User_Alias", "Name", "Command", "Invocation", "Arguments", "Parent")
-						.from("data", "Custom_Command_Alias")
-						.where("ID = %n", alias.Parent)
-						.limit(1)
-						.single()
-					);
-
-					const originalUser = await sb.User.get(alias.User_Alias);
-					appendix = `This alias is a link to "${alias.Name}" made by ${originalUser.Name}.`;
-				}
-				else if (alias.Command === null && alias.Parent === null) {
-					return {
-						reply: `${prefix} alias is a link to a different alias, but the original has been deleted.`
-					};
-				}
-
-				let message;
-				const aliasArgs = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
-				if (type === "code") {
-					message = `${alias.Invocation} ${aliasArgs.join(" ")}`;
-				}
-				else {
-					message = `${appendix} ${prefix} alias "${aliasName}" has this definition: ${alias.Invocation} ${aliasArgs.join(" ")}`;
-				}
-
-				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
-				const cooldown = (context.append.pipe) ? null : this.Cooldown;
-
-				if (!context.append.pipe && message.length >= limit) {
-					const escapedAliasName = encodeURIComponent(aliasName);
-					const escapedUsername = encodeURIComponent(user.Name);
-					const prefixMessage = (type !== "code")
-						? `${prefix} alias "${aliasName}" details: `
-						: "";
-
-					return {
-						cooldown,
-						reply: `${prefixMessage}https://supinic.com/bot/user/${escapedUsername}/alias/detail/${escapedAliasName}`
-					};
-				}
-				else {
-					return {
-						cooldown,
-						reply: message
-					};
-				}
-			}
 
 			case "publish":
 			case "unpublish": {
@@ -1346,11 +1125,6 @@ export default {
 		"",
 
 		`<h5>Usage</h5>`,
-		`<code>${prefix}alias add (name) (definition)</code>`,
-		`<code>${prefix}alias create (name) (definition)</code>`,
-		`Creates your command alias, e.g.:`,
-		`<code>${prefix}alias add <u>hello</u> translate to:german Hello!</code>`,
-		"",
 
 		`<code>${prefix}$ (name)</code>`,
 		`<code>${prefix}alias run (name)</code>`,
@@ -1535,4 +1309,7 @@ export default {
 		"This command lets you build up aliases without needing to create small aliases of your own for menial tasks.",
 		"A good example is <code>$abb say</code>, which simply returns its input - so you don't have to create an alias that does that for you."
 	])
-};
+});
+
+export const aliasBinding = createSubcommandBinding<typeof aliasCommandDefinition>();
+export default aliasCommandDefinition;

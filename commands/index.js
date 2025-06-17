@@ -4,7 +4,7 @@ import AboutCommand from "./about/index.js";
 import AccountAgeCommand from "./accountage/index.js";
 import AddBetweenCommand from "./addbetween/index.js";
 import AfkCommand from "./afk/index.js";
-import AliasCommand from "./alias/index.js";
+import AliasCommand from "./alias/index.ts";
 import AliasBuildingBlockCommand from "./aliasbuildingblock/index.js";
 import BadAppleRenditionCommand from "./badapplerendition/index.js";
 import BanCommand from "./ban/index.js";
