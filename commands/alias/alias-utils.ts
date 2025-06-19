@@ -28,14 +28,36 @@ export type AliasData = {
 	User_Alias: User["ID"] | null;
 	Channel: Channel["ID"] | null;
 	Name: string;
-	Command: Command["Name"];
-	Invocation: Command["Name"];
+	Command: Command["Name"] | null;
+	Invocation: Command["Name"] | null;
 	Arguments: string | null;
 	Description: string | null;
-	Parent: AliasData["ID"];
+	Parent: AliasData["ID"] | null;
 	Restrictions: ("copy" | "link")[] | null;
 	Created: SupiDate;
 	Edited: SupiDate | null;
+};
+type ClassicAliasData = AliasData & {
+	User_Alias: User["ID"];
+	Channel: null;
+	Invocation: Command["Name"];
+	Arguments: string | null;
+}
+type LinkedAliasData = AliasData & {
+	User_Alias: User["ID"];
+	Channel: null;
+	Command: null;
+	Invocation: null;
+	Arguments: null;
+	Parent: AliasData["ID"];
+};
+type ChannelAliasData = AliasData & {
+	User_Alias: null;
+	Channel: Channel["ID"];
+	Command: null;
+	Invocation: null;
+	Arguments: null;
+	Parent: AliasData["ID"];
 };
 
 /**
@@ -120,3 +142,59 @@ export const applyParameters = (context: Context, aliasArguments: string[], comm
 		resultArguments
 	};
 };
+
+export const getAliasByNameAndUser = async (name: string, userId: User["ID"]) => (
+	await core.Query.getRecordset<AliasData | undefined>(rs => rs
+		.select("Command", "Invocation", "Arguments", "Parent")
+		.from("data", "Custom_Command_Alias")
+		.where("User_Alias = %n", userId)
+		.where("Name COLLATE utf8mb4_bin = %s", name)
+		.limit(1)
+		.single()
+	)
+);
+
+export const getChannelAlias = async (name: string, channelId: Channel["ID"]) => {
+	return await core.Query.getRecordset<ChannelAliasData | undefined>(rs => rs
+		.select("ID", "Parent")
+		.from("data", "Custom_Command_Alias")
+		.where("User_Alias IS NULL")
+		.where("Channel = %n", channelId)
+		.where("Name COLLATE utf8mb4_bin = %s", name)
+		.single()
+	);
+};
+
+export const isLinkedAlias = (alias: AliasData): alias is LinkedAliasData => (
+	(alias.Parent !== null) && (alias.Command === null) && (alias.Channel === null) && (alias.User_Alias !== null)
+);
+
+export const isChannelAlias = (alias: AliasData): alias is ChannelAliasData => (
+	(alias.Parent !== null) && (alias.Command === null) && (alias.Channel !== null) && (alias.User_Alias === null)
+);
+
+export const getLinkedAlias = async (parentId: AliasData["ID"]) => {
+	const linkedAlias = await core.Query.getRecordset<LinkedAliasData | undefined>(rs => rs
+		.select("*")
+		.from("data", "Custom_Command_Alias")
+		.where("ID = %n", parentId)
+		.limit(1)
+		.single()
+	);
+
+	if (!linkedAlias) {
+		throw new SupiError({
+		    message: "Assert error: Linked alias does not exist",
+			args: { parentId }
+		});
+	}
+
+	return linkedAlias;
+};
+
+export const getGenericAliasRow = async () => (
+	await core.Query.getRow<AliasData>("data", "Custom_Command_Alias")
+);
+export const getClassicAliasRow = async () => (
+	await core.Query.getRow<ClassicAliasData>("data", "Custom_Command_Alias")
+);

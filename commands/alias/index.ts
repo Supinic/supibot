@@ -33,136 +33,6 @@ const aliasCommandDefinition = declare({
 		type = type.toLowerCase();
 
 		switch (type) {
-
-
-
-
-			case "publish":
-			case "unpublish": {
-				if (!context.channel) {
-					return {
-						success: false,
-						reply: `This subcommand can only be used in the channel you want the alias to be global in!`
-					};
-				}
-
-				const permissions = await context.getUserPermissions();
-				if (permissions.flag === sb.User.permissions.regular) {
-					return {
-						success: false,
-						reply: `Only the owner and ambassadors of this channel can use this subcommand!`
-					};
-				}
-
-				const [aliasName, userName] = args;
-				if (!aliasName) {
-					return {
-						success: false,
-						reply: `No alias name provided!`
-					};
-				}
-
-				const existing = await core.Query.getRecordset(rs => rs
-					.select("ID", "Parent")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias IS NULL")
-					.where("Channel = %n", context.channel.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
-					.single()
-				);
-
-				if (type === "publish") {
-					const userData = (userName)
-						? await sb.User.get(userName)
-						: context.user;
-
-					if (!userData) {
-						return {
-							success: false,
-							reply: `Provided user does not exist!`
-						};
-					}
-
-					if (!ALIAS_NAME_REGEX.test(aliasName)) {
-						return {
-							success: false,
-							reply: `Published alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
-						};
-					}
-
-					/** @type {number | null} */
-					const alias = await core.Query.getRecordset(rs => rs
-						.select("ID", "Parent")
-						.from("data", "Custom_Command_Alias")
-						.where("User_Alias = %n", userData.ID)
-						.where("Name COLLATE utf8mb4_bin = %s", aliasName)
-						.single()
-						.limit(1)
-					);
-
-					if (!alias) {
-						return {
-							success: false,
-							reply: `That user does not have an alias with that name!`
-						};
-					}
-					else if (existing) {
-						const sourceAlias = await core.Query.getRow("data", "Custom_Command_Alias");
-						await sourceAlias.load(existing.Parent);
-
-						const sourceAuthorData = await sb.User.get(sourceAlias.values.User_Alias);
-						return {
-							success: false,
-							reply: core.Utils.tag.trim `
-								The alias name "${aliasName}" (by ${sourceAuthorData.Name}) is already published in this channel!
-								If you want to publish the version made by ${userData.Name}, you must unpublish the other one first.
-							`
-						};
-					}
-
-					const row = await core.Query.getRow("data", "Custom_Command_Alias");
-					row.setValues({
-						Name: aliasName,
-						Channel: context.channel.ID,
-						Parent: alias.Parent ?? alias.ID
-					});
-
-					await row.save({ skipLoad: true });
-					return {
-						reply: `Successfully published alias ${aliasName} in this channel. Users in this channel can now use it directly.`
-					};
-				}
-				else {
-					if (!existing) {
-						return {
-							success: false,
-							reply: `That alias has not been published in this channel!`
-						};
-					}
-
-					const row = await core.Query.getRow("data", "Custom_Command_Alias");
-					await row.load(existing.ID);
-					await row.delete();
-
-					return {
-						reply: `Successfully unpublished alias ${aliasName} in this channel. Users in this channel won't be able to use it directly.`
-					};
-				}
-			}
-
-			case "published": {
-				if (!context.channel) {
-					return {
-						success: false,
-						reply: `There are no channel-published aliases in private messages!`
-					};
-				}
-
-				return {
-					reply: `List of published aliases in this channel: https://supinic.com/bot/channel/detail/${context.channel.ID}/alias/list`
-				};
-			}
-
 			case "copy":
 			case "copyplace": {
 				const [targetUserName, targetAliasName] = args;
@@ -688,61 +558,6 @@ const aliasCommandDefinition = declare({
 				};
 			}
 
-			case "rename": {
-				const [oldAliasName, newAliasName] = args;
-				if (!oldAliasName || !newAliasName) {
-					return {
-						success: false,
-						reply: "You must provide both the current alias name and the new one!"
-					};
-				}
-				else if (!ALIAS_NAME_REGEX.test(newAliasName)) {
-					return {
-						success: false,
-						reply: `Your new alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
-					};
-				}
-
-				const oldAlias = await core.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", oldAliasName)
-					.limit(1)
-					.single()
-				);
-				if (!oldAlias) {
-					return {
-						success: false,
-						reply: `You don't have the "${oldAliasName}" alias!`
-					};
-				}
-
-				const newAlias = await core.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", newAliasName)
-					.limit(1)
-					.single()
-				);
-				if (newAlias) {
-					return {
-						success: false,
-						reply: `You already have the "${newAliasName}" alias!`
-					};
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				await row.load(oldAlias.ID);
-				row.values.Name = newAliasName;
-
-				await row.save({ skipLoad: true });
-				return {
-					reply: `Your alias "${oldAliasName}" has been successfully renamed to "${newAliasName}".`
-				};
-			}
-
 			case "restrict":
 			case "unrestrict": {
 				const [name, restriction] = args;
@@ -1194,10 +1009,6 @@ const aliasCommandDefinition = declare({
 		`Creates a new alias, or updates an existing alias of your own. If you replace an existing one, you will lose its definition`,
 		"",
 
-		`<code>${prefix}alias rename (old-name) (new-name)</code>`,
-		"Renames your command alias from old-name to new-name.",
-		"",
-
 		`<code>${prefix}alias duplicate (old-name) (new-name)</code>`,
 		"Creates a new alias (new-name) with the definition of an existing alias (old-name).",
 		"",
@@ -1220,17 +1031,6 @@ const aliasCommandDefinition = declare({
 		`<code>${prefix}alias inspect (alias)</code>`,
 		`<code>${prefix}alias inspect (username) (alias)</code>`,
 		"If your or someone else's alias has a description, this command will print it to chat.",
-		"",
-
-		`<code>${prefix}alias publish (alias) (username)</code>`,
-		`<code>${prefix}alias unpublish (alias)</code>`,
-		"Channel owners and ambassadors are able to \"publish\" an existing alias in the channel they're authorized in.",
-		"An alias being published means that anyone in that channel will be able to use it as if they had made it.",
-		"Naturally, if a user has their own alias with the same name, that one will be used first.",
-		"",
-
-		`<code>${prefix}alias published</code>`,
-		"Lists the currently published channel aliases in the current channel",
 		"",
 
 		`<code>${prefix}alias restrict (name) (type)</code>`,

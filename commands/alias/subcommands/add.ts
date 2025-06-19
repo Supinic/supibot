@@ -1,6 +1,13 @@
-import { aliasBinding, prefix } from "../index.js";
-import { ALIAS_NAME_REGEX, ALIAS_INVALID_NAME_RESPONSE, parseCommandName, type AliasData } from "../alias-utils.js";
 import { SupiDate } from "supi-core";
+
+import { aliasBinding, prefix } from "../index.js";
+import {
+	ALIAS_NAME_REGEX,
+	ALIAS_INVALID_NAME_RESPONSE,
+	parseCommandName,
+	type AliasData,
+	getAliasByNameAndUser
+} from "../alias-utils.js";
 
 export default aliasBinding({
 	name: "add",
@@ -28,17 +35,7 @@ export default aliasBinding({
 			};
 		}
 
-		type PartialAliasData = Pick<AliasData, "ID" | "Name" | "Invocation" | "Arguments">;
-		const alias = await core.Query.getRecordset<PartialAliasData | undefined>(rs => rs
-			.select("ID", "Name", "Invocation", "Arguments")
-			.from("data", "Custom_Command_Alias")
-			.where("Channel IS NULL")
-			.where("User_Alias = %n", context.user.ID)
-			.where("Name COLLATE utf8mb4_bin = %s", name)
-			.single()
-			.limit(1)
-		);
-
+		const alias = await getAliasByNameAndUser(name, context.user.ID);
 		if (alias && (invocation === "add" || invocation === "create")) {
 			return {
 				success: false,

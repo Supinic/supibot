@@ -1,20 +1,11 @@
 import { aliasBinding, prefix } from "../index.js";
-import { ALIAS_NAME_REGEX, ALIAS_INVALID_NAME_RESPONSE, parseCommandName, type AliasData } from "../alias-utils.js";
-import { SupiDate } from "supi-core";
-import User from "../../../classes/user.js";
-
-case "code":
-case "check":
-case "list":
-case "show":
-case "spy": {
-
-}
+import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser } from "../alias-utils.js";
+import { type User } from "../../../classes/user.js";
 
 export default aliasBinding({
-	name: "add",
-	title: "Item IDs",
-	aliases: ["addedit", "create", "upsert"],
+	name: "check",
+	title: "Check alias definition",
+	aliases: ["code", "list", "show", "spy"],
 	default: false,
 	description: [
 		`<code>${prefix}alias add (name) (definition)</code>`,
@@ -103,16 +94,7 @@ export default aliasBinding({
 			prefix = (context.user === user) ? "Your" : "Their";
 		}
 
-		type PartialAliasData = Pick<AliasData, "Command" | "Invocation" | "Parent" | "Arguments">;
-		let alias = await core.Query.getRecordset<PartialAliasData | undefined>(rs => rs
-			.select("Command", "Invocation", "Arguments", "Parent")
-			.from("data", "Custom_Command_Alias")
-			.where("User_Alias = %n", user.ID)
-			.where("Name COLLATE utf8mb4_bin = %s", aliasName)
-			.limit(1)
-			.single()
-		);
-
+		const alias = await getAliasByNameAndUser(aliasName, user.ID);
 		if (!alias) {
 			const who = (context.user === user) ? "You" : "They";
 			return {
@@ -122,18 +104,14 @@ export default aliasBinding({
 		}
 
 		let appendix = "";
-		if (alias.Command === null && alias.Parent !== null) {
+		let targetAlias = alias;
+		if (isLinkedAlias(alias)) {
 			// special case for linked aliases
-			alias = await core.Query.getRecordset(rs => rs
-				.select("User_Alias", "Name", "Command", "Invocation", "Arguments", "Parent")
-				.from("data", "Custom_Command_Alias")
-				.where("ID = %n", alias.Parent)
-				.limit(1)
-				.single()
-			);
+			const linkedAlias = await getLinkedAlias(alias.Parent);
+			const originalUser = await sb.User.getAsserted(linkedAlias.User_Alias);
 
-			const originalUser = await sb.User.get(alias.User_Alias);
 			appendix = `This alias is a link to "${alias.Name}" made by ${originalUser.Name}.`;
+			targetAlias = linkedAlias;
 		}
 		else if (alias.Command === null && alias.Parent === null) {
 			return {
@@ -142,12 +120,15 @@ export default aliasBinding({
 		}
 
 		let message;
-		const aliasArgs = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
+		const aliasArgs = (targetAlias.Arguments)
+			? JSON.parse(targetAlias.Arguments) as string[]
+			: [];
+
 		if (invocation === "code") {
-			message = `${alias.Invocation} ${aliasArgs.join(" ")}`;
+			message = `${targetAlias.Invocation} ${aliasArgs.join(" ")}`;
 		}
 		else {
-			message = `${appendix} ${prefix} alias "${aliasName}" has this definition: ${alias.Invocation} ${aliasArgs.join(" ")}`;
+			message = `${appendix} ${prefix} alias "${aliasName}" has this definition: ${targetAlias.Invocation} ${aliasArgs.join(" ")}`;
 		}
 
 		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
@@ -171,4 +152,5 @@ export default aliasBinding({
 				reply: message
 			};
 		}
+	}
 });
