@@ -226,62 +226,6 @@ const aliasCommandDefinition = declare({
 					reply: `Successfully ${verb} alias${nameString}. When the original changes, so will yours. ${appendix}`
 				};
 			}
-
-			case "delete":
-			case "remove": {
-				const [name] = args;
-				if (!name) {
-					return {
-						success: false,
-						reply: `No alias name provided!`
-					};
-				}
-
-				const alias = await core.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", name)
-					.limit(1)
-					.single()
-				);
-				if (!alias) {
-					return {
-						success: false,
-						reply: `You don't have the "${name}" alias!`
-					};
-				}
-
-				let publishString = "";
-				const publishedIDs = await core.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("data", "Custom_Command_Alias")
-					.where("Channel IS NOT NULL")
-					.where("Parent = %n", alias.ID)
-					.flat("ID")
-				);
-
-				if (publishedIDs.length !== 0) {
-					await core.Query.getRecordDeleter(rd => rd
-						.delete()
-						.from("data", "Custom_Command_Alias")
-						.where("ID IN %n+", publishedIDs)
-						.where("Channel IS NOT NULL")
-						.where("Parent = %n", alias.ID)
-					);
-
-					publishString = ` It was also published in ${publishedIDs.length} channels - these have also been removed.`;
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				await row.load(alias.ID);
-
-				await row.delete();
-				return {
-					success: false,
-					reply: `Your alias "${name}" has been successfully removed.${publishString}`
-				};
-			}
 		}
 
 		return {
@@ -341,12 +285,6 @@ const aliasCommandDefinition = declare({
 		"Two param - user name + alias name - gives you the definition of that user's alias.",
 		"",
 
-
-		`<code>${prefix}alias addedit (name) (definition)</code>`,
-		`<code>${prefix}alias upsert (name) (definition)</code>`,
-		`Creates a new alias, or updates an existing alias of your own. If you replace an existing one, you will lose its definition`,
-		"",
-
 		`<code>${prefix}alias duplicate (old-name) (new-name)</code>`,
 		"Creates a new alias (new-name) with the definition of an existing alias (old-name).",
 		"",
@@ -354,11 +292,6 @@ const aliasCommandDefinition = declare({
 		`<code>${prefix}alias list</code>`,
 		"Lists all your currently active aliases.",
 		`You can also check them in <a href="/user/alias/list">this list</a> - after you log in.`,
-		"",
-
-		`<code>${prefix}alias delete (name)</code>`,
-		`<code>${prefix}alias remove (name)</code>`,
-		"Removes your command alias with the given name.",
 		"",
 
 		"<h5>Replacements</h5>",

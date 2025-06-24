@@ -17,8 +17,17 @@ export default {
 	description: [
 		`<code>${prefix}alias add (name) (definition)</code>`,
 		`<code>${prefix}alias create (name) (definition)</code>`,
-		`Creates your command alias, e.g.:`,
-		`<code>${prefix}alias add <u>hello</u> translate to:german Hello!</code>`
+		`Creates a new command alias for yourself.`,
+		"",
+
+		"Example:",
+		`<code>${prefix}alias add <u>hello</u> translate to:german Hello!</code>`,
+		"",
+
+		`<code>${prefix}alias addedit (name) (definition)</code>`,
+		`<code>${prefix}alias upsert (name) (definition)</code>`,
+		`Creates a new alias, or updates an existing alias of your own. If you replace an existing one, you will lose its original definition.`
+
 	],
 	execute: async function (context, invocation, ...args) {
 		const [name, command, ...rest] = args;
