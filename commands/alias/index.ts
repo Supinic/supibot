@@ -1,4 +1,5 @@
 import { declare, type SubcommandDefinition } from "../../classes/command.js";
+import { AliasSubcommands } from "./subcommands/index.js";
 
 export type AliasSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
 import config from "../../config.json" with { type: "json" };
@@ -13,37 +14,39 @@ const aliasCommandDefinition = declare({
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function alias (context, type, ...args) {
-		if (context.invocation === "$") {
-			args = [type, ...args]; // This the command name
-			type = "run"; // This is the implicit subcommand
+		let subArgs: string[] = args;
+		let subInvocation: string | undefined = type;
+
+		if (context.invocation === "$" && subInvocation) {
+			subArgs = [subInvocation, ...args]; // This the command name
+			subInvocation = "run"; // This is the implicit subcommand
 		}
 
-		if (!type) {
+		const url = this.getDetailURL();
+		if (!subInvocation) {
 			return {
 				reply: core.Utils.tag.trim `
 					This command lets you create your own command aliases.
-					Check the extended help here:
-					${this.getDetailURL()}
+					Check the extended help here: ${url}
 					If you created some, check your list here:
 					https://supinic.com/user/alias/list
 				`
 			};
 		}
 
-		type = type.toLowerCase();
+		subInvocation = subInvocation.toLowerCase();
+		const subcommand = AliasSubcommands.get(subInvocation);
+		if (!subcommand) {
+			return {
+				success: false,
+				reply: core.Utils.tag.trim `Invalid sub-command provided! Check the extended help here: ${url}`
+			};
+		}
 
-
-		return {
-			success: false,
-			reply: core.Utils.tag.trim `
-				Invalid sub-command provided!
-				Check the extended help here:
-				${this.getDetailURL()}
-			`
-		};
+		return await subcommand.execute.call(this, context, subInvocation, ...subArgs);
 	}),
 	Dynamic_Description: (prefix) => {
-
+		const subcommandDescriptions = AliasSubcommands.createDescription();
 		return [
 			"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
 			"You have to first create an alias, and then run it. You can manage your aliases by listing, checking, removing and adding.",
@@ -56,6 +59,9 @@ const aliasCommandDefinition = declare({
 			"",
 
 			`<h5>Usage</h5>`,
+			"",
+
+			...subcommandDescriptions,
 			"",
 
 			"<h5>Replacements</h5>",
