@@ -557,70 +557,6 @@ const aliasCommandDefinition = declare({
 					reply: `Your alias "${name}" has been successfully removed.${publishString}`
 				};
 			}
-
-			case "restrict":
-			case "unrestrict": {
-				const [name, restriction] = args;
-				if (!name || !restriction || (restriction !== "link" && restriction !== "copy")) {
-					return {
-						success: false,
-						reply: `You didn't provide a name or a correct restriction type! Use: "$alias ${type} (alias name) (copy/link)"`
-					};
-				}
-
-				const verb = (restriction === "link") ? "linked" : "copied";
-				const alias = await core.Query.getRecordset(rs => rs
-					.select("ID", "Restrictions")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", name)
-					.limit(1)
-					.single()
-				);
-
-				if (!alias) {
-					return {
-						success: false,
-						reply: `You don't have the "${name}" alias!`
-					};
-				}
-				else if (type === "restrict" && AliasUtils.isRestricted(restriction, alias)) {
-					return {
-						success: false,
-						reply: `Your alias ${name} is already restricted from being ${verb}!`
-					};
-				}
-				else if (type === "unrestrict" && !AliasUtils.isRestricted(restriction, alias)) {
-					return {
-						success: false,
-						reply: `Your alias ${name} is already unrestricted from being ${verb}!`
-					};
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				await row.load(alias.ID);
-				row.values.Restrictions = (row.values.Restrictions) ? [...row.values.Restrictions] : [];
-
-				if (type === "restrict") {
-					row.values.Restrictions.push(restriction);
-				}
-				else if (type === "unrestrict") {
-					const index = row.values.Restrictions.indexOf(restriction);
-					row.values.Restrictions.splice(index, 1);
-
-					if (row.values.Restrictions.length === 0) {
-						row.values.Restrictions = null;
-					}
-				}
-
-				await row.save({ skipLoad: true });
-				return {
-					reply: `Your alias ${name} has been successfully ${type}ed from being ${verb}!`
-				};
-			}
-
-			case "transfer": {
-			}
 		}
 
 		return {
@@ -718,13 +654,6 @@ const aliasCommandDefinition = declare({
 		`<code>${prefix}alias inspect (alias)</code>`,
 		`<code>${prefix}alias inspect (username) (alias)</code>`,
 		"If your or someone else's alias has a description, this command will print it to chat.",
-		"",
-
-		`<code>${prefix}alias restrict (name) (type)</code>`,
-		`<code>${prefix}alias unrestrict (name) (type)</code>`,
-		"Restricts, or unrestricts one of your aliases from being copied or linked by other people.",
-		"You (as the creator of the alias) will still be able to copy and link it yourself, though.",
-		`Use "copy" and "link" as the type name respectively to allow/disallow each operation.`,
 		"",
 
 		"<h5>Replacements</h5>",
