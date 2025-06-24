@@ -35,119 +35,7 @@ const aliasCommandDefinition = declare({
 		switch (type) {
 			case "copy":
 			case "copyplace": {
-				const [targetUserName, targetAliasName] = args;
-				if (!targetUserName) {
-					return {
-						success: false,
-						reply: "No target username provided!"
-					};
-				}
-				else if (!targetAliasName) {
-					return {
-						success: false,
-						reply: "No target alias provided!"
-					};
-				}
-				else if (!ALIAS_NAME_REGEX.test(targetAliasName)) {
-					return {
-						success: false,
-						reply: "The copied alias's name is not valid and therefore can't be copied!"
-					};
-				}
 
-				const targetUser = await sb.User.get(targetUserName);
-				if (!targetUser) {
-					return {
-						success: false,
-						reply: "Invalid user provided!"
-					};
-				}
-
-				let targetAlias = await core.Query.getRecordset(rs => rs
-					.select("ID", "Command", "Invocation", "Arguments", "Parent", "Restrictions")
-					.from("data", "Custom_Command_Alias")
-					.where("Channel IS NULL")
-					.where("User_Alias = %n", targetUser.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", targetAliasName)
-					.limit(1)
-					.single()
-				);
-
-				if (!targetAlias) {
-					return {
-						success: false,
-						reply: `User "${targetUserName}" doesn't have the "${targetAliasName}" alias!`
-					};
-				}
-				else if (targetAlias.Command === null) {
-					const parentAlias = await core.Query.getRecordset(rs => rs
-						.select("ID", "Command", "Invocation", "Arguments", "Parent", "Restrictions")
-						.from("data", "Custom_Command_Alias")
-						.where("ID = %n", targetAlias.Parent)
-						.limit(1)
-						.single()
-					);
-
-					if (!parentAlias) {
-						return {
-							success: false,
-							reply: core.Utils.tag.trim `
-								You cannot copy this alias because the original it links to has been deleted!
-							`
-						};
-					}
-
-					targetAlias = parentAlias;
-				}
-
-				if (context.user !== targetUser && AliasUtils.isRestricted("copy", targetAlias)) {
-					return {
-						success: false,
-						reply: `You cannot copy this alias! Its creator has prevented new copies from being created.`
-					};
-				}
-
-				const currentAlias = await core.Query.getRecordset(rs => rs
-					.select("ID", "Command", "Invocation", "Arguments")
-					.from("data", "Custom_Command_Alias")
-					.where("Channel IS NULL")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", targetAliasName)
-					.limit(1)
-					.single()
-				);
-
-				if (currentAlias && type !== "copyplace") {
-					return {
-						success: false,
-						reply: `Cannot copy alias "${targetAliasName} - you already have it! If you want to copy + replace, use "alias copyplace".`
-					};
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				if (currentAlias) {
-					await row.load(currentAlias.ID);
-				}
-
-				row.setValues({
-					User_Alias: context.user.ID,
-					Channel: null,
-					Name: targetAliasName,
-					Command: targetAlias.Command,
-					Invocation: targetAlias.Invocation,
-					Arguments: targetAlias.Arguments,
-					Description: null,
-					Parent: targetAlias.ID,
-					Created: new sb.Date(),
-					Edited: null
-				});
-
-				await row.save({ skipLoad: true });
-
-				const verb = (type === "copyplace") ? "copied and replaced" : "copied";
-				return {
-					reply: `Alias "${targetAliasName}" ${verb} successfully.`
-				};
 			}
 
 
@@ -475,12 +363,6 @@ const aliasCommandDefinition = declare({
 		"",
 
 		`<h5>Usage</h5>`,
-
-		`<code>${prefix}alias copy (username) (alias)</code>`,
-		`<code>${prefix}alias copyplace (username) (alias)</code>`,
-		"Takes someone else's alias, and attempts to copy it with the same name for you.",
-		"If you use <code>copy</code>, it will only create an alias if you don't already have one with that name.",
-		"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking.",
 		"",
 
 		`<code>${prefix}alias link (username) (alias)</code>`,

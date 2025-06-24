@@ -157,6 +157,7 @@ export const getAliasByNameAndUser = async (name: string, userId: User["ID"]) =>
 	await core.Query.getRecordset<AliasData | undefined>(rs => rs
 		.select("Command", "Invocation", "Arguments", "Parent")
 		.from("data", "Custom_Command_Alias")
+		.where("Channel IS NULL")
 		.where("User_Alias = %n", userId)
 		.where("Name COLLATE utf8mb4_bin = %s", name)
 		.limit(1)
@@ -164,7 +165,7 @@ export const getAliasByNameAndUser = async (name: string, userId: User["ID"]) =>
 	)
 );
 
-export const getAliasByIdAsserted = async (id: AliasData["ID"]) => {
+export const getAliasById = async (id: AliasData["ID"]) => {
 	const aliasData = await core.Query.getRecordset<AliasData | undefined>(rs => rs
 		.select("Command", "Invocation", "Arguments", "Parent")
 		.from("data", "Custom_Command_Alias")
@@ -173,6 +174,11 @@ export const getAliasByIdAsserted = async (id: AliasData["ID"]) => {
 		.single()
 	);
 
+	return aliasData;
+};
+
+export const getAliasByIdAsserted = async (id: AliasData["ID"]) => {
+	const aliasData = await getAliasById(id);
 	if (!aliasData) {
 		throw new SupiError({
 		    message: "Assert error: Fetching alias by ID - does not exist",
