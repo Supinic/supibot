@@ -72,7 +72,7 @@ export default {
 
 		if (!isClassicAlias(targetAlias)) {
 			throw new SupiError({
-			    message: "Assert error: Obtained alias is not a classic type alias",
+			    message: "Assert error: Alias is not classic-type",
 				args: { targetAlias }
 			});
 		}

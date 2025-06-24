@@ -33,76 +33,6 @@ const aliasCommandDefinition = declare({
 		type = type.toLowerCase();
 
 		switch (type) {
-			case "duplicate": {
-				const [oldAliasName, newAliasName] = args;
-				if (!oldAliasName || !newAliasName) {
-					return {
-						reply: `To duplicate an alias, you must provide both existing and new alias names!`
-					};
-				}
-				else if (!ALIAS_NAME_REGEX.test(newAliasName)) {
-					return {
-						success: false,
-						reply: `Your alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
-					};
-				}
-
-				const oldAlias = await core.Query.getRecordset(rs => rs
-					.select("ID", "Command", "Invocation", "Arguments", "Description", "Parent")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", oldAliasName)
-					.limit(1)
-					.single()
-				);
-				if (!oldAlias) {
-					return {
-						success: false,
-						reply: `You don't have the "${oldAliasName}" alias!`
-					};
-				}
-				else if (oldAlias.Command === null) {
-					return {
-						success: false,
-						reply: `You cannot duplicate links to other aliases!`
-					};
-				}
-
-				const newAlias = await core.Query.getRecordset(rs => rs
-					.select("Command", "Invocation", "Arguments", "Description")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", newAliasName)
-					.limit(1)
-					.single()
-				);
-				if (newAlias) {
-					return {
-						success: false,
-						reply: `You already have the "${newAliasName}" alias!`
-					};
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				row.setValues({
-					User_Alias: context.user.ID,
-					Channel: null,
-					Name: newAliasName,
-					Command: oldAlias.Command,
-					Invocation: oldAlias.Invocation,
-					Arguments: oldAlias.Arguments,
-					Description: null,
-					Parent: oldAlias.ID,
-					Created: new sb.Date(),
-					Edited: null
-				});
-
-				await row.save();
-				return {
-					reply: `Successfully duplicated "${oldAliasName}" as "${newAliasName}"!`
-				};
-			}
-
 			case "link":
 			case "linkplace": {
 				const [userName, aliasName, customLinkName] = args;
@@ -283,10 +213,6 @@ const aliasCommandDefinition = declare({
 		"One param - your alias - gives you the definition of your alias with that name.",
 		"One param - user name - gives you the link with the list of that user's aliases.",
 		"Two param - user name + alias name - gives you the definition of that user's alias.",
-		"",
-
-		`<code>${prefix}alias duplicate (old-name) (new-name)</code>`,
-		"Creates a new alias (new-name) with the definition of an existing alias (old-name).",
 		"",
 
 		`<code>${prefix}alias list</code>`,
