@@ -32,11 +32,6 @@ const aliasCommandDefinition = declare({
 
 		type = type.toLowerCase();
 
-		switch (type) {
-			case "link":
-			case "linkplace": {
-			}
-		}
 
 		return {
 			success: false,
@@ -47,44 +42,25 @@ const aliasCommandDefinition = declare({
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
-		"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
-		"You have to first create an alias, and then run it. You can manage your aliases by listing, checking, removing and adding.",
-		"",
+	Dynamic_Description: (prefix) => {
 
-		`<h5>What's an alias?</h5>`,
-		`An alias is a word that lets you quickly use a command without typing the entirety of it.`,
-		`E.g.: You don't want to type <code>${prefix}weather New York, USA</code> every time, so you create an alias called <code>ny</code>.`,
-		`Then, you can simply use the alias like so: <code>${prefix}$ ny</code>`,
-		"",
+		return [
+			"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
+			"You have to first create an alias, and then run it. You can manage your aliases by listing, checking, removing and adding.",
+			"",
 
-		`<h5>Usage</h5>`,
-		"",
+			`<h5>What's an alias?</h5>`,
+			`An alias is a word that lets you quickly use a command without typing the entirety of it.`,
+			`E.g.: You don't want to type <code>${prefix}weather New York, USA</code> every time, so you create an alias called <code>ny</code>.`,
+			`Then, you can simply use the alias like so: <code>${prefix}$ ny</code>`,
+			"",
 
-		`<code>${prefix}alias check</code>`,
-		`<code>${prefix}alias spy</code>`,
-		`<code>${prefix}alias code</code>`,
-		`<code>${prefix}alias show</code>`,
-		`<code>${prefix}alias check (alias)</code>`,
-		`<code>${prefix}alias check (user)</code>`,
-		`<code>${prefix}alias check (user) (alias)</code>`,
-		"Checks your or someone else's aliases.",
-		"You can use <code>alias spy</code> instead of <code>check</code>.",
-		"You can use <code>alias code</code> instead of <code>check</code> - this will post the invocation directly, without fluff.",
-		"No params - gives you the link with the list of your aliases.",
-		"One param - your alias - gives you the definition of your alias with that name.",
-		"One param - user name - gives you the link with the list of that user's aliases.",
-		"Two param - user name + alias name - gives you the definition of that user's alias.",
-		"",
+			`<h5>Usage</h5>`,
+			"",
 
-		`<code>${prefix}alias list</code>`,
-		"Lists all your currently active aliases.",
-		`You can also check them in <a href="/user/alias/list">this list</a> - after you log in.`,
-		"",
-
-		"<h5>Replacements</h5>",
-		"Replaces a symbol in your alias with a value depending on its name.",
-		`<ul>
+			"<h5>Replacements</h5>",
+			"Replaces a symbol in your alias with a value depending on its name.",
+			`<ul>
 				<li>
 					<code>\${#}</code> (e.g. \${0}, \${1}, ...)
 					<br>
@@ -147,10 +123,11 @@ const aliasCommandDefinition = declare({
 				</li>
 			</ul>`,
 
-		`For a list of neat small commands usable within aliases to ease up your work, check the <a href="/bot/command/detail/aliasbuildingblock">${prefix}aliasbuildingblock</a> command.`,
-		"This command lets you build up aliases without needing to create small aliases of your own for menial tasks.",
-		"A good example is <code>$abb say</code>, which simply returns its input - so you don't have to create an alias that does that for you."
-	])
+			`For a list of neat small commands usable within aliases to ease up your work, check the <a href="/bot/command/detail/aliasbuildingblock">${prefix}aliasbuildingblock</a> command.`,
+			"This command lets you build up aliases without needing to create small aliases of your own for menial tasks.",
+			"A good example is <code>$abb say</code>, which simply returns its input - so you don't have to create an alias that does that for you."
+		];
+	}
 });
 
 export default aliasCommandDefinition;

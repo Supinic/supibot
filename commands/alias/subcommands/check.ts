@@ -4,14 +4,40 @@ import { type User } from "../../../classes/user.js";
 
 export default {
 	name: "check",
-	title: "Check alias definition",
+	title: "Check/list alias definition",
 	aliases: ["code", "list", "show", "spy"],
 	default: false,
 	description: [
-		`<code>${prefix}alias add (name) (definition)</code>`,
-		`<code>${prefix}alias create (name) (definition)</code>`,
-		`Creates your command alias, e.g.:`,
-		`<code>${prefix}alias add <u>hello</u> translate to:german Hello!</code>`
+		`<code>${prefix}alias check</code>`,
+		`<code>${prefix}alias spy</code>`,
+		`<code>${prefix}alias show</code>`,
+		"Checks your or someone else's alias definition.",
+		"",
+
+		`<code>${prefix}alias code</code>`,
+		"Posts the definition directly, without any surroudning text",
+		"",
+
+		`<code>${prefix}alias check</code>`,
+		`<code>${prefix}alias list</code>`,
+		"No parameters or using <code>list</code> - gives you a link to the list of all of your aliases.",
+		`You can also check them in <a href="/user/alias/list">this list</a> - after you log in.`,
+		"",
+
+		`<code>${prefix}alias check (user)</code>`,
+		"One parameter - user name: gives you a link to the list of that user's aliases.",
+		"",
+
+		`<code>${prefix}alias check (alias name)</code>`,
+		"One parameter - alias name: gives the definition of your alias with that name.",
+		"",
+
+		`<code>${prefix}alias check (alias name)</code>`,
+		"One parameter - alias name: gives the definition of your alias with that name.",
+		"",
+
+		`<code>${prefix}alias check (user) (alias name)</code>`,
+		"Two parameters - user name + alias name - gives you the definition of that user's alias."
 	],
 	execute: async function (context, invocation, ...args) {
 		const [firstName, secondName] = args;
