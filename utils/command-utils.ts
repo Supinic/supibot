@@ -1,3 +1,6 @@
+import config from "../config.json" with { type: "json" };
+export const { prefix } = config.modules.commands;
+
 import { randomInt as cryptoRandomInt } from "node:crypto";
 
 import RSSParser from "rss-parser";

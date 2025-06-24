@@ -1,5 +1,7 @@
 import { ALIAS_DESCRIPTION_LIMIT, getAliasByNameAndUser, getClassicAliasRow } from "../alias-utils.js";
-import { type AliasSubcommandDefinition, prefix } from "../index.js";
+
+import { type AliasSubcommandDefinition } from "../index.js";
+import { prefix } from "../../../utils/command-utils.js";
 
 export default {
 	name: "describe",

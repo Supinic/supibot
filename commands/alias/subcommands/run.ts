@@ -3,7 +3,9 @@ import type { User } from "../../../classes/user.js";
 import type { ContextAppendData } from "../../../classes/command.js";
 
 import config from "../../../config.json" with { type: "json" };
-import { type AliasSubcommandDefinition, prefix } from "../index.js";
+import { type AliasSubcommandDefinition } from "../index.js";
+import { prefix } from "../../../utils/command-utils.js";
+
 import {
 	ALIAS_NAME_REGEX,
 	NESTED_ALIAS_LIMIT,
@@ -22,7 +24,7 @@ export default {
 	name: "run",
 	title: "Run an alias",
 	aliases: ["try"],
-	default: false,
+	default: true,
 	description: [
 		`<code>${prefix}$ (name)</code>`,
 		`<code>${prefix}alias run (name)</code>`,

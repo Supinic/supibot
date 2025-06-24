@@ -2,8 +2,6 @@ import { declare, type SubcommandDefinition } from "../../classes/command.js";
 import { AliasSubcommands } from "./subcommands/index.js";
 
 export type AliasSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
-import config from "../../config.json" with { type: "json" };
-export const { prefix } = config.modules.commands;
 
 const aliasCommandDefinition = declare({
 	Name: "alias",

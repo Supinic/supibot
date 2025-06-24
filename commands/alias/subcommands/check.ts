@@ -1,4 +1,6 @@
-import { type AliasSubcommandDefinition, prefix } from "../index.js";
+import { type AliasSubcommandDefinition } from "../index.js";
+import { prefix } from "../../../utils/command-utils.js";
+
 import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser, parseAliasArguments } from "../alias-utils.js";
 import { type User } from "../../../classes/user.js";
 

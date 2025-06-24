@@ -1,5 +1,6 @@
 import { SupiDate, SupiError } from "supi-core";
-import { type AliasSubcommandDefinition, prefix } from "../index.js";
+import { type AliasSubcommandDefinition } from "../index.js";
+import { prefix } from "../../../utils/command-utils.js";
 import {
 	ALIAS_NAME_REGEX,
 	ALIAS_INVALID_NAME_RESPONSE,

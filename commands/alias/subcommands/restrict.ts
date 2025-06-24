@@ -1,5 +1,6 @@
 import { getAliasByNameAndUser, getClassicAliasRow, isRestricted } from "../alias-utils.js";
-import { type AliasSubcommandDefinition, prefix } from "../index.js";
+import { type AliasSubcommandDefinition } from "../index.js";
+import { prefix } from "../../../utils/command-utils.js";
 
 export default {
 	name: "restrict",
