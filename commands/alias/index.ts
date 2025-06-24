@@ -33,12 +33,6 @@ const aliasCommandDefinition = declare({
 		type = type.toLowerCase();
 
 		switch (type) {
-			case "copy":
-			case "copyplace": {
-
-			}
-
-
 			case "duplicate": {
 				const [oldAliasName, newAliasName] = args;
 				if (!oldAliasName || !newAliasName) {
@@ -106,58 +100,6 @@ const aliasCommandDefinition = declare({
 				await row.save();
 				return {
 					reply: `Successfully duplicated "${oldAliasName}" as "${newAliasName}"!`
-				};
-			}
-
-			case "edit": {
-				const [name, command, ...rest] = args;
-				if (!name || !command) {
-					return {
-						success: false,
-						reply: `No alias or command name provided!"`
-					};
-				}
-
-				const commandCheck = AliasUtils.parseCommandName(command);
-				if (!commandCheck) {
-					return {
-						success: false,
-						reply: `Cannot edit alias! The command "${command}" does not exist.`
-					};
-				}
-
-				const alias = await core.Query.getRecordset(rs => rs
-					.select("ID", "Command", "Parent")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", name)
-					.limit(1)
-					.single()
-				);
-				if (!alias) {
-					return {
-						success: false,
-						reply: `You don't have the "${name}" alias!`
-					};
-				}
-				else if (alias.Command === null) {
-					return {
-						success: false,
-						reply: `You cannot edit links to other aliases!`
-					};
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				await row.load(alias.ID);
-				row.setValues({
-					Command: commandCheck.Name,
-					Invocation: command,
-					Arguments: (rest.length > 0) ? JSON.stringify(rest) : null
-				});
-
-				await row.save({ skipLoad: true });
-				return {
-					reply: `Your alias "${name}" has been successfully edited.`
 				};
 			}
 
@@ -399,10 +341,6 @@ const aliasCommandDefinition = declare({
 		"Two param - user name + alias name - gives you the definition of that user's alias.",
 		"",
 
-		`<code>${prefix}alias edit (name)</code>`,
-		"Edits an existing alias, without the need of removing and re-adding it.",
-		`<code>${prefix}alias edit <u>hello</u> translate to:italian Hello!</code>`,
-		"",
 
 		`<code>${prefix}alias addedit (name) (definition)</code>`,
 		`<code>${prefix}alias upsert (name) (definition)</code>`,
