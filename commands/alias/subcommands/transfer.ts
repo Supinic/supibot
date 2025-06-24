@@ -10,7 +10,7 @@ export default {
 		`<code>${prefix}alias transfer (previous username)</code>`,
 		"If you renamed on Twitch, this command will transfer all aliases (including links) from your previous username to the current one.",
 		"Only works on Twitch at the moment, by checking that it is the same account for your and the old username.",
-		"You must also not have any conflicting aliases - you will get warned first.",
+		"You must also not have any conflicting aliases - you will get warned first."
 	],
 	execute: async function (context, subInvocation, ...args) {
 		if (!context.user.Twitch_ID) {

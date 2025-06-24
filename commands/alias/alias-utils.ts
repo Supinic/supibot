@@ -194,16 +194,16 @@ export const getAliasByIdAsserted = async (id: AliasData["ID"]) => {
 	return aliasData;
 };
 
-export const getChannelAlias = async (name: string, channelId: Channel["ID"]) => {
-	return await core.Query.getRecordset<ChannelAliasData | undefined>(rs => rs
+export const getChannelAlias = async (name: string, channelId: Channel["ID"]) => (
+	await core.Query.getRecordset<ChannelAliasData | undefined>(rs => rs
 		.select("*")
 		.from("data", "Custom_Command_Alias")
 		.where("User_Alias IS NULL")
 		.where("Channel = %n", channelId)
 		.where("Name COLLATE utf8mb4_bin = %s", name)
 		.single()
-	);
-};
+	)
+);
 
 export const isClassicAlias = (alias: AliasData): alias is ClassicAliasData => (
 	(alias.Command !== null) && (alias.Channel === null) && (alias.User_Alias !== null)
