@@ -155,7 +155,7 @@ export const applyParameters = (context: Context, aliasArguments: string[], comm
 
 export const getAliasByNameAndUser = async (name: string, userId: User["ID"]) => (
 	await core.Query.getRecordset<AliasData | undefined>(rs => rs
-		.select("Command", "Invocation", "Arguments", "Parent")
+		.select("*")
 		.from("data", "Custom_Command_Alias")
 		.where("Channel IS NULL")
 		.where("User_Alias = %n", userId)
@@ -167,13 +167,18 @@ export const getAliasByNameAndUser = async (name: string, userId: User["ID"]) =>
 
 export const getAliasById = async (id: AliasData["ID"]) => {
 	const aliasData = await core.Query.getRecordset<AliasData | undefined>(rs => rs
-		.select("Command", "Invocation", "Arguments", "Parent")
+		.select("*")
 		.from("data", "Custom_Command_Alias")
 		.where("ID = %n", id)
 		.limit(1)
 		.single()
 	);
 
+	return aliasData;
+};
+
+export const getParentAlias = async (linkedAlias: LinkedAliasData) => {
+	const aliasData = await getAliasById(linkedAlias.Parent) as ClassicAliasData | undefined;
 	return aliasData;
 };
 
@@ -191,7 +196,7 @@ export const getAliasByIdAsserted = async (id: AliasData["ID"]) => {
 
 export const getChannelAlias = async (name: string, channelId: Channel["ID"]) => {
 	return await core.Query.getRecordset<ChannelAliasData | undefined>(rs => rs
-		.select("ID", "Parent")
+		.select("*")
 		.from("data", "Custom_Command_Alias")
 		.where("User_Alias IS NULL")
 		.where("Channel = %n", channelId)
@@ -236,4 +241,7 @@ export const getGenericAliasRow = async () => (
 );
 export const getClassicAliasRow = async () => (
 	await core.Query.getRow<ClassicAliasData>("data", "Custom_Command_Alias")
+);
+export const getLinkedAliasRow = async () => (
+	await core.Query.getRow<LinkedAliasData>("data", "Custom_Command_Alias")
 );
