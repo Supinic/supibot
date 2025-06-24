@@ -40,6 +40,7 @@ export type AliasData = {
 type ClassicAliasData = AliasData & {
 	User_Alias: User["ID"];
 	Channel: null;
+	Command: Command["Name"];
 	Invocation: Command["Name"];
 	Arguments: string | null;
 }
@@ -58,6 +59,14 @@ type ChannelAliasData = AliasData & {
 	Invocation: null;
 	Arguments: null;
 	Parent: AliasData["ID"];
+};
+
+export const parseAliasArguments = (aliasData: AliasData): string[] => {
+	if (!aliasData.Arguments) {
+		return [];
+	}
+
+	return JSON.parse(aliasData.Arguments) as string[];
 };
 
 /**
@@ -130,7 +139,8 @@ export const applyParameters = (context: Context, aliasArguments: string[], comm
 		if (errorReason) {
 			return {
 				success: false,
-				reply: errorReason
+				reply: errorReason,
+				resultArguments: [] as string[]
 			};
 		}
 
@@ -154,6 +164,25 @@ export const getAliasByNameAndUser = async (name: string, userId: User["ID"]) =>
 	)
 );
 
+export const getAliasByIdAsserted = async (id: AliasData["ID"]) => {
+	const aliasData = await core.Query.getRecordset<AliasData | undefined>(rs => rs
+		.select("Command", "Invocation", "Arguments", "Parent")
+		.from("data", "Custom_Command_Alias")
+		.where("ID = %n", id)
+		.limit(1)
+		.single()
+	);
+
+	if (!aliasData) {
+		throw new SupiError({
+		    message: "Assert error: Fetching alias by ID - does not exist",
+			args: { id }
+		});
+	}
+
+	return aliasData;
+};
+
 export const getChannelAlias = async (name: string, channelId: Channel["ID"]) => {
 	return await core.Query.getRecordset<ChannelAliasData | undefined>(rs => rs
 		.select("ID", "Parent")
@@ -164,6 +193,10 @@ export const getChannelAlias = async (name: string, channelId: Channel["ID"]) =>
 		.single()
 	);
 };
+
+export const isClassicAlias = (alias: AliasData): alias is ClassicAliasData => (
+	(alias.Command !== null) && (alias.Channel === null) && (alias.User_Alias !== null)
+);
 
 export const isLinkedAlias = (alias: AliasData): alias is LinkedAliasData => (
 	(alias.Parent !== null) && (alias.Command === null) && (alias.Channel === null) && (alias.User_Alias !== null)

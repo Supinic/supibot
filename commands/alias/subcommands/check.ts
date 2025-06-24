@@ -1,5 +1,5 @@
 import { type AliasSubcommandDefinition, prefix } from "../index.js";
-import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser } from "../alias-utils.js";
+import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser, parseAliasArguments } from "../alias-utils.js";
 import { type User } from "../../../classes/user.js";
 
 export default {
@@ -120,10 +120,7 @@ export default {
 		}
 
 		let message;
-		const aliasArgs = (targetAlias.Arguments)
-			? JSON.parse(targetAlias.Arguments) as string[]
-			: [];
-
+		const aliasArgs = parseAliasArguments(targetAlias);
 		if (invocation === "code") {
 			message = `${targetAlias.Invocation} ${aliasArgs.join(" ")}`;
 		}

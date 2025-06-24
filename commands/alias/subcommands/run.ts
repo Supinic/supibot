@@ -1,12 +1,22 @@
+import { SupiError } from "supi-core";
+import type { User } from "../../../classes/user.js";
+import type { ContextAppendData } from "../../../classes/command.js";
+
+import config from "../../../config.json" with { type: "json" };
 import { type AliasSubcommandDefinition, prefix } from "../index.js";
 import {
 	ALIAS_NAME_REGEX,
-	ALIAS_INVALID_NAME_RESPONSE,
-	getAliasByNameAndUser,
-	getGenericAliasRow,
-    AliasData
+	NESTED_ALIAS_LIMIT,
+	type AliasData,
+	getAliasByIdAsserted,
+	parseAliasArguments,
+	applyParameters,
+	parseInvocationName,
+	parseCommandName,
+	isClassicAlias
 } from "../alias-utils.js";
-import type { User } from "../../../classes/user.js";
+
+const bannedCommandCombinations = config.modules.commands.bannedCombinations;
 
 export default {
 	name: "run",
@@ -14,11 +24,29 @@ export default {
 	aliases: ["try"],
 	default: false,
 	description: [
+		`<code>${prefix}$ (name)</code>`,
+		`<code>${prefix}alias run (name)</code>`,
+		"Runs your command alias.",
 
+		"Examples:",
+		`<code>${prefix}$<u>hello</u></code>`,
+		`<code>${prefix}$ <u>hello</u></code>`,
+		`<code>${prefix}alias run <u>hello</u></code>`,
+		"",
+
+		`<code>${prefix}alias try (user) (alias) (...arguments)</code>`,
+		"Runs another user's alias, without needing to copy it from them first.",
+		""
 	],
-	execute: async function (context, aliasInvocation: "run" | "try", ...args) {
+	execute: async function (context, subInvocation, ...args) {
 		let name: string;
 		let user: User;
+
+		if (subInvocation !== "try" && subInvocation !== "run") {
+			throw new SupiError({
+			    message: `Assert error: $alias run did not receive "run" or "try" as subInvocation`
+			});
+		}
 
 		const runArgs = [...args];
 		const [firstArg, secondArg] = runArgs;
@@ -29,7 +57,7 @@ export default {
 			};
 		}
 
-		if (aliasInvocation === "run") {
+		if (subInvocation === "run") {
 			name = firstArg;
 			user = context.user;
 		}
@@ -74,7 +102,7 @@ export default {
 
 		if (eligibleAliases.length <= 1) {
 			alias = eligibleAliases.at(0);
-			if (alias && aliasInvocation === "try" && alias.User_Alias !== user.ID) {
+			if (alias && subInvocation === "try" && alias.User_Alias !== user.ID) {
 				return {
 					success: false,
 					reply: `${who} don't have the "${name}" alias!`
@@ -98,36 +126,44 @@ export default {
 				reply: `${who} don't have the "${name}" alias!`
 			};
 		}
-		else if (alias.Command === null && alias.Parent !== null) {
-			alias = await core.Query.getRecordset(rs => rs
-				.select("User_Alias", "Command", "Invocation", "Arguments", "Parent")
-				.from("data", "Custom_Command_Alias")
-				.where("ID = %n", alias.Parent)
-				.limit(1)
-				.single()
-			);
+
+		if (alias.Command === null && alias.Parent !== null) {
+			const parentAlias = await getAliasByIdAsserted(alias.Parent);
+			if (!parentAlias.User_Alias) {
+				throw new SupiError({
+				    message: "Assert error: Parent alias does not belong to a user",
+					args: { parentAlias, alias }
+				});
+			}
 
 			// When running a linked alias, make sure to actually use the link owner's data -
 			// as if using $alias try (user) (linked alias)
-			aliasInvocation = "try";
-			user = await sb.User.get(alias.User_Alias);
+			alias = parentAlias;
+			subInvocation = "try";
+			user = await sb.User.getAsserted(parentAlias.User_Alias);
 		}
 		else if (alias.Command === null && alias.Parent === null) {
 			return {
 				success: false,
-				reply: `You tried to ${aliasInvocation} a linked alias, but the original has been deleted!`
+				reply: `You tried to ${subInvocation} a linked alias, but the original has been deleted!`
 			};
 		}
 
-		const aliasArguments = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
-
-		const { success, reply, resultArguments } = AliasUtils.applyParameters(context, aliasArguments, runArgs.slice(1));
+		const aliasArguments = parseAliasArguments(alias);
+		const { success, resultArguments, reply } = applyParameters(context, aliasArguments, runArgs.slice(1));
 		if (!success) {
 			return { success, reply };
 		}
 
-		let invocation = AliasUtils.parseInvocationName(alias.Invocation);
-		const commandData = AliasUtils.parseCommandName(alias.Invocation);
+		if (!isClassicAlias(alias)) {
+			throw new SupiError({
+			    message: "Assert error: No classic alias obtained",
+				args: { alias }
+			});
+		}
+
+		let invocation = parseInvocationName(alias.Invocation);
+		const commandData = parseCommandName(alias.Invocation);
 		if (!commandData) {
 			return {
 				success: false,
@@ -144,8 +180,8 @@ export default {
 		// If the invocation is `$alias try (user) (alias)`, and the invoked alias contains another alias
 		// execution, replace the sub-alias from `$alias run` (or `$$`) to `$alias try`, so that the user
 		// who is trying the alias does not need to care about dependencies.
-		const aliasTry = {};
-		if (aliasInvocation === "try") {
+		const aliasTry: ContextAppendData["aliasTry"] = {};
+		if (subInvocation === "try") {
 			aliasTry.userName = user.Name;
 
 			if (invocation === "$" && commandData === this) {
@@ -163,10 +199,10 @@ export default {
 			return {
 				success: false,
 				reply: core.Utils.tag.trim `
-						Your alias cannot continue!
-						It causes more than ${NESTED_ALIAS_LIMIT} alias calls.
-						Please reduce the complexity first.
-					`
+					Your alias cannot continue!
+					It causes more than ${NESTED_ALIAS_LIMIT} alias calls.
+					Please reduce the complexity first.
+				`
 			};
 		}
 
@@ -231,8 +267,8 @@ export default {
 		return {
 			...execution,
 			cooldown: (context.append.pipe) ? null : this.Cooldown,
-			hasExternalInput: Boolean(execution?.hasExternalInput ?? commandData.Flags.includes("externalInput")),
+			hasExternalInput: Boolean(execution.hasExternalInput ?? commandData.Flags.includes("external-input")),
 			isChannelAlias: Boolean(alias.Channel)
 		};
-}
+	}
 } satisfies AliasSubcommandDefinition;

@@ -1,9 +1,7 @@
 import { declare, type SubcommandDefinition } from "../../classes/command.js";
 
-import config from "../../config.json" with { type: "json" };
-const bannedCommandCombinations = config.modules.commands.bannedCombinations;
-
 export type AliasSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
+import config from "../../config.json" with { type: "json" };
 export const { prefix } = config.modules.commands;
 
 const aliasCommandDefinition = declare({
@@ -717,17 +715,6 @@ const aliasCommandDefinition = declare({
 		"",
 
 		`<h5>Usage</h5>`,
-
-		`<code>${prefix}$ (name)</code>`,
-		`<code>${prefix}alias run (name)</code>`,
-		"Runs your command alias!, e.g.:",
-		`<code>${prefix}$ <u>hello</u></code> => Hallo!`,
-		`<code>${prefix}alias run <u>hello</u></code> => Hallo!`,
-		"",
-
-		`<code>${prefix}alias try (user) (alias) (...arguments)</code>`,
-		"Runs another user's alias, without needing to copy it from them first.",
-		"",
 
 		`<code>${prefix}alias copy (username) (alias)</code>`,
 		`<code>${prefix}alias copyplace (username) (alias)</code>`,
