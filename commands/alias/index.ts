@@ -1,7 +1,9 @@
-import { createSubcommandBinding, declare } from "../../classes/command.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.js";
 
 import config from "../../config.json" with { type: "json" };
 const bannedCommandCombinations = config.modules.commands.bannedCombinations;
+
+export type AliasSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
 export const { prefix } = config.modules.commands;
 
 const aliasCommandDefinition = declare({
@@ -886,5 +888,4 @@ const aliasCommandDefinition = declare({
 	])
 });
 
-export const aliasBinding = createSubcommandBinding<typeof aliasCommandDefinition>();
 export default aliasCommandDefinition;

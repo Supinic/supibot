@@ -1,4 +1,4 @@
-import { aliasBinding, prefix } from "../index.js";
+import { type AliasSubcommandDefinition, prefix } from "../index.js";
 import {
 	ALIAS_NAME_REGEX,
 	ALIAS_INVALID_NAME_RESPONSE,
@@ -8,7 +8,7 @@ import {
 } from "../alias-utils.js";
 import type { User } from "../../../classes/user.js";
 
-export default aliasBinding({
+export default {
 	name: "run",
 	title: "Run an alias",
 	aliases: ["try"],
@@ -235,4 +235,4 @@ export default aliasBinding({
 			isChannelAlias: Boolean(alias.Channel)
 		};
 }
-});
+} satisfies AliasSubcommandDefinition;

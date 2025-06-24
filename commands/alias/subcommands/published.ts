@@ -1,6 +1,6 @@
-import { aliasBinding, prefix } from "../index.js";
+import { type AliasSubcommandDefinition, prefix } from "../index.js";
 
-export default aliasBinding({
+export default {
 	name: "publish",
 	title: "Publish alias in a channel",
 	aliases: ["unpublish"],
@@ -22,4 +22,4 @@ export default aliasBinding({
 			reply: `List of published aliases in this channel: https://supinic.com/bot/channel/detail/${context.channel.ID}/alias/list`
 		};
 	}
-});
+} satisfies AliasSubcommandDefinition;

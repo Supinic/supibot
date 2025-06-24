@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
+import { type AliasSubcommandDefinition, prefix } from "../index.js";
 
-import { aliasBinding, prefix } from "../index.js";
 import {
 	ALIAS_NAME_REGEX,
 	ALIAS_INVALID_NAME_RESPONSE,
@@ -9,7 +9,7 @@ import {
 	getAliasByNameAndUser
 } from "../alias-utils.js";
 
-export default aliasBinding({
+export default {
 	name: "add",
 	title: "Item IDs",
 	aliases: ["addedit", "create", "upsert"],
@@ -74,4 +74,4 @@ export default aliasBinding({
 				: `Your alias "${name}" has been replaced successfully.`
 		};
 	}
-});
+} satisfies AliasSubcommandDefinition;

@@ -1,8 +1,8 @@
-import { aliasBinding, prefix } from "../index.js";
+import { type AliasSubcommandDefinition, prefix } from "../index.js";
 import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser } from "../alias-utils.js";
 import { type User } from "../../../classes/user.js";
 
-export default aliasBinding({
+export default {
 	name: "check",
 	title: "Check alias definition",
 	aliases: ["code", "list", "show", "spy"],
@@ -153,4 +153,4 @@ export default aliasBinding({
 			};
 		}
 	}
-});
+} satisfies AliasSubcommandDefinition;

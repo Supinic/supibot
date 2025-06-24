@@ -1,4 +1,4 @@
-import { aliasBinding, prefix } from "../index.js";
+import { type AliasSubcommandDefinition, prefix } from "../index.js";
 import {
 	ALIAS_NAME_REGEX,
 	ALIAS_INVALID_NAME_RESPONSE,
@@ -6,7 +6,7 @@ import {
 	getGenericAliasRow
 } from "../alias-utils.js";
 
-export default aliasBinding({
+export default {
 	name: "rename",
 	title: "Rename an alias",
 	aliases: [],
@@ -57,4 +57,4 @@ export default aliasBinding({
 			reply: `Your alias "${oldAliasName}" has been successfully renamed to "${newAliasName}".`
 		};
 	}
-});
+} satisfies AliasSubcommandDefinition;

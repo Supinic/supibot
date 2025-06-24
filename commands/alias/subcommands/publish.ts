@@ -1,4 +1,4 @@
-import { aliasBinding, prefix } from "../index.js";
+import { type AliasSubcommandDefinition, prefix } from "../index.js";
 import {
 	ALIAS_NAME_REGEX,
 	ALIAS_INVALID_NAME_RESPONSE,
@@ -7,7 +7,7 @@ import {
 	getClassicAliasRow
 } from "../alias-utils.js";
 
-export default aliasBinding({
+export default {
 	name: "publish",
 	title: "Publish alias in a channel",
 	aliases: ["unpublish"],
@@ -114,4 +114,4 @@ export default aliasBinding({
 			};
 		}
 	}
-});
+} satisfies AliasSubcommandDefinition;
