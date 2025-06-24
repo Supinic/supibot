@@ -1,4 +1,4 @@
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 
 type StatusData = {
 	playDisabled: boolean;
@@ -11,7 +11,7 @@ type StatusData = {
 	remoteLogoFileName: string;
 };
 
-export default bindOsrsSubcommand({
+export default {
 	name: "status",
 	title: "Game status",
 	aliases: [],
@@ -47,4 +47,4 @@ export default bindOsrsSubcommand({
 			};
 		}
 	}
-});
+} satisfies OsrsSubcommandDefinition;

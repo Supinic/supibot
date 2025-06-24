@@ -1,13 +1,16 @@
-import { formulaOneBinding } from "../index.js";
-import quoteList from "./kimi.json" with { type: "json" };
+import type { FormulaOneSubcommandDefinition } from "../index.js";
 import type { Channel } from "../../../classes/channel.js";
+
+import quoteList from "./kimi.json" with { type: "json" };
 
 const MAXIMUM_QUOTE_REPEATS = 10;
 const repeatedQuotes: Map<Channel["ID"] | "whispers", string[]> = new Map();
 
-export default formulaOneBinding({
+export default {
 	name: "kimi",
 	aliases: ["gimi"],
+	title: "Kimi quote",
+	default: false,
 	description: [
 		`<code>$f1 gimi</code>`,
 		"Posts a random Kimi Räikkönen quote or radio comms."
@@ -31,4 +34,4 @@ export default formulaOneBinding({
 			reply: quote
 		};
 	}
-});
+} satisfies FormulaOneSubcommandDefinition;

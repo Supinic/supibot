@@ -1,10 +1,12 @@
-import { formulaOneBinding } from "../index.js";
-import { fetchDriverStandings } from "../api-wrapper.js";
 import { SupiDate } from "supi-core";
+import type { FormulaOneSubcommandDefinition } from "../index.js";
+import { fetchDriverStandings } from "../f1-api.js";
 
-export default formulaOneBinding({
+export default {
 	name: "driverStandings",
 	aliases: ["wdc"],
+	title: "WDC standings",
+	default: false,
 	description: [
 		`<code>$f1 driverStandings</code>`,
 		`<code>$f1 wdc</code>`,
@@ -30,4 +32,4 @@ export default formulaOneBinding({
 			reply: `Driver standings for season ${year}: ${string}`
 		};
 	}
-});
+} satisfies FormulaOneSubcommandDefinition;

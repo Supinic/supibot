@@ -1,4 +1,4 @@
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 import { fetchItemId } from "./osrs-utils.js";
 
 const formatPrice = (price: number) => {
@@ -21,11 +21,11 @@ export type WikiPriceData<T extends string | number> = {
 	};
 };
 
-export default bindOsrsSubcommand({
+export default {
 	name: "price",
 	title: "Item prices",
 	aliases: [],
-	default: true,
+	default: false,
 	description: [
 		`<code>$osrs price (item)</code>`,
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`
@@ -78,4 +78,4 @@ export default bindOsrsSubcommand({
 			`
 		};
 	}
-});
+} satisfies OsrsSubcommandDefinition;

@@ -1,24 +1,34 @@
-import { formulaOneBinding } from "../index.js";
+import { SupiDate } from "supi-core";
+import type { FormulaOneSubcommandDefinition } from "../index.js";
 import {
 	fetchRace,
 	fetchNextRaceDetail,
 	fetchQualifyingResults,
 	fetchRaceResults,
 	getHighlights
-} from "../api-wrapper.js";
-import { SupiDate } from "supi-core";
+} from "../f1-api.js";
 
-export default formulaOneBinding({
+export default {
 	name: "race",
+	title: "Race details",
 	aliases: [],
+	default: true,
 	description: [
+		`<code>$f1</code>`,
+		"Posts quick info about the closest upcoming race in the current season.",
+		"If the season is over, will try to find the date for the next season's first race.",
+		"",
+
 		`<code>$f1 race (name)</code>`,
+		`<code>$f1 race emilia romagna</code>`,
 		`<code>$f1 race (country)</code>`,
+		`<code>$f1 race monaco</code>`,
 		`<code>$f1 race (circuit)</code>`,
+		`<code>$f1 race zanddvoort</code>`,
 		`<code>$f1 season:1990 race (name)</code>`,
 		`<code>$f1 year:1990 race (name)</code>`,
 		"Searches for info about a race given by its name or country.",
-		"Use <code>season</code> to select a season, otherwise defaults to current year."
+		"Use <code>season</code> or <code>year</code> to select a season, otherwise defaults to current year."
 	],
 	execute: async (context, type, ...rest) => {
 		if (rest.length === 0) {
@@ -41,7 +51,6 @@ export default formulaOneBinding({
 			: new SupiDate(race.date);
 
 		const delta = core.Utils.timeDelta(raceDate);
-
 		const afterRaceDate = raceDate.clone().addHours(3);
 
 		const data = {
@@ -109,4 +118,4 @@ export default formulaOneBinding({
 			`
 		};
 	}
-});
+} satisfies FormulaOneSubcommandDefinition;

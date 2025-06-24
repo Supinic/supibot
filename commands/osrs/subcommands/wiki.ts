@@ -1,10 +1,10 @@
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 
-export default bindOsrsSubcommand({
+export default {
 	name: "wiki",
 	title: "Search the Wiki",
 	aliases: ["search"],
-	default: true,
+	default: false,
 	description: [
 		"<u>Search the Wiki</u>",
 		`<code>$osrs search (query)</code>`,
@@ -42,4 +42,4 @@ export default bindOsrsSubcommand({
 			};
 		}
 	}
-});
+} satisfies OsrsSubcommandDefinition;

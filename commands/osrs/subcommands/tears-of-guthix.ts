@@ -1,4 +1,4 @@
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 import { fetchWorldsData } from "./osrs-utils.js";
 
 type WorldTearsData = {
@@ -7,7 +7,7 @@ type WorldTearsData = {
 	stream_order: string;
 };
 
-export default bindOsrsSubcommand({
+export default {
 	name: "guthix",
 	title: "Tears of Guthix",
 	aliases: ["tears", "tog"],
@@ -62,4 +62,4 @@ export default bindOsrsSubcommand({
 			reply: `Ideal Tears of Guthix worlds (GGGBBB): ${string}`
 		};
 	}
-});
+} satisfies OsrsSubcommandDefinition;
