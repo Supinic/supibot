@@ -324,60 +324,6 @@ const aliasCommandDefinition = declare({
 				};
 			}
 
-			case "inspect": {
-				let user;
-				let aliasName;
-				let prefix;
-
-				const [firstName, secondName] = args;
-				if (!firstName && !secondName) {
-					return {
-						success: false,
-						reply: `You didn't provide an alias or user name! Use: "$alias inspect (your alias)" or "$alias inspect (username) (alias)"`
-					};
-				}
-				else if (firstName && !secondName) {
-					user = context.user;
-					aliasName = firstName;
-					prefix = "You";
-				}
-				else {
-					user = await sb.User.get(firstName);
-					if (!user) {
-						return {
-							success: false,
-							reply: "Provided user does not exist!"
-						};
-					}
-
-					aliasName = secondName;
-					prefix = (context.user === user) ? "You" : "They";
-				}
-
-				const alias = await core.Query.getRecordset(rs => rs
-					.select("Description")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
-					.limit(1)
-					.single()
-				);
-
-				if (!alias) {
-					return {
-						success: false,
-						reply: `${prefix} don't have the "${aliasName}" alias!`
-					};
-				}
-
-				return {
-					cooldown: (context.append.pipe) ? null : this.Cooldown,
-					reply: (alias.Description)
-						? `${aliasName}: ${alias.Description}`
-						: `Alias "${aliasName}" has no description.`
-				};
-			}
-
 			case "link":
 			case "linkplace": {
 				const [userName, aliasName, customLinkName] = args;
@@ -651,10 +597,6 @@ const aliasCommandDefinition = declare({
 		`If you don't provide a description, or use the word "none" exactly, the description will be reset.`,
 		"",
 
-		`<code>${prefix}alias inspect (alias)</code>`,
-		`<code>${prefix}alias inspect (username) (alias)</code>`,
-		"If your or someone else's alias has a description, this command will print it to chat.",
-		"",
 
 		"<h5>Replacements</h5>",
 		"Replaces a symbol in your alias with a value depending on its name.",
