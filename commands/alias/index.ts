@@ -150,57 +150,6 @@ const aliasCommandDefinition = declare({
 				};
 			}
 
-			case "describe": {
-				const [name, ...rest] = args;
-				if (!name) {
-					return {
-						success: false,
-						reply: `You didn't provide a name, or a command! Use: alias describe (name) (...description)"`
-					};
-				}
-
-				const alias = await core.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", name)
-					.limit(1)
-					.single()
-				);
-
-				if (!alias) {
-					return {
-						success: false,
-						reply: `You don't have the "${name}" alias!`
-					};
-				}
-
-				const description = rest.join(" ").trim();
-				if (description.length > ALIAS_DESCRIPTION_LIMIT) {
-					return {
-						success: false,
-						reply: `Your alias description is too long! Maximum of ${ALIAS_DESCRIPTION_LIMIT} is allowed.`
-					};
-				}
-
-				const row = await core.Query.getRow("data", "Custom_Command_Alias");
-				await row.load(alias.ID);
-
-				let verb;
-				if (description.length === 0 || description === "none") {
-					row.values.Description = null;
-					verb = "reset";
-				}
-				else {
-					row.values.Description = description;
-					verb = "updated";
-				}
-
-				await row.save({ skipLoad: true });
-				return {
-					reply: `The description of your alias "${name}" has been ${verb} successfully.`
-				};
-			}
 
 			case "duplicate": {
 				const [oldAliasName, newAliasName] = args;
@@ -591,12 +540,6 @@ const aliasCommandDefinition = declare({
 		`<code>${prefix}alias remove (name)</code>`,
 		"Removes your command alias with the given name.",
 		"",
-
-		`<code>${prefix}alias describe (alias) (...description)</code>`,
-		"Gives your command a description, which can then be checked by you or others.",
-		`If you don't provide a description, or use the word "none" exactly, the description will be reset.`,
-		"",
-
 
 		"<h5>Replacements</h5>",
 		"Replaces a symbol in your alias with a value depending on its name.",
