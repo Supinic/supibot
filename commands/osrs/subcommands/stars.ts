@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 import { fetchWorldsData, type GameWorlds } from "./osrs-utils.js";
 
 /**
@@ -39,11 +39,11 @@ const formatStar = (star: AdjustedStarData, worldsData: GameWorlds) => {
 	return `${world.flagEmoji} W${star.world}${activityString}: T${star.tier} ${star.calledLocation} (${delta})`;
 };
 
-export default bindOsrsSubcommand({
+export default {
 	name: "stars",
 	title: "Shooting Stars",
 	aliases: ["star"],
-	default: true,
+	default: false,
 	description: [
 		"<u>Shooting Stars</u>",
 		`<code>$osrs stars</code>`,
@@ -78,4 +78,4 @@ export default bindOsrsSubcommand({
 			reply: `Top 3 stars: ${string}`
 		};
 	}
-});
+} satisfies OsrsSubcommandDefinition;

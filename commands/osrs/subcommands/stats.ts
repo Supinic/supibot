@@ -1,9 +1,9 @@
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
 import GameData from "./game-data.json" with { type: "json" };
 import { SupiError } from "supi-core";
 
-export default bindOsrsSubcommand({
+export default {
 	name: "stats",
 	title: "Skill levels",
 	aliases: [],
@@ -142,4 +142,4 @@ export default bindOsrsSubcommand({
 			};
 		}
 	}
-});
+} satisfies OsrsSubcommandDefinition;

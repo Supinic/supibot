@@ -58,7 +58,7 @@ import FirstLineCommand from "./firstline/index.js";
 import FirstSeenCommand from "./firstseen/index.js";
 import FishCommand from "./fish/index.js";
 import FollowAgeCommand from "./followage/index.js";
-import Formula1Command from "./formula1/index.ts";
+import Formula1Command from "./formula1/index.js";
 import ForsenCDCommand from "./forsenCD/index.js";
 import ForsenECommand from "./forsenE/index.js";
 import FunFactCommand from "./funfact/index.js";

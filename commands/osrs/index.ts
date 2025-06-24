@@ -1,16 +1,10 @@
-import { SupiError } from "supi-core";
-import { declare, createSubcommandBinding } from "../../classes/command.js";
-import { subcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.js";
+import { OsrsSubcommands } from "./subcommands/index.js";
 
 import gameData from "./subcommands/game-data.json" with { type: "json" };
 const { activities, activityAliases, skills } = gameData;
 
-const defaultSubcommand = subcommands.find(i => i.default);
-if (!defaultSubcommand) {
-	throw new SupiError({
-	    message: "Assert error: No default $osrs subcommand found"
-	});
-}
+export type OsrsSubcommandDefinition = SubcommandDefinition<typeof osrsCommandDefinition>
 
 const osrsCommandDefinition = declare({
 	Name: "osrs",
@@ -30,21 +24,16 @@ const osrsCommandDefinition = declare({
 	Whitelist_Response: null,
 	Code: (async function osrs (context, first, ...args) {
 		const input = (first) ? first.toLowerCase() : "";
-		let subcommand = subcommands.find(i => i.name === input || i.aliases.includes(input));
+		let subcommand = OsrsSubcommands.get(input);
 		if (!subcommand) {
 			args.unshift(first);
-			subcommand = defaultSubcommand;
+			subcommand = OsrsSubcommands.default;
 		}
 
 		return await subcommand.execute.call(this, context, ...args);
 	}),
 	Dynamic_Description: function (prefix) {
-		const subcommandsDescription = subcommands.flatMap(i => [
-			`<h6>${i.title}</h6>`,
-			"",
-			...i.description,
-			""
-		]);
+		const subcommandsDescription = OsrsSubcommands.createDescription();
 
 		const aliases: { activity: string; alias: string; }[] = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
@@ -102,5 +91,4 @@ const osrsCommandDefinition = declare({
 	}
 });
 
-export const bindOsrsSubcommand = createSubcommandBinding<typeof osrsCommandDefinition>();
 export default osrsCommandDefinition;

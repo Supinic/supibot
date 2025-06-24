@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 import {
 	fetchUserData,
 	parseUserIdentifier,
@@ -10,7 +10,7 @@ import {
 
 import SetCommand from "../../set/subcommands/osrs-username.js";
 
-export default bindOsrsSubcommand({
+export default {
 	name: "kc",
 	title: "Kill count",
 	aliases: ["kill-count"],
@@ -104,4 +104,4 @@ export default bindOsrsSubcommand({
 				: `${ironman} ${username}'s KC for ${name}: ${value} - rank #${rank}.`
 		};
 	}
-});
+} satisfies OsrsSubcommandDefinition;

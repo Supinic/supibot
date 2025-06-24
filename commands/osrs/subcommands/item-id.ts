@@ -1,7 +1,7 @@
-import { bindOsrsSubcommand } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.js";
 import { fetchItemId } from "./osrs-utils.js";
 
-export default bindOsrsSubcommand({
+export default {
 	name: "itemid",
 	title: "Item IDs",
 	aliases: ["item-id"],
@@ -25,4 +25,4 @@ export default bindOsrsSubcommand({
 			};
 		}
 	}
-});
+} satisfies OsrsSubcommandDefinition;
