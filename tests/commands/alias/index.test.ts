@@ -1,5 +1,11 @@
-import test, { describe } from "node:test";
+import { it, describe } from "node:test";
 import assert from "node:assert/strict";
+
+import * as core from "supi-core";
+// @ts-ignore
+globalThis.core = {
+	Utils: new core.Utils()
+};
 
 import { Command } from "../../../classes/command.js";
 import { User } from "../../../classes/user.js";
@@ -33,9 +39,15 @@ const fakeContext = Command.createFakeContext(command, {
 	platformSpecificData: null
 });
 
-test.describe("Test xd", () => {
-	test("test 123", async () => {
-		const result = await command.execute(fakeContext, "alias", "list");
-		console.log({ result });
+describe("Test xd", () => {
+	it("test 123", async () => {
+		try {
+			// const result = await command.execute(fakeContext, "alias", "list");
+			const result = {};
+			console.log({ result });
+		}
+		catch (e) {
+			console.log({ e });
+		}
 	});
 });

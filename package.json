@@ -36,6 +36,7 @@
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
     "test": "yarn build && node -r ./build/tests/test-utils/db.js --test ./build/tests/**/*.test.js",
+    "test2": "NODE_ENV=test node --import tsx --test \"tests/**/*.test.ts\"",
     "coverage": "nyc yarn test",
     "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core"
   },
@@ -54,6 +55,7 @@
     "mocha": "^11.6.0",
     "nyc": "^17.1.0",
     "supi-db-init": "supinic/supi-db-init",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.0"
   },
