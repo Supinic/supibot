@@ -28,8 +28,8 @@ const formulaOneCommandDefinition = declare({
 		const rest = args.slice(1);
 		return await subcommand.execute.call(this, context, type, ...rest);
 	}),
-	Dynamic_Description: () => {
-		const subcommandDescriptions = FormulaOneSubcommands.createDescription();
+	Dynamic_Description: async () => {
+		const subcommandDescriptions = await FormulaOneSubcommands.createDescription();
 		return [
 			"All things F1-related in a single command.",
 			`Powered by <a href="https://api.jolpi.ca/ergast/">Jolpica Developer API</a>`,

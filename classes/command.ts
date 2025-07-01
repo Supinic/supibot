@@ -63,6 +63,7 @@ type ResultFailure = { success: false; reply: string; };
 export type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
+	text?: string;
 	replyWithPrivateMessage?: boolean;
 	cooldown?: CooldownDefinition;
 	partialReplies?: {
@@ -305,6 +306,7 @@ export interface SubcommandDefinition<T extends CommandDefinition = CommandDefin
 	title: string;
 	aliases: string[];
 	description: string[];
+	getDescription?: (prefix: string) => string[] | Promise<string[]>;
 	default: boolean;
 	flags?: Record<string, boolean>;
 	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
@@ -353,12 +355,16 @@ export class SubcommandCollection {
 		return null;
 	}
 
-	createDescription () {
+	async createDescription () {
 		const result: string[] = [];
 		for (const subcommand of this.subcommands) {
+			const description = (subcommand.getDescription)
+				? await subcommand.getDescription(Command.prefix)
+				: subcommand.description;
+
 			result.push(
 				`<h6>${subcommand.title}</h6>`,
-				...subcommand.description,
+				...description,
 				"",
 				""
 			);

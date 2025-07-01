@@ -5,9 +5,10 @@ export default {
 	title: "Search the Wiki",
 	aliases: ["search"],
 	default: false,
-	description: [
+	description: [],
+	getDescription: (prefix) => [
 		"<u>Search the Wiki</u>",
-		`<code>$osrs search (query)</code>`,
+		`<code>${prefix}osrs search (query)</code>`,
 		`Attempts to post a direct OSRS Wiki link to whatever you're looking for.`
 	],
 	execute: async function (context, ...args) {

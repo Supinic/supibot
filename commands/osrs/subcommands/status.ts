@@ -16,9 +16,10 @@ export default {
 	title: "Game status",
 	aliases: [],
 	default: false,
-	description: [
+	description: [],
+	getDescription: (prefix) => [
 		"Game status",
-		`<code>$osrs status</code>`,
+		`<code>${prefix}osrs status</code>`,
 		"If there is a Jagex Launcher status (e.g. worlds going down, etc.), this command will tell you about it."
 	],
 	execute: async function () {
