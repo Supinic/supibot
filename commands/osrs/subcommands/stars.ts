@@ -44,10 +44,11 @@ export default {
 	title: "Shooting Stars",
 	aliases: ["star"],
 	default: false,
-	description: [
+	description: [],
+	getDescription: (prefix) => [
 		"<u>Shooting Stars</u>",
-		`<code>$osrs stars</code>`,
-		`<code>$osrs star</code>`,
+		`<code>${prefix}osrs stars</code>`,
+		`<code>${prefix}osrs star</code>`,
 		`Posts a couple of "best" (heuristically selected) worlds with a currently active Shooting star!`,
 		`Powered by the <a href="https://map.starminers.site/">Starminers API</a>.`
 	],

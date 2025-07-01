@@ -17,10 +17,6 @@ const formalitySupportedLanguages: readonly string[] = [
 	"de", "es", "fr", "it", "ja",
 	"nl", "pl", "pt", "ru"
 ];
-const formalitySupportedLanguageNames: readonly string[] = formalitySupportedLanguages.map(i => {
-	const name = getName(i);
-	return (name) ? core.Utils.capitalize(name) : `(unknown: ${i})`;
-});
 
 type DeeplSearchParams = {
 	text: string;
@@ -35,23 +31,31 @@ type DeeplTranslateResponse = {
 	}[];
 }
 
+let formalitySupportedLanguageNames: string[] | undefined;
 export default {
 	name: "deepl",
 	title: "DeepL",
 	aliases: [],
 	default: false,
 	description: [],
-	getDescription: (prefix) => [
-		`<code>${prefix}deepl</code>`,
-		`<code>${prefix}translate engine:deepl</code>`,
-		"You can use the DeepL directly by using <code>${prefix}deepl</code> or indirectly by specifying <code>engine:deepl</code>",
-		"",
+	getDescription: (prefix) => {
+		formalitySupportedLanguageNames ??= formalitySupportedLanguages.map(i => {
+			const name = getName(i);
+			return (name) ? core.Utils.capitalize(name) : `(unknown: ${i})`;
+		});
 
-		`<code>${prefix}deepl formality:(level) to:(language)</code>`,
-		"Translates provided text using a specified formality level - \"more\" or \"less\".",
-		"This will result in more or less formal reply.",
-		`Only supports these languages: ${formalitySupportedLanguageNames.join(", ")}`
-	],
+		return [
+			`<code>${prefix}deepl</code>`,
+			`<code>${prefix}translate engine:deepl</code>`,
+			"You can use the DeepL directly by using <code>${prefix}deepl</code> or indirectly by specifying <code>engine:deepl</code>",
+			"",
+
+			`<code>${prefix}deepl formality:(level) to:(language)</code>`,
+			"Translates provided text using a specified formality level - \"more\" or \"less\".",
+			"This will result in more or less formal reply.",
+			`Only supports these languages: ${formalitySupportedLanguageNames.join(", ")}`
+		];
+	},
 	execute: async function (context, subInvocation, query) {
 		if (!process.env.API_DEEPL_KEY) {
 			throw new SupiError({

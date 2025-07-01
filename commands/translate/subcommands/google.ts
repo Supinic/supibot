@@ -80,7 +80,7 @@ export default {
 			`<code>${prefix}translate confidence:false FeelsDankMan</code> => English -> English: FeelsDankMan`,
 
 			"List of supported language codes, as provided by Google:",
-			`<pre>${list.join(" ")}</pre>`
+			`<code>${list.join(" ")}</code>`
 		];
 	},
 	execute: async function (context, type, query) {
