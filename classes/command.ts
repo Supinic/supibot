@@ -306,7 +306,7 @@ export interface SubcommandDefinition<T extends CommandDefinition = CommandDefin
 	title: string;
 	aliases: string[];
 	description: string[];
-	getDescription?: () => string[] | Promise<string[]>;
+	getDescription?: (prefix: string) => string[] | Promise<string[]>;
 	default: boolean;
 	flags?: Record<string, boolean>;
 	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
@@ -359,7 +359,7 @@ export class SubcommandCollection {
 		const result: string[] = [];
 		for (const subcommand of this.subcommands) {
 			const description = (subcommand.getDescription)
-				? await subcommand.getDescription()
+				? await subcommand.getDescription(Command.prefix)
 				: subcommand.description;
 
 			result.push(

@@ -65,19 +65,19 @@ export default {
 	aliases: [],
 	default: true,
 	description: [],
-	getDescription: async () => {
+	getDescription: async (prefix) => {
 		const rawList = await getGoogleLanguageList();
 		const list = rawList.sort();
 
 		return [
-			`<code>$translate confidence:(true | false) (text)</code>`,
+			`<code>${prefix}translate confidence:(true | false) (text)</code>`,
 			"<b>Only works for the Google translation engine!</b>",
 			"Translates the text, and outputs the result text with direction, but without the confidence percentage.",
 			"",
 
 			"See examples:",
-			`<code>$translate confidence:true FeelsDankMan</code> => English (51%) -> English: FeelsDankMan`,
-			`<code>$translate confidence:false FeelsDankMan</code> => English -> English: FeelsDankMan`,
+			`<code>${prefix}translate confidence:true FeelsDankMan</code> => English (51%) -> English: FeelsDankMan`,
+			`<code>${prefix}translate confidence:false FeelsDankMan</code> => English -> English: FeelsDankMan`,
 
 			"List of supported language codes, as provided by Google:",
 			`<pre>${list.join(" ")}</pre>`

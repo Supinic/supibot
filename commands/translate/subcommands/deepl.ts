@@ -17,9 +17,10 @@ const formalitySupportedLanguages: readonly string[] = [
 	"de", "es", "fr", "it", "ja",
 	"nl", "pl", "pt", "ru"
 ];
-const formalitySupportedLanguageNames: readonly string[] = formalitySupportedLanguages
-	.map(i => getName(i))
-	.filter(Boolean) as string[];
+const formalitySupportedLanguageNames: readonly string[] = formalitySupportedLanguages.map(i => {
+	const name = getName(i);
+	return (name) ? core.Utils.capitalize(name) : `(unknown: ${i})`;
+});
 
 type DeeplSearchParams = {
 	text: string;
@@ -39,13 +40,14 @@ export default {
 	title: "DeepL",
 	aliases: [],
 	default: false,
-	description: [
-		`<code>$deepl</code>`,
-		`<code>$translate engine:deepl</code>`,
-		"You can use the DeepL directly by using <code>$deepl</code> or indirectly by specifying <code>engine:deepl</code>",
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}deepl</code>`,
+		`<code>${prefix}translate engine:deepl</code>`,
+		"You can use the DeepL directly by using <code>${prefix}deepl</code> or indirectly by specifying <code>engine:deepl</code>",
 		"",
 
-		`<code>$deepl formality:(level) to:(language)</code>`,
+		`<code>${prefix}deepl formality:(level) to:(language)</code>`,
 		"Translates provided text using a specified formality level - \"more\" or \"less\".",
 		"This will result in more or less formal reply.",
 		`Only supports these languages: ${formalitySupportedLanguageNames.join(", ")}`
