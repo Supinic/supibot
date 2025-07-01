@@ -1,17 +1,25 @@
-import DeeplTranslate from "./deepl.js";
-import GoogleTranslate from "./google.js";
+import { TranslateSubcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.js";
+import type { User } from "../../classes/user.js";
+import type { Channel } from "../../classes/channel.js";
 
-let logTableExists;
-const engines = {
-	deepl: DeeplTranslate,
-	google: GoogleTranslate
+let logTableExists: boolean | undefined;
+export type TranslateSubcommandDefinition = SubcommandDefinition<typeof translateCommandDefinition>;
+
+type LogTableRow = {
+	User_Alias: User["ID"];
+	Channel: Channel["ID"] | null;
+	Engine: string;
+	Excerpt: string;
+	Input_Length: number;
+	Output_Length: number | null;
+	Success: boolean;
+	Params: string | null;
 };
-const engineNames = Object.keys(engines);
 
-export default {
+export const translateCommandDefinition = declare({
 	Name: "translate",
 	Aliases: ["deepl"],
-	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\"",
 	Flags: ["external-input","mention","non-nullable","pipe"],
@@ -22,7 +30,7 @@ export default {
 		{ name: "formality", type: "string" },
 		{ name: "to", type: "string" },
 		{ name: "textOnly", type: "boolean" }
-	],
+	] as const,
 	Whitelist_Response: null,
 	initialize: async () => {
 		logTableExists = await core.Query.isTablePresent("data", "Translate_Log");
@@ -52,18 +60,17 @@ export default {
 			engine = "deepl";
 		}
 
-		if (!engineNames.includes(engine)) {
+		const subcommand = TranslateSubcommands.get(engine);
+		if (!subcommand) {
 			return {
 				success: false,
-				reply: `Invalid translation engine provided! Use one of: ${engineNames.join(", ")}`
+				reply: `Invalid translation engine provided! Use one of: ${TranslateSubcommands.names.join(", ")}`
 			};
 		}
 
-		const engineData = engines[engine];
-		const result = await engineData.execute(context, query);
-
+		const result = await subcommand.execute.call(this, context, engine, query);
 		if (logTableExists) {
-			const row = await core.Query.getRow("data", "Translate_Log");
+			const row = await core.Query.getRow<LogTableRow>("data", "Translate_Log");
 			row.setValues({
 				User_Alias: context.user.ID,
 				Channel: context.channel?.ID ?? null,
@@ -72,7 +79,7 @@ export default {
 				Input_Length: query.length,
 				Output_Length: result.text?.length ?? null,
 				Success: result.success,
-				Params: (Object.keys(context.params) !== 0) ? JSON.stringify(context.params) : null
+				Params: (Object.keys(context.params).length !== 0) ? JSON.stringify(context.params) : null
 			});
 
 			await row.save({ skipLoad: true });
@@ -92,14 +99,13 @@ export default {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Translates provided text from one language into another provided language.",
 		"Default languages are: from = auto-detected, to = English. This can be changed with the from and to parameters - see below.",
 		"",
 
 		`<code>${prefix}translate (text)</code>`,
-		"Translates the text from auto-detected language to English, e.g.:",
-		`<code>${prefix}translate FeelsDankMan</code> => Luxembourgish (53%) -> English: FeelsDankMan`,
+		"Translates the text from auto-detected language to English.",
 		"",
 
 		`<code>${prefix}translate from:fr (text)</code>`,
@@ -109,43 +115,26 @@ export default {
 		"The language auto-detection usually works fine. However, if you run into issues or if the text is too short, you can force the source langauge.",
 		"",
 
-		`<code>${prefix}translate to:italian from:swahili (text)</code>`,
-		"Both parameters can be combined together for maximum accuracy.",
-		"",
-
-		`<code>${prefix}translate engine:(translation engine)</code>`,
-		`<code>${prefix}translate engine:deepl</code>`,
-		`<code>${prefix}deepl</code>`,
-		"Allows you to choose a translation engine. Keep in mind they both support different parameters and languages!",
-		"Supported: <code>google</code> and <code>deepl</code>",
-		"",
-
-		`<code>${prefix}translate to:random (text)</code>`,
-		"Translates provided text to a randomly picked, supported language.",
-		"",
-
-		`<code>${prefix}translate engine:deepl formality:(level) to:(language)</code>`,
-		"Translates provided text using a specified formality level - \"more\" or \"less\".",
-		"This will result in more or less formal reply.",
-		"Only supports some languages - check the command's response for a list.",
-		"Only supported by the DeepL engine. Attempting to use it with Google will fail the command.",
-		"",
-
 		`<code>${prefix}translate to:de (text)</code>`,
 		`<code>${prefix}translate to:german (text)</code>`,
 		`<code>${prefix}translate to:German (text)</code>`,
 		"Translates the text from a auto-detected language to a provided language (German here).",
 		"",
 
-		`<code>${prefix}translate textOnly:true (text)</code>`,
-		"Translates the text, and only outputs the result text, without the direction and confidence %, e.g.:",
-		`<code>${prefix}translate textOnly:true FeelsDankMan</code> => FeelsDankMan`,
+		`<code>${prefix}translate to:italian from:swahili (text)</code>`,
+		"Both parameters can be combined together for maximum accuracy.",
 		"",
 
-		`<code>${prefix}translate confidence:false (text)</code>`,
-		"<b>Only works for the Google translation engine!</b>",
-		"Translates the text, and outputs the result text with direction, but without the confidence %, e.g.:",
-		`<code>${prefix}translate confidence:false FeelsDankMan</code> => Luxembourgish -> English: FeelsDankMan`,
-		""
-	])
-};
+		`<code>${prefix}translate to:random (text)</code>`,
+		"Translates provided text to a randomly picked, supported language.",
+		"",
+
+		`<code>${prefix}translate textOnly:true (text)</code>`,
+		"Translates, and only outputs the result text without any surrounding command result text.",
+		"",
+
+		...TranslateSubcommands.createDescription()
+	]
+});
+
+export default translateCommandDefinition;

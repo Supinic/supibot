@@ -63,6 +63,7 @@ type ResultFailure = { success: false; reply: string; };
 export type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
+	text?: string;
 	replyWithPrivateMessage?: boolean;
 	cooldown?: CooldownDefinition;
 	partialReplies?: {
