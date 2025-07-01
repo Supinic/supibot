@@ -20,7 +20,7 @@ type LogTableRow = {
 export const translateCommandDefinition = declare({
 	Name: "translate",
 	Aliases: ["deepl"],
-	Cooldown: 15000,
+	Cooldown: 10000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\"",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
@@ -99,42 +99,45 @@ export const translateCommandDefinition = declare({
 			};
 		}
 	}),
-	Dynamic_Description: (prefix) => [
-		"Translates provided text from one language into another provided language.",
-		"Default languages are: from = auto-detected, to = English. This can be changed with the from and to parameters - see below.",
-		"",
+	Dynamic_Description: async (prefix) => {
+		const subcommandDescriptions = await TranslateSubcommands.createDescription();
+		return [
+			"Translates provided text from one language into another provided language.",
+			"Default languages are: from = auto-detected, to = English. This can be changed with the from and to parameters - see below.",
+			"",
 
-		`<code>${prefix}translate (text)</code>`,
-		"Translates the text from auto-detected language to English.",
-		"",
+			`<code>${prefix}translate (text)</code>`,
+			"Translates the text from auto-detected language to English.",
+			"",
 
-		`<code>${prefix}translate from:fr (text)</code>`,
-		`<code>${prefix}translate from:french (text)</code>`,
-		`<code>${prefix}translate from:French (text)</code>`,
-		"Translates the text from a provided language (French here, can use a language code or name) to English.",
-		"The language auto-detection usually works fine. However, if you run into issues or if the text is too short, you can force the source langauge.",
-		"",
+			`<code>${prefix}translate from:fr (text)</code>`,
+			`<code>${prefix}translate from:french (text)</code>`,
+			`<code>${prefix}translate from:French (text)</code>`,
+			"Translates the text from a provided language (French here, can use a language code or name) to English.",
+			"The language auto-detection usually works fine. However, if you run into issues or if the text is too short, you can force the source langauge.",
+			"",
 
-		`<code>${prefix}translate to:de (text)</code>`,
-		`<code>${prefix}translate to:german (text)</code>`,
-		`<code>${prefix}translate to:German (text)</code>`,
-		"Translates the text from a auto-detected language to a provided language (German here).",
-		"",
+			`<code>${prefix}translate to:de (text)</code>`,
+			`<code>${prefix}translate to:german (text)</code>`,
+			`<code>${prefix}translate to:German (text)</code>`,
+			"Translates the text from a auto-detected language to a provided language (German here).",
+			"",
 
-		`<code>${prefix}translate to:italian from:swahili (text)</code>`,
-		"Both parameters can be combined together for maximum accuracy.",
-		"",
+			`<code>${prefix}translate to:italian from:swahili (text)</code>`,
+			"Both parameters can be combined together for maximum accuracy.",
+			"",
 
-		`<code>${prefix}translate to:random (text)</code>`,
-		"Translates provided text to a randomly picked, supported language.",
-		"",
+			`<code>${prefix}translate to:random (text)</code>`,
+			"Translates provided text to a randomly picked, supported language.",
+			"",
 
-		`<code>${prefix}translate textOnly:true (text)</code>`,
-		"Translates, and only outputs the result text without any surrounding command result text.",
-		"",
+			`<code>${prefix}translate textOnly:true (text)</code>`,
+			"Translates, and only outputs the result text without any surrounding command result text.",
+			"",
 
-		...TranslateSubcommands.createDescription()
-	]
+			...subcommandDescriptions
+		];
+	}
 });
 
 export default translateCommandDefinition;

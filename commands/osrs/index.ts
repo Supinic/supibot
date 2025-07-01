@@ -32,8 +32,8 @@ const osrsCommandDefinition = declare({
 
 		return await subcommand.execute.call(this, context, ...args);
 	}),
-	Dynamic_Description: function (prefix) {
-		const subcommandsDescription = OsrsSubcommands.createDescription();
+	Dynamic_Description: async function (prefix) {
+		const subcommandsDescription = await OsrsSubcommands.createDescription();
 
 		const aliases: { activity: string; alias: string; }[] = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
