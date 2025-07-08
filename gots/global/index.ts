@@ -16,6 +16,7 @@ export default {
 	options: (() => ({
 		responseType: "json",
 		http2: true,
+		agent: { http2: agent },
 		retry: {
 			limit: 0
 		},
