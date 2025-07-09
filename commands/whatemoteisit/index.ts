@@ -1,10 +1,23 @@
+import { type ContextPlatformSpecificData, declare } from "../../classes/command.js";
+import type { MessageData as TwitchMessageData } from "../../platforms/twitch.js";
+import { filterNonNullable } from "../../utils/ts-helpers.js";
+import { IvrEmoteData } from "../../@types/globals.js";
+import { SupiError } from "supi-core";
+
 const REGEXES = {
 	V1: /^\d+$/,
 	V2: /emotesv2_[a-z0-9]{32}/,
 	CDN: /emoticons\/v[12]\/([\w\d]*)\//
 };
 
-export default {
+const platformHasMessageId = (input: ContextPlatformSpecificData): input is TwitchMessageData => {
+	if (!input) {
+		return false;
+	}
+	return Object.hasOwn(input, "fragments");
+};
+
+export default declare({
 	Name: "whatemoteisit",
 	Aliases: ["weit"],
 	Author: "supinic",
@@ -26,30 +39,25 @@ export default {
 		}
 
 		const messageData = context.platformSpecificData;
-		if (messageData?.emotes) {
-			input = messageData.emotes.split(":")[0];
+		if (platformHasMessageId(messageData)) {
+			const { fragments } = messageData;
+			const eligibleEmoteFragments = filterNonNullable(fragments.map(i => i.emote));
+
+			const firstEmoteFragment = eligibleEmoteFragments.at(0);
+			if (firstEmoteFragment) {
+				input = firstEmoteFragment.id;
+			}
 		}
+
+		const inputEmoteIdentifier = (
+			input.match(REGEXES.CDN)?.[1]
+			?? input.match(REGEXES.V2)?.[0]
+			?? input.match(REGEXES.V1)?.[0]
+			?? args[0]
+		);
 
 		const isEmoteID = (REGEXES.V1.test(input) || REGEXES.V2.test(input) || REGEXES.CDN.test(input));
-
-		let inputEmoteIdentifier;
-		if (isEmoteID) {
-			// Ordering is important here, go from the most → the least specific regex
-			if (REGEXES.CDN.test(input)) {
-				inputEmoteIdentifier = input.match(REGEXES.CDN)[1];
-			}
-			else if (REGEXES.V2.test(input)) {
-				inputEmoteIdentifier = input.match(REGEXES.V2)[0];
-			}
-			else if (REGEXES.V1.test(input)) {
-				inputEmoteIdentifier = input.match(REGEXES.V1)[0];
-			}
-		}
-		else {
-			inputEmoteIdentifier = args[0];
-		}
-
-		const response = await core.Got.get("IVR")({
+		const response = await core.Got.get("IVR")<IvrEmoteData>({
 			url: `v2/twitch/emotes/${encodeURIComponent(inputEmoteIdentifier)}`,
 			searchParams: {
 				id: String(isEmoteID) // literally "true" or "false" based on if the input is an emote ID
@@ -63,17 +71,11 @@ export default {
 				reply: "Emote has not been found!"
 			};
 		}
-		else if (response.statusCode !== 200) {
-			return {
-				success: false,
-				reply: response.body.error.message
-			};
-		}
 
 		const {
 			channelName,
 			channelLogin,
-			// channelID,
+			channelID,
 			emoteAssetType,
 			emoteCode,
 			emoteID,
@@ -82,7 +84,7 @@ export default {
 			emoteType
 		} = response.body;
 
-		const originID = await core.Query.getRecordset(rs => rs
+		const originID = await core.Query.getRecordset<number | undefined>(rs => rs
 			.select("ID")
 			.from("data", "Origin")
 			.where("Emote_ID = %s", emoteID)
@@ -104,6 +106,7 @@ export default {
 		}
 
 		let tierString = "";
+		let emoteLink = "https://twitchemotes.com/";
 		if (emoteType === "SUBSCRIPTIONS") {
 			if (!channelName && !channelLogin) {
 				const tier = (emoteTier) ? `tier ${emoteTier}` : "";
@@ -111,20 +114,29 @@ export default {
 					reply: `${emoteCode} (ID ${emoteID}) - ${active} ${tier} emote to an unknown banned/deleted channel. ${cdnLink} ${originString}`
 				};
 			}
-			else if (channelName !== null) {
+			else if (channelName && channelLogin) {
 				let channelString = `@${channelName}`;
 				if (channelName.toLowerCase() !== channelLogin.toLowerCase()) {
 					channelString = `@${channelLogin} (${channelName})`;
 				}
 
+				emoteLink += `channels/${channelID}/emotes/${emoteID}`;
 				tierString = `tier ${emoteTier} ${emoteAssetType.toLowerCase()} sub emote to channel ${channelString}`;
+			}
+			else {
+				throw new SupiError({
+				    message: "Assert error: Unexpected emote type + data combination",
+					args: { data: response.body }
+				});
 			}
 		}
 		else if (emoteType === "GLOBALS") {
+			emoteLink += `global/emotes/${emoteID}`;
 			tierString = "global Twitch emote";
 		}
 		else {
-			tierString = `${emoteAssetType?.toLowerCase() ?? ""} ${emoteType?.toLowerCase() ?? ""} ${channelName ?? ""} emote`;
+			emoteLink += `channels/${channelID}/emotes/${emoteID}`;
+			tierString = `${emoteAssetType.toLowerCase()} ${emoteType.toLowerCase()} ${channelName ?? ""} emote`;
 		}
 
 		if (context.params.noLinks) {
@@ -133,11 +145,10 @@ export default {
 			};
 		}
 		else {
-			const emoteLink = `https://emotes.awoo.nl/twitch/emote/${emoteID}`;
 			return {
 				reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 			};
 		}
 	}),
 	Dynamic_Description: null
-};
+});
