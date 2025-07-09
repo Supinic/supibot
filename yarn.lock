@@ -937,6 +937,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/xml2js@npm:^0.4.14":
+  version: 0.4.14
+  resolution: "@types/xml2js@npm:0.4.14"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/06776e7f7aec55a698795e60425417caa7d7db3ff680a7b4ccaae1567c5fec28ff49b9975e9a0d74ff4acb8f4a43730501bbe64f9f761d784c6476ba4db12e13
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:8.34.0":
   version: 8.34.0
   resolution: "@typescript-eslint/eslint-plugin@npm:8.34.0"
@@ -4973,6 +4982,7 @@ supi-db-init@supinic/supi-db-init:
     "@babel/eslint-parser": "npm:^7.27.5"
     "@discordjs/formatters": "npm:^0.6.1"
     "@jprochazk/roll-dice": "npm:^0.4.2"
+    "@types/xml2js": "npm:^0.4.14"
     acorn-node: "npm:^2.0.1"
     async-markov: supinic/async-markov
     bing-chat: "npm:^0.2.3"

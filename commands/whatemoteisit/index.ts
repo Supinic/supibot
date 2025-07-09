@@ -120,7 +120,8 @@ export default declare({
 					channelString = `@${channelLogin} (${channelName})`;
 				}
 
-				emoteLink += `channels/${channelID}/emotes/${emoteID}`;
+				emoteLink += `channels/${channelID}`;
+				// emoteLink += `channels/${channelID}/emotes/${emoteID}`;
 				tierString = `tier ${emoteTier} ${emoteAssetType.toLowerCase()} sub emote to channel ${channelString}`;
 			}
 			else {
@@ -135,7 +136,7 @@ export default declare({
 			tierString = "global Twitch emote";
 		}
 		else {
-			emoteLink += `channels/${channelID}/emotes/${emoteID}`;
+			emoteLink += `channels/${channelID}`;
 			tierString = `${emoteAssetType.toLowerCase()} ${emoteType.toLowerCase()} ${channelName ?? ""} emote`;
 		}
 
