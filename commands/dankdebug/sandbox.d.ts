@@ -1,11 +1,11 @@
-import type { JSONifiable, Emote } from "../../@types/globals";
-import type { Command, Parameter } from "../../@types/classes/command";
-import type { Channel } from "../../@types/classes/channel";
-import type { Platform } from "../../@types/platforms/template";
-import type { User, Permissions as UserPermissions } from "../../@types/classes/user";
+import type { JSONifiable, Emote } from "../../@types/globals.d.ts"
+import type { Command, ParameterType } from "../../classes/command.js"
+import type { Channel } from "../../classes/channel.js"
+import type { User, permissions as Permissions } from "../../classes/user.js"
 
-import type { Utils } from "supi-core/@types/types";
-declare type UtilsSingleton = Utils.Utils;
+import type { Platform } from "../../platforms/template.js"
+
+import type { Utils } from "supi-core";
 
 // import * as Util from "util";
 
@@ -54,7 +54,7 @@ declare namespace DankDebug {
 		 * Takes a string value, and parses it according to the provided type.
 		 * This is the underlying function used to parse parameters for all supibot commands.
 		 */
-		parseParameter: (value: string, type: Parameter.Type) => ReturnType<typeof Command.parseParameter>;
+		parseParameter: (value: string, type: ParameterType) => ReturnType<typeof Command.parseParameter>;
 
 		/**
 		 * Parses parameters from arguments in the same manner supibot does for commands.
@@ -67,58 +67,58 @@ declare namespace DankDebug {
 		/**
 		 * Capitalizes the string's first letter.
 		 */
-		capitalize: UtilsSingleton["capitalize"];
+		capitalize: Utils["capitalize"];
 
 		/**
 		 * Returns a random array element.
 		 */
-		randArray: UtilsSingleton["randArray"];
+		randArray: Utils["randArray"];
 
 		/**
 		 * Returns a random integer between min and max, inclusively.
 		 */
-		random: UtilsSingleton["random"];
+		random: Utils["random"];
 
 		/**
 		 * Creates a random string using the characters provided, or the base ASCII alphabet.
 		 */
-		randomString: UtilsSingleton["randomString"];
+		randomString: Utils["randomString"];
 
 		/**
 		 * Removes all (central European?) accents from a string.
 		 */
-		removeAccents: UtilsSingleton["removeAccents"];
+		removeAccents: Utils["removeAccents"];
 
 		/**
 		 * Creates a shallow copy of the array with elements shuffled around randomly.
 		 */
-		shuffleArray: UtilsSingleton["shuffleArray"];
+		shuffleArray: Utils["shuffleArray"];
 
 		/**
 		 * Returns a formatted string, specifying an amount of time delta from current date to provided date.
 		 */
-		timeDelta: UtilsSingleton["timeDelta"];
+		timeDelta: Utils["timeDelta"];
 
 		/**
 		 * Trims all redundant and duplicated whitespace from the provided string.
 		 * Uses a tag-function syntax, and should be used with template strings directly.
 		 */
-		trim: UtilsSingleton["tag"]["trim"];
+		trim: Utils["tag"]["trim"];
 
 		/**
 		 * Wraps the input string into the given amount of characters, discarding the rest.
 		 */
-		wrapString: UtilsSingleton["wrapString"];
+		wrapString: Utils["wrapString"];
 
 		/**
 		 * Pads a number with specified number of zeroes.
 		 */
-		zf: UtilsSingleton["zf"];
+		zf: Utils["zf"];
 
 		/**
 		 * Returns the best fit for given string, based on Levenshtein distance.
 		 */
-		selectClosestString: UtilsSingleton["selectClosestString"];
+		selectClosestString: Utils["selectClosestString"];
 	}
 
 	/** Supported primitive value types, used to construct the full value types later */
@@ -187,8 +187,8 @@ declare namespace DankDebug {
 	}
 
 	export interface SupibotPermissions {
-		get (): UserPermissions.Value;
-		is (level: UserPermissions.Level): boolean;
+		get (): Permissions[keyof Permissions];
+		is (level: keyof Permissions): boolean;
 	}
 
 	/**

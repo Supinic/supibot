@@ -45,7 +45,7 @@ type ParameterValueMap = {
 	regex: RegExp;
 	language: Language;
 };
-type ParameterType = keyof ParameterValueMap;
+export type ParameterType = keyof ParameterValueMap;
 type ParameterValue = ParameterValueMap[ParameterType];
 type ParameterDefinition = {
 	readonly name: string;
