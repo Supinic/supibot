@@ -5,7 +5,10 @@ import { isGotRequestError } from "supi-core";
 import config from "../../config.json" with { type: "json" };
 const { defaultUserAgent } = config.modules.gots;
 
-const agent = new Agent();
+const agent = new Agent({
+	maxEmptySessions: 100,
+	maxCachedTlsSessions: 250
+});
 agent.on("session", (session: Http2Session) => {
 	session.on("goaway", () => session.destroy());
 });
