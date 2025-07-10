@@ -128,3 +128,27 @@ export type IvrClipData = {
     };
 }
 
+type IvrEmoteSuccess = {
+    error: undefined;
+    channelName: string | null;
+    channelLogin: string | null;
+    channelID: string | null;
+    artist: string | null;
+    emoteID: string;
+    emoteCode: string;
+    emoteURL: string;
+    emoteSetID: string;
+    emoteAssetType: string;
+    emoteState: string;
+    emoteType: string;
+    emoteTier: "1" | "2" | "3" | null;
+};
+type IvrEmoteFailure = {
+    emoteID: undefined;
+    statusCode: number;
+    error: {
+        message: string;
+    };
+};
+export type IvrEmoteData = IvrEmoteSuccess | IvrEmoteFailure;
+
