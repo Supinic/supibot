@@ -652,7 +652,11 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		if (!response.ok) {
 			const data = JSON.stringify({
 				body: response.body,
-				statusCode: response.statusCode
+				statusCode: response.statusCode,
+				message: trimmedMessage,
+				rawMessage: message,
+				// eslint-disable-next-line unicorn/error-message
+				stack: new Error().stack?.split(/\r?\n/)
 			});
 
 			await sb.Logger.log("Twitch.Warning", data, null, userData);
