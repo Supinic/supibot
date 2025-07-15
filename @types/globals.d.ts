@@ -86,14 +86,14 @@ type BaseIvrUserData = {
     } | null;
     panels: { id: string; }[];
 }
-type NormaIvrUserData = BaseIvrUserData & {
+type RegularIvrUserData = BaseIvrUserData & {
     banned: false;
 };
 type BannedIvrUserData = BaseIvrUserData & {
     banned: true;
     banReason: "TOS_INDEFINITE" | "TOS_TEMPORARY" | "DMCA" | "DEACTIVATED";
 };
-export type IvrUserData = NormaIvrUserData | BannedIvrUserData;
+export type IvrUserData = RegularIvrUserData | BannedIvrUserData;
 
 export type IvrClipData = {
     clipKey: string | null;
@@ -105,7 +105,7 @@ export type IvrClipData = {
       url: string;
       tiny: string;
       small: string;
-      medim: string;
+      medium: string;
       createdAt: string;
       viewCount: number;
       game: {
