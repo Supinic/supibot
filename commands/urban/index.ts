@@ -1,5 +1,32 @@
+import { declare } from "../../classes/command.js";
+
 const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
-const prepareItemStrings = (item) => {
+
+type UrbanItem = {
+	author: string;
+	current_vote: string;
+	defid: number;
+	definition: string;
+	example: string;
+	permalink: string;
+	thumbs_up: number;
+	thumbs_down: number;
+	word: string;
+	written_on: string; // Date string
+};
+type UrbanResponse = {
+	list: UrbanItem[];
+};
+
+type UrbanAutocompleteItem = {
+	preview: string;
+	term: string;
+};
+type UrbanAutocompleteResponse = {
+	results: UrbanAutocompleteItem[];
+};
+
+const prepareItemStrings = (item: UrbanItem) => {
 	const url = new URL(item.permalink);
 	// const id = url.pathname.replace("/", ""); // Looks like this no longer works as of cca. 2025-07-06
 	const id = url.searchParams.get("defid");
@@ -14,10 +41,9 @@ const prepareItemStrings = (item) => {
 	return { link, content, thumbs };
 };
 
-export default {
+export default declare({
 	Name: "urban",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the top definition of a given term from Urban Dictionary. You can append \"index:#\" at the end to access definitions that aren't first in the search.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
@@ -27,7 +53,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function urban (context, ...args) {
 		if (args.length === 0 || args[0] === "random") {
-			const randomResponse = await core.Got.get("GenericAPI")({
+			const randomResponse = await core.Got.get("GenericAPI")<UrbanResponse>({
 				url: "https://api.urbandictionary.com/v0/random"
 			});
 
@@ -42,7 +68,7 @@ export default {
 		}
 
 		const term = args.join(" ").toLowerCase();
-		const response = await core.Got.get("GenericAPI")({
+		const response = await core.Got.get("GenericAPI")<UrbanResponse>({
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
 				api_key: URBAN_FAUX_ACCESS_KEY,
@@ -58,7 +84,7 @@ export default {
 		});
 
 		if (response.statusCode === 500) {
-			const autocompleteResponse = await core.Got.get("GenericAPI")({
+			const autocompleteResponse = await core.Got.get("GenericAPI")<UrbanAutocompleteResponse>({
 				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
 				searchParams: {
 					api_key: URBAN_FAUX_ACCESS_KEY,
@@ -89,10 +115,10 @@ export default {
 			}
 		}
 
-		if (!response.body.list || response.body.result_type === "no_results") {
+		if (response.body.list.length === 0) {
 			return {
 				success: false,
-				reply: "No results found!"
+				reply: "No such definition exists!"
 			};
 		}
 
@@ -100,14 +126,12 @@ export default {
 			.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase())
 			.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
-		const index = context.params.index ?? null;
-		const item = items[index ?? 0];
+		const index = context.params.index ?? 0;
+		const item = items.at(index);
 		if (!item) {
 			return {
 				success: false,
-				reply: (items.length === 0)
-					? `No such definition exists!`
-					: `No definition with index ${index ?? 0}! Maximum available: ${items.length - 1}.`
+				reply: `No definition with index ${index}! Maximum available: ${items.length - 1}.`
 			};
 		}
 
@@ -118,7 +142,7 @@ export default {
 				: `${thumbs} ${content}`
 		};
 	}),
-	Dynamic_Description: async () => [
+	Dynamic_Description: () => [
 		`Queries <a href="//urbandictionary.com">UrbanDictionary.com</a> for a definition of a word or aterm.`,
 		"If you don't provide a word or use \"random\", a random term will be rolled and posted.",
 		"",
@@ -136,4 +160,4 @@ export default {
 		`<code>$urban random</code>`,
 		`Returns the definition of a random term`
 	]
-};
+});
