@@ -1,7 +1,8 @@
 const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
 const prepareItemStrings = (item) => {
 	const url = new URL(item.permalink);
-	const id = url.pathname.replace("/", "");
+	// const id = url.pathname.replace("/", ""); // Looks like this no longer works as of cca. 2025-07-06
+	const id = url.searchParams.get("defid");
 	const link = `https://urbanup.com/${id}`;
 
 	const thumbs = `(+${item.thumbs_up}/-${item.thumbs_down})`;
