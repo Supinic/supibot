@@ -133,7 +133,7 @@ export default tseslint.config(
 				consistent: true
 			}],
 			"object-curly-spacing": ["warn", "always", {
-				arraysInObjects: false,
+				arraysInObjects: true,
 				objectsInObjects: true
 			}],
 			"object-property-newline": ["warn", {
@@ -241,6 +241,25 @@ export default tseslint.config(
 
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error"
+		}
+	},
+	{
+		files: ["tests/**/*.{test,spec}.ts"],
+		languageOptions: {
+			globals: {
+				test: "readonly",
+				describe: "readonly",
+				it: "readonly",
+				before: "readonly",
+				beforeEach: "readonly",
+				after: "readonly",
+				afterEach: "readonly"
+			}
+		},
+		rules: {
+			"max-nested-callbacks": "off",
+			"unicorn/prefer-module": "off",
+			"import/extensions": "off"
 		}
 	}
 );

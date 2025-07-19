@@ -91,7 +91,7 @@ export default {
 					};
 				}
 			}
-			else if (commandData.Flags.includes("externalInput")) {
+			else if (commandData.Flags.includes("external-input")) {
 				hasExternalInput = true;
 			}
 
