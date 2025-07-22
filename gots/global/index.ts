@@ -1,5 +1,17 @@
+import { Agent } from "http2-wrapper";
+import type { Http2Session } from "node:http2";
+import { isGotRequestError } from "supi-core";
+
 import config from "../../config.json" with { type: "json" };
 const { defaultUserAgent } = config.modules.gots;
+
+const agent = new Agent({
+	maxEmptySessions: 100,
+	maxCachedTlsSessions: 250
+});
+agent.on("session", (session: Http2Session) => {
+	session.on("goaway", () => session.destroy());
+});
 
 export default {
 	name: "Global",
@@ -7,6 +19,7 @@ export default {
 	options: (() => ({
 		responseType: "json",
 		http2: true,
+		agent: { http2: agent },
 		retry: {
 			limit: 0
 		},
@@ -20,8 +33,11 @@ export default {
 		},
 		hooks: {
 			beforeError: [
-				async (err) => {
-					if (!err || err.code !== "ETIMEDOUT" || typeof globalThis?.sb?.Logger?.logError !== "function") {
+				async (err: unknown) => {
+					if (!isGotRequestError(err)) {
+						return err;
+					}
+					else if (err.code !== "ETIMEDOUT") {
 						return err;
 					}
 
@@ -29,11 +45,10 @@ export default {
 						origin: "External",
 						context: {
 							code: err.code,
-							responseType: err.options?.responseType ?? null,
-							timeout: err.options?.timeout ?? null,
-							url: err.options?.url?.toString?.() ?? null
-						},
-						arguments: null
+							responseType: err.options.responseType,
+							timeout: err.options.timeout,
+							url: err.options.url?.toString() ?? null
+						}
 					});
 
 					return err;
