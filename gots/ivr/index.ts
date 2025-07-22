@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "IVR",
 	optionsType: "object",
@@ -6,4 +8,4 @@ export default {
 	},
 	parent: "Global",
 	description: "IVR"
-};
+} satisfies GotInstanceDefinition;
