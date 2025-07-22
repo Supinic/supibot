@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "Supibot",
 	optionsType: "function",
@@ -11,5 +13,5 @@ export default {
 		};
 	}),
 	parent: "Global",
-	description: null
-};
+	description: "Instance for the internal Supibot API, for the purpose of self-reference, configurable"
+} satisfies GotInstanceDefinition;

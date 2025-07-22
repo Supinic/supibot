@@ -1,10 +1,12 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "Google",
 	optionsType: "object",
 	options: {
 		prefixUrl: "https://maps.googleapis.com/maps/api",
-		throwHttpError: true
+		throwHttpErrors: true
 	},
 	parent: "Global",
-	description: null
-};
+	description: "Google instance for the Maps API"
+} satisfies GotInstanceDefinition;
