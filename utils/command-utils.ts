@@ -215,19 +215,20 @@ type GoogleAddressComponent = {
 	short_name: string;
 	types: string[];
 };
+type GoogleCoordinates = { lat: number; lng: number; };
 type GoogleGeoData = {
 	address_components: GoogleAddressComponent[];
 	formatted_address: string;
 	geometry: {
 		bounds: {
-			northeast: Coordinates;
-			southwest: Coordinates;
+			northeast: GoogleCoordinates;
+			southwest: GoogleCoordinates;
 		};
-		location: Coordinates;
+		location: GoogleCoordinates;
 		location_type: string;
 		viewport: {
-			northeast: Coordinates;
-			southwest: Coordinates;
+			northeast: GoogleCoordinates;
+			southwest: GoogleCoordinates;
 		};
 	};
 	place_id: string;
@@ -261,7 +262,7 @@ export const fetchGeoLocationData = async (query: string) => {
 		return {
 			success: false,
 			cause: response.body.status
-		};
+		} as const;
 	}
 
 	const results = response.body.results;

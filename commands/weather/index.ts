@@ -1,11 +1,23 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
+import { SupiDate, SupiError } from "supi-core";
 
+import { declare } from "../../classes/command.js";
+import { fetchGeoLocationData, postToHastebin } from "../../utils/command-utils.js";
 import weatherCodeData from "./codes.json" with { type: "json" };
-import { getIcon, getWindDirection } from "./helpers.js";
-import { postToHastebin } from "../../utils/command-utils.js";
 
-const { codes } = weatherCodeData;
+import {
+	getIcon,
+	getWindDirection,
+	isCurrentItem, isDailyItem,
+	isHourlyItem,
+	OwmPollutionResponse,
+	OwmWeatherResponse,
+	WeatherDataItem
+} from "./helpers.js";
+
+
+const { codes } = weatherCodeData as { codes: Record<string, string> };
 const shell = promisify(exec);
 
 const ALLOWED_FORMAT_TYPES = [
@@ -28,10 +40,9 @@ const POLLUTION_INDEX_ICONS = {
 	5: "🔴"
 };
 
-export default {
+export default declare({
 	Name: "weather",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the current weather in a given location. You can specify parameters to check the forecast, or mention a user to get their location, if they set it up. Check all possibilities in extended help.",
 	Flags: ["mention","non-nullable","pipe"],
@@ -43,47 +54,55 @@ export default {
 		{ name: "pollution", type: "boolean" },
 		{ name: "status", type: "string" },
 		{ name: "radar", type: "boolean" }
-	],
+	] as const,
 	Whitelist_Response: null,
 	Code: (async function weather (context, ...args) {
 		if (!process.env.API_GOOGLE_GEOCODING) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No Google geocoding key configured (API_GOOGLE_GEOCODING)"
 			});
 		}
 		if (!process.env.API_OPEN_WEATHER_MAP) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No OpenWeatherMap key configured (API_OPEN_WEATHER_MAP)"
 			});
 		}
 
-		let number = null;
-		let type = "current";
+		// @todo reformat this mess
+		let weatherTime:
+			| { number: null; type: "current"; }
+			| { number: number; type: "hourly" | "daily"; }
+		= { number: null, type: "current" };
+
 		const weatherRegex = /\b(hour|day)\+(\d+)$/;
 		const historyRegex = /-\s*\d/;
 
 		if (args.length > 0) {
-			const last = args.at(-1);
+			const last = args.at(-1) as string; // Fully known because of array length check above
 			if (historyRegex.test(last)) {
 				return {
 					success: false,
 					reply: "Checking for weather history is not currently implemented"
 				};
 			}
-			else if (args && weatherRegex.test(last)) {
-				const match = args.pop().match(weatherRegex);
-				if (!match[1] || !match[2]) {
+
+			const weatherMatch = last.match(weatherRegex);
+			if (weatherMatch) {
+				args.pop();
+
+				if (!weatherMatch[1] || !weatherMatch[2]) {
 					return {
 						success: false,
 						reply: `Invalid syntax of hour/day parameters!`
 					};
 				}
 
-				number = Number(match[2]);
-				if (match[1] === "day") {
+				let type: "daily" | "hourly";
+				const number = Number(weatherMatch[2]);
+				if (weatherMatch[1] === "day") {
 					type = "daily";
 				}
-				else if (match[1] === "hour") {
+				else if (weatherMatch[1] === "hour") {
 					type = "hourly";
 				}
 				else {
@@ -92,13 +111,15 @@ export default {
 						reply: "Invalid combination of parameters! Use day+# or hour+#"
 					};
 				}
+
+				weatherTime = { type, number };
 			}
 		}
 
 		let skipLocation = false;
-		let coords = null;
-		let formattedAddress = null;
-		let isOwnLocation = null;
+		let coords: { lat: number; lng: number; } | null = null;
+		let formattedAddress: string | null = null;
+		let isOwnLocation: boolean | null = null;
 
 		if (typeof context.params.latitude === "number" || typeof context.params.longitude === "number") {
 			const { latitude, longitude } = context.params;
@@ -144,22 +165,6 @@ export default {
 				};
 			}
 		}
-		else if (args[0].toLowerCase().replace(/^@/, "") === "supibot") {
-			try {
-				const result = await shell("vcgencmd measure_temp");
-				const temperature = `${result.stdout.toString().match(/([\d.]+)/)[1]}°C`;
-
-				return {
-					reply: `Supibot, Supinic's LACK table: ${temperature}. No wind detected. No precipitation expected.`
-				};
-			}
-			catch {
-				return {
-					success: false,
-					reply: `Supibot, Supinic's LACK table: Unknown temperature, something is wrong with the configuration!`
-				};
-			}
-		}
 		else if (args[0].startsWith("@")) {
 			const userData = await sb.User.get(args[0]);
 			isOwnLocation = (userData === context.user);
@@ -173,12 +178,31 @@ export default {
 				};
 			}
 
+			if (userData.Name === context.platform.selfName) {
+				let temperature;
+				try {
+					const result = await shell("vcgencmd measure_temp");
+					const temperatureMatch = result.stdout.toString().match(/([\d.]+)/);
+					if (temperatureMatch) {
+						temperature = `${temperatureMatch[1]}°C`;
+					}
+				}
+				catch (e) {
+					console.warn(e);
+					temperature = "Unknown temperature";
+				}
+
+				return {
+					reply: `Supibot, Supinic's LACK table: ${temperature}. No wind detected. No precipitation expected.`
+				};
+			}
+
 			const location = await userData.getDataProperty("location");
 			if (!location) {
 				return {
 					reply: "That user did not set their location!",
 					cooldown: {
-						length: 1000
+						length: 2500
 					}
 				};
 			}
@@ -189,7 +213,7 @@ export default {
 			}
 		}
 
-		if (!coords) {
+		if (!coords || !formattedAddress) {
 			if (args.length === 0) {
 				return {
 					reply: "No place provided!",
@@ -197,33 +221,29 @@ export default {
 				};
 			}
 
+			type GeoCacheData = { empty: true } | {
+				empty: false;
+				formattedAddress: string;
+				coords: { lat: number; lng: number; };
+			};
+
 			const location = args.join(" ");
 			const geoKey = {
 				type: "coordinates",
 				location
 			};
 
-			let geoData = await this.getCacheData(geoKey);
+			let geoData = await this.getCacheData(geoKey) as GeoCacheData | undefined;
 			if (!geoData) {
-				const response = await core.Got.get("GenericAPI")({
-					url: "https://maps.googleapis.com/maps/api/geocode/json",
-					responseType: "json",
-					throwHttpErrors: false,
-					searchParams: {
-						key: process.env.API_GOOGLE_GEOCODING,
-						address: args.join(" ")
-					}
-				});
-
-				if (!response.body.results[0]) {
+				const data = await fetchGeoLocationData(args.join(" "));
+				if (!data.success) {
 					geoData = { empty: true };
 				}
 				else {
-					const [result] = response.body.results;
 					geoData = {
 						empty: false,
-						formattedAddress: result.formatted_address,
-						coords: result.geometry.location
+						formattedAddress: data.formatted,
+						coords: data.location
 					};
 				}
 
@@ -285,7 +305,7 @@ export default {
 		}
 
 		if (context.params.pollution) {
-			const response = await core.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")<OwmPollutionResponse>({
 				url: "https://api.openweathermap.org/data/2.5/air_pollution",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -301,6 +321,7 @@ export default {
 
 			const [data] = response.body.list;
 			const index = data.main.aqi;
+
 			const { components } = data;
 			const place = (skipLocation) ? "(location hidden)" : formattedAddress;
 			const icon = POLLUTION_INDEX_ICONS[index];
@@ -318,9 +339,9 @@ export default {
 		}
 
 		const weatherKey = { type: "weather", coords: `${coords.lat}-${coords.lng}` };
-		let data = await this.getCacheData(weatherKey);
+		let data = await this.getCacheData(weatherKey) as OwmWeatherResponse | undefined;
 		if (!data) {
-			const response = await core.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")<OwmWeatherResponse>({
 				url: "https://api.openweathermap.org/data/3.0/onecall",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -367,25 +388,25 @@ export default {
 			}
 
 			const hastebinKey = { type: "hastebin", coords: `${coords.lat}-${coords.lng}` };
-			let hastebinLink = await this.getCacheData(hastebinKey);
+			let hastebinLink = await this.getCacheData(hastebinKey) as string | undefined;
 			if (!hastebinLink) {
 				const text = data.alerts.map(i => {
-					const start = new sb.Date(i.start * 1000).setTimezoneOffset(data.timezone_offset / 60);
-					const end = new sb.Date(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
+					const start = new SupiDate(i.start * 1000).setTimezoneOffset(data.timezone_offset / 60);
+					const end = new SupiDate(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
 					const tags = (!i.tags || i.tags.length === 0)
 						? ""
 						: `-- ${i.tags.sort().join(", ")}`;
 
 					return [
 						`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
-						i.event ?? "(no event specified)",
+						(i.event ?? "(no event specified)"),
 						`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
-						`${i.description ?? "(no description)"}`
+						(i.description ?? "(no description)")
 					].join("\n");
 				}).join("\n\n");
 
 				const paste = await postToHastebin(text, {
-					name: (skipLocation)
+					title: (skipLocation)
 						? `Weather alerts - private location`
 						: `Weather alerts - ${formattedAddress}`
 				});
@@ -405,7 +426,7 @@ export default {
 				if (isOwnLocation) {
 					await context.platform.pm(
 						`Your location's weather alerts: ${hastebinLink}`,
-						context.user.Name,
+						context.user,
 						context.channel
 					);
 
@@ -425,62 +446,46 @@ export default {
 			else {
 				return {
 					reply: core.Utils.tag.trim `
-						Weather alert summary for
-						${(skipLocation) ? "(location hidden)" : formattedAddress}
-						- 
-						${data.alerts.length} alerts 
-						-
+						Weather alert summary for ${formattedAddress} - 
+						${data.alerts.length} alerts -
 						full info: ${hastebinLink}
 					`
 				};
 			}
 		}
 
-		let target;
-		if (type === "current") {
+		let target: WeatherDataItem;
+		if (weatherTime.type === "current") {
 			target = data.current;
 		}
-		else if (type === "hourly") {
-			target = data.hourly[number];
-
-			if (!target) {
+		else if (weatherTime.type === "hourly") {
+			const hourlyTarget = data.hourly.at(weatherTime.number);
+			if (!hourlyTarget) {
 				return {
 					success: false,
 					reply: `Invalid hour offset provided! Use a number between 0 and ${data.hourly.length - 1}.`
 				};
 			}
-		}
-		else if (type === "daily") {
-			target = data.daily[number];
 
-			if (!target) {
+			target = hourlyTarget;
+		}
+		else {
+			const dailyTarget = data.daily.at(weatherTime.number);
+			if (!dailyTarget) {
 				return {
 					success: false,
 					reply: `Invalid day offset provided! Use a number between 0 and ${data.daily.length - 1}.`
 				};
 			}
-		}
 
-		if (!target) {
-			const json = JSON.stringify(data);
-			await sb.Logger.log(
-				"Command.Fail",
-				`No "target" variable in $weather: ${json}`,
-				context.channel,
-				context.user
-			);
-
-			return {
-				success: false,
-				reply: `Cannot get any weather data! Please let @Supinic know about this via the $suggest command.`
-			};
+			target = dailyTarget;
 		}
 
 		const icon = (context.params.status === "text")
-			? codes[target.weather[0].id]
+			? (codes[String(target.weather[0].id)] ?? "(unknown icon)")
 			: getIcon(target.weather[0].id, target);
 
-		const obj = {
+		const obj: Record<string, string> = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
 			icon,
 			cloudCover: `Cloud cover: ${target.clouds}%.`,
@@ -492,51 +497,18 @@ export default {
 			windGusts: (target.wind_gust)
 				? `Wind gusts: up to ${target.wind_gust} m/s.`
 				: "No wind gusts.",
+			precipitation: "No precipitation right now.",
 			sun: ""
 		};
 
-		if (type === "current") {
-			const rain = target.rain?.["1h"] ?? target.rain ?? null;
-			const snow = target.snow?.["1h"] ?? target.snow ?? null;
-
-			if (rain && snow) {
-				obj.precipitation = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
-			}
-			else if (rain) {
-				obj.precipitation = `It is currently raining, ${rain}mm/h.`;
-			}
-			else if (snow) {
-				obj.precipitation = `It is currently snowing, ${snow}mm/h.`;
-			}
-			else {
-				const start = new sb.Date().discardTimeUnits("s", "ms");
-				for (const { dt, precipitation: pr } of (data.minutely ?? [])) {
-					if (pr !== 0) {
-						const when = new sb.Date(dt * 1000).discardTimeUnits("s", "ms");
-						const minuteIndex = Math.trunc(when - start) / 60_000;
-						if (minuteIndex < 1) {
-							obj.precipitation = "Precipitation expected in less than a minute!";
-						}
-						else {
-							const plural = (minuteIndex === 1) ? "" : "s";
-							obj.precipitation = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
-						}
-
-						break;
-					}
-				}
-
-				obj.precipitation ??= "No precipitation right now.";
-			}
-		}
-		else if (type === "hourly" || type === "daily") {
+		if (isDailyItem(target) || isHourlyItem(target)) {
 			if (target.pop === 0) {
 				obj.precipitation = "No precipitation expected.";
 			}
 			else {
 				const percent = `${core.Utils.round(target.pop * 100, 0)}%`;
-				const rain = target.rain?.["1h"] ?? target.rain ?? null;
-				const snow = target.snow?.["1h"] ?? target.snow ?? null;
+				const rain = (isDailyItem(target)) ? target.rain : target.rain?.["1h"];
+				const snow = (isDailyItem(target)) ? target.snow : target.snow?.["1h"];
 
 				if (rain && snow) {
 					obj.precipitation = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
@@ -552,17 +524,49 @@ export default {
 				}
 			}
 		}
+		else if (isCurrentItem(target)) {
+			const rain = target.rain?.["1h"] ?? null;
+			const snow = target.snow?.["1h"] ?? null;
 
-		if (type === "current" || type === "hourly") {
+			if (rain && snow) {
+				obj.precipitation = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
+			}
+			else if (rain) {
+				obj.precipitation = `It is currently raining, ${rain}mm/h.`;
+			}
+			else if (snow) {
+				obj.precipitation = `It is currently snowing, ${snow}mm/h.`;
+			}
+			else {
+				const start = new SupiDate().discardTimeUnits("s", "ms");
+				for (const { dt, precipitation: pr } of data.minutely) {
+					if (pr !== 0) {
+						const when = new SupiDate(dt * 1000).discardTimeUnits("s", "ms").valueOf();
+						const minuteIndex = Math.trunc(when - start.valueOf()) / 60_000;
+						if (minuteIndex < 1) {
+							obj.precipitation = "Precipitation expected in less than a minute!";
+						}
+						else {
+							const plural = (minuteIndex === 1) ? "" : "s";
+							obj.precipitation = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
+						}
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (isCurrentItem(target) || isHourlyItem(target)) {
 			obj.temperature = `${target.temp}°C, feels like ${target.feels_like}°C.`;
 		}
-		else if (type === "daily") {
+		else if (isDailyItem(target)) {
 			obj.temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
 		}
 
-		if (type === "current" && !skipLocation) {
-			const nowSeconds = sb.Date.now() / 1000;
-			let verb;
+		if (isCurrentItem(target) && !skipLocation) {
+			const nowSeconds = SupiDate.now() / 1000;
+			let verb: "rise" | "set";
 			let sunTime;
 
 			if (nowSeconds < data.current.sunrise) {
@@ -584,7 +588,7 @@ export default {
 			else {
 				// Determine if the Sun is down or up based on UV index
 				verb = (data.current.uvi === 0) ? "rise" : "set";
-				const property = `sun${verb}`;
+				const property: "sunrise" | "sunset" = `sun${verb}`;
 
 				let time;
 				for (const day of data.daily) {
@@ -605,17 +609,17 @@ export default {
 
 		let weatherAlert = "";
 		if (data.alerts && data.alerts.length !== 0) {
-			const targetTime = new sb.Date();
-			if (type === "hourly") {
-				targetTime.addHours(number);
+			const targetTime = new SupiDate();
+			if (weatherTime.type === "hourly") {
+				targetTime.addHours(weatherTime.number);
 			}
-			else if (type === "daily") {
-				targetTime.addDays(number);
+			else if (weatherTime.type === "daily") {
+				targetTime.addDays(weatherTime.number);
 			}
 
 			const relevantAlerts = data.alerts.filter(i => {
-				const start = new sb.Date(i.start * 1000);
-				const end = new sb.Date(i.end * 1000);
+				const start = new SupiDate(i.start * 1000);
+				const end = new SupiDate(i.end * 1000);
 
 				return (start <= targetTime && end >= targetTime);
 			});
@@ -630,16 +634,16 @@ export default {
 		}
 
 		let plusTime;
-		if (typeof number === "number") {
-			const time = new sb.Date(target.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
-			if (type === "hourly") {
+		if (typeof weatherTime.number === "number") {
+			const time = new SupiDate(target.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
+			if (weatherTime.type === "hourly") {
 				plusTime = ` (${time.format("H:00")} local time)`;
 			}
 			else {
 				plusTime = ` (${time.format("j.n.")} local date)`;
 			}
 		}
-		else if (type === "current") {
+		else {
 			plusTime = " (now)";
 		}
 
@@ -691,79 +695,77 @@ export default {
 			};
 		}
 	}),
-	Dynamic_Description: (async function (prefix) {
-		return [
-			"Checks for current weather, or for hourly/daily forecast in a given location.",
-			"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
-			"",
+	Dynamic_Description: (prefix) => ([
+		"Checks for current weather, or for hourly/daily forecast in a given location.",
+		"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
+		"",
 
-			`<code>${prefix}weather (place)</code>`,
-			"current weather in given location",
-			"",
+		`<code>${prefix}weather (place)</code>`,
+		"current weather in given location",
+		"",
 
-			`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-			"weather forecast in X hour(s) - accepts 0 (this hour) through 48 (in 2 days).",
-			"",
+		`<code>${prefix}weather (place) <b>hour+X</b></code>`,
+		"weather forecast in X hour(s) - accepts 0 (this hour) through 48 (in 2 days).",
+		"",
 
-			`<code>${prefix}weather (place) <b>day+X</b></code>`,
-			"weather forecast in X day(s) - accepts 0 (today) through 7 (next week).",
-			"",
+		`<code>${prefix}weather (place) <b>day+X</b></code>`,
+		"weather forecast in X day(s) - accepts 0 (today) through 7 (next week).",
+		"",
 
-			`<code>${prefix}weather (place) alerts:true</code>`,
-			"Posts a summary of all weather alerts for the provided location - for the next 7 days.",
-			"",
+		`<code>${prefix}weather (place) alerts:true</code>`,
+		"Posts a summary of all weather alerts for the provided location - for the next 7 days.",
+		"",
 
-			`<code>${prefix}weather (place) pollution:true</code>`,
-			"Posts a summary of the current pollution for the provided location.",
-			"",
+		`<code>${prefix}weather (place) pollution:true</code>`,
+		"Posts a summary of the current pollution for the provided location.",
+		"",
 
-			`<code>${prefix}weather (place) radar:true</code>`,
-			"Posts a link to a weather radar for the provided location. Uses Windy.com",
-			"",
+		`<code>${prefix}weather (place) radar:true</code>`,
+		"Posts a link to a weather radar for the provided location. Uses Windy.com",
+		"",
 
-			`<code>${prefix}weather (place) status:text</code>`,
-			"Instead of posting an emoji signifying the current weather state, a brief text description will be used instead.",
-			"",
+		`<code>${prefix}weather (place) status:text</code>`,
+		"Instead of posting an emoji signifying the current weather state, a brief text description will be used instead.",
+		"",
 
-			`<code>${prefix}weather (place) format:(custom format)</code>`,
-			`<code>${prefix}weather (place) format:temperature</code>`,
-			`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
-			"Lets you choose specific weather elements to show in the result.",
-			`Supported elements: <code>${ALLOWED_FORMAT_TYPES.join(", ")}</code>`,
-			"",
+		`<code>${prefix}weather (place) format:(custom format)</code>`,
+		`<code>${prefix}weather (place) format:temperature</code>`,
+		`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
+		"Lets you choose specific weather elements to show in the result.",
+		`Supported elements: <code>${ALLOWED_FORMAT_TYPES.join(", ")}</code>`,
+		"",
 
-			`<code>${prefix}weather latitude:(number) longitude:(number)</code>`,
-			`<code>${prefix}weather latitude:0.2998175 longitude:32.5394548</code>`,
-			"Allows you to query a location to find weather in by GPS coordinates precisely.",
-			"",
+		`<code>${prefix}weather latitude:(number) longitude:(number)</code>`,
+		`<code>${prefix}weather latitude:0.2998175 longitude:32.5394548</code>`,
+		"Allows you to query a location to find weather in by GPS coordinates precisely.",
+		"",
 
-			"",
-			"=".repeat(20),
-			"",
+		"",
+		"=".repeat(20),
+		"",
 
-			`<code>${prefix}weather</code>`,
-			"If you set your own weather location, show its weather.",
-			"",
+		`<code>${prefix}weather</code>`,
+		"If you set your own weather location, show its weather.",
+		"",
 
-			`<code>${prefix}weather alerts:true</code>`,
-			"Posts a summary of all weather alerts for your location - for the next 7 days, if you have set it up.",
-			"",
+		`<code>${prefix}weather alerts:true</code>`,
+		"Posts a summary of all weather alerts for your location - for the next 7 days, if you have set it up.",
+		"",
 
-			`<code>${prefix}weather @User</code>`,
-			"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
-			"",
+		`<code>${prefix}weather @User</code>`,
+		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
+		"",
 
-			`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
-			"Similar to above, shows the user's weather, but uses the hour/day specifier.",
-			"",
+		`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
+		"Similar to above, shows the user's weather, but uses the hour/day specifier.",
+		"",
 
-			`<code>${prefix}weather @User alerts:true</code>`,
-			"Posts a summary of all weather alerts for the user's location - for the next 7 days.",
-			"",
+		`<code>${prefix}weather @User alerts:true</code>`,
+		"Posts a summary of all weather alerts for the user's location - for the next 7 days.",
+		"",
 
-			`<code>${prefix}weather pollution:true</code>`,
-			`<code>${prefix}weather @User pollution:true</code>`,
-			"Posts a summary of the current pollution for your or the provided user's location."
-		];
-	})
-};
+		`<code>${prefix}weather pollution:true</code>`,
+		`<code>${prefix}weather @User pollution:true</code>`,
+		"Posts a summary of the current pollution for your or the provided user's location."
+	])
+});
