@@ -1,7 +1,6 @@
 import {
 	SupiDate,
 	SupiError,
-	isGenericRequestError,
 	isGotRequestError,
 	type Counter,
 	type Query,
@@ -858,18 +857,7 @@ export class Command extends TemplateWithoutId {
 				isPrivateMessage
 			};
 
-			if (isGenericRequestError(e)) {
-				origin = "External";
-				const { hostname, statusCode, statusMessage } = e.args as Record<string, string>;
-				errorContext = {
-					type: "Command request error",
-					hostname,
-					message: e.simpleMessage,
-					statusCode,
-					statusMessage
-				};
-			}
-			else if (isGotRequestError(e)) {
+			if (isGotRequestError(e)) {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
@@ -890,16 +878,7 @@ export class Command extends TemplateWithoutId {
 				},
 				arguments: args
 			});
-
-			if (isGenericRequestError(e)) {
-				const { hostname } = errorContext;
-				execution = {
-					success: false,
-					reason: "generic-request-error",
-					reply: `Third party service ${hostname} failed! 🚨 (ID ${errorID})`
-				};
-			}
-			else if (isGotRequestError(e)) {
+			if (isGotRequestError(e)) {
 				execution = {
 					success: false,
 					reason: "got-error",
