@@ -1,13 +1,13 @@
+import { SupiDate } from "supi-core";
+
 type BaseWeatherDataItem = {
 	clouds: number;
 	dew_point: number;
 	dt: number;
-	feels_like: number;
 	humidity: number;
 	pressure: number;
 	sunrise: number;
 	sunset: number;
-	temp: number;
 	uvi: number;
 	visibility: number;
 	weather: {
@@ -21,6 +21,8 @@ type BaseWeatherDataItem = {
 	wind_speed: number;
 };
 type CurrentWeatherDataItem = BaseWeatherDataItem & {
+	feels_like: number;
+	temp: number;
 	rain?: { "1h": number; };
 	snow?: { "1h": number; };
 };
@@ -48,6 +50,8 @@ type DailyWeatherDataItem = BaseWeatherDataItem & {
 	};
 }
 type HourlyWeatherDataItem = BaseWeatherDataItem & {
+	feels_like: number;
+	temp: number;
 	rain?: { "1h": number; };
 	snow?: { "1h": number; };
 	pop: number;
@@ -163,3 +167,68 @@ export const getWindDirection = (degrees: number) => {
 	const index = Math.trunc((degrees - base) / interval);
 	return WIND_DIRECTIONS.at(index) as string;
 };
+
+export class WeatherItem {
+	constructor (type: "current", item: CurrentWeatherDataItem, minutes: MinutelyWeatherDataItem[]);
+	constructor (type: "hourly", item: HourlyWeatherDataItem, minutes: MinutelyWeatherDataItem[]);
+	constructor (type: "daily", item: DailyWeatherDataItem, minutes: MinutelyWeatherDataItem[]);
+	constructor (private type: "current" | "hourly" | "daily", private item: WeatherDataItem, private minutes: MinutelyWeatherDataItem[]) {}
+
+	get precipitation () {
+		if (isDailyItem(this.item) || isHourlyItem(this.item)) {
+			if (this.item.pop === 0) {
+				return "No precipitation expected.";
+			}
+			else {
+				const percent = `${core.Utils.round(this.item.pop * 100, 0)}%`;
+				const rain = (this.type === "daily") ? this.item.rain : this.item.rain?.["1h"];
+				const snow = (isDailyItem(this.item)) ? this.item.snow : this.item.snow?.["1h"];
+
+				if (rain && snow) {
+					return `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
+				}
+				else if (rain) {
+					return `${percent} chance of ${rain}mm/h rain.`;
+				}
+				else if (snow) {
+					return `${percent} chance of ${snow}mm/h snow.`;
+				}
+				else {
+					return `${percent} chance of precipitation.`;
+				}
+			}
+		}
+		else {
+			const rain = this.item.rain?.["1h"] ?? null;
+			const snow = this.item.snow?.["1h"] ?? null;
+
+			if (rain && snow) {
+				return `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
+			}
+			else if (rain) {
+				return `It is currently raining, ${rain}mm/h.`;
+			}
+			else if (snow) {
+				return `It is currently snowing, ${snow}mm/h.`;
+			}
+			else {
+				const start = new SupiDate().discardTimeUnits("s", "ms");
+				for (const { dt, precipitation: pr } of this.minutes) {
+					if (pr !== 0) {
+						const when = new SupiDate(dt * 1000).discardTimeUnits("s", "ms").valueOf();
+						const minuteIndex = Math.trunc(when - start.valueOf()) / 60_000;
+						if (minuteIndex < 1) {
+							return "Precipitation expected in less than a minute!";
+						}
+						else {
+							const plural = (minuteIndex === 1) ? "" : "s";
+							return `Precipitation expected in ~${minuteIndex} minute${plural}.`;
+						}
+					}
+				}
+			}
+
+			return "No precipitation expected.";
+		}
+	}
+}

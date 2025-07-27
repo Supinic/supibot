@@ -13,7 +13,7 @@ import {
 	isHourlyItem,
 	OwmPollutionResponse,
 	OwmWeatherResponse,
-	WeatherDataItem
+	WeatherDataItem, WeatherItem
 } from "./helpers.js";
 
 
@@ -454,9 +454,9 @@ export default declare({
 			}
 		}
 
-		let target: WeatherDataItem;
+		let target: WeatherItem;
 		if (weatherTime.type === "current") {
-			target = data.current;
+			target = new WeatherItem(data.current, data.minutely);
 		}
 		else if (weatherTime.type === "hourly") {
 			const hourlyTarget = data.hourly.at(weatherTime.number);
@@ -467,7 +467,7 @@ export default declare({
 				};
 			}
 
-			target = hourlyTarget;
+			target = new WeatherItem(hourlyTarget, data.minutely);
 		}
 		else {
 			const dailyTarget = data.daily.at(weatherTime.number);
@@ -478,14 +478,14 @@ export default declare({
 				};
 			}
 
-			target = dailyTarget;
+			target = new WeatherItem(dailyTarget, data.minutely);
 		}
 
 		const icon = (context.params.status === "text")
 			? (codes[String(target.weather[0].id)] ?? "(unknown icon)")
 			: getIcon(target.weather[0].id, target);
 
-		const obj: Record<string, string> = {
+		const obj = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
 			icon,
 			cloudCover: `Cloud cover: ${target.clouds}%.`,
@@ -498,7 +498,8 @@ export default declare({
 				? `Wind gusts: up to ${target.wind_gust} m/s.`
 				: "No wind gusts.",
 			precipitation: "No precipitation right now.",
-			sun: ""
+			sun: "",
+			temperature: ""
 		};
 
 		if (isDailyItem(target) || isHourlyItem(target)) {
@@ -560,7 +561,7 @@ export default declare({
 		if (isCurrentItem(target) || isHourlyItem(target)) {
 			obj.temperature = `${target.temp}°C, feels like ${target.feels_like}°C.`;
 		}
-		else if (isDailyItem(target)) {
+		else {
 			obj.temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
 		}
 
@@ -664,7 +665,7 @@ export default declare({
 			const reply = [];
 
 			for (const element of format) {
-				if (typeof obj[element] === "undefined") {
+				if (!(element in obj)) {
 					return {
 						success: false,
 						reply: `Cannot create custom weather format with the "${element}" element!`
