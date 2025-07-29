@@ -45,6 +45,7 @@ export const check = async (context: GptContext, text: string) => {
 			Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 		},
 		json: {
+			model: "omni-moderation-latest",
 			input: text
 		}
 	});
@@ -99,6 +100,7 @@ export const checkImage = async (url: string) => {
 			Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 		},
 		json: {
+			model: "omni-moderation-latest",
 			input: [{
 				image_url: { url },
 				type: "image_url"
