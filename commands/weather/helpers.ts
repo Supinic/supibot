@@ -1,4 +1,6 @@
 import { SupiDate } from "supi-core";
+import weatherCodeData from "./codes.json" with { type: "json" };
+const { codes } = weatherCodeData as { codes: Record<string, string | undefined> };
 
 type BaseWeatherDataItem = {
 	clouds: number;
@@ -106,6 +108,20 @@ export type OwmPollutionResponse = {
 	}[];
 };
 
+export type WeatherFormatObject = {
+	cloudCover: string;
+	humidity: string;
+	icon: string;
+	place: string;
+	precipitation: string;
+	pressure: string;
+	sun: string;
+	temperature: string;
+	windGusts: string;
+	windSpeed: string;
+};
+export const isWeatherFormatKey = (input: string, obj: WeatherFormatObject): input is keyof typeof obj => Object.hasOwn(obj, input);
+
 /* eslint-disable quote-props */
 // Sourced from: https://openweathermap.org/weather-conditions
 const WEATHER_ICONS = {
@@ -168,11 +184,61 @@ export const getWindDirection = (degrees: number) => {
 	return WIND_DIRECTIONS.at(index) as string;
 };
 
+export const getSunPosition = (data: OwmWeatherResponse) => {
+	const nowSeconds = SupiDate.now() / 1000;
+	let verb: "rise" | "set";
+	let sunTime;
+
+	if (nowSeconds < data.current.sunrise) {
+		verb = "rise";
+		sunTime = data.current.sunrise;
+	}
+	else if (nowSeconds < data.current.sunset) {
+		verb = "set";
+		sunTime = data.current.sunset;
+	}
+	else {
+		verb = "rise";
+		sunTime = data.daily[1].sunrise;
+	}
+
+	// Determine position based on sunrise/sunset data, if available directly
+	if (sunTime !== 0) {
+		return `Sun ${verb}s ${core.Utils.timeDelta(sunTime * 1000)}.`;
+	}
+
+	// Otherwise, try and determine whether the Sun is currently down or up based on UV index
+	verb = (data.current.uvi === 0) ? "rise" : "set";
+	const property: "sunrise" | "sunset" = `sun${verb}`;
+
+	let time;
+	for (const day of data.daily) {
+		if (day[property]) {
+			time = day[property];
+			break;
+		}
+	}
+
+	return (time)
+		? `Sun ${verb}s ${core.Utils.timeDelta(time * 1000)}.`
+		: `Sun does not ${verb} in the next 7 days.`;
+}
+
 export class WeatherItem {
-	constructor (type: "current", item: CurrentWeatherDataItem, minutes: MinutelyWeatherDataItem[]);
-	constructor (type: "hourly", item: HourlyWeatherDataItem, minutes: MinutelyWeatherDataItem[]);
-	constructor (type: "daily", item: DailyWeatherDataItem, minutes: MinutelyWeatherDataItem[]);
-	constructor (private type: "current" | "hourly" | "daily", private item: WeatherDataItem, private minutes: MinutelyWeatherDataItem[]) {}
+	constructor (private item: WeatherDataItem, private minutes: MinutelyWeatherDataItem[]) {}
+
+	get dt () {
+		return this.item.dt;
+	}
+
+	get code () {
+		const id = String(this.item.weather[0].id);
+		return codes[id] ?? "(unknown icon)";
+	}
+
+	get icon () {
+		return getIcon(this.item.weather[0].id, this.item);
+	}
 
 	get precipitation () {
 		if (isDailyItem(this.item) || isHourlyItem(this.item)) {
@@ -181,7 +247,7 @@ export class WeatherItem {
 			}
 			else {
 				const percent = `${core.Utils.round(this.item.pop * 100, 0)}%`;
-				const rain = (this.type === "daily") ? this.item.rain : this.item.rain?.["1h"];
+				const rain = (isDailyItem(this.item)) ? this.item.rain : this.item.rain?.["1h"];
 				const snow = (isDailyItem(this.item)) ? this.item.snow : this.item.snow?.["1h"];
 
 				if (rain && snow) {
@@ -230,5 +296,36 @@ export class WeatherItem {
 
 			return "No precipitation expected.";
 		}
+	}
+
+	get temperature () {
+		return (isDailyItem(this.item))
+			? `${this.item.temp.min}°C to ${this.item.temp.max}°C.`
+			: `${this.item.temp}°C, feels like ${this.item.feels_like}°C.`;
+	}
+
+	get cloudCover () {
+		return `Cloud cover: ${this.item.clouds}%.`;
+	}
+
+	get pressure () {
+		return `Air pressure: ${this.item.pressure} hPa.`;
+	}
+
+	get humidity () {
+		return `Humidity: ${this.item.humidity}%.`;
+	}
+
+	get windSpeed () {
+		const direction = getWindDirection(this.item.wind_deg);
+		return (this.item.wind_speed)
+			? `${direction} wind speed: ${this.item.wind_speed} m/s.`
+			: "No wind.";
+	}
+
+	get windGusts () {
+		return (this.item.wind_gust)
+			? `Wind gusts: ${this.item.wind_gust} m/s.`
+			: "No wind gusts.";
 	}
 }

@@ -4,20 +4,15 @@ import { SupiDate, SupiError } from "supi-core";
 
 import { declare } from "../../classes/command.js";
 import { fetchGeoLocationData, postToHastebin } from "../../utils/command-utils.js";
-import weatherCodeData from "./codes.json" with { type: "json" };
 
 import {
-	getIcon,
-	getWindDirection,
-	isCurrentItem, isDailyItem,
-	isHourlyItem,
+	getSunPosition, isWeatherFormatKey,
 	OwmPollutionResponse,
 	OwmWeatherResponse,
-	WeatherDataItem, WeatherItem
+	WeatherFormatObject,
+	WeatherItem
 } from "./helpers.js";
 
-
-const { codes } = weatherCodeData as { codes: Record<string, string> };
 const shell = promisify(exec);
 
 const ALLOWED_FORMAT_TYPES = [
@@ -481,132 +476,18 @@ export default declare({
 			target = new WeatherItem(dailyTarget, data.minutely);
 		}
 
-		const icon = (context.params.status === "text")
-			? (codes[String(target.weather[0].id)] ?? "(unknown icon)")
-			: getIcon(target.weather[0].id, target);
-
 		const obj = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
-			icon,
-			cloudCover: `Cloud cover: ${target.clouds}%.`,
-			humidity: `Humidity: ${target.humidity}%.`,
-			pressure: `Air pressure: ${target.pressure} hPa.`,
-			windSpeed: (target.wind_speed)
-				? `${getWindDirection(target.wind_deg)} wind speed: ${target.wind_speed} m/s.`
-				: "No wind.",
-			windGusts: (target.wind_gust)
-				? `Wind gusts: up to ${target.wind_gust} m/s.`
-				: "No wind gusts.",
-			precipitation: "No precipitation right now.",
-			sun: "",
-			temperature: ""
-		};
-
-		if (isDailyItem(target) || isHourlyItem(target)) {
-			if (target.pop === 0) {
-				obj.precipitation = "No precipitation expected.";
-			}
-			else {
-				const percent = `${core.Utils.round(target.pop * 100, 0)}%`;
-				const rain = (isDailyItem(target)) ? target.rain : target.rain?.["1h"];
-				const snow = (isDailyItem(target)) ? target.snow : target.snow?.["1h"];
-
-				if (rain && snow) {
-					obj.precipitation = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
-				}
-				else if (rain) {
-					obj.precipitation = `${percent} chance of ${rain}mm/h rain.`;
-				}
-				else if (snow) {
-					obj.precipitation = `${percent} chance of ${snow}mm/h snow.`;
-				}
-				else {
-					obj.precipitation = `${percent} chance of precipitation.`;
-				}
-			}
-		}
-		else if (isCurrentItem(target)) {
-			const rain = target.rain?.["1h"] ?? null;
-			const snow = target.snow?.["1h"] ?? null;
-
-			if (rain && snow) {
-				obj.precipitation = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
-			}
-			else if (rain) {
-				obj.precipitation = `It is currently raining, ${rain}mm/h.`;
-			}
-			else if (snow) {
-				obj.precipitation = `It is currently snowing, ${snow}mm/h.`;
-			}
-			else {
-				const start = new SupiDate().discardTimeUnits("s", "ms");
-				for (const { dt, precipitation: pr } of data.minutely) {
-					if (pr !== 0) {
-						const when = new SupiDate(dt * 1000).discardTimeUnits("s", "ms").valueOf();
-						const minuteIndex = Math.trunc(when - start.valueOf()) / 60_000;
-						if (minuteIndex < 1) {
-							obj.precipitation = "Precipitation expected in less than a minute!";
-						}
-						else {
-							const plural = (minuteIndex === 1) ? "" : "s";
-							obj.precipitation = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
-						}
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (isCurrentItem(target) || isHourlyItem(target)) {
-			obj.temperature = `${target.temp}°C, feels like ${target.feels_like}°C.`;
-		}
-		else {
-			obj.temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
-		}
-
-		if (isCurrentItem(target) && !skipLocation) {
-			const nowSeconds = SupiDate.now() / 1000;
-			let verb: "rise" | "set";
-			let sunTime;
-
-			if (nowSeconds < data.current.sunrise) {
-				verb = "rise";
-				sunTime = data.current.sunrise;
-			}
-			else if (nowSeconds < data.current.sunset) {
-				verb = "set";
-				sunTime = data.current.sunset;
-			}
-			else {
-				verb = "rise";
-				sunTime = data.daily[1].sunrise;
-			}
-
-			if (sunTime !== 0) {
-				obj.sun = `Sun ${verb}s ${core.Utils.timeDelta(sunTime * 1000)}.`;
-			}
-			else {
-				// Determine if the Sun is down or up based on UV index
-				verb = (data.current.uvi === 0) ? "rise" : "set";
-				const property: "sunrise" | "sunset" = `sun${verb}`;
-
-				let time;
-				for (const day of data.daily) {
-					if (day[property]) {
-						time = day[property];
-						break;
-					}
-				}
-
-				if (time) {
-					obj.sun = `Sun ${verb}s ${core.Utils.timeDelta(time * 1000)}.`;
-				}
-				else {
-					obj.sun = `Sun does not ${verb} in the next 7 days.`;
-				}
-			}
-		}
+			icon: target.icon,
+			temperature: target.temperature,
+			cloudCover: target.cloudCover,
+			humidity: target.humidity,
+			pressure: target.pressure,
+			windSpeed: target.windSpeed,
+			windGusts: target.windGusts,
+			precipitation: target.precipitation,
+			sun: (weatherTime.type === "current" && !skipLocation) ? getSunPosition(data) : ""
+		} satisfies WeatherFormatObject;
 
 		let weatherAlert = "";
 		if (data.alerts && data.alerts.length !== 0) {
@@ -665,7 +546,7 @@ export default declare({
 			const reply = [];
 
 			for (const element of format) {
-				if (!(element in obj)) {
+				if (!isWeatherFormatKey(element, obj)) {
 					return {
 						success: false,
 						reply: `Cannot create custom weather format with the "${element}" element!`
