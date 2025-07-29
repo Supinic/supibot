@@ -20,7 +20,7 @@ export default {
 			// const appendix = (previousPlayerCount) ? ` Last recorded number: ${previousPlayerCount}` : "";
 			return {
 			    success: false,
-			    reply: `The number of players online is currently available!`
+			    reply: `The number of players online is not currently available!`
 			};
 		}
 
