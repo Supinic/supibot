@@ -20,7 +20,6 @@ const platformHasMessageId = (input: ContextPlatformSpecificData): input is Twit
 export default declare({
 	Name: "whatemoteisit",
 	Aliases: ["weit"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "What emote is it? Posts specifics about a given Twitch subscriber emote.",
 	Flags: ["mention","non-nullable","pipe"],
@@ -75,7 +74,7 @@ export default declare({
 		const {
 			channelName,
 			channelLogin,
-			channelID,
+			// channelID,
 			emoteAssetType,
 			emoteCode,
 			emoteID,
@@ -106,7 +105,6 @@ export default declare({
 		}
 
 		let tierString = "";
-		let emoteLink = "https://twitchemotes.com/";
 		if (emoteType === "SUBSCRIPTIONS") {
 			if (!channelName && !channelLogin) {
 				const tier = (emoteTier) ? `tier ${emoteTier}` : "";
@@ -120,7 +118,6 @@ export default declare({
 					channelString = `@${channelLogin} (${channelName})`;
 				}
 
-				emoteLink += `channels/${channelID}`;
 				// emoteLink += `channels/${channelID}/emotes/${emoteID}`;
 				tierString = `tier ${emoteTier} ${emoteAssetType.toLowerCase()} sub emote to channel ${channelString}`;
 			}
@@ -132,14 +129,13 @@ export default declare({
 			}
 		}
 		else if (emoteType === "GLOBALS") {
-			emoteLink += `global/emotes/${emoteID}`;
 			tierString = "global Twitch emote";
 		}
 		else {
-			emoteLink += `channels/${channelID}`;
 			tierString = `${emoteAssetType.toLowerCase()} ${emoteType.toLowerCase()} ${channelName ?? ""} emote`;
 		}
 
+		const emoteLink = `https://chatvau.lt/emote/twitch/${emoteID}`;
 		if (context.params.noLinks) {
 			return {
 				reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}.`
