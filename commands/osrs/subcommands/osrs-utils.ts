@@ -164,7 +164,7 @@ export const fetchItemId = async (query: string) => {
 		}
 
 		const regexLikeQuery = query.replaceAll(/\s+/g, ".*");
-		const regex = new RegExp(`^.*${regexLikeQuery}.*$`, "i");
+		const regex = new RegExp(`^.*${RegExp.escape(regexLikeQuery)}.*$`, "i");
 
 		const likelyMatches = matches
 			.filter(i => i.includes || regex.test(i.string))
