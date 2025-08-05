@@ -248,10 +248,6 @@ await ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinition
 
 console.timeEnd("chat modules");
 
-console.time("crons");
-initializeCrons(config.modules.crons);
-console.timeEnd("crons");
-
 core.Metrics.registerCounter({
 	name: "supibot_messages_sent_total",
 	help: "Total number of Twitch messages sent by the bot.",
@@ -280,6 +276,10 @@ if (promises.length === 0) {
 }
 
 await Promise.all(promises);
+
+console.time("crons");
+initializeCrons(config.modules.crons);
+console.timeEnd("crons");
 
 console.debug("Connected to all platforms. Ready!");
 console.groupEnd();
