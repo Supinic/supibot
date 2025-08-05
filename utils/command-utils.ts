@@ -108,7 +108,7 @@ export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" 
 
 	// !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
 	const formData = new FormData();
-	formData.append("image", new Blob([fileData]), filename);
+	formData.append("image", new Blob([fileData.toString()]), filename);
 	formData.append("type", "image");
 	formData.append("title", "Simple upload");
 

@@ -28,7 +28,7 @@ import TwitchUtils, {
 import { Channel } from "../classes/channel.js";
 import { User } from "../classes/user.js";
 import { SupiDate, SupiError } from "supi-core";
-import type { Emote } from "../@types/globals.d.ts";
+import type { Emote, ThirdPartyEmote } from "../@types/globals.d.ts";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -1379,20 +1379,25 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				channel: i.owner_id
 			};
 		});
+
 		const ffzEmotes = rawFFZEmotes.flatMap(i => i.emoticons).map(i => ({
 			ID: i.id,
 			name: i.name,
-			type: "ffz" as const,
+			type: "ffz",
 			global: true,
-			animated: false
-		}));
+			animated: false,
+			zeroWidth: false
+		})) satisfies ThirdPartyEmote[];
+
 		const bttvEmotes = rawBTTVEmotes.map(i => ({
 			ID: i.id,
 			name: i.code,
 			type: "bttv" as const,
 			global: true,
-			animated: (i.imageType === "gif")
-		}));
+			animated: (i.imageType === "gif"),
+			zeroWidth: false
+		})) satisfies ThirdPartyEmote[];
+
 		const sevenTvEmotes = rawSevenTvEmotes.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -1401,7 +1406,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			animated: i.data.animated,
 			// eslint-disable-next-line no-bitwise
 			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
-		}));
+		})) satisfies ThirdPartyEmote[];
 
 		return [
 			...twitchEmotes,

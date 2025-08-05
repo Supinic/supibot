@@ -1,13 +1,35 @@
+declare global {
+    interface RegExpConstructor {
+        /**
+         * @todo Temporary declaration augment, remove when baseline in TS (wasn't in 5.9.2)
+         * Escape any special regex characters in `text`.
+         * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/escape
+         */
+        escape (str: string): string;
+    }
+}
+
 export type Message = string;
-export type Emote = {
+
+type BaseEmote = {
     ID: string | number;
     name: string;
-    type: "twitch-subscriber" | "twitch-global" | "twitch-follower" | "ffz" | "bttv" | "7tv" | "discord" | "cytube";
     global: boolean;
     animated: boolean | null;
-    guild?: string;
-    zeroWidth?: boolean;
 };
+export type ThirdPartyEmote = BaseEmote & {
+    type: "ffz" | "bttv" | "7tv" | "cytube";
+    zeroWidth: boolean;
+}
+export type TwitchEmote = BaseEmote & {
+    type: "twitch-subscriber" | "twitch-global" | "twitch-follower";
+    channel: string;
+};
+export type DiscordEmote = BaseEmote & {
+    type: "discord";
+    guild: string;
+};
+export type Emote = TwitchEmote | DiscordEmote | ThirdPartyEmote;
 
 export type Coordinates = { lat: number; lng: number; } | { lat: string; lng: string; };
 

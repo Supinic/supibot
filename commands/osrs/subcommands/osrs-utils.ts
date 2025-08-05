@@ -164,7 +164,7 @@ export const fetchItemId = async (query: string) => {
 		}
 
 		const regexLikeQuery = query.replaceAll(/\s+/g, ".*");
-		const regex = new RegExp(`^.*${regexLikeQuery}.*$`, "i");
+		const regex = new RegExp(`^.*${RegExp.escape(regexLikeQuery)}.*$`, "i");
 
 		const likelyMatches = matches
 			.filter(i => i.includes || regex.test(i.string))
@@ -244,6 +244,33 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 	}
 
 	return data;
+};
+
+const playerCountRegex = /([\d,]+)/;
+export const fetchPlayerCount = async (): Promise<number | null> => {
+	const response = await core.Got.get("FakeAgent")({
+		url: "https://oldschool.runescape.com/slu",
+		responseType: "text"
+	}) as GameWorldResult;
+
+	if (!response.ok) {
+		return null;
+	}
+
+	const $ = core.Utils.cheerio(response.body);
+	const playerCountNode = $(".player-count");
+	if (playerCountNode.length === 0) {
+		return null;
+	}
+
+	const playerCountStr = playerCountNode.text();
+	const match = playerCountStr.match(playerCountRegex);
+	if (!match) {
+		return null;
+	}
+
+	const fixedString = match[1].replaceAll(",", "");
+	return Number(fixedString);
 };
 
 export const fetchUserData = async (user: string, options: FetchOptions = {}): Promise<FetchUserSuccess | Failure> => {
