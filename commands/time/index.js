@@ -1,4 +1,3 @@
-import { GenericRequestError } from "supi-core";
 import { fetchTimeData } from "../../utils/command-utils.js";
 import timezones from "./timezones.json" with { type: "json" };
 
@@ -144,14 +143,15 @@ export default {
 		}
 
 		if (coordinates === null) {
-			const { results: [geoData] } = await core.Got.get("Google")({
+			const response = await core.Got.get("Google")({
 				url: "geocode/json",
 				searchParams: {
 					address: place,
 					key: process.env.API_GOOGLE_GEOCODING
 				}
-			}).json();
+			});
 
+			const [geoData] = response.body.results;
 			if (!geoData) {
 				const checkUserData = await sb.User.get(args[0]);
 				const checkLocation = await checkUserData?.getDataProperty("location");
@@ -177,17 +177,7 @@ export default {
 
 		const response = await fetchTimeData({ coordinates });
 		const timeData = response.body;
-
-		if (response.statusCode !== 200) {
-			throw new GenericRequestError({
-				statusCode: response.statusCode,
-				hostname: "maps.googleapis.com",
-				statusMessage: timeData.statusMessage ?? null,
-				message: timeData.message ?? null,
-				stack: null
-			});
-		}
-		else if (timeData.status === "ZERO_RESULTS") {
+		if (timeData.status === "ZERO_RESULTS") {
 			return {
 				success: false,
 				reply: "Target place is ambiguous - it contains more than one timezone!"

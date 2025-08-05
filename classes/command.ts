@@ -1,7 +1,6 @@
 import {
 	SupiDate,
 	SupiError,
-	isGenericRequestError,
 	isGotRequestError,
 	type Counter,
 	type Query,
@@ -45,7 +44,7 @@ type ParameterValueMap = {
 	regex: RegExp;
 	language: Language;
 };
-type ParameterType = keyof ParameterValueMap;
+export type ParameterType = keyof ParameterValueMap;
 type ParameterValue = ParameterValueMap[ParameterType];
 type ParameterDefinition = {
 	readonly name: string;
@@ -63,6 +62,7 @@ type ResultFailure = { success: false; reply: string; };
 export type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
+	text?: string;
 	replyWithPrivateMessage?: boolean;
 	cooldown?: CooldownDefinition;
 	partialReplies?: {
@@ -310,6 +310,7 @@ export interface SubcommandDefinition<T extends CommandDefinition = CommandDefin
 	title: string;
 	aliases: string[];
 	description: string[];
+	getDescription?: (prefix: string) => string[] | Promise<string[]>;
 	default: boolean;
 	flags?: Record<string, boolean>;
 	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
@@ -351,12 +352,16 @@ export class SubcommandCollection {
 		return null;
 	}
 
-	createDescription () {
+	async createDescription () {
 		const result: string[] = [];
 		for (const subcommand of this.subcommands) {
+			const description = (subcommand.getDescription)
+				? await subcommand.getDescription(Command.prefix)
+				: subcommand.description;
+
 			result.push(
 				`<h6>${subcommand.title}</h6>`,
-				...subcommand.description,
+				...description,
 				"",
 				""
 			);
@@ -850,18 +855,7 @@ export class Command extends TemplateWithoutId {
 				isPrivateMessage
 			};
 
-			if (isGenericRequestError(e)) {
-				origin = "External";
-				const { hostname, statusCode, statusMessage } = e.args as Record<string, string>;
-				errorContext = {
-					type: "Command request error",
-					hostname,
-					message: e.simpleMessage,
-					statusCode,
-					statusMessage
-				};
-			}
-			else if (isGotRequestError(e)) {
+			if (isGotRequestError(e)) {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
@@ -882,16 +876,7 @@ export class Command extends TemplateWithoutId {
 				},
 				arguments: args
 			});
-
-			if (isGenericRequestError(e)) {
-				const { hostname } = errorContext;
-				execution = {
-					success: false,
-					reason: "generic-request-error",
-					reply: `Third party service ${hostname} failed! 🚨 (ID ${errorID})`
-				};
-			}
-			else if (isGotRequestError(e)) {
+			if (isGotRequestError(e)) {
 				execution = {
 					success: false,
 					reason: "got-error",

@@ -2,6 +2,7 @@ import { SubcommandCollection, type SubcommandDefinition } from "../../../classe
 
 import ItemIdSubcommand from "./item-id.js";
 import KillcountSubcommand from "./killcount.js";
+import PlayerCountSubcommand from "./playercount.js";
 import PriceSubcommand from "./price.js";
 import StarsSubcommand from "./stars.js";
 import StatsSubcommand from "./stats.js";
@@ -12,6 +13,7 @@ import WikiSubcommand from "./wiki.js";
 const subcommands: SubcommandDefinition[] = [
 	ItemIdSubcommand,
 	KillcountSubcommand,
+	PlayerCountSubcommand,
 	PriceSubcommand,
 	StarsSubcommand,
 	StatsSubcommand,

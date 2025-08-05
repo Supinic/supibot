@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 const list = [
 	"TWITCH_GQL_OAUTH",
 	"TWITCH_GQL_CLIENT_ID",
@@ -31,4 +33,4 @@ export default {
 	}),
 	parent: "Global",
 	description: "Twitch GQL API"
-};
+} satisfies GotInstanceDefinition;

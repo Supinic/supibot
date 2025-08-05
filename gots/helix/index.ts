@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "Helix",
 	optionsType: "function",
@@ -8,6 +10,7 @@ export default {
 
 		return {
 			prefixUrl: "https://api.twitch.tv/helix",
+			http2: true,
 			headers: {
 				"Client-ID": process.env.TWITCH_CLIENT_ID
 			},
@@ -18,9 +21,14 @@ export default {
 				limit: 3
 			},
 			hooks: {
+				afterResponse: [],
+				beforeError: [],
+				beforeRedirect: [],
+				beforeRetry: [],
+				init: [],
 				beforeRequest: [
 					async (options) => {
-						const token = await core.Cache.getByPrefix("TWITCH_OAUTH");
+						const token = await core.Cache.getByPrefix("TWITCH_OAUTH") as string;
 						options.headers.authorization = `Bearer ${token}`;
 					}
 				]
@@ -29,4 +37,4 @@ export default {
 	}),
 	parent: "Global",
 	description: "Twitch Helix API"
-};
+} satisfies GotInstanceDefinition;

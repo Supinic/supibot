@@ -34,6 +34,13 @@ const HIGH_LOAD_CACHE_PREFIX = "sb-user-high-load";
 const HIGH_LOAD_CACHE_EXPIRY = 60_000;
 const pendingUserAdditionPromises: Map<User["Name"], Promise<User | null>> = new Map();
 
+export const permissions = {
+	regular: 0b0000_0001,
+	ambassador: 0b0000_0010,
+	channelOwner: 0b0000_0100,
+	administrator: 0b1000_0000
+} as const;
+
 export class User extends TemplateWithIdString {
 	readonly ID: number;
 	readonly Discord_ID: string | null;
@@ -49,12 +56,7 @@ export class User extends TemplateWithIdString {
 	static readonly dataCache: WeakMap<User, Partial<UserDataPropertyMap>> = new WeakMap();
 	static readonly pendingNewUsers: Map<User["Name"], Promise<User> | null> = new Map();
 
-	static readonly permissions = {
-		regular: 0b0000_0001,
-		ambassador: 0b0000_0010,
-		channelOwner: 0b0000_0100,
-		administrator: 0b1000_0000
-	} as const;
+	static readonly permissions = permissions;
 
 	static highLoadUserBatch: Batch | undefined;
 	static highLoadUserInterval: NodeJS.Timeout;

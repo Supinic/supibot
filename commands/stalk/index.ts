@@ -101,7 +101,7 @@ export default declare({
 		let channelString = stalkChannelData.getFullName();
 		let messageString = stalkData.Text;
 		const isStalkPrevented = await stalkChannelData.getDataProperty("stalkPrevention");
-		if (isStalkPrevented) {
+		if (isStalkPrevented && context.channel !== stalkChannelData) {
 			channelString = `${stalkChannelData.Platform.name}-[EXPUNGED]`;
 			messageString = "[EXPUNGED]";
 		}

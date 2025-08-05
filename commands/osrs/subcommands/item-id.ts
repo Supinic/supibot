@@ -6,8 +6,9 @@ export default {
 	title: "Item IDs",
 	aliases: ["item-id"],
 	default: false,
-	description: [
-		`<code>$osrs itemid (item name)</code>`,
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}osrs itemid (item name)</code>`,
 		`Posts the item's in-game ID. Shows up to 5 best matching results.`
 	],
 	execute: async function (context, ...args) {

@@ -1,14 +1,7 @@
-/**
- * await core.Got.get("Helix")({
- * 	url: "subscriptions/user",
- * 	searchParams: {
- * 		broadcaster_id: "31400525",
- * 		user_id: "31400525"
- * 	}
- * })
- */
+import { TwitchEmote } from "../../@types/globals.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "botsubs",
 	Aliases: null,
 	Author: "supinic",
@@ -19,13 +12,13 @@ export default {
 		{ name: "channel", type: "string" },
 		{ name: "channelsOnly", type: "boolean" },
 		{ name: "emotesOnly", type: "boolean" }
-	],
+	] as const,
 	Whitelist_Response: null,
 	Code: (async function botSubs (context) {
-		const twitch = sb.Platform.get("twitch");
-
+		const twitch = sb.Platform.getAsserted("twitch");
 		const globalEmotes = await twitch.fetchGlobalEmotes();
-		const subEmotes = globalEmotes.filter(i => i.type === "twitch-subscriber" && i.channel);
+
+		const subEmotes = globalEmotes.filter(i => i.type === "twitch-subscriber" && i.channel) as TwitchEmote[];
 		const subChannels = new Set(subEmotes.map(i => i.channel));
 
 		const result = [];
@@ -62,7 +55,7 @@ export default {
 			reply: message
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => ([
 		"Fetches a list of all channels Supibot is currently subscribed to, along with a sample of their emotes.",
 		"If the list is too long, the channel names are omitted, and only the emotes are posted.",
 		"",
@@ -83,4 +76,4 @@ export default {
 		"Only posts random emote samples, 1 per each channel, without any other text.",
 		""
 	])
-};
+});

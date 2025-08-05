@@ -8,25 +8,26 @@ export default {
 	title: "Skill levels",
 	aliases: [],
 	default: true,
-	description: [
+	description: [],
+	getDescription: (prefix) => [
 		"Skill level overview",
-		`<code>$osrs (username)</code>`,
-		`<code>$osrs stats (username)</code>`,
-		`<code>$osrs stats (username) force:true</code>`,
+		`<code>${prefix}osrs (username)</code>`,
+		`<code>${prefix}osrs stats (username)</code>`,
+		`<code>${prefix}osrs stats (username) force:true</code>`,
 		"Posts a full list of skill levels for provided user. Does not include experience or rankings.",
 		"Results are cached. If you would like to force a new user reload, use the <code>force:true</code> parameter.",
 		"",
 
 		"Skill level detail",
-		`<code>$osrs (username) skill:(skill)</code>`,
-		`<code>$osrs stats (username) skill:(skill)</code>`,
+		`<code>${prefix}osrs (username) skill:(skill)</code>`,
+		`<code>${prefix}osrs stats (username) skill:(skill)</code>`,
 		"For given user, posts the skill's level, experience, and ranking.",
 		`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
 		"",
 
 		"Virtual levels",
-		`<code>$osrs (username) skill:(skill) virtual:true</code>`,
-		`<code>$osrs (username) virtual:true</code>`,
+		`<code>${prefix}osrs (username) skill:(skill) virtual:true</code>`,
+		`<code>${prefix}osrs (username) virtual:true</code>`,
 		"Will take into account virtual levels."
 	],
 	execute: async function (context, ...args) {

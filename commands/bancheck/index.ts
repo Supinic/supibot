@@ -1,5 +1,5 @@
 import { linkRegex } from "../../utils/regexes.js";
-import { GenericRequestError } from "supi-core";
+import { isGotRequestError } from "supi-core";
 import { declare } from "../../classes/command.js";
 
 export default declare({
@@ -67,8 +67,8 @@ export default declare({
 				console.warn(e);
 
 				let code: string | number = "(N/A)";
-				if (e instanceof GenericRequestError) {
-					code = e.statusCode ?? e.message;
+				if (isGotRequestError(e)) {
+					code = e.response?.statusCode ?? e.message;
 				}
 				else if (e instanceof Error) {
 					code = e.message;

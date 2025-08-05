@@ -1,7 +1,16 @@
+import { declare } from "../../classes/command.js";
+import { SupiDate, SupiError } from "supi-core";
 import { linkRegex } from "../../utils/regexes.js";
 
-const charToFlagEmoji = (char) => {
-	const emojiPart = String.fromCodePoint(56741 + char.codePointAt(0));
+const charToFlagEmoji = (char: string) => {
+	const charCode = char.codePointAt(0);
+	if (typeof charCode === "undefined") {
+		throw new SupiError({
+		    message: "Assert error: Empty string provided"
+		});
+	}
+
+	const emojiPart = String.fromCodePoint(56741 + charCode);
 	return `\uD83C${emojiPart}`;
 };
 const FOUR_CHAN_REPLACEMENTS = [
@@ -11,10 +20,66 @@ const FOUR_CHAN_REPLACEMENTS = [
 	{ regex: /kek/ig, string: "cuck" }
 ];
 
-export default {
+type BoardData = {
+	name: string;
+	title: string;
+	nsfw: boolean;
+};
+type BoardListResponse = {
+	boards: {
+		board: string;
+		title: string;
+		ws_board: 0 | 1;
+	}[];
+};
+
+type BoardThreadsResponse = {
+	page: number;
+	threads: {
+		no: number;
+		sticky?: 1;
+		closed?: 1;
+		replies: number;
+		sub?: string;
+		com: string;
+		last_modified: number;
+		time: number
+	}[];
+}[];
+type ThreadData = {
+	ID: number;
+	contentSplitIndex: number;
+	content: string;
+	modified: number;
+	created: number;
+};
+
+type ThreadPostsResponse = {
+	posts: {
+		id: string;
+		no: number;
+		name: string;
+		tim: number;
+		time: number;
+		country?: string;
+		com?: string;
+		filename?: string;
+		ext?: string;
+		replies?: number;
+	}[];
+};
+type PostData = {
+	ID: number;
+	author: string;
+	created: number;
+	content: string | null;
+	file: string | null;
+	country: string | null;
+};
+
+export default declare({
 	Name: "chan",
 	Aliases: ["4chan","textchan","filechan","imagechan"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Pulls a random post from a random 4Chan board, or a specified one if you provide it.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
@@ -22,7 +87,7 @@ export default {
 		{ name: "regex", type: "regex" },
 		{ name: "search", type: "string" },
 		{ name: "textOnly", type: "string" }
-	],
+	] as const,
 	Whitelist_Response: null,
 	Code: (async function chan (context, identifier, ...rest) {
 		if (!identifier) {
@@ -55,7 +120,7 @@ export default {
 			enabled.file.sfw = true;
 		}
 
-		let resultType = (context.channel?.NSFW)
+		let resultType: "file" | "content" = (context.channel?.NSFW)
 			? "file"
 			: "content";
 
@@ -72,9 +137,9 @@ export default {
 			resultType = "file";
 		}
 
-		let boardList = await this.getCacheData({ type: "board-list" });
+		let boardList = await this.getCacheData({ type: "board-list" }) as BoardData[] | undefined;
 		if (!boardList) {
-			const response = await core.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")<BoardListResponse>({
 				url: "https://api.4chan.org/boards.json",
 				responseType: "json"
 			});
@@ -119,9 +184,9 @@ export default {
 		}
 
 		const threadKey = { type: "thread-list", board: identifier };
-		let threadList = await this.getCacheData(threadKey);
+		let threadList = await this.getCacheData(threadKey) as ThreadData[] | undefined;
 		if (!threadList) {
-			const response = await core.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")<BoardThreadsResponse>({
 				url: `https://api.4chan.org/${board.name}/catalog.json`,
 				responseType: "json"
 			});
@@ -131,14 +196,14 @@ export default {
 				.filter(i => !i.sticky && !i.closed && i.replies >= 5)
 				.map(i => {
 					const title = core.Utils.fixHTML(core.Utils.removeHTML(i.sub ?? ""));
-					const subtitle = core.Utils.fixHTML(core.Utils.removeHTML(i.com ?? ""));
+					const subtitle = core.Utils.fixHTML(core.Utils.removeHTML(i.com));
 
 					return {
 						ID: i.no,
 						contentSplitIndex: title.length,
 						content: `${title}${subtitle}`,
-						modified: new sb.Date(i.last_modified),
-						created: new sb.Date(i.tim)
+						modified: new SupiDate(i.last_modified * 1000).valueOf(),
+						created: new SupiDate(i.time * 1000).valueOf()
 					};
 				});
 
@@ -151,10 +216,6 @@ export default {
 		if (rest.length > 0 || context.params.regex) {
 			const query = rest.join(" ").toLowerCase();
 			const filteredThreads = threadList.filter(i => {
-				if (i.dead) {
-					return false;
-				}
-
 				let targetString;
 				if (context.params.search === "title") {
 					targetString = i.content.slice(0, i.contentSplitIndex);
@@ -174,14 +235,14 @@ export default {
 				}
 			});
 
-			const thread = core.Utils.randArray(filteredThreads);
-			if (!thread) {
+			if (filteredThreads.length === 0) {
 				return {
 					success: false,
 					reply: "No threads found for your query!"
 				};
 			}
 
+			const thread = core.Utils.randArray(filteredThreads);
 			threadID = thread.ID;
 		}
 		else {
@@ -189,10 +250,10 @@ export default {
 			threadID = thread.ID;
 		}
 
-		const postKey = { type: "post-list", board: identifier, threadID };
-		let postList = await this.getCacheData(postKey);
+		const postKey = { type: "post-list", board: identifier, threadID: String(threadID) };
+		let postList = await this.getCacheData(postKey) as PostData[] | undefined;
 		if (!postList) {
-			const response = await core.Got.get("GenericAPI")({
+			const response = await core.Got.get("GenericAPI")<ThreadPostsResponse>({
 				url: `https://a.4cdn.org/${board.name}/thread/${threadID}.json`,
 				throwHttpErrors: false,
 				responseType: "json"
@@ -217,7 +278,7 @@ export default {
 				.map(i => ({
 					ID: i.no,
 					author: i.name,
-					created: new sb.Date(i.time * 1000),
+					created: new SupiDate(i.time * 1000).valueOf(),
 					content: (i.com)
 						? core.Utils.fixHTML(core.Utils.removeHTML(i.com ?? ""))
 						: null,
@@ -241,7 +302,7 @@ export default {
 		}
 
 		const post = core.Utils.randArray(eligiblePosts);
-		const delta = core.Utils.timeDelta(new sb.Date(post.created));
+		const delta = core.Utils.timeDelta(new SupiDate(post.created));
 
 		if (post.content) {
 			post.content = post.content.replaceAll(/>>\d+/g, "");
@@ -250,7 +311,7 @@ export default {
 				post.content = post.content.replace(regex, string);
 			}
 
-			if (enabled.content.nsfw === false) {
+			if (!enabled.content.nsfw) {
 				post.content = post.content.replace(linkRegex, "[LINK]");
 			}
 		}
@@ -266,7 +327,7 @@ export default {
 					: `${post.ID} ${flagEmoji} (posted ${delta}): ${post.file} ${post.content ?? ""}`
 			};
 		}
-		else if (resultType === "content") {
+		else {
 			return {
 				reply: (context.params.textOnly)
 					? `${post.content}`
@@ -274,38 +335,38 @@ export default {
 			};
 		}
 	}),
-	Dynamic_Description: (() => [
+	Dynamic_Description: (prefix) => ([
 		"Query 4chan for text or image posts",
 		"NSFW content is only enabled on Discord NSFW channels.",
 		"",
 
-		`<code>$4chan (board abbreviation)</code>`,
-		"<code>$4chan g</code>",
+		`<code>${prefix}4chan (board abbreviation)</code>`,
+		"<code>${prefix}4chan g</code>",
 		"Fetches a random post from a random thread from the specified board.",
 		"You must specify the board abbreviation exactly as it is, without slashes.",
 		"Stickied threads are ignored for this purpose.",
 		"",
 
-		`<code>$filechan (...)</code>`,
-		`<code>$imagechan (...)</code>`,
+		`<code>${prefix}filechan (...)</code>`,
+		`<code>${prefix}imagechan (...)</code>`,
 		"As above, but only queries posts that have images or media attached to them.",
 		"",
 
-		"<code>$4chan (board) (query)</code>",
-		"<code>$4chan g /mkg/</code>",
-		"<code>$4chan vg old school runescape</code>",
+		"<code>${prefix}4chan (board) (query)</code>",
+		"<code>${prefix}4chan g /mkg/</code>",
+		"<code>${prefix}4chan vg old school runescape</code>",
 		"Fetches a random post from a thread specified by your query, from the given board.",
 		"Your query is checked against the thread's title and subtitle together.",
 		"",
 
-		"<code>$4chan (board) regex:(regex)</code>",
+		"<code>${prefix}4chan (board) regex:(regex)</code>",
 		"Fetches a random post from a thread specified by your regex query, from the given board.",
 		"Your regex is tested against the thread's title and subtitle together.",
 		"",
 
-		"<code>$4chan (board) search:(content part)</code>",
-		"<code>$4chan (board) regex:(regex) search:(content part)</code>",
+		"<code>${prefix}4chan (board) search:(content part)</code>",
+		"<code>${prefix}4chan (board) regex:(regex) search:(content part)</code>",
 		"Same as above, but your regex/query will only match the specified content part.",
 		`Supports either "title" or "subtitle".`
 	])
-};
+});

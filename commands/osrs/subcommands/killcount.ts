@@ -15,20 +15,21 @@ export default {
 	title: "Kill count",
 	aliases: ["kill-count"],
 	default: false,
-	description: [
-		`<code>$osrs kc activity:"(activity name)" (username)</code>`,
-		`<code>$osrs kill-count activity:"(activity name)" (username)</code>`,
-		`<code>$osrs kc boss:"(activity name)" (username)</code>`,
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}osrs kc activity:"(activity name)" (username)</code>`,
+		`<code>${prefix}osrs kill-count activity:"(activity name)" (username)</code>`,
+		`<code>${prefix}osrs kc boss:"(activity name)" (username)</code>`,
 		"For given user and activity, prints their kill-count and ranking.",
 		"",
 
-		`<code>$osrs kc (activity)</code>`,
-		`<code>$osrs kc jad</code>`,
-		`If you have set up your username via the <code>$set ${SetCommand.name}</code>, you can use the name of the activity directly!`,
+		`<code>${prefix}osrs kc (activity)</code>`,
+		`<code>${prefix}osrs kc jad</code>`,
+		`If you have set up your username via the <code>${prefix}set ${SetCommand.name}</code>, you can use the name of the activity directly!`,
 		"",
 
-		`<code>$osrs kc @Username (activity)</code>`,
-		`<code>$osrs kc @Supinic Corrupted Gauntlet</code>`,
+		`<code>${prefix}osrs kc @Username (activity)</code>`,
+		`<code>${prefix}osrs kc @Supinic Corrupted Gauntlet</code>`,
 		"Same as above, but if the target has their OSRS username set, you can use the command like this."
 	],
 	execute: async function (context, ...args) {

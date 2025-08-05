@@ -12,11 +12,11 @@ export default {
 	title: "Tears of Guthix",
 	aliases: ["tears", "tog"],
 	default: false,
-	description: [
-		"<u>Tears of Guthix</u>",
-		`<code>$osrs tog</code>`,
-		`<code>$osrs tears</code>`,
-		`<code>$osrs guthix</code>`,
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}osrs tog</code>`,
+		`<code>${prefix}osrs tears</code>`,
+		`<code>${prefix}osrs guthix</code>`,
 		`Posts the list of "ideal" worlds for Tears of Guthix.`,
 		`Powered by <a href="https://github.com/jcarbelbide/tog-crowdsourcing-server">Tears of Guthix Crowdsourcing API</a>.`
 	],

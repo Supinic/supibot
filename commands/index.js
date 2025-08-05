@@ -65,7 +65,6 @@ import FunFactCommand from "./funfact/index.js";
 import GachiCommand from "./gachi/index.js";
 import GachiCheckCommand from "./gachicheck/index.js";
 import GachiSearchCommand from "./gachisearch/index.js";
-import GamesDoneQuickCommand from "./gamesdonequick/index.js";
 import GetProfilePictureCommand from "./getprofilepicture/index.js";
 import GetVideoDataCommand from "./getvideodata/index.js";
 import GiftCommand from "./gift/index.js";
@@ -156,7 +155,6 @@ import StatisticsCommand from "./statistics/index.js";
 import SteamGamePlayersCommand from "./steamgameplayers/index.js";
 import StockCommand from "./stock/index.js";
 import StreamCommand from "./stream/index.js";
-import StreamGamesCommand from "./streamgames/index.js";
 import StreamInfoCommand from "./streaminfo/index.js";
 import SubAgeCommand from "./subage/index.js";
 import SubscribeCommand from "./subscribe/index.js";
@@ -262,7 +260,6 @@ export default [
 	GachiCommand,
 	GachiCheckCommand,
 	GachiSearchCommand,
-	GamesDoneQuickCommand,
 	GetProfilePictureCommand,
 	GetVideoDataCommand,
 	GiftCommand,
@@ -352,7 +349,6 @@ export default [
 	SteamGamePlayersCommand,
 	StockCommand,
 	StreamCommand,
-	StreamGamesCommand,
 	StreamInfoCommand,
 	SubAgeCommand,
 	SubscribeCommand,
