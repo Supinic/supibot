@@ -67,9 +67,7 @@ interface GlobalCore {
 }
 
 declare global {
-	// eslint-disable-next-line no-var
 	var sb: GlobalSb;
-	// eslint-disable-next-line no-var
 	var core: GlobalCore;
 }
 

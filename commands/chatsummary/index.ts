@@ -46,7 +46,7 @@ const getLocalLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT)
 
 	const usersData = await Promise.all(promises);
 	const result = data
-		.reverse()
+		.toReversed()
 		.map(row => {
 			const userData = usersData.find(i => row.Platform_ID === i.id);
 			if (userData) {

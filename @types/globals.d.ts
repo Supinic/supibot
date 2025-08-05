@@ -1,3 +1,14 @@
+declare global {
+    interface RegExpConstructor {
+        /**
+         * @todo Temporary declaration augment, remove when baseline in TS (wasn't in 5.9.2)
+         * Escape any special regex characters in `text`.
+         * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/escape
+         */
+        escape (str: string): string;
+    }
+}
+
 export type Message = string;
 export type Emote = {
     ID: string | number;
