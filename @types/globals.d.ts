@@ -10,15 +10,26 @@ declare global {
 }
 
 export type Message = string;
-export type Emote = {
+
+type BaseEmote = {
     ID: string | number;
     name: string;
-    type: "twitch-subscriber" | "twitch-global" | "twitch-follower" | "ffz" | "bttv" | "7tv" | "discord" | "cytube";
     global: boolean;
     animated: boolean | null;
-    guild?: string;
-    zeroWidth?: boolean;
 };
+export type ThirdPartyEmote = BaseEmote & {
+    type: "ffz" | "bttv" | "7tv" | "cytube";
+    zeroWidth: boolean;
+}
+export type TwitchEmote = BaseEmote & {
+    type: "twitch-subscriber" | "twitch-global" | "twitch-follower";
+    channel: string;
+};
+export type DiscordEmote = BaseEmote & {
+    type: "discord";
+    guild: string;
+};
+export type Emote = TwitchEmote | DiscordEmote | ThirdPartyEmote;
 
 export type Coordinates = { lat: number; lng: number; } | { lat: string; lng: string; };
 

@@ -18,7 +18,7 @@ import {
 } from "discord.js";
 
 import { BaseConfig, Platform, PlatformVerificationStatus, PrepareMessageOptions } from "./template.js";
-import type { Emote } from "../@types/globals.d.ts";
+import type { DiscordEmote, Emote } from "../@types/globals.d.ts";
 import User from "../classes/user.js";
 import { SupiError } from "supi-core";
 import Channel from "../classes/channel.js";
@@ -171,7 +171,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				.filter(i => i.length > 2 && emojiNameRegex.test(i));
 
 			const wordSet = new Set(words);
-			const globalEmotes = await this.fetchGlobalEmotes();
+			const globalEmotes = await this.fetchGlobalEmotes() as DiscordEmote[];
 			const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
 
 			for (const word of wordSet) {
@@ -180,7 +180,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					continue;
 				}
 
-				let emote: Emote;
+				let emote;
 				const eligibleGuildEmotes = eligibleEmotes.filter(i => i.guild === channelObject.guild.id);
 				if (eligibleGuildEmotes.length !== 0) {
 					emote = eligibleGuildEmotes[0];

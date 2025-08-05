@@ -414,7 +414,8 @@ class CytubeClient {
 			name: emote.name,
 			type: "cytube",
 			global: false,
-			animated: Boolean(emote.image && emote.image.includes(".gif"))
+			animated: Boolean(emote.image && emote.image.includes(".gif")),
+			zeroWidth: false
 		};
 	}
 }
