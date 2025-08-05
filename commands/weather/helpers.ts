@@ -222,7 +222,7 @@ export const getSunPosition = (data: OwmWeatherResponse) => {
 	return (time)
 		? `Sun ${verb}s ${core.Utils.timeDelta(time * 1000)}.`
 		: `Sun does not ${verb} in the next 7 days.`;
-}
+};
 
 export class WeatherItem {
 	constructor (private item: WeatherDataItem, private minutes: MinutelyWeatherDataItem[]) {}
