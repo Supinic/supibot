@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "TwitchEmotes",
 	optionsType: "object",
@@ -12,5 +14,5 @@ export default {
 		}
 	},
 	parent: "GenericAPI",
-	description: null
-};
+	description: "Shorthand for fetching of Twitch emotes from various sources, including Helix, and the third party providers"
+} satisfies GotInstanceDefinition;

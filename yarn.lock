@@ -937,7 +937,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/geojson@npm:^7946.0.14":
+"@types/geojson@npm:^7946.0.14, @types/geojson@npm:^7946.0.16":
   version: 7946.0.16
   resolution: "@types/geojson@npm:7946.0.16"
   checksum: 10c0/1ff24a288bd5860b766b073ead337d31d73bdc715e5b50a2cee5cb0af57a1ed02cc04ef295f5fa68dc40fe3e4f104dd31282b2b818a5ba3231bc1001ba084e3c
@@ -1642,7 +1642,7 @@ async-markov@supinic/async-markov:
   languageName: node
   linkType: hard
 
-"cheerio@npm:^1.0.0":
+"cheerio@npm:^1.1.0":
   version: 1.1.0
   resolution: "cheerio@npm:1.1.0"
   dependencies:
@@ -3002,7 +3002,7 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
-"got@npm:^14.4.5":
+"got@npm:^14.4.7":
   version: 14.4.7
   resolution: "got@npm:14.4.7"
   dependencies:
@@ -3243,7 +3243,7 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
-"ioredis@npm:^5.4.2":
+"ioredis@npm:^5.6.1":
   version: 5.6.1
   resolution: "ioredis@npm:5.6.1"
   dependencies:
@@ -3954,7 +3954,7 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.4.0":
+"mariadb@npm:^3.4.4":
   version: 3.4.4
   resolution: "mariadb@npm:3.4.4"
   dependencies:
@@ -5153,16 +5153,17 @@ duration-parser@supinic/duration-parser:
 
 supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=e94ef9776b3ae0a23c1f8f80f3afbf4e8ccd9320"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=f579c80d264f5a5b371dbc9dfd7c88bf439b4477"
   dependencies:
-    cheerio: "npm:^1.0.0"
+    "@types/geojson": "npm:^7946.0.16"
+    cheerio: "npm:^1.1.0"
     duration-parser: supinic/duration-parser
-    got: "npm:^14.4.5"
-    ioredis: "npm:^5.4.2"
-    mariadb: "npm:^3.4.0"
+    got: "npm:^14.4.7"
+    ioredis: "npm:^5.6.1"
+    mariadb: "npm:^3.4.4"
     prom-client: "npm:^15.1.3"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/8cc3b6e0959654764bccff49d0174e2352b7e4adfb6226aa09c3e6f562af871b0f7ee1d9c8c340a30e138ea6fb83a64e7fffb6a9460ae0f1f773e8dec4221024
+  checksum: 10c0/1d02e5a08fd1fe27fc93429d446e3739ba05f72bf1fff1e5eabf1b06f69927ccb2609323d328305beb79463f41d2b6ec45886737badad44c84b8130aebf9662b
   languageName: node
   linkType: hard
 
@@ -5465,9 +5466,9 @@ track-link-parser@supinic/track-link-parser:
   linkType: hard
 
 "undici@npm:^7.10.0":
-  version: 7.11.0
-  resolution: "undici@npm:7.11.0"
-  checksum: 10c0/e5dd3cc2acae9c8333f97a78d4e91108957367fa7e69918e3a5cbd84702cb453cf7de3f8c2a33bcf808850d78ead70f3bd62900a70d969912e9fed8842bbfc11
+  version: 7.12.0
+  resolution: "undici@npm:7.12.0"
+  checksum: 10c0/27aada7bd8d2588f146a2ba554f2f6b7593f9c2d14bf3797bbc7b74825d9bee38eb3ab61e2d0ee01bb827a9ac8017eb2991cb4f06d9ed9971c8a142d8306fbab
   languageName: node
   linkType: hard
 

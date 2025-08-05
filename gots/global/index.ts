@@ -1,6 +1,6 @@
 import { Agent } from "http2-wrapper";
 import type { Http2Session } from "node:http2";
-import { isGotRequestError } from "supi-core";
+import { isGotRequestError, type GotInstanceDefinition } from "supi-core";
 
 import config from "../../config.json" with { type: "json" };
 const { defaultUserAgent } = config.modules.gots;
@@ -32,8 +32,13 @@ export default {
 			"User-Agent": defaultUserAgent
 		},
 		hooks: {
+			afterResponse: [],
+			beforeRedirect: [],
+			beforeRetry: [],
+			beforeRequest: [],
+			init: [],
 			beforeError: [
-				async (err: unknown) => {
+				async (err) => {
 					if (!isGotRequestError(err)) {
 						return err;
 					}
@@ -58,4 +63,4 @@ export default {
 	})),
 	parent: null,
 	description: "Global definition - template for all others"
-};
+} satisfies GotInstanceDefinition;

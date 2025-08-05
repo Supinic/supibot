@@ -7,7 +7,6 @@ export type GotDefinition = {
 };
 
 import GlobalGot from "./global/index.js";
-
 import FakeAgentGot from "./fake-agent/index.js";
 import GenericAPIGot from "./generic-api/index.js";
 import GitHubGot from "./github/index.js";
@@ -22,7 +21,6 @@ import TwitchEmotesGot from "./twitch-emotes/index.js";
 
 export const definitions = [
 	GlobalGot,
-
 	FakeAgentGot,
 	GenericAPIGot,
 	GitHubGot,
@@ -34,4 +32,4 @@ export const definitions = [
 	SupinicGot,
 	TwitchEmotesGot,
 	TwitchGQLGot
-] as GotDefinition[]; // @todo change to `satisfies` when gots are fully TS
+] satisfies GotDefinition[];

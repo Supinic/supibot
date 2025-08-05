@@ -2,7 +2,7 @@ export default {
 	name: "bot-active",
 	expression: "0 */10 * * * *",
 	description: "Pings the bot active API to make sure supibot is being registered as online",
-	code: (async function verifyBotAcitivity (cron) {
+	code: (async function verifyBotActivity (cron) {
 		if (!sb.Platform || !sb.User) {
 			return;
 		}

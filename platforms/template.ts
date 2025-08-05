@@ -131,7 +131,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	protected abstract initListeners (): void;
 	public abstract connect (): Promise<void>;
 	public abstract send (message: string, channel: Channel, options?: GenericSendOptions): Promise<unknown>;
-	public abstract pm (message: string, user: User, channel?: Channel | Record<string, unknown>): Promise<void>;
+	public abstract pm (message: string, user: User, channel?: Channel | null | Record<string, unknown>): Promise<void>;
 	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean> | null;
 	public abstract populateUserList (channelData: Channel): never[] | Promise<string[]>;
 	public abstract populateGlobalEmotes (): never[] | Promise<Emote[]>;

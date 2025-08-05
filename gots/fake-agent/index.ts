@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "FakeAgent",
 	optionsType: "object",
@@ -7,5 +9,5 @@ export default {
 		}
 	},
 	parent: "Global",
-	description: null
-};
+	description: "Pretends to describe a User-Agent, mostly used for scraping."
+} satisfies GotInstanceDefinition;
