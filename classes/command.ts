@@ -13,11 +13,11 @@ import type { BaseMessageOptions } from "discord.js";
 
 type DiscordEmbeds = BaseMessageOptions["embeds"];
 
-import { TemplateWithoutId, TemplateDefinition } from "./template.js";
+import { TemplateWithoutId, type TemplateDefinition } from "./template.js";
 
-import Banphrase from "./banphrase.js";
+import { Banphrase } from "./banphrase.js";
 import { Filter } from "./filter.js";
-import User from "./user.js";
+import { User } from "./user.js";
 import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import { Platform, type GetEmoteOptions } from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
@@ -28,7 +28,7 @@ import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
-import { Emote } from "../@types/globals.js";
+import type { Emote } from "../@types/globals.js";
 
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";

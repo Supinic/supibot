@@ -1,53 +1,50 @@
-import { it, describe } from "node:test";
-import assert from "node:assert/strict";
+/* eslint-disable @typescript-eslint/no-floating-promises */
+import { it, describe, beforeEach } from "node:test";
 
-import * as core from "supi-core";
-// @ts-ignore
-globalThis.core = {
-	Utils: new core.Utils()
-};
-
-import { Command } from "../../../classes/command.js";
-import { User } from "../../../classes/user.js";
-import { Platform } from "../../../platforms/template.js";
-
-import aliasCommandDefinition from "../../../commands/alias/index.js";
-
-const [command] = Command.importSpecific(aliasCommandDefinition);
-
-const FakeUser = new User({
-	ID: 1,
-	Name: "TestUser",
-	Twitch_ID: null,
-	Discord_ID: null,
-	Started_Using: null
-});
-const FakePlatform = await Platform.create("unknown", {
-	ID: -1,
-	active: true,
-	platform: {},
-	logging: {},
-	messageLimit: 1000,
-	selfId: "123",
-	selfName: "Supibot"
-});
-
-const fakeContext = Command.createFakeContext(command, {
-	user: FakeUser,
-	channel: null,
-	platform: FakePlatform,
-	platformSpecificData: null
-});
+// @ts-expect-error xd testing node stuff
+import { Command } from "../../../classes/command.ts";
+import aliasCommandDefinition from "../../../commands/alias/index.ts";
+import checkSubcommand from "../../../commands/alias/subcommands/check.ts";
 
 describe("Test xd", () => {
-	it("test 123", async () => {
-		try {
-			// const result = await command.execute(fakeContext, "alias", "list");
-			const result = {};
-			console.log({ result });
-		}
-		catch (e) {
-			console.log({ e });
-		}
+	it("test", () => console.log("xd"));
+
+	// beforeEach(() => {
+	// 	globalThis.core = {
+	// 		Utils: {
+	// 			tag: {
+	// 				trim: (strings: TemplateStringsArray, ...values: Array<string | number>) => {
+	// 					const result = [];
+	// 					for (let i = 0; i < strings.length; i++) {
+	// 						result.push(strings[i].replaceAll(/\s+/g, " "), values[i]);
+	// 					}
+	//
+	// 					return result.join("").trim();
+	// 				}
+	// 			}
+	// 		}
+	// 	};
+	// });
+
+	it("base command", async () => {
+		const command = new Command(aliasCommandDefinition);
+		const context = Command.createFakeContext(command, {
+			platformSpecificData: null,
+			user: {},
+			platform: {}
+		});
+
+		// await command.execute(context, "Test");
 	});
+
+	// it("test 123", async () => {
+	//
+	// 	try {
+	// 		// const result = await command.execute(fakeContext, "alias", "list");
+	// 		console.log({});
+	// 	}
+	// 	catch (e) {
+	// 		console.log({ e });
+	// 	}
+	// });
 });
