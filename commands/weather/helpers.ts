@@ -83,7 +83,7 @@ export type OwmWeatherResponse = {
 	current: CurrentWeatherDataItem;
 	daily: DailyWeatherDataItem[];
 	hourly: HourlyWeatherDataItem[];
-	minutely: MinutelyWeatherDataItem[];
+	minutely?: MinutelyWeatherDataItem[];
 	lat: number;
 	lon: number;
 	timezone: string;

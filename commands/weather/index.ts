@@ -451,7 +451,7 @@ export default declare({
 
 		let target: WeatherItem;
 		if (weatherTime.type === "current") {
-			target = new WeatherItem(data.current, data.minutely);
+			target = new WeatherItem(data.current, data.minutely ?? []);
 		}
 		else if (weatherTime.type === "hourly") {
 			const hourlyTarget = data.hourly.at(weatherTime.number);
@@ -462,7 +462,7 @@ export default declare({
 				};
 			}
 
-			target = new WeatherItem(hourlyTarget, data.minutely);
+			target = new WeatherItem(hourlyTarget, data.minutely ?? []);
 		}
 		else {
 			const dailyTarget = data.daily.at(weatherTime.number);
@@ -473,7 +473,7 @@ export default declare({
 				};
 			}
 
-			target = new WeatherItem(dailyTarget, data.minutely);
+			target = new WeatherItem(dailyTarget, data.minutely ?? []);
 		}
 
 		const obj = {
