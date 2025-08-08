@@ -41,7 +41,7 @@ type BoardThreadsResponse = {
 		closed?: 1;
 		replies: number;
 		sub?: string;
-		com: string;
+		com?: string;
 		last_modified: number;
 		time: number
 	}[];
@@ -196,7 +196,7 @@ export default declare({
 				.filter(i => !i.sticky && !i.closed && i.replies >= 5)
 				.map(i => {
 					const title = core.Utils.fixHTML(core.Utils.removeHTML(i.sub ?? ""));
-					const subtitle = core.Utils.fixHTML(core.Utils.removeHTML(i.com));
+					const subtitle = core.Utils.fixHTML(core.Utils.removeHTML(i.com ?? ""));
 
 					return {
 						ID: i.no,
