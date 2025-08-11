@@ -209,10 +209,7 @@ export default {
 		if (result && typeof result === "object") {
 			try {
 				return {
-					reply: JSON.stringify(result, null, 1),
-					meta: {
-						skipWhitespaceCheck: true
-					}
+					reply: JSON.stringify(result, null, 1)
 				};
 			}
 			catch (e) {
@@ -226,10 +223,7 @@ export default {
 		else {
 			return {
 				cooldown,
-				reply: String(result),
-				meta: {
-					skipWhitespaceCheck: true
-				}
+				reply: String(result)
 			};
 		}
 	}),
