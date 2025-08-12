@@ -20,11 +20,11 @@ type DictionaryApiSuccess = [{
 			definitions: {
 				definition: string;
 				synonyms: string[];
-				antontyms: string[];
+				antonyms: string[];
 				example?: string;
 			}[];
 			synonyms: string[];
-			antontyms: string[];
+			antonyms: string[];
 		}[];
 }];
 type DictionaryApiResponse = DictionaryApiFailure | DictionaryApiSuccess;
