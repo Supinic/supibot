@@ -5,6 +5,7 @@ import type { Context } from "../../classes/command.js";
 import type { User } from "../../classes/user.js";
 import type { Channel } from "../../classes/channel.js";
 import type { Platform } from "../../platforms/template.js";
+import { SubscribeCommandContext } from "./index.js";
 
 const DEFAULT_CHANNEL_ID = 38;
 
@@ -184,8 +185,7 @@ export type SpecialEventDefinition = BaseEventDefinition & {
 		added: string;
 		removed: string;
 	};
-	// @todo perhaps specify the Context by typing it with the $subscribe command params?
-	handler?: (context: Context, subscription: Row<EventSubscription>, ...args: string[]) => Promise<CommandResult>;
+	handler?: (context: SubscribeCommandContext, subscription: Row<EventSubscription>, ...args: string[]) => Promise<CommandResult>;
 };
 
 export type RssEventDefinition = BaseEventDefinition & {

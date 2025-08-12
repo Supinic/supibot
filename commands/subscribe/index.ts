@@ -1,10 +1,13 @@
 import { CronJob } from "cron";
-import { declare } from "../../classes/command.js";
+import { type Context, declare } from "../../classes/command.js";
 
 import subscriptions from "./event-types/index.js";
 import { EventSubscription, handleGenericSubscription, isGenericSubscriptionDefinition } from "./generic-event.js";
 
 const crons: Set<CronJob> = new Set();
+
+const subscribeCommandParams = [{ name: "skipPrivateReminder", type: "boolean" }] as const;
+export type SubscribeCommandContext = Context<typeof subscribeCommandParams>;
 
 export default declare({
 	Name: "subscribe",
@@ -12,7 +15,7 @@ export default declare({
 	Cooldown: 5000,
 	Description: "Subscribe or unsubscribe to a plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: [{ name: "skipPrivateReminder", type: "boolean" }] as const,
+	Params: subscribeCommandParams,
 	Whitelist_Response: null,
 	initialize: function () {
 		for (const def of subscriptions) {
