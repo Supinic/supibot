@@ -889,7 +889,7 @@ export class Command extends TemplateWithoutId {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
 				const reply = (channelHasFullErrorMessage)
 					? `Error ID ${errorID} - ${e.message}`
-					: config.responses.commandErrorResponse;
+					: `${config.responses.commandErrorResponse} (error ID ${errorID})`;
 
 				execution = {
 					success: false,
