@@ -10,6 +10,8 @@ export default {
 	aliases: ["live", "online"],
 	notes: "Usage: <code>subscribe/unsubscribe live (channel)</code> Every time a channel with Supibot in their chat goes live, users with this subscription for the specific channel will be notified of this via PMs.",
 	channelSpecificMention: false,
+	generic: false,
+	type: "special",
 	handler: async function (context, subscription, ...args) {
 		const { invocation } = context;
 		if (!subscription.loaded) {

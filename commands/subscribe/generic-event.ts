@@ -155,21 +155,16 @@ type CommandResult = { // @todo import from Command when supi-core has type expo
 };
 
 type BaseEventDefinition = {
-	type: "rss" | "custom";
+	type: "rss" | "custom" | "special";
 	name: string;
-	subName: string;
 	aliases: string[];
 	notes: string;
 	channelSpecificMention?: boolean;
-	response: {
-		added: string;
-		removed: string;
-	};
 	generic: boolean;
-	cronExpression: string;
 };
 
-type EventSubscription = {
+export type EventSubscription = {
+	ID: number;
 	User_Alias: User["ID"];
 	Channel: Channel["ID"] | null;
 	Platform: Platform["ID"];
@@ -178,10 +173,12 @@ type EventSubscription = {
 	Flags: string;
 	Active: boolean;
 };
-export type SpecialEventDefinition = {
+export type SpecialEventDefinition = BaseEventDefinition & {
 	name: string;
 	aliases: string[];
 	notes: string;
+	type: "special";
+	generic: false,
 	channelSpecificMention: boolean;
 	response?: {
 		added: string;
@@ -193,17 +190,33 @@ export type SpecialEventDefinition = {
 
 export type RssEventDefinition = BaseEventDefinition & {
 	type: "rss";
+	cronExpression: string;
+	subName: string;
 	url: string;
 	cacheKey: string;
+	response: {
+		added: string;
+		removed: string;
+	};
 	options?: {
 		ignoredCategories?: string[];
 	};
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
+	cronExpression: string;
+	subName: string;
+	response: {
+		added: string;
+		removed: string;
+	};
 	process: () => Promise<null | { message: string }>;
 };
 export type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
+
+export type EventDefinition = RssEventDefinition | CustomEventDefinition | SpecialEventDefinition;
+
+export const isGenericSubscriptionDefinition = (input: EventDefinition): input is GenericEventDefinition => (input.generic);
 
 /**
  * For a given definition of a subscription event, fetches the newest item and handles the subscription if a new is found.

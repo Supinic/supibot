@@ -3,6 +3,8 @@ import { SpecialEventDefinition } from "../generic-event.js";
 export default {
 	name: "Changelog",
 	aliases: [],
+	type: "special",
+	generic: false,
 	notes: "Every minute, Supibot checks for new changelogs. If you are subscribed, you will receive a private system reminder from Supibot.",
 	channelSpecificMention: false,
 	response: {

@@ -387,7 +387,7 @@ export class Command extends TemplateWithoutId {
 	#ready = false;
 	#destroyed = false;
 	readonly #customDestroy: CustomDestroyFunction | null;
-	readonly data = {};
+	readonly data: Record<string, unknown> = {};
 
 	static readonly importable = true;
 	static readonly uniqueIdentifier = "Name";

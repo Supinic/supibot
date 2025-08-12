@@ -1,44 +1,36 @@
 import { CronJob } from "cron";
+import { declare } from "../../classes/command.js";
+
 import subscriptions from "./event-types/index.js";
-import { handleGenericSubscription } from "./generic-event.js";
+import { EventSubscription, handleGenericSubscription, isGenericSubscriptionDefinition } from "./generic-event.js";
 
-const nameSymbol = Symbol.for("name");
-const definitionSymbol = Symbol.for("definition");
+const crons: Set<CronJob> = new Set();
 
-export default {
+export default declare({
 	Name: "subscribe",
 	Aliases: ["unsubscribe"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Subscribe or unsubscribe to a plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: [
-		{ name: "skipPrivateReminder", type: "boolean" }
-	],
+	Params: [{ name: "skipPrivateReminder", type: "boolean" }] as const,
 	Whitelist_Response: null,
-	initialize: async function () {
-		const genericSubscriptions = subscriptions.filter(i => i.generic);
+	initialize: function () {
+		for (const def of subscriptions) {
+			if (!isGenericSubscriptionDefinition(def)) {
+				continue;
+			}
 
-		this.data.crons = new Set();
-
-		for (const def of genericSubscriptions) {
-			const expression = def.cronExpression ?? "0 */5 * * * *";
-			const cronJob = new CronJob(expression, () => handleGenericSubscription(def));
-
-			// These symbols are only used for debugging purposes, simplifies the inspection of each cron job
-			cronJob[nameSymbol] = def.name ?? null;
-			cronJob[definitionSymbol] = def;
-
+			const cronJob = new CronJob(def.cronExpression, () => handleGenericSubscription(def));
 			cronJob.start();
-			this.data.crons.add(cronJob);
+			crons.add(cronJob);
 		}
 	},
 	destroy: function () {
-		for (const cronJob of this.data.crons) {
-			cronJob.stop();
+		for (const cronJob of crons) {
+			void cronJob.stop();
 		}
 
-		this.data.crons.clear();
+		crons.clear();
 	},
 	Code: async function subscribe (context, type, ...args) {
 		if (!type) {
@@ -64,8 +56,7 @@ export default {
 			};
 		}
 
-		/** @type {{ ID: number, Active: boolean }} */
-		const subData = await core.Query.getRecordset(rs => rs
+		const subData = await core.Query.getRecordset<EventSubscription | undefined>(rs => rs
 			.select("ID", "Active", "Channel", "Platform", "Flags")
 			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
@@ -74,8 +65,8 @@ export default {
 			.single()
 		);
 
-		if (typeof event.handler === "function") {
-			const subscription = await core.Query.getRow("data", "Event_Subscription");
+		if ("handler" in event) {
+			const subscription = await core.Query.getRow<EventSubscription>("data", "Event_Subscription");
 			if (subData?.ID) {
 				await subscription.load(subData.ID);
 			}
@@ -123,9 +114,9 @@ export default {
 				);
 
 				let previousString = "";
-				const previousPlatformData = sb.Platform.get(subData.Platform);
+				const previousPlatformData = sb.Platform.getAsserted(subData.Platform);
 				if (subData.Channel) {
-					const previousChannelData = sb.Channel.get(subData.Channel);
+					const previousChannelData = sb.Channel.getAsserted(subData.Channel);
 					previousString += `${previousPlatformData.Name} channel ${previousChannelData.Description ?? previousChannelData.Name}`;
 				}
 				else {
@@ -149,7 +140,9 @@ export default {
 
 			// Error response for attempting to repeat an existing state - already (un)subscribed.
 			if ((invocation === "subscribe" && subData.Active) || (invocation === "unsubscribe" && !subData.Active)) {
-				const storedFlagValue = Boolean(JSON.parse(subData.Flags ?? {}).skipPrivateReminder);
+				const flags = JSON.parse(subData.Flags) as { skipPrivateReminder?: boolean; };
+				const storedFlagValue = Boolean(flags.skipPrivateReminder);
+
 				if (storedFlagValue !== flags.skipPrivateReminder) {
 					invocationString = "update";
 				}
@@ -197,7 +190,7 @@ export default {
 			};
 		}
 	},
-	Dynamic_Description: async function (prefix) {
+	Dynamic_Description: (prefix) => {
 		const typesList = subscriptions.map(i => core.Utils.tag.trim `
 			<li>
 				<code>${i.name}</code>
@@ -229,4 +222,4 @@ export default {
 			`<ul>${typesList}</ul>`
 		];
 	}
-};
+});
