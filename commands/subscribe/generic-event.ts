@@ -1,6 +1,10 @@
-import { type Context } from "../../classes/command.js";
 import { Date as SupiDate, type Row } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
+
+import type { User } from "../../classes/user.js";
+import type { Channel } from "../../classes/channel.js";
+import type { Platform } from "../../platforms/template.js";
+import { SubscribeCommandContext } from "./index.js";
 
 const DEFAULT_CHANNEL_ID = 38;
 
@@ -151,45 +155,67 @@ type CommandResult = { // @todo import from Command when supi-core has type expo
 };
 
 type BaseEventDefinition = {
-	type: "rss" | "custom";
+	type: "rss" | "custom" | "special";
 	name: string;
-	subName: string;
 	aliases: string[];
 	notes: string;
 	channelSpecificMention?: boolean;
-	response: {
-		added: string;
-		removed: string;
-	};
 	generic: boolean;
-	cronExpression: string;
 };
-export type SpecialEventDefinition = {
+
+export type EventSubscription = {
+	ID: number;
+	User_Alias: User["ID"];
+	Channel: Channel["ID"] | null;
+	Platform: Platform["ID"];
+	Type: string;
+	Data: string | null;
+	Flags: string;
+	Active: boolean;
+};
+export type SpecialEventDefinition = BaseEventDefinition & {
 	name: string;
 	aliases: string[];
 	notes: string;
+	type: "special";
+	generic: false,
 	channelSpecificMention: boolean;
 	response?: {
 		added: string;
 		removed: string;
 	};
-	// @todo perhaps specify the Context by typing it with the $subscribe command params?
-	handler?: (context: Context, subscription: Row<UserSubscription>, ...args: string[]) => Promise<CommandResult>;
+	handler?: (context: SubscribeCommandContext, subscription: Row<EventSubscription>, ...args: string[]) => Promise<CommandResult>;
 };
 
 export type RssEventDefinition = BaseEventDefinition & {
 	type: "rss";
+	cronExpression: string;
+	subName: string;
 	url: string;
 	cacheKey: string;
+	response: {
+		added: string;
+		removed: string;
+	};
 	options?: {
 		ignoredCategories?: string[];
 	};
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
+	cronExpression: string;
+	subName: string;
+	response: {
+		added: string;
+		removed: string;
+	};
 	process: () => Promise<null | { message: string }>;
 };
 export type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
+
+export type EventDefinition = RssEventDefinition | CustomEventDefinition | SpecialEventDefinition;
+
+export const isGenericSubscriptionDefinition = (input: EventDefinition): input is GenericEventDefinition => (input.generic);
 
 /**
  * For a given definition of a subscription event, fetches the newest item and handles the subscription if a new is found.

@@ -507,6 +507,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public static getAsserted (identifier: "discord"): DiscordPlatform;
 	public static getAsserted (identifier: "cytube"): CytubePlatform;
 	public static getAsserted (identifier: "irc", host: string): IrcPlatform;
+	public static getAsserted (identifier: number, host?: string): Platform;
 	public static getAsserted (identifier: string | number) {
 		const platform = Platform.get(identifier);
 		if (!platform) {
