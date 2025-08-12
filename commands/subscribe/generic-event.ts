@@ -1,7 +1,6 @@
 import { Date as SupiDate, type Row } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
 
-import type { Context } from "../../classes/command.js";
 import type { User } from "../../classes/user.js";
 import type { Channel } from "../../classes/channel.js";
 import type { Platform } from "../../platforms/template.js";
