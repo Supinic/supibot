@@ -8,6 +8,7 @@ import ChannelLiveSubDefinition from "./channel-live.js";
 import DenoSubDefinition from "./deno.js";
 import DotnetSubDefinition from "./dotnet.js";
 import FactorioSubDefinition from "./factorio.js";
+import GithubBlogDefinition from "./github-blog.js";
 import GrindingGearGamesSubDefinition from "./ggg.js";
 import MicrosoftCppSubDefinition from "./msvcpp.js";
 import NodeSubDefinition from "./nodejs.js";
@@ -28,6 +29,7 @@ export default [
 	DenoSubDefinition,
 	DotnetSubDefinition,
 	FactorioSubDefinition,
+	GithubBlogDefinition,
 	GrindingGearGamesSubDefinition,
 	MicrosoftCppSubDefinition,
 	NodeSubDefinition,
