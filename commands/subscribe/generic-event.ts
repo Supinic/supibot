@@ -1,6 +1,10 @@
-import { type Context } from "../../classes/command.js";
 import { Date as SupiDate, type Row } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
+
+import type { Context } from "../../classes/command.js";
+import type { User } from "../../classes/user.js";
+import type { Channel } from "../../classes/channel.js";
+import type { Platform } from "../../platforms/template.js";
 
 const DEFAULT_CHANNEL_ID = 38;
 
@@ -164,6 +168,16 @@ type BaseEventDefinition = {
 	generic: boolean;
 	cronExpression: string;
 };
+
+type EventSubscription = {
+	User_Alias: User["ID"];
+	Channel: Channel["ID"] | null;
+	Platform: Platform["ID"];
+	Type: string;
+	Data: string | null;
+	Flags: string;
+	Active: boolean;
+};
 export type SpecialEventDefinition = {
 	name: string;
 	aliases: string[];
@@ -174,7 +188,7 @@ export type SpecialEventDefinition = {
 		removed: string;
 	};
 	// @todo perhaps specify the Context by typing it with the $subscribe command params?
-	handler?: (context: Context, subscription: Row<UserSubscription>, ...args: string[]) => Promise<CommandResult>;
+	handler?: (context: Context, subscription: Row<EventSubscription>, ...args: string[]) => Promise<CommandResult>;
 };
 
 export type RssEventDefinition = BaseEventDefinition & {
