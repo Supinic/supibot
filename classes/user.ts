@@ -479,6 +479,7 @@ export class User extends TemplateWithIdString {
 
 	static destroy () {
 		clearInterval(User.mapExpirationInterval);
+		clearInterval(User.highLoadUserInterval);
 		User.data.clear();
 	}
 }
