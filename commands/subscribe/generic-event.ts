@@ -105,11 +105,21 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
 /**
  * Parses RSS xml into an object definition, caching and uncaching it as required.
  */
-const parseRssNews = async function (xml: string, cacheKey: string): Promise<string[] | null> {
+const parseRssNews = async function (xml: string, cacheKey: string, options: RssEventDefinition["options"] = {}): Promise<string[] | null> {
 	const feed = await parseRSS(xml);
 	const lastPublishDate = (await core.Cache.getByPrefix(cacheKey) ?? 0) as number;
+
+	const skippedCategories = (options.ignoredCategories ?? []).map(i => i.toLowerCase());
 	const eligibleArticles = feed.items
-		.filter(i => new SupiDate(i.pubDate).valueOf() > lastPublishDate)
+		.filter(article => new SupiDate(article.pubDate).valueOf() > lastPublishDate)
+		.filter(article => {
+			if (skippedCategories.length === 0) {
+				return true;
+			}
+
+			const itemCat = (article.categories ?? []).map(i => i.toLowerCase());
+			return itemCat.some(category => skippedCategories.includes(category));
+		})
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
 
 	if (eligibleArticles.length === 0) {
@@ -166,10 +176,14 @@ export type SpecialEventDefinition = {
 	// @todo perhaps specify the Context by typing it with the $subscribe command params?
 	handler?: (context: Context, subscription: Row<UserSubscription>, ...args: string[]) => Promise<CommandResult>;
 };
+
 export type RssEventDefinition = BaseEventDefinition & {
 	type: "rss";
 	url: string;
 	cacheKey: string;
+	options?: {
+		ignoredCategories?: string[];
+	};
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
@@ -185,7 +199,7 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 
 	let message;
 	if (type === "rss") {
-		const { cacheKey, url } = definition;
+		const { cacheKey, options, url } = definition;
 		const response = await core.Got.get("GenericAPI")({
 			url,
 			responseType: "text",
@@ -202,7 +216,7 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 			return;
 		}
 
-		const result = await parseRssNews(response.body, cacheKey);
+		const result = await parseRssNews(response.body, cacheKey, options);
 		if (!result) {
 			return;
 		}
