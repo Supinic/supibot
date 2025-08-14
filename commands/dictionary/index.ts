@@ -32,7 +32,6 @@ type DictionaryApiResponse = DictionaryApiFailure | DictionaryApiSuccess;
 export default declare({
 	Name: "dictionary",
 	Aliases: ["dict"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the dictionary definition of a word in English. If there are multiple definitions, you can add \"index:#\" with a number to access specific definition indexes.",
 	Flags: ["mention","non-nullable","pipe"],
