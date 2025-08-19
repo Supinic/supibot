@@ -43,8 +43,8 @@ const aliasCommandDefinition = declare({
 
 		return await subcommand.execute.call(this, context, subInvocation, ...subArgs);
 	}),
-	Dynamic_Description: (prefix) => {
-		const subcommandDescriptions = AliasSubcommands.createDescription();
+	Dynamic_Description: async (prefix) => {
+		const subcommandDescriptions = await AliasSubcommands.createDescription();
 		return [
 			"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
 			"You have to first create an alias, and then run it. You can manage your aliases by listing, checking, removing and adding.",
