@@ -101,14 +101,14 @@ type ImageUploadResult = {
 /**
  * Uploads a file to {@link https://imgur.com}
  */
-export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" | "video"; }): Promise<ImageUploadResult> => {
+export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" | "video"; } = {}): Promise<ImageUploadResult> => {
 	const { type = "image" } = options;
 	const endpoint = (type === "image") ? "image" : "upload";
 	const filename = (type === "image") ? "image.jpg" : "video.mp4";
 
 	// !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
 	const formData = new FormData();
-	formData.append("image", new Blob([fileData.toString()]), filename);
+	formData.append("image", new Blob([fileData.buffer as ArrayBuffer]), filename);
 	formData.append("type", "image");
 	formData.append("title", "Simple upload");
 
