@@ -1,4 +1,4 @@
-import { GenericEventDefinition, SpecialEventDefinition } from "../generic-event.js";
+import { EventDefinition } from "../generic-event.js";
 
 import ArchLinuxSubDefinition from "./archlinux.js";
 import BrighterShoresSubDefinition from "./brighter-shores.js";
@@ -8,7 +8,7 @@ import ChannelLiveSubDefinition from "./channel-live.js";
 import DenoSubDefinition from "./deno.js";
 import DotnetSubDefinition from "./dotnet.js";
 import FactorioSubDefinition from "./factorio.js";
-import GrindingGearGamesSubDefinition from "./ggg.js";
+import GithubBlogDefinition from "./github-blog.js";
 import MicrosoftCppSubDefinition from "./msvcpp.js";
 import NodeSubDefinition from "./nodejs.js";
 import OsrsSubDefinition from "./osrs.js";
@@ -28,7 +28,7 @@ export default [
 	DenoSubDefinition,
 	DotnetSubDefinition,
 	FactorioSubDefinition,
-	GrindingGearGamesSubDefinition,
+	GithubBlogDefinition,
 	MicrosoftCppSubDefinition,
 	NodeSubDefinition,
 	OsrsSubDefinition,
@@ -38,4 +38,4 @@ export default [
 	SteamGiveawayDefinition,
 	SuggestionSubDefinition,
 	V8SubDefinition
-] satisfies Array<GenericEventDefinition | SpecialEventDefinition>;
+] satisfies EventDefinition[];

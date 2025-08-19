@@ -368,6 +368,17 @@ export class Channel extends TemplateWithId {
 		return null;
 	}
 
+	static getAsserted (identifier: string | number, platformIdentifier?: Platform | string | number): Channel {
+		const channel = Channel.get(identifier, platformIdentifier);
+		if (!channel) {
+			throw new SupiError({
+				message: `Assert error: asserted Channel ${identifier} is not available`
+			});
+		}
+
+		return channel;
+	}
+
 	static getBySpecificId (identifier: Channel["Specific_ID"], platform: Platform | string | number) {
 		const platformData = Platform.get(platform);
 		if (!platformData) {

@@ -1,8 +1,17 @@
+import type { Channel } from "../../../classes/channel.js";
+import type { SpecialEventDefinition } from "../generic-event.js";
+
+type ChannelsSubData = {
+	channels?: Channel["ID"][];
+};
+
 export default {
 	name: "Channel live",
 	aliases: ["live", "online"],
 	notes: "Usage: <code>subscribe/unsubscribe live (channel)</code> Every time a channel with Supibot in their chat goes live, users with this subscription for the specific channel will be notified of this via PMs.",
 	channelSpecificMention: false,
+	generic: false,
+	type: "special",
 	handler: async function (context, subscription, ...args) {
 		const { invocation } = context;
 		if (!subscription.loaded) {
@@ -26,14 +35,14 @@ export default {
 			}
 		}
 
-		const data = JSON.parse(subscription.values.Data ?? "{}");
+		const data = JSON.parse(subscription.values.Data ?? "{}") as ChannelsSubData;
 		data.channels = data.channels ?? [];
 
-		const twitch = sb.Platform.get("twitch");
+		const twitch = sb.Platform.getAsserted("twitch");
 		const channels = args
 			.map(i => sb.Channel.get(i.toLowerCase(), twitch))
-			.filter(i => i !== null && i.Type !== "Inactive")
-			.map(i => i.ID);
+			.filter(i => i !== null && i.Mode !== "Inactive")
+			.map(i => (i as Channel).ID);
 
 		if (channels.length === 0) {
 			if (invocation === "unsubscribe") {
@@ -47,11 +56,12 @@ export default {
 				};
 			}
 			else if (args.length === 0) {
+				const channelList = data.channels.map(i => sb.Channel.get(i)?.Name ?? "").filter(Boolean);
 				return {
 					success: true,
 					reply: (data.channels.length === 0)
 						? "You're not subscribed to any channels."
-						: `You're subscribed to these ${data.channels.length} channels: ${data.channels.map(i => sb.Channel.get(i).Name).join(", ")}`
+						: `You're subscribed to these ${data.channels.length} channels: ${channelList.join(", ")}`
 				};
 			}
 			else {
@@ -89,4 +99,4 @@ export default {
 			reply: response
 		};
 	}
-};
+} satisfies SpecialEventDefinition;

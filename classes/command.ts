@@ -385,7 +385,7 @@ export class Command extends TemplateWithoutId {
 	#ready = false;
 	#destroyed = false;
 	readonly #customDestroy: CustomDestroyFunction | null;
-	readonly data = {};
+	readonly data: Record<string, unknown> = {};
 
 	static readonly importable = true;
 	static readonly uniqueIdentifier = "Name";
@@ -887,7 +887,7 @@ export class Command extends TemplateWithoutId {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
 				const reply = (channelHasFullErrorMessage)
 					? `Error ID ${errorID} - ${e.message}`
-					: config.responses.commandErrorResponse;
+					: `${config.responses.commandErrorResponse} (error ID ${errorID})`;
 
 				execution = {
 					success: false,
@@ -1374,6 +1374,8 @@ export class Command extends TemplateWithoutId {
 		for (const command of Command.data.values()) {
 			command.destroy();
 		}
+
+		Command.#cooldownManager.destroy();
 	}
 
 	static get prefixRegex () {
