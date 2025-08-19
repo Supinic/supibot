@@ -1,8 +1,8 @@
 import type { DoesNotExistSubcommandDefinition } from "../index.js";
 
 export default {
-	name: "words",
-	aliases: [],
+	name: "word",
+	aliases: ["words"],
 	title: "Word",
 	default: false,
 	description: [
