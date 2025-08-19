@@ -51,7 +51,6 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-unicorn": "^59.0.1",
     "globals": "^16.2.0",
-    "mocha": "^11.6.0",
     "nyc": "^17.1.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^5.8.3",
