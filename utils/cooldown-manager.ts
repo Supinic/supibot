@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import config from "../config.json" with { type: "json" };
 const { values } = config;
 
@@ -98,23 +99,14 @@ const isPending = (input: Inhibitor): input is Pending => (input instanceof Pend
  * Manages the cooldowns between each message sent to channels.
  */
 export default class CooldownManager {
-	private readonly data: Inhibitor[] = [];
-	private readonly pruneInterval: NodeJS.Timeout;
-
-	constructor () {
-		this.pruneInterval = setInterval(() => {
-			this.prune();
-		}, 60_000);
-	}
+	private readonly data: Set<Inhibitor> = new Set();
 
 	/**
 	 * Checks if given combination of parameters has a cooldown pending.
 	 * @returns `true` if it's safe to run the command, `false` if the execution should be denied.
 	 */
 	check (channel: Identifier, user: Identifier, command: Identifier, skipPending: boolean) {
-		const length = this.data.length;
-		for (let i = 0; i < length; i++) {
-			const inhibitor = this.data[i];
+		for (const inhibitor of this.data) {
 			if (skipPending && inhibitor instanceof Pending) {
 				continue;
 			}
@@ -135,29 +127,31 @@ export default class CooldownManager {
 	 * Sets a cooldown for given combination of parameters
 	 */
 	set (channel: Identifier, user: Identifier, command: Identifier, cooldown: number) {
-		this.data.push(new Cooldown({
+		this.data.add(new Cooldown({
 			channel,
 			user,
 			command,
 			expires: Date.now() + cooldown
 		}));
+
+		this.prune();
 	}
 
 	/**
 	 * Sets a pending cooldown (it's really a status) for given user.
-	 * @param {string|number} user
-	 * @param {string} [description]
 	 */
 	setPending (user: Identifier, description: string) {
-		this.data.push(new Pending({
+		this.data.add(new Pending({
 			user,
 			description,
 			expires: Date.now() + values.pendingCommandTimeout
 		}));
+
+		this.prune();
 	}
 
 	/**
-	 * Prematurely revoke a cooldown given by its parameters.
+	 * Prematurely revoke a Cooldown inhibitor given by its parameters.
 	 */
 	unset (channel: Identifier, user: Identifier, command: Identifier) {
 		for (const inhibitor of this.data) {
@@ -169,11 +163,12 @@ export default class CooldownManager {
 			}
 
 			inhibitor.revoke();
+			this.data.delete(inhibitor);
 		}
 	}
 
 	/**
-	 * Unsets a pending cooldown for given user.
+	 * Prematurely unset a Pending inhibitor for given user.
 	 */
 	unsetPending (user: Identifier) {
 		for (const inhibitor of this.data) {
@@ -185,6 +180,7 @@ export default class CooldownManager {
 			}
 
 			inhibitor.revoke();
+			this.data.delete(inhibitor);
 		}
 	}
 
@@ -208,16 +204,14 @@ export default class CooldownManager {
 	 * Removes expired inhibitors from the list.
 	 */
 	prune () {
-		const now = Date.now();
-		const length = this.data.length;
-		for (let i = length - 1; i >= 0; i--) {
-			if (this.data[i].expires <= now) {
-				this.data.splice(i, 1);
+		const now = SupiDate.now();
+		for (const inhibitor of this.data) {
+			if (inhibitor.expires > now) {
+				continue;
 			}
-		}
-	}
 
-	destroy () {
-		clearInterval(this.pruneInterval);
+			inhibitor.revoke();
+			this.data.delete(inhibitor);
+		}
 	}
 }
