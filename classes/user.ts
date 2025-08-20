@@ -48,11 +48,10 @@ export class User extends TemplateWithIdString {
 	readonly Name: string;
 	readonly Started_Using: SupiDate;
 
+	static readonly data: Map<string, User> = new Map();
+	private static lastUserDataClear = 0;
 	static readonly mapCacheExpiration = 300_000;
 	static readonly redisCacheExpiration = 3_600_000;
-
-	static data: Map<string, User> = new Map();
-	private static lastUserDataClear = 0;
 
 	static readonly dataCache: WeakMap<User, Partial<UserDataPropertyMap>> = new WeakMap();
 	static readonly pendingNewUsers: Map<User["Name"], Promise<User> | null> = new Map();
