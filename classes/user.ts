@@ -50,9 +50,10 @@ export class User extends TemplateWithIdString {
 
 	static readonly mapCacheExpiration = 300_000;
 	static readonly redisCacheExpiration = 3_600_000;
-	static readonly mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
 	static data: Map<string, User> = new Map();
+	private static lastUserDataClear = 0;
+
 	static readonly dataCache: WeakMap<User, Partial<UserDataPropertyMap>> = new WeakMap();
 	static readonly pendingNewUsers: Map<User["Name"], Promise<User> | null> = new Map();
 
@@ -61,7 +62,7 @@ export class User extends TemplateWithIdString {
 	static highLoadUserBatch: Batch | undefined;
 	static highLoadUserInterval: NodeJS.Timeout;
 	static {
-		User.highLoadUserInterval = setInterval(() => void User.handleHighLoad(), HIGH_LOAD_CACHE_EXPIRY);
+		User.highLoadUserInterval = setInterval(() => void User.handleHighLoad(), HIGH_LOAD_CACHE_EXPIRY).unref();
 	}
 
 	constructor (data: ConstructorData) {
@@ -150,6 +151,12 @@ export class User extends TemplateWithIdString {
 	static async initialize () {}
 
 	static async get (identifier: Like, strict: boolean = true, options: GetOptions = {}): Promise<User | null> {
+		const now = SupiDate.now();
+		if (now >= (User.lastUserDataClear + User.mapCacheExpiration)) {
+			User.data.clear();
+			User.lastUserDataClear = now;
+		}
+
 		if (identifier instanceof User) {
 			return identifier;
 		}
@@ -478,7 +485,6 @@ export class User extends TemplateWithIdString {
 	}
 
 	static destroy () {
-		clearInterval(User.mapExpirationInterval);
 		clearInterval(User.highLoadUserInterval);
 		User.data.clear();
 	}
