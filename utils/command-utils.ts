@@ -96,22 +96,28 @@ export const fetchTimeData = async (data: { coordinates: Coordinates, date?: Sup
 	};
 };
 
+const getFormTypes = (type: "image" | "video") => (type === "image")
+	? { filename: "image.png", mime: "image/png" }
+	: { filename: "video.mp4", mime: "video/mp4" };
+
 type ImageUploadResult = {
 	statusCode: number;
 	link: string | null;
 };
+type UploadOptions = { type?: "image" | "video"; };
+type SmartUploadOptions = UploadOptions & { order?: ("nuuls" | "imgur" | "kappa")[] };
 
 /**
  * Uploads a file to {@link https://imgur.com}
  */
-export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" | "video"; }): Promise<ImageUploadResult> => {
+export const uploadToImgur = async (fileData: Buffer, options: UploadOptions = {}): Promise<ImageUploadResult> => {
 	const { type = "image" } = options;
 	const endpoint = (type === "image") ? "image" : "upload";
-	const filename = (type === "image") ? "image.jpg" : "video.mp4";
+	const { filename, mime } = getFormTypes(type);
 
 	// !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
 	const formData = new FormData();
-	formData.append("image", new Blob([fileData.toString()]), filename);
+	formData.append("image", new Blob([fileData.buffer as ArrayBuffer], { type: mime }), filename);
 	formData.append("type", "image");
 	formData.append("title", "Simple upload");
 
@@ -149,9 +155,12 @@ export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" 
 /**
  * Uploads a file to {@link https://i.nuuls.com}
  */
-export const uploadToNuuls = async (fileData: string): Promise<ImageUploadResult> => {
+export const uploadToNuuls = async (fileData: Buffer, options: UploadOptions = {}): Promise<ImageUploadResult> => {
+	const { type = "image" } = options;
+	const { filename, mime } = getFormTypes(type);
+
 	const formData = new FormData();
-	formData.append("attachment", fileData);
+	formData.append("file", new Blob([fileData.buffer as ArrayBuffer], { type: mime }), filename);
 
 	const response = await core.Got.get("GenericAPI")({
 		method: "POST",
@@ -170,6 +179,58 @@ export const uploadToNuuls = async (fileData: string): Promise<ImageUploadResult
 	return {
 		statusCode: response.statusCode,
 		link: (response.ok) ? response.body : null
+	};
+};
+
+/**
+ * Uploads a file to {@link https://i.nuuls.com}
+ */
+export const uploadToKappaLol = async (fileData: Buffer, options: UploadOptions = {}): Promise<ImageUploadResult> => {
+	const { type = "image" } = options;
+	const { filename, mime } = getFormTypes(type);
+
+	const formData = new FormData();
+	formData.append("file", new Blob([fileData.buffer as ArrayBuffer], { type: mime }), filename);
+
+	const response = await core.Got.get("GenericAPI")({
+		method: "POST",
+		throwHttpErrors: false,
+		url: "https://kappa.lol/api/upload",
+		responseType: "text",
+		body: formData,
+		retry: {
+			limit: 0
+		},
+		timeout: {
+			request: 10_000
+		}
+	});
+
+	return {
+		statusCode: response.statusCode,
+		link: (response.ok) ? response.body : null
+	};
+};
+
+const UPLOAD_MAP = {
+	imgur: uploadToImgur,
+	nuuls: uploadToNuuls,
+	kappa: uploadToKappaLol
+} as const;
+const DEFAULT_ORDER = ["nuuls", "kappa", "imgur"] as const;
+
+export const uploadFile = async (fileData: Buffer, options: SmartUploadOptions): Promise<ImageUploadResult> => {
+	const uploadOptions = { type: options.type };
+	for (const item of options.order ?? DEFAULT_ORDER) {
+		const result = await UPLOAD_MAP[item](fileData, uploadOptions);
+		if (result.link) {
+			return result;
+		}
+	}
+
+	return {
+		link: null,
+		statusCode: 500
 	};
 };
 

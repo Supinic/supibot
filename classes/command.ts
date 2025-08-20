@@ -1374,8 +1374,6 @@ export class Command extends TemplateWithoutId {
 		for (const command of Command.data.values()) {
 			command.destroy();
 		}
-
-		Command.#cooldownManager.destroy();
 	}
 
 	static get prefixRegex () {
