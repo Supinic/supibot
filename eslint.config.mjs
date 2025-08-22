@@ -247,20 +247,15 @@ export default tseslint.config(
 	{
 		files: ["tests/**/*.{test,spec}.ts"],
 		languageOptions: {
-			globals: {
-				test: "readonly",
-				describe: "readonly",
-				it: "readonly",
-				before: "readonly",
-				beforeEach: "readonly",
-				after: "readonly",
-				afterEach: "readonly"
-			}
 		},
 		rules: {
 			"max-nested-callbacks": "off",
 			"unicorn/prefer-module": "off",
-			"import/extensions": "off"
+			"import/extensions": "off",
+			"unicorn/consistent-function-scoping": "off",
+			"@typescript-eslint/no-floating-promises": "off",
+			"@typescript-eslint/no-unused-vars": "off",
+			"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }]
 		}
 	}
 );
