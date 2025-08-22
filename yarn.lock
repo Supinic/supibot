@@ -5208,6 +5208,7 @@ supi-db-init@supinic/supi-db-init:
     typescript-eslint: "npm:^8.39.0"
     vm2: "npm:^3.9.19"
     ws: "npm:^8.18.3"
+    zod: "npm:^4.0.17"
   languageName: unknown
   linkType: soft
 
@@ -5875,5 +5876,12 @@ track-link-parser@supinic/track-link-parser:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^4.0.17":
+  version: 4.0.17
+  resolution: "zod@npm:4.0.17"
+  checksum: 10c0/c56ef4cc02f8f52be8724c5a8b338266202d68477c7606bee9b7299818b75c9adc27f16f4b6704a372f3e7578bd016f389de19bfec766564b7c39d0d327c540a
   languageName: node
   linkType: hard

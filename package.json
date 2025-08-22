@@ -18,7 +18,8 @@
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "zod": "^4.0.17"
   },
   "engines": {
     "node": ">= 24.0"
