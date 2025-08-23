@@ -13,11 +13,11 @@ import type { BaseMessageOptions } from "discord.js";
 
 type DiscordEmbeds = BaseMessageOptions["embeds"];
 
-import { TemplateWithoutId, TemplateDefinition } from "./template.js";
+import { TemplateWithoutId, type TemplateDefinition } from "./template.js";
 
-import Banphrase from "./banphrase.js";
+import { Banphrase } from "./banphrase.js";
 import { Filter } from "./filter.js";
-import User from "./user.js";
+import { User } from "./user.js";
 import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import { Platform, type GetEmoteOptions } from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
@@ -28,7 +28,7 @@ import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
-import { Emote } from "../@types/globals.js";
+import type { Emote } from "../@types/globals.js";
 
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
@@ -100,19 +100,24 @@ export type ContextData<T extends ParameterDefinitions = ParameterDefinitions> =
 	params?: Context<T>["params"];
 };
 export type ContextAppendData = {
-	tee?: Invocation[];
-	pipe?: boolean;
+	alias?: boolean;
+	aliasArgs?: readonly string[];
 	aliasCount?: number;
-	commandList?: Command["Name"][];
 	aliasStack?: Command["Name"][];
+	aliasTry?: {
+		userName?: User["Name"];
+	};
+	badges?: unknown;
+	commandList?: Command["Name"][];
+	emotes?: unknown;
 	flags?: unknown;
 	id?: string;
 	messageID?: string;
-	badges?: unknown;
-	emotes?: unknown;
-	skipPending?: boolean;
-	privateMessage?: boolean;
+	pipe?: boolean;
 	platform?: never; // @todo this is a temporary check for refactor purposes
+	privateMessage?: boolean;
+	skipPending?: boolean;
+	tee?: Invocation[];
 };
 export type ContextPlatformSpecificData = TwitchAppendData | DiscordAppendData | null;
 
@@ -279,7 +284,7 @@ export type DescriptionFunction = (this: Command, prefix: string) => string[] | 
 export type CustomInitFunction = (this: Command) => Promise<void> | void;
 export type CustomDestroyFunction = (this: Command) => void;
 
-type ExecuteOptions = {
+export type ExecuteOptions = ContextAppendData & {
 	skipPending?: boolean;
 	privateMessage?: boolean;
 	skipBanphrases?: boolean;
@@ -310,13 +315,6 @@ export interface SubcommandDefinition<T extends CommandDefinition = CommandDefin
 	flags?: Record<string, boolean>;
 	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
 }
-
-export const createSubcommandBinding = <
-	T extends CommandDefinition
-> () => <
-	D extends SubcommandDefinition<T>
-> (def: D) => def;
-
 export class SubcommandCollection {
 	public readonly name: string;
 	public readonly names: readonly string[];
@@ -378,7 +376,7 @@ export class Command extends TemplateWithoutId {
 	readonly Aliases: string[];
 	readonly Description: string | null;
 	readonly Cooldown: number | null;
-	readonly Flags: Readonly<Flag[]>;
+	readonly Flags: readonly Flag[];
 	readonly Params: ParameterDefinitions = [];
 	readonly Whitelist_Response: string | null;
 	readonly Code: ExecuteFunction;
