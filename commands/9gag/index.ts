@@ -5,14 +5,14 @@ import * as z from "zod";
 const NineGagData = z.object({
 	data: z.object({
 		posts: z.array(z.object({
-			title: z.string(),
+			title: z.string().lowercase(),
 			nsfw: z.literal([0, 1]),
 			creationTs: z.int(),
 			upVoteCount: z.int(),
-			id: z.string(),
+			id: z.string()
 		}))
 	})
-})
+});
 
 export default declare({
 	Name: "9gag",
@@ -22,7 +22,7 @@ export default declare({
 	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: async function nineGag(context, ...args) {
+	Code: async function nineGag (context, ...args) {
 		const options = (args.length === 0)
 			? { url: "https://9gag.com/v1/group-posts/group/default/type/hot" }
 			: {

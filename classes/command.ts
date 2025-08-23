@@ -10,6 +10,7 @@ import {
 	type Gauge
 } from "supi-core";
 import type { BaseMessageOptions } from "discord.js";
+import { ZodError } from "zod";
 
 type DiscordEmbeds = BaseMessageOptions["embeds"];
 
@@ -878,11 +879,19 @@ export class Command extends TemplateWithoutId {
 				},
 				arguments: args
 			});
+
 			if (isGotRequestError(e)) {
 				execution = {
 					success: false,
 					reason: "got-error",
 					reply: `Third party service failed! 🚨 (ID ${errorID})`
+				};
+			}
+			else if (e instanceof ZodError) {
+				execution = {
+					success: false,
+					reason: "zod-error",
+					reply: `Schema validation failed! 🚨 (ID ${errorID})`
 				};
 			}
 			else {

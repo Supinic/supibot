@@ -30,14 +30,14 @@ const ChannelListResponse = z.object({
 	channels: z.array(z.object({
 		name: z.string(),
 		userID: z.string()
-	})),
+	}))
 });
 
 const Message = z.object({
 	text: z.string(),
 	displayName: z.string(),
 	timestamp: z.iso.datetime(),
-	username: z.string(),
+	username: z.string()
 });
 const LogsResponse = z.object({ messages: z.array(Message).min(1) });
 
