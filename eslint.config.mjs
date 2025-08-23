@@ -253,6 +253,7 @@ export default tseslint.config(
 			"unicorn/prefer-module": "off",
 			"import/extensions": "off",
 			"unicorn/consistent-function-scoping": "off",
+			"unicorn/no-await-expression-member": "off",
 			"@typescript-eslint/no-floating-promises": "off",
 			"@typescript-eslint/no-unused-vars": "off",
 			"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }]
