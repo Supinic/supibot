@@ -22,6 +22,7 @@ export default {
 		const [oldAliasName, newAliasName] = args;
 		if (!oldAliasName || !newAliasName) {
 			return {
+				success: false,
 				reply: `To duplicate an alias, you must provide both existing and new alias names!`
 			};
 		}

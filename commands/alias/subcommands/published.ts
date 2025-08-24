@@ -2,9 +2,9 @@ import { type AliasSubcommandDefinition } from "../index.js";
 import { prefix } from "../../../utils/command-utils.js";
 
 export default {
-	name: "publish",
+	name: "published",
 	title: "Publish alias in a channel",
-	aliases: ["unpublish"],
+	aliases: [],
 	default: false,
 	description: [
 		`<code>${prefix}alias published</code>`,
