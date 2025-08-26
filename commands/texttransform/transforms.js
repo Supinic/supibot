@@ -17,7 +17,7 @@ import LingoCockneyDefinition from "./lingo-translations/cockney.json" with { ty
 import LingoCowboyDefinition from "./lingo-translations/cowboy.json" with { type: "json" };
 import LingoOutbackDefinition from "./lingo-translations/outback.json" with { type: "json" };
 
-const ANTI_PING_CHARACTER = "\u{E0000}";
+const ANTI_PING_CHARACTER = "\u{34f}";
 
 const convert = {
 	method: (string, fn, context) => fn(string, context),
@@ -233,7 +233,7 @@ const types = [
 		description: "Every word will have an invisible character added, so that it does not mention users in e.g. Chatterino.",
 		data: (message) => message.split(" ").map(word => {
 			if (/^\w+$/.test(word)) {
-				return `${word[0]}\u{E0000}${word.slice(1)}`;
+				return `${word[0]}\u{34f}${word.slice(1)}`;
 			}
 			else {
 				return word;

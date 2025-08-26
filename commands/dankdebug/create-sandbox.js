@@ -486,7 +486,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("Empty strings cannot be unpinged");
 				}
 
-				return `${string[0]}\u{E0000}${string.slice(1)}`;
+				return `${string[0]}\u{34f}${string.slice(1)}`;
 			}
 		}
 	};
