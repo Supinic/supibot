@@ -6,6 +6,7 @@ import config from "../config.json" with { type: "json" };
 import regexes from "../utils/regexes.js";
 import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
 import { transliterate as executeTransliteration } from "transliteration";
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
 const { responses, values } = config;
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
@@ -13,6 +14,7 @@ const apiResultSymbol: unique symbol = Symbol("banphrase-api-result");
 const inactiveSymbol: unique symbol = Symbol("banphrase-inactive");
 
 const banphraseConfigData = {
+	TWITCH_ANTIPING_CHARACTER,
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
 	transliterate: (input: string) => executeTransliteration(input),
 	...regexes
