@@ -1,3 +1,5 @@
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+
 export default {
 	Name: "randomcommandalias",
 	Aliases: ["rca"],
@@ -52,7 +54,7 @@ export default {
 		}
 
 		const authorData = await sb.User.get(randomAlias.User_Alias);
-		const unpingedAuthorName = `${authorData.Name[0]}\u{34f}${authorData.Name.slice(1)}`;
+		const unpingedAuthorName = `${authorData.Name[0]}${TWITCH_ANTIPING_CHARACTER}${authorData.Name.slice(1)}`;
 		return {
 			reply: `
 				Random alias "${randomAlias.Name}" made by ${unpingedAuthorName} for your query:

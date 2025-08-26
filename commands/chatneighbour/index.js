@@ -1,3 +1,5 @@
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+
 export default {
 	Name: "chatneighbour",
 	Aliases: ["cn"],
@@ -54,7 +56,7 @@ export default {
 
 		const neighbours = [list[index - 1], list[index], list[index + 1]]
 			.filter(Boolean)
-			.map(i => `${i[0]}\u{34f}${i.slice(1)}`);
+			.map(i => `${i[0]}${TWITCH_ANTIPING_CHARACTER}${i.slice(1)}`);
 
 		if (neighbours.length < 2) {
 			return {

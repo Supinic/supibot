@@ -6,6 +6,7 @@ import User from "./user.js";
 import type Platform from "../platforms/template.js";
 import type { Command } from "./command.js";
 import type { XOR } from "../@types/globals.d.ts";
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
 export type Type =
 	"Blacklist" | "Whitelist" | "Opt-out" | "Block" | "Unping" | "Unmention" |
@@ -714,7 +715,7 @@ export class Filter extends TemplateWithId {
 			// Only unping usernames if they are not followed by a specific set of characters.
 			// This refers to "." and "@" - these are usually parts of URLs or e-mail addresses.
 			const regex = new RegExp(`(?<![\\/=])\\b(${user.Name})(?![.@]\\w+)`, "gi");
-			string = string.replace(regex, (name: string) => `${name[0]}\u{34f}${name.slice(1)}`);
+			string = string.replace(regex, (name: string) => `${name[0]}${TWITCH_ANTIPING_CHARACTER}${name.slice(1)}`);
 		}
 
 		return string;

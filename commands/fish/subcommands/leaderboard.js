@@ -1,6 +1,7 @@
 import { itemTypes } from "./fishing-utils.js";
+import { TWITCH_ANTIPING_CHARACTER } from "../../../utils/command-utils.js";
 
-const unping = (str) => `${str[0]}\u{34f}${str.slice(1)}`;
+const unping = (str) => `${str[0]}${TWITCH_ANTIPING_CHARACTER}${str.slice(1)}`;
 
 const typeProperty = {
 	fish: ["catch.fish", "anglers"],
