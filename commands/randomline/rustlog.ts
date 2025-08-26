@@ -59,6 +59,7 @@ const getChannelLoggingInstances = async function () {
 		});
 
 		if (!response.ok) {
+			result[instanceKey] = [];
 			return;
 		}
 
