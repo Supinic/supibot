@@ -1,4 +1,4 @@
-const TWITCH_ANTIPING_CHARACTER = "\u{E0000}";
+const TWITCH_ANTIPING_CHARACTER = "\u{34f}";
 
 export default {
 	Name: "async-markov-experiment",

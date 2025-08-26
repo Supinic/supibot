@@ -64,7 +64,7 @@ export default {
 
 		const separator = (context.params.subStatus) ? " " : ", ";
 		const foundersString = founders.map(i => {
-			let message = `${i.login[0]}\u{E0000}${i.login.slice(1)}`;
+			let message = `${i.login[0]}\u{34f}${i.login.slice(1)}`;
 			if (context.params.subStatus) {
 				const stillSubbed = (i.isSubscribed) ? "✅" : "⛔";
 				message = `${stillSubbed} ${message}`;

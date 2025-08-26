@@ -1,6 +1,6 @@
 import { itemTypes } from "./fishing-utils.js";
 
-const unping = (str) => `${str[0]}\u{E0000}${str.slice(1)}`;
+const unping = (str) => `${str[0]}\u{34f}${str.slice(1)}`;
 
 const typeProperty = {
 	fish: ["catch.fish", "anglers"],
