@@ -18,8 +18,7 @@
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
-    "ws": "^8.18.3",
-    "zod": "^4.0.17"
+    "ws": "^8.18.3"
   },
   "engines": {
     "node": ">= 24.0"
@@ -36,7 +35,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
-    "test": "yarn build && mocha ./build/tests --recursive --exit",
+    "test": "node --import ./tests/register-loader.mjs --test",
     "coverage": "nyc yarn test",
     "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core"
   },
@@ -65,5 +64,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.9.2"
 }
