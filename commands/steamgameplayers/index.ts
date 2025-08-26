@@ -55,49 +55,6 @@ const fetchGamesData = async () => {
 	}
 };
 
-// Currently unused
-/*
-const SteamReviewSchema = z.object({
-	query_summary: z.object({
-		num_reviews: z.int().min(0),
-		review_score: z.int().min(0),
-		total_negative: z.int().min(0),
-		total_positive: z.int().min(0),
-		total_reviews: z.int().min(0),
-		review_score_desc: z.string()
-	})
-});
-const fetchReviewData = async (gameId: string | number) => {
-	const response = await core.Got.get("GenericAPI")({
-		url: `https://store.steampowered.com/appreviews/${gameId}`,
-		searchParams: {
-			json: "1",
-			filter: "all",
-			language: "all"
-		}
-	});
-
-	let reviewsString;
-	if (response.ok) {
-		const { query_summary: summary } = SteamReviewSchema.parse(response.body);
-		if (summary.total_reviews > 0) {
-			const score = core.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
-			reviewsString = `Rating: ${summary.review_score_desc} (${score}% positive)`;
-		}
-		else {
-			reviewsString = `Rating: ${summary.review_score_desc}`;
-		}
-	}
-	else {
-		reviewsString = "Could not fetch reviews data";
-	}
-
-	return {
-		result: reviewsString
-	};
-};
-*/
-
 const SteamRecommendationSchema = z.object({
 	success: z.union([z.literal(0), z.literal(1)]),
 	results: z.object({
