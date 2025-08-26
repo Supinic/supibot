@@ -1,5 +1,6 @@
 import { SupiDate, SupiError } from "supi-core";
 import config from "../../config.json" with { type: "json" };
+import * as z from "zod";
 
 type InstancesDefinition = Record<string, {
 	url: string;
@@ -20,22 +21,25 @@ for (const [name, def] of Object.entries(instances)) {
 
 if (!defaultInstance) {
 	throw new SupiError({
-	    message: "Assert error: No default Rustlog instance set"
+		message: "Assert error: No default Rustlog instance set"
 	});
 }
 
 type InstanceChannelMap = Record<string, string[]>;
-type ChannelListResponse = {
-	channels: { name: string; userID: string; }[];
-};
-type RandomLineResponse = {
-	messages: {
-		text: string;
-		displayName: string;
-		timestamp: string;
-		username: string;
-	}[];
-};
+const ChannelListResponse = z.object({
+	channels: z.array(z.object({
+		name: z.string(),
+		userID: z.string()
+	}))
+});
+
+const Message = z.object({
+	text: z.string(),
+	displayName: z.string(),
+	timestamp: z.iso.datetime(),
+	username: z.string()
+});
+const LogsResponse = z.object({ messages: z.array(Message).min(1) });
 
 const channelInstanceMap: Map<string, string> = new Map();
 const getChannelLoggingInstances = async function () {
@@ -46,7 +50,7 @@ const getChannelLoggingInstances = async function () {
 
 	const result: InstanceChannelMap = {};
 	const promises = Object.entries(instances).map(async ([instanceKey, instance]) => {
-		const response = await core.Got.get("GenericAPI")<ChannelListResponse>({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://${instance.url}/channels`,
 			throwHttpErrors: false,
 			timeout: {
@@ -55,10 +59,11 @@ const getChannelLoggingInstances = async function () {
 		});
 
 		if (!response.ok) {
+			result[instanceKey] = [];
 			return;
 		}
 
-		const { channels } = response.body;
+		const { channels } = ChannelListResponse.parse(response.body);
 		result[instanceKey] = channels.map(i => i.userID);
 	});
 
@@ -111,13 +116,13 @@ export const getRandomChannelLine = async function (channelId: string): Promise<
 	const instanceName = await getInstance(channelId);
 	if (!instanceName) {
 		throw new SupiError({
-		    message: "Assert error: No instance name found for existing channel",
+			message: "Assert error: No instance name found for existing channel",
 			args: { channelId }
 		});
 	}
 
 	const instance = instances[instanceName];
-	const response = await core.Got.get("GenericAPI")<RandomLineResponse>({
+	const response = await core.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelId}/random`,
 		throwHttpErrors: false,
 		searchParams: {
@@ -144,7 +149,7 @@ export const getRandomChannelLine = async function (channelId: string): Promise<
 		};
 	}
 
-	const message = response.body.messages.at(0);
+	const message = LogsResponse.parse(response.body).messages.at(0);
 	if (!message) {
 		return {
 			success: false,
@@ -170,7 +175,7 @@ export const getRandomUserLine = async function (channelId: string, userId: stri
 	}
 
 	const instance = instances[instanceName];
-	const response = await core.Got.get("GenericAPI")<RandomLineResponse>({
+	const response = await core.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelId}/userid/${userId}/random`,
 		throwHttpErrors: false,
 		searchParams: {
@@ -197,7 +202,7 @@ export const getRandomUserLine = async function (channelId: string, userId: stri
 		};
 	}
 
-	const [message] = response.body.messages;
+	const [message] = LogsResponse.parse(response.body).messages;
 	return {
 		success: true,
 		date: new SupiDate(message.timestamp),

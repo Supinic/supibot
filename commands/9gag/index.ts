@@ -1,24 +1,25 @@
 import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
+import * as z from "zod";
 
-type NineGagData = {
-	data: {
-		posts: {
-			title: string;
-			nsfw: 0 | 1;
-			creationTs: number;
-			upVoteCount: number;
-			id: string;
-		}[];
-	};
-};
+const NineGagData = z.object({
+	data: z.object({
+		posts: z.array(z.object({
+			title: z.string().lowercase(),
+			nsfw: z.literal([0, 1]),
+			creationTs: z.int(),
+			upVoteCount: z.int(),
+			id: z.string()
+		}))
+	})
+});
 
 export default declare({
 	Name: "9gag",
 	Aliases: ["gag"],
 	Cooldown: 10_000,
 	Description: "Searches 9gag for posts that fit your search text, or a random featured one if you don't provide anything.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: async function nineGag (context, ...args) {
@@ -31,12 +32,13 @@ export default declare({
 				})
 			};
 
-		const response = await core.Got.get("GenericAPI")<NineGagData>(options);
+		const response = await core.Got.get("GenericAPI")(options);
+		const body = NineGagData.parse(response.body);
 
 		const nsfw = Boolean(context.channel?.NSFW);
 		const filteredPosts = (nsfw)
-			? response.body.data.posts
-			: response.body.data.posts.filter(i => i.nsfw !== 1);
+			? body.data.posts
+			: body.data.posts.filter(i => i.nsfw !== 1);
 
 		if (filteredPosts.length === 0) {
 			return {

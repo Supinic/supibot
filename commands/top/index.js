@@ -1,4 +1,5 @@
 import connectedChannelGroups from "./connected-channels.json" with { type: "json" };
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 
 export default {
 	Name: "top",
@@ -66,7 +67,7 @@ export default {
 		);
 
 		const chatters = top.map((i, ind) => {
-			const name = `${i.Name[0]}\u{E0000}${i.Name.slice(1)}`;
+			const name = `${i.Name[0]}${TWITCH_ANTIPING_CHARACTER}${i.Name.slice(1)}`;
 			return `#${ind + 1}: ${name} (${core.Utils.groupDigits(i.Total)})`;
 		}).join(", ");
 

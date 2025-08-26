@@ -1,5 +1,5 @@
 import { createRecentUseCacheKey } from "../twitchlotto/definitions.js";
-import { postToHastebin } from "../../utils/command-utils.js";
+import { postToHastebin, TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 import { isSupported } from "../randomline/rustlog.js";
 import handleErrorInspection from "./inspect-errors.js";
 
@@ -105,7 +105,7 @@ export default [
 			}
 
 			const ambassadors = await sb.User.getMultiple(rawAmbassadors);
-			const namesList = ambassadors.map(i => `${i.Name[0]}\u{E0000}${i.Name.slice(1)}`);
+			const namesList = ambassadors.map(i => `${i.Name[0]}${TWITCH_ANTIPING_CHARACTER}${i.Name.slice(1)}`);
 			return {
 				meta: {
 					skipWhitespaceCheck: true

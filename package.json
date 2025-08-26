@@ -8,20 +8,21 @@
     "acorn-node": "^2.0.1",
     "async-markov": "supinic/async-markov",
     "bing-chat": "^0.2.3",
-    "chrono-node": "^2.8.2",
-    "cron": "^4.3.1",
+    "chrono-node": "^2.8.4",
+    "cron": "^4.3.3",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "^14.19.3",
+    "discord.js": "^14.21.0",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
-    "ws": "^8.18.2"
+    "ws": "^8.18.3",
+    "zod": "^4.0.17"
   },
   "engines": {
-    "node": ">= 20.0"
+    "node": ">= 24.0"
   },
   "scripts": {
     "build": "tsc",
@@ -35,7 +36,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
-    "test": "node --import ./tests/register-loader.mjs --test",
+    "test": "yarn build && mocha ./build/tests --recursive --exit",
     "coverage": "nyc yarn test",
     "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core"
   },
@@ -45,16 +46,17 @@
   "license": "AGPL-3.0",
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
-    "@babel/core": "^7.27.4",
-    "@babel/eslint-parser": "^7.27.5",
-    "eslint": "^9.28.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-unicorn": "^59.0.1",
-    "globals": "^16.2.0",
+    "@babel/core": "^7.28.0",
+    "@babel/eslint-parser": "^7.28.0",
+    "@types/xml2js": "^0.4.14",
+    "eslint": "^9.32.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-unicorn": "^60.0.0",
+    "globals": "^16.3.0",
     "nyc": "^17.1.0",
     "supi-db-init": "supinic/supi-db-init",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.34.0"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0"
   },
   "nyc": {
     "all": false,
@@ -63,5 +65,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@4.9.2"
+  "packageManager": "yarn@4.9.4"
 }

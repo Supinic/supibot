@@ -1,3 +1,5 @@
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+
 const ALLOWED_PARAMETER_TYPES = new Set(["string", "number", "boolean", "date", "object", "regex"]);
 const allowedUtilsMethods = [
 	"capitalize",
@@ -486,7 +488,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("Empty strings cannot be unpinged");
 				}
 
-				return `${string[0]}\u{E0000}${string.slice(1)}`;
+				return `${string[0]}${TWITCH_ANTIPING_CHARACTER}${string.slice(1)}`;
 			}
 		}
 	};
