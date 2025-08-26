@@ -5,16 +5,16 @@ import * as z from "zod";
 import { declare } from "../../classes/command.js";
 
 const SteamAppSchema = z.object({
-	apps: z.array(
-		z.object({
-			appid: z.int(),
-			last_modified: z.int(),
-			name: z.string(),
-			price_change_number: z.int()
-		})
-	),
-	have_more_results: z.boolean(),
-	last_appid: z.int()
+	response: z.object({
+		apps: z.array(
+			z.object({
+				appid: z.int(),
+				last_modified: z.int(),
+				name: z.string(),
+				price_change_number: z.int()
+			})
+		).optional()
+	})
 });
 const fetchGamesData = async () => {
 	let lastUpdate = await core.Cache.getByPrefix("latest-steam-games-update") as number | undefined;
@@ -33,8 +33,11 @@ const fetchGamesData = async () => {
 		}
 	});
 
-	const { apps } = SteamAppSchema.parse(response.body);
+	const { apps } = SteamAppSchema.parse(response.body).response;
 	await core.Cache.setByPrefix("latest-steam-games-update", SupiDate.now() / 1000);
+	if (!apps) {
+		return;
+	}
 
 	for (const game of apps) {
 		const row = await core.Query.getRow("data", "Steam_Game");
