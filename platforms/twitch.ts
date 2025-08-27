@@ -2,27 +2,30 @@ import WebSocket from "ws";
 import { randomBytes } from "node:crypto";
 import { setTimeout as wait } from "node:timers/promises";
 
-import { Platform, BaseConfig } from "./template.js";
+import { Platform, type BaseConfig } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
 import TwitchUtils, {
-	MessageNotification,
+	type MessageNotification,
 	isMessageNotification,
-	TwitchWebsocketMessage,
+	type TwitchWebsocketMessage,
 	isWelcomeMessage,
 	isReconnectMessage,
 	isRevocationMessage,
 	isNotificationMessage,
 	isKeepaliveMessage,
-	NotificationMessage,
-	SessionReconnectMessage,
+	type NotificationMessage,
+	type SessionReconnectMessage,
 	isWhisperNotification,
 	isRaidNotification,
 	isSubscribeNotification,
 	isStreamChangeNotification,
-	WhisperNotification,
-	SubscribeMessageNotification,
-	RaidNotification, StreamOnlineNotification, StreamOfflineNotification, BroadcasterSubscription
+	type WhisperNotification,
+	type SubscribeMessageNotification,
+	type RaidNotification,
+	type StreamOnlineNotification,
+	type StreamOfflineNotification,
+	type BroadcasterSubscription
 } from "./twitch-utils.js";
 
 import { Channel } from "../classes/channel.js";
@@ -320,7 +323,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		super("twitch", resultConfig);
 
-		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
+		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000).unref();
 	}
 
 	async connect (options: ConnectOptions = {}) {
@@ -1472,7 +1475,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
 			client.close();
 			void this.connect({ skipSubscriptions: true });
-		}, NO_EVENT_RECONNECT_TIMEOUT);
+		}, NO_EVENT_RECONNECT_TIMEOUT).unref();
 
 		const start = SupiDate.now();
 		client.once("pong", () => {
