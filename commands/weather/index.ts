@@ -209,7 +209,7 @@ export default declare({
 		}
 
 		if (!coords || !formattedAddress) {
-			if (args.length === 0) {
+			if (args.length === 0 && !context.params.longitude && !context.params.latitude) {
 				return {
 					reply: "No place provided!",
 					cooldown: 2500
