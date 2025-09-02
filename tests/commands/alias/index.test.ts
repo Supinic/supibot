@@ -299,18 +299,21 @@ describe("$alias", async () => {
 	});
 
 	it("published: properly lists published aliases", async () => {
+		it.skip("published");
 		// $alias published [not in a channel] -> error
 		// $alias published [in a channel] -> OK
 	});
 
 	it("remove: properly deletes existing aliases", async () => {
+		it.skip("remove");
 		// $alias remove -> error
 		// $alias remove (unowned alias) -> error
 		// $alias remove (owned alias) -> OK
 		// $alias remove (owned alias) [published in channels] -> OK, check that publishes get removed + message
 	});
 
-	it("remove: properly renames existing aliases", async () => {
+	it("rename: properly renames existing aliases", async () => {
+		it.skip("rename");
 		// $alias rename -> error
 		// $alias rename (string) -> error
 		// $alias rename (string) (illegal new name) -> error
@@ -318,6 +321,7 @@ describe("$alias", async () => {
 	});
 
 	it("restrict: properly restricts existing aliases", async () => {
+		it.skip("restrict");
 		// $alias restrict -> error
 		// $alias restrict (string) -> error
 		// $alias restrict (string) (not link/copy) -> error
@@ -340,6 +344,7 @@ describe("$alias", async () => {
 	});
 
 	it("run: properly executes aliases", async () => {
+		it.skip("run");
 		// $alias run -> error
 		// $alias try -> error
 		// $alias try (nonexistent user) -> error
@@ -358,6 +363,7 @@ describe("$alias", async () => {
 	});
 
 	it("transfer: properly transfers aliases between linked user aliases", async () => {
+		it.skip("transfer");
 		// $alias transfer [not a Twitch user] -> error
 		// $alias transfer -> error
 		// $alias transfer (nonexistent old username) -> error
