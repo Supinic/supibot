@@ -524,10 +524,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			data: (MessageSendSuccess | MessageSendFailure)[];
 		};
 
-		const response = await core.Got.get("Helix")<SendMessageResponse>({
-			url: "chat/messages",
+		const response = await core.Got.get("GenericAPI")<SendMessageResponse>({
+			url: "https://api.twitch.tv/helix/chat/messages",
 			method: "POST",
 			throwHttpErrors: false,
+			headers: {
+				Authorization: `Bearer ${await TwitchUtils.getAppAccessToken()}`,
+				"Client-ID": process.env.TWITCH_CLIENT_ID
+			},
 			json: {
 				broadcaster_id: channelData.Specific_ID,
 				sender_id: this.selfId,
