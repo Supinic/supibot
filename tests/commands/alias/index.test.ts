@@ -74,123 +74,188 @@ describe("$alias", async () => {
 
 	it("provides link to details when no subcommand provided", async () => {
 		const result = await baseCommand.execute(baseContext);
-		expectCommandResultSuccess(result, "https://", "Must include link to details");
+		expectCommandResultSuccess(result, "This command", "create", "command aliases", "https://");
 	});
 
 	it("fails on invalid subcommand provided", async () => {
 		const result = await baseCommand.execute(baseContext, "DOES_NOT_EXIST");
-		expectCommandResultFailure(result);
+		expectCommandResultFailure(result, "Invalid sub-command", "Check", "help", "https://");
 	});
 
 	describe("$alias check", () => {
-		it ("should post a link when nothing is provided", async () => {
+		it ("0 args: should post a link when nothing is provided", async () => {
 			const result = await baseCommand.execute(baseContext, "check");
-			expectCommandResultSuccess(result, BASE_USERNAME);
+			expectCommandResultSuccess(result, "List of your aliases", BASE_USERNAME);
 		});
 
-		it ("should fail when neither user nor alias exists", async () => {
-			world.queueRsData([]);
-
-			const result = await baseCommand.execute(baseContext, "check", "NO_USER");
-			expectCommandResultFailure(result);
-		});
-
-		it ("should suceed when provided user exists", async () => {
-			const TARGET_USER = "bob";
-			world.allowUser(TARGET_USER);
+		it ("1 arg: should fail when neither user nor alias exists", async () => {
 			world.queueRsData([]); // No aliases for current user
-			world.queueRsData([{}]); // Some alias for target user
 
-			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
-			expectCommandResultSuccess(result, TARGET_USER);
+			const result = await baseCommand.execute(baseContext, "check", "NO_COMMAND");
+			expectCommandResultFailure(result, "Could not match your input", "username", "your aliases");
 		});
 
-		it ("should fail when provided user exists but has no aliases", async () => {
+		it ("1 arg: should fail when provided user exists but has no aliases", async () => {
 			const TARGET_USER = "bob";
 			world.allowUser(TARGET_USER);
 			world.queueRsData([]); // No aliases for current user
 			world.queueRsData([]); // No aliases for target user
 
 			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
-			expectCommandResultFailure(result);
+			expectCommandResultFailure(result, "Could not match your input", "username", "your aliases");
 		});
 
-		it ("should succeed when base user owns the provided alias", async () => {
+		it ("1 arg: should suceed when provided user exists and has some aliases", async () => {
+			const TARGET_USER = "bob";
+			world.allowUser(TARGET_USER);
+			world.queueRsData([]); // No aliases for current user
+			world.queueRsData([{}]); // Some alias for target user
+
+			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
+			expectCommandResultSuccess(result, "List of their aliases", "https://", TARGET_USER);
+		});
+
+		it ("1 arg: should succeed when base user owns the provided alias", async () => {
 			const ALIAS_NAME = "Foo";
 			world.queueRsData([ALIAS_NAME]);
 			existingAliasMap[baseUser.ID] = { Foo: {} };
 
 			const result = await baseCommand.execute(baseContext, "check", ALIAS_NAME);
-			expectCommandResultSuccess(result, ALIAS_NAME);
+			expectCommandResultSuccess(result, "Your alias", ALIAS_NAME, "has this definition");
 		});
 
-		it ("should succeed when provided user owns the provided alias", async () => {
+		it ("2 args: should succeed when provided user owns the provided alias", async () => {
 			const ALIAS_NAME = "Foo";
+			const TARGET_USER = "Bob";
+			const TARGET_USER_ID = 123;
+			const BASE_ALIAS_COMMAND = "test";
+
 			world.queueRsData([]);
 			world.queueRsData([ALIAS_NAME]);
-			existingAliasMap[baseUser.ID] = { Foo: {} };
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
 
-			const result = await baseCommand.execute(baseContext, "check", ALIAS_NAME);
-			// todo continue here
-			// expectCommandResultSuccess(result, ALIAS_NAME);
+			existingAliasMap[TARGET_USER_ID] = {
+				[ALIAS_NAME]: { Command: BASE_ALIAS_COMMAND }
+			};
+
+			const result = await baseCommand.execute(baseContext, "check", TARGET_USER, ALIAS_NAME);
+			console.log({ result });
+			expectCommandResultSuccess(result, "Their alias", ALIAS_NAME, "has this definition");
+		});
+
+		it ("2 args: should fail when provided user does not own the provided alias", async () => {
+			const ALIAS_NAME = "Foo";
+			const DIFFERENT_ALIAS_NAME = "Bar";
+			const TARGET_USER = "Bob";
+			const TARGET_USER_ID = 123;
+
+			world.queueRsData([]);
+			world.queueRsData([ALIAS_NAME]);
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[DIFFERENT_ALIAS_NAME]: {}
+			};
+
+			const result = await baseCommand.execute(baseContext, "check", TARGET_USER, ALIAS_NAME);
+			expectCommandResultFailure(result, "They don't have", ALIAS_NAME, "alias");
 		});
 	});
 
-	/*
-	describe("$alias add", async () => {
-		it("should fail on no alias name provided", async () => {
-			const result1 = await baseCommand.execute(baseContext, "add");
-			assert.strictEqual(result1.success, false, "Should fail on no alias name provided");
+	describe("$alias add", () => {
+		it("0 args: should fail, no alias name provided", async () => {
+			const result = await baseCommand.execute(baseContext, "add");
+			expectCommandResultFailure(result, "didn't provide", "name", "command");
 		});
 
-		const result2 = await baseCommand.execute(baseContext, "add", "foo");
-		assert.strictEqual(result2.success, false, "Should fail on no alias content provided");
+		it("1 arg: should fail, no command provided", async () => {
+			const result = await baseCommand.execute(baseContext, "add", "foo");
+			expectCommandResultFailure(result, "didn't provide", "name", "command");
+		});
 
-		const result3 = await baseCommand.execute(baseContext, "add", "foo", "NO_COMMAND");
-		assert.strictEqual(result3.success, false, "Should fail on invalid command name provided");
+		it("2 args: should fail when command does not exist", async () => {
+			const NONEXISTENT_COMMAND = "NO_COMMAND";
+			const result = await baseCommand.execute(baseContext, "add", "foo", NONEXISTENT_COMMAND);
+			expectCommandResultFailure(result, "Cannot create", "command", NONEXISTENT_COMMAND, "does not exist");
+		});
 
-		const aliasName = "foo";
-		const commandName = EXISTING_COMMANDS[0];
-		const result4 = await baseCommand.execute(baseContext, "add", aliasName, commandName);
-		assert.notStrictEqual(result4.success, false, "Should pass when creating an alias");
-		assert.strictEqual(result4.reply?.includes("created"), true, "Should say \"created\" in response");
+		it("2 args: should create a new alias", async () => {
+			const aliasName = "foo";
+			const commandName = EXISTING_COMMANDS[0];
 
-		const row4 = rows.pop();
-		assert.ok(row4);
-		assert.deepEqual(row4.values.Command, commandName);
-		assert.strictEqual(row4.values.Name, aliasName);
-		assert.strictEqual(row4.values.Arguments, null);
-		assert.strictEqual(row4.values.User_Alias, BASE_USER_ID);
+			const result = await baseCommand.execute(baseContext, "add", aliasName, commandName);
+			expectCommandResultSuccess(result, "created");
 
-		existingAliasMap = {
-			[BASE_USER_ID]: {
-				[row4.values.Name]: row4.values
-			}
-		};
+			const row = world.rows.at(-1);
+			assert.ok(row, "Expected a Row to be created");
+			assert.strictEqual(row.values.Name, aliasName);
+			assert.strictEqual(row.values.Command, commandName);
+			assert.strictEqual(row.values.Arguments, null);
+			assert.strictEqual(row.values.User_Alias, BASE_USER_ID);
+			assert.strictEqual(row.stored, true);
+		});
 
-		const result5 = await baseCommand.execute(baseContext, "add", aliasName, commandName);
-		assert.strictEqual(result5.success, false, "Should fail when trying to add an existing alias");
+		it("2 args: should fail when adding an already existing alias", async () => {
+			const aliasName = "foo";
+			const commandName = EXISTING_COMMANDS[0];
 
-		const testArgs = ["foo", "bar", "baz"];
-		const result6 = await baseCommand.execute(baseContext, "upsert", aliasName, commandName, ...testArgs);
-		assert.notStrictEqual(result6.success, false, "Should overwrite existing alias");
-		assert.strictEqual(result6.reply?.includes("replaced"), true, "Should say \"replaced\" in response");
+			existingAliasMap[BASE_USER_ID] = {
+				[aliasName]: {
+					Name: aliasName,
+					Command: commandName
+				}
+			};
 
-		const row6 = rows.pop();
-		assert.ok(row6);
-		assert.deepStrictEqual(row6.values.Arguments, JSON.stringify(testArgs));
+			const result = await baseCommand.execute(baseContext, "add", aliasName, commandName);
+			expectCommandResultFailure(result, "Cannot add", "alias", aliasName, "already have one");
+		});
 
-		const result7 = await baseCommand.execute(baseContext, "add", "@@@", commandName, ...testArgs);
-		assert.strictEqual(result7.success, false, "Should reject non-conforming alias names (illegal character)");
+		it("2+ args: should override when upserting an already existing alias", async () => {
+			const aliasName = "foo";
+			const commandName = EXISTING_COMMANDS[0];
+			const testArgs = ["foo", "bar", "baz"];
 
-		const result8 = await baseCommand.execute(baseContext, "add", "F", commandName, ...testArgs);
-		assert.strictEqual(result8.success, false, "Should reject non-conforming alias names (too short)");
+			existingAliasMap[BASE_USER_ID] = {
+				[aliasName]: {
+					Name: aliasName,
+					Command: commandName
+				}
+			};
 
-		const result9 = await baseCommand.execute(baseContext, "add", "F".repeat(31), commandName, ...testArgs);
-		assert.strictEqual(result9.success, false, "Should reject non-conforming alias names (too long)");
+			const result = await baseCommand.execute(baseContext, "upsert", aliasName, commandName, ...testArgs);
+			expectCommandResultSuccess(result, "alias", aliasName, "replaced", "successfully");
+
+			const row = world.rows.at(-1);
+			assert.ok(row, "Expected a Row to be saved");
+			assert.ok(row.updated, "Expected Row to be updated");
+
+			assert.strictEqual(row.values.Name, aliasName);
+			assert.strictEqual(row.values.Command, commandName);
+			assert.strictEqual(row.values.Arguments, JSON.stringify(testArgs));
+			assert.strictEqual(row.values.User_Alias, BASE_USER_ID);
+		});
+
+		it("2 args: should reject non-conforming alias names (illegal character)", async () => {
+			const commandName = EXISTING_COMMANDS[0];
+			const result = await baseCommand.execute(baseContext, "add", "@@@", commandName);
+			expectCommandResultFailure(result, "alias name is not valid");
+		});
+
+		it("2 args: should reject non-conforming alias names (too short)", async () => {
+			const commandName = EXISTING_COMMANDS[0];
+			const result = await baseCommand.execute(baseContext, "add", "F", commandName);
+			expectCommandResultFailure(result, "alias name is not valid");
+		});
+
+		it("2 args: should reject non-conforming alias names (too short)", async () => {
+			const commandName = EXISTING_COMMANDS[0];
+			const result = await baseCommand.execute(baseContext, "add", "F".repeat(31), commandName);
+			expectCommandResultFailure(result, "alias name is not valid");
+		});
 	});
 
-	 */
 	/*
 
 	it("check: properly links aliases for specific users", async () => {

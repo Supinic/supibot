@@ -36,19 +36,19 @@ export const createTestCommand = (opts: { Name?: string } = {}) => new Command({
 });
 
 type CommandResult = Awaited<ReturnType<Command["execute"]>>;
-export const expectCommandResultSuccess = (result: CommandResult, includedMessage?: string, message?: string) => {
-	assert.notStrictEqual(result.success, false, message ?? "expected success");
-	if (includedMessage) {
-		assert.strictEqual(result.reply?.includes(includedMessage), true);
+export const expectCommandResultSuccess = (result: CommandResult, ...includedMessages: string[]) => {
+	assert.notStrictEqual(result.success, false, "Expected command success");
+	for (const includedMessage of includedMessages) {
+		assert.strictEqual(result.reply?.includes(includedMessage), true, `Message does not contain "${includedMessage}"\n\nMessage: ${result.reply}`);
 	}
 
 	return result;
 };
 
-export const expectCommandResultFailure = (result: CommandResult, includedMessage?: string, message?: string) => {
-	assert.strictEqual(result.success, false, message ?? "expected failure");
-	if (includedMessage) {
-		assert.strictEqual(result.reply?.includes(includedMessage), true);
+export const expectCommandResultFailure = (result: CommandResult, ...includedMessages: string[]) => {
+	assert.strictEqual(result.success, false, "Expected command failure");
+	for (const includedMessage of includedMessages) {
+		assert.strictEqual(result.reply?.includes(includedMessage), true, `Message does not contain "${includedMessage}"\n\nMessage: ${result.reply}`);
 	}
 
 	return result;
@@ -113,6 +113,10 @@ export class FakeRow {
 	load () {
 		this.loaded = true;
 	}
+
+	get updated () {
+		return (this.loaded && this.stored);
+	}
 }
 
 export class TestWorld <Tables extends object = object> {
@@ -120,9 +124,11 @@ export class TestWorld <Tables extends object = object> {
 	public readonly recordsets: FakeRecordset[] = [];
 	public readonly tables = new Map<string, Tables[]>();
 
-	private allowedUsers = new Set<string>();
-	private recordsetQueue: unknown[] = [];
-	public failOnEmptyRecordset = true;
+	private readonly specificUserIds = new Map<string, number>();
+	private readonly allowedUsers = new Set<string>();
+	private readonly recordsetQueue: unknown[] = [];
+
+	public failOnEmptyRecordset: boolean = true;
 
 	install () {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias, unicorn/no-this-assignment
@@ -153,15 +159,23 @@ export class TestWorld <Tables extends object = object> {
 					if (!world.tables.has(key)) {
 						world.tables.set(key, []);
 					}
+
+					return row;
 				}
 			}
 		};
 
 		const baseSb = {
 			User: {
-				get: (name: string) => (this.allowedUsers.has(name))
-					? createTestUser({ Name: name })
-					: null
+				get: (name: string) => {
+					const isAllowed = (this.allowedUsers.has(name));
+					if (!isAllowed) {
+						return null;
+					}
+
+					const ID = this.specificUserIds.get(name);
+					return createTestUser({ Name: name, ID });
+				}
 			}
 		};
 
@@ -174,6 +188,7 @@ export class TestWorld <Tables extends object = object> {
 		this.recordsets.length = 0;
 		this.recordsetQueue.length = 0;
 		this.allowedUsers.clear();
+		this.specificUserIds.clear();
 	}
 
 	clearTables () {
@@ -186,6 +201,10 @@ export class TestWorld <Tables extends object = object> {
 
 	allowUser (username: string) {
 		this.allowedUsers.add(username);
+	}
+
+	setUserId (username: string, id: number) {
+		this.specificUserIds.set(username, id);
 	}
 
 	static getKey (schema: string, table: string) { return `${schema}.${table}`; }
