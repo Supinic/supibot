@@ -4,6 +4,7 @@ import { setTimeout as wait } from "node:timers/promises";
 
 import { Platform, BaseConfig } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
 import TwitchUtils, {
 	MessageNotification,
@@ -81,7 +82,6 @@ const DEFAULT_PLATFORM_CONFIG = {
 	recentBanThreshold: null,
 	updateAvailableBotEmotes: false,
 	ignoredUserNotices: [],
-	sameMessageEvasionCharacter: "󠀀",
 	rateLimits: "default",
 	reconnectAnnouncement: null,
 	emitLiveEventsOnlyForFlaggedChannels: false,
@@ -276,7 +276,6 @@ export interface TwitchConfig extends BaseConfig {
 		recentBanThreshold?: number | null;
 		updateAvailableBotEmotes?: boolean;
 		ignoredUserNotices?: readonly string[];
-		sameMessageEvasionCharacter?: string;
 		rateLimits?: "default" | "knownBot" | "verifiedBot",
 		emitLiveEventsOnlyForFlaggedChannels?: boolean;
 		suspended?: boolean;
@@ -506,7 +505,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			// Ideally, this is determined by string comparison, but keeping strings of last messages over
 			// thousands of channels isn't exactly memory friendly. So we just keep the lengths and hope it works.
 			if (message.length === length) {
-				message += ` ${this.config.sameMessageEvasionCharacter}`;
+				message += ` ${TWITCH_ANTIPING_CHARACTER}`;
 			}
 		}
 

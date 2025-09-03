@@ -122,7 +122,6 @@
         "recentBanThreshold": null,
         "updateAvailableBotEmotes": false,
         "ignoredUserNotices": [],
-        "sameMessageEvasionCharacter": "󠀀",
         "rateLimits": "default",
         "reconnectAnnouncement": {},
         "emitLiveEventsOnlyForFlaggedChannels": false,
