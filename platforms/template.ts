@@ -1,7 +1,7 @@
 import { type Counter, SupiError } from "supi-core";
 
 import { User } from "../classes/user.js";
-import { Channel, Like as ChannelLike } from "../classes/channel.js";
+import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
 import createMessageLoggingTable from "../utils/create-db-table.js";
