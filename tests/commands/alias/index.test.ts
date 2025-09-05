@@ -188,13 +188,17 @@ describe("$alias", async () => {
 			const result = await baseCommand.execute(baseContext, "add", aliasName, commandName);
 			expectCommandResultSuccess(result, "created");
 
-			const row = world.rows.at(-1);
+			const row = world.rows.pop();
 			assert.ok(row, "Expected a Row to be created");
+			assert.ok(row.stored, "Expected a Row to be stored");
+			assert.strictEqual(row.loaded, false, "Expected a Row to not be loaded");
+
 			assert.strictEqual(row.values.Name, aliasName);
 			assert.strictEqual(row.values.Command, commandName);
 			assert.strictEqual(row.values.Arguments, null);
 			assert.strictEqual(row.values.User_Alias, BASE_USER_ID);
-			assert.strictEqual(row.stored, true);
+
+			assert.strictEqual(world.rows.length, 0);
 		});
 
 		it("2 args: should fail when adding an already existing alias", async () => {
@@ -227,7 +231,7 @@ describe("$alias", async () => {
 			const result = await baseCommand.execute(baseContext, "upsert", aliasName, commandName, ...testArgs);
 			expectCommandResultSuccess(result, "alias", aliasName, "replaced", "successfully");
 
-			const row = world.rows.at(-1);
+			const row = world.rows.pop();
 			assert.ok(row, "Expected a Row to be saved");
 			assert.ok(row.updated, "Expected Row to be updated");
 
@@ -235,6 +239,8 @@ describe("$alias", async () => {
 			assert.strictEqual(row.values.Command, commandName);
 			assert.strictEqual(row.values.Arguments, JSON.stringify(testArgs));
 			assert.strictEqual(row.values.User_Alias, BASE_USER_ID);
+
+			assert.strictEqual(world.rows.length, 0);
 		});
 
 		it("2 args: should reject non-conforming alias names (illegal character)", async () => {
@@ -256,25 +262,6 @@ describe("$alias", async () => {
 		});
 	});
 
-	/*
-
-	it("check: properly links aliases for specific users", async () => {
-		const result1 = await baseCommand.execute(baseContext, "list");
-		assert.notStrictEqual(result1.success, false);
-		assert.strictEqual(result1.reply?.includes("your aliases"), true);
-
-		recordsetData = [];
-		const someUsername = "SOME_USER";
-		const result2 = await baseCommand.execute(baseContext, "check", someUsername);
-		assert.strictEqual(result2.reply?.includes(someUsername), true);
-
-		// $alias check (neither exist)
-		// $alias check (username)
-		// $alias check (alias)
-		// $alias check (both username and alias exist)
-		//
-	});
-*/
 	it("copy: properly copies aliases", async () => {
 		// $alias copy -> error
 		// $alias copy (username) -> error
