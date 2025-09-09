@@ -162,6 +162,12 @@ describe("$alias", async () => {
 			const result = await baseCommand.execute(baseContext, "check", TARGET_USER, ALIAS_NAME);
 			expectCommandResultFailure(result, "They don't have", ALIAS_NAME, "alias");
 		});
+
+		// alias definition + message = too long -> link
+		// different result for $alias code -> should post definition and no fluff
+		// checking user - user doesn't exist
+		// checking linked alias -> exists
+		// checking linked alias -> original is deleted
 	});
 
 	describe("$alias add", () => {
