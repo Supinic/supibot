@@ -71,6 +71,7 @@ export default {
 			targetAlias = parentAlias;
 		}
 
+		/* node:coverage ignore next 6 */
 		if (!isClassicAlias(targetAlias)) {
 			throw new SupiError({
 			    message: "Assert error: Alias is not classic-type",
