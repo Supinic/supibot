@@ -262,17 +262,256 @@ describe("$alias", async () => {
 		});
 	});
 
-	it("copy: properly copies aliases", async () => {
-		// $alias copy -> error
-		// $alias copy (username) -> error
-		// $alias copy (username) (illegal alias name) -> error
-		// $alias copy (nonexistent username) (alias name) -> error
-		// $alias copy (username) (alias name that username does not own) -> error
-		// $alias copy (username) (alias name that username owns but is linked) -> error
-		// $alias copy (username) (alias name, but is copy-restricted) -> error
-		// $alias copy (username) (alias name, but name already exists) -> error
-		// $alias copyplace (username) (alias name, but name already exists) -> OK, check object
-		// $alias copy (username) (alias name) -> OK, check object
+	describe("$alias copy", () => {
+		it("0 args: should fail, no user name provided", async () => {
+			const resultCopy = await baseCommand.execute(baseContext, "copy");
+			expectCommandResultFailure(resultCopy, "No", "username");
+
+			const resultCopyplace = await baseCommand.execute(baseContext, "copyplace");
+			expectCommandResultFailure(resultCopyplace, "No", "username");
+		});
+
+		it("1 arg: should fail, no alias name provided", async () => {
+			const result = await baseCommand.execute(baseContext, "copy", "Bob");
+			expectCommandResultFailure(result, "No", "alias");
+		});
+
+		it("2 arg: should fail, incorrect user provided", async () => {
+			const result = await baseCommand.execute(baseContext, "copy", "Bob", "foo");
+			expectCommandResultFailure(result, "Invalid", "user");
+		});
+
+		it("2 arg: should fail, illegal alias provided (too short)", async () => {
+			const TARGET_USER = "bob";
+			world.allowUser(TARGET_USER);
+
+			const result = await baseCommand.execute(baseContext, "copyplace", TARGET_USER, "f");
+			expectCommandResultFailure(result, "copied alias", "name", "not valid");
+		});
+
+		it("2 arg: should fail, illegal alias provided (too long)", async () => {
+			const TARGET_USER = "bob";
+			world.allowUser(TARGET_USER);
+
+			const result = await baseCommand.execute(baseContext, "copyplace", TARGET_USER, "f".repeat(31));
+			expectCommandResultFailure(result, "copied alias", "name", "not valid");
+		});
+
+		it("2 arg: should fail, illegal alias provided (too long)", async () => {
+			const TARGET_USER = "bob";
+			world.allowUser(TARGET_USER);
+
+			const result = await baseCommand.execute(baseContext, "copyplace", TARGET_USER, "$$$");
+			expectCommandResultFailure(result, "copied alias", "name", "not valid");
+		});
+
+		it("2 arg: should fail, user does not own alias", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_ALIAS = "foo";
+			world.allowUser(TARGET_USER);
+
+			const result = await baseCommand.execute(baseContext, "copy", TARGET_USER, TARGET_ALIAS);
+			expectCommandResultFailure(result, "User", TARGET_USER, "doesn't have", TARGET_ALIAS);
+		});
+
+		it("2 arg: should fail, user owns alias but it is linked", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_ALIAS = "foo";
+			const TARGET_USER_ID = 123;
+
+			world.queueRsData(undefined);
+			existingAliasMap[TARGET_USER_ID] = {
+				[TARGET_ALIAS]: {
+					Channel: null,
+					User_Alias: TARGET_USER_ID,
+					Parent: 1,
+					Command: null
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "copy", TARGET_USER, TARGET_ALIAS);
+			expectCommandResultFailure(result, "cannot copy", "original", "deleted");
+		});
+
+		it("2 arg: should fail, user owns alias but it is copy-restricted", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_ALIAS = "foo";
+			const TARGET_USER_ID = 123;
+
+			world.queueRsData(undefined);
+			existingAliasMap[TARGET_USER_ID] = {
+				[TARGET_ALIAS]: {
+					User_Alias: TARGET_USER_ID,
+					Parent: null,
+					Command: "foo",
+					Channel: null,
+					Restrictions: ["copy"]
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "copy", TARGET_USER, TARGET_ALIAS);
+			expectCommandResultFailure(result, "cannot copy", "prevented new copies");
+		});
+
+		it("2 arg: should fail, copy - name collision", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_ALIAS = "foo";
+			const TARGET_USER_ID = 123;
+
+			world.queueRsData(undefined);
+			existingAliasMap[TARGET_USER_ID] = {
+				[TARGET_ALIAS]: {
+					User_Alias: TARGET_USER_ID,
+					Parent: null,
+					Command: "foo",
+					Channel: null
+				}
+			};
+			existingAliasMap[BASE_USER_ID] = {
+				[TARGET_ALIAS]: {
+					User_Alias: BASE_USER_ID,
+					Parent: null,
+					Command: "foo",
+					Channel: null
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "copy", TARGET_USER, TARGET_ALIAS);
+			expectCommandResultFailure(result, "Cannot copy", TARGET_ALIAS, "already have it");
+		});
+
+		it("2 arg: should succeed, copyplace - name collision", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_ALIAS = "foo";
+			const TARGET_USER_ID = 123;
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[TARGET_ALIAS]: {
+					Name: TARGET_ALIAS,
+					User_Alias: TARGET_USER_ID,
+					Command: "foo",
+					Invocation: "foobar",
+					Channel: null,
+					Arguments: "bar baz"
+				}
+			};
+			existingAliasMap[BASE_USER_ID] = {
+				[TARGET_ALIAS]: {
+					Name: TARGET_ALIAS,
+					User_Alias: BASE_USER_ID,
+					Command: "bar",
+					Channel: null,
+					Arguments: null
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "copyplace", TARGET_USER, TARGET_ALIAS);
+			expectCommandResultSuccess(result, TARGET_ALIAS, "copied", "replaced");
+
+			const row = world.rows.pop();
+			assert.ok(row);
+
+			const expectedAlias = existingAliasMap[TARGET_USER_ID][TARGET_ALIAS];
+			assert.strictEqual(row.values.Command, expectedAlias.Command);
+			assert.strictEqual(row.values.Arguments, expectedAlias.Arguments);
+			assert.strictEqual(row.values.Invocation, expectedAlias.Invocation);
+			assert.strictEqual(row.values.Parent, undefined);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("2 arg: should succeed on correct usage", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_ALIAS = "foo";
+			const TARGET_USER_ID = 123;
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[TARGET_ALIAS]: {
+					Name: TARGET_ALIAS,
+					User_Alias: TARGET_USER_ID,
+					Command: "foo",
+					Invocation: "foobar",
+					Channel: null,
+					Arguments: "bar baz"
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "copy", TARGET_USER, TARGET_ALIAS);
+			expectCommandResultSuccess(result, TARGET_ALIAS, "copied", "success");
+
+			const row = world.rows.pop();
+			assert.ok(row);
+
+			const expectedAlias = existingAliasMap[TARGET_USER_ID][TARGET_ALIAS];
+			assert.strictEqual(row.values.Command, expectedAlias.Command);
+			assert.strictEqual(row.values.Arguments, expectedAlias.Arguments);
+			assert.strictEqual(row.values.Invocation, expectedAlias.Invocation);
+			assert.strictEqual(row.values.Parent, undefined);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("2 arg: should succeed on copying a linked alias (conversion)", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_ALIAS = "foo";
+			const TARGET_USER_ID = 123;
+
+			const LINKED_ALIAS_ID = 234;
+			const LINKED_USER_ID = 234;
+
+			const linkedAlias = {
+				ID: LINKED_ALIAS_ID,
+				User_Alias: LINKED_USER_ID,
+				Command: "bar",
+				Channel: null,
+				Arguments: "bar baz",
+				Invocation: "foo"
+			};
+			world.queueRsData(linkedAlias);
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[TARGET_ALIAS]: {
+					Name: TARGET_ALIAS,
+					User_Alias: TARGET_USER_ID,
+					Parent: LINKED_ALIAS_ID,
+					Command: null,
+					Invocation: null,
+					Channel: null,
+					Arguments: null
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "copy", TARGET_USER, TARGET_ALIAS);
+			expectCommandResultSuccess(result, TARGET_ALIAS, "copied", "success");
+
+			const row = world.rows.pop();
+			assert.ok(row);
+
+			assert.strictEqual(row.values.Command, linkedAlias.Command);
+			assert.strictEqual(row.values.Arguments, linkedAlias.Arguments);
+			assert.strictEqual(row.values.Invocation, linkedAlias.Invocation);
+			assert.strictEqual(row.values.Parent, linkedAlias.ID);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
 	});
 
 	it("describe: properly adds descriptions", async () => {
