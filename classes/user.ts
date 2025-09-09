@@ -40,6 +40,13 @@ export const permissions = {
 	channelOwner: 0b0000_0100,
 	administrator: 0b1000_0000
 } as const;
+export const permissionNames = {
+	REGULAR: "regular",
+	AMBASSADOR: "ambassador",
+	CHANNEL_OWNER: "channelOwner",
+	ADMINISTRATOR: "administrator"
+} as const satisfies Record<string, keyof typeof permissions>;
+export type PermissionNumbers = (typeof User.permissions[keyof typeof User.permissions]);
 
 export class User extends TemplateWithIdString {
 	readonly ID: number;

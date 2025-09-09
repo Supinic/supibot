@@ -250,13 +250,32 @@ export default declare({
 		if (filterResult.length !== 0) {
 			const [existing] = filterResult;
 
-			if (existing.Issued_By !== context.user.ID && !isAdmin) {
-				return {
-					success: false,
-					reply: "This ban has not been created by you, so you cannot modify it!"
-				};
+			let appendix = "";
+			if (existing.Issued_By !== context.user.ID) {
+				const issuerUser = await sb.User.get(existing.Issued_By);
+				if (!issuerUser) {
+					throw new SupiError({
+						message: "Assert error: Issuer user does not exist"
+					});
+				}
+
+				const [currentPerm, issuerPerm] = await Promise.all([
+					context.getUserPermissions(),
+					context.getUserPermissions({ user: issuerUser })
+				]);
+
+				if (currentPerm.flag < issuerPerm.flag) {
+					return {
+						success: false,
+						reply: `This filter has been created by user with level ${issuerPerm.name}, which is higher than yours, so you cannot modify it!`
+					};
+				}
+				else {
+					appendix = ` (this filter has been created by @${issuerUser.Name})`;
+				}
 			}
-			else if (type === "Arguments") {
+
+			if (type === "Arguments") {
 				if (!existing.Data) {
 					throw new SupiError({
 						message: `Invalid filter definition - missing Data`
@@ -409,14 +428,6 @@ export default declare({
 				};
 			}
 			else {
-				let appendix = "";
-				if (existing.Issued_By !== context.user.ID && !isAdmin) {
-					const userData = await sb.User.get(existing.Issued_By);
-					if (userData) {
-						appendix = ` (this filter has been created by @${userData.Name})`;
-					}
-				}
-
 				await existing.toggle();
 
 				const [prefix, suffix] = (existing.Active) ? ["", " again"] : ["un", ""];

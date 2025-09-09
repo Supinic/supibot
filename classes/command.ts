@@ -18,7 +18,12 @@ import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 
 import Banphrase from "./banphrase.js";
 import { Filter } from "./filter.js";
-import User from "./user.js";
+import {
+	User,
+	permissions as userPermissions,
+	permissionNames as userPermissionNames,
+	type PermissionNumbers
+} from "./user.js";
 import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import { Platform, type GetEmoteOptions } from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
@@ -208,24 +213,31 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			channelOwner: Boolean(data[2])
 		};
 
-		let flag = User.permissions.regular;
+		let name: keyof typeof userPermissions | null = null;
+		let flag: PermissionNumbers = userPermissions.regular;
 		if (flags.administrator) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.administrator;
+			flag |= userPermissions.administrator;
+			name ??= userPermissionNames.ADMINISTRATOR;
 		}
 		if (flags.channelOwner) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.channelOwner;
+			flag |= userPermissions.channelOwner;
+			name ??= userPermissionNames.CHANNEL_OWNER;
 		}
 		if (flags.ambassador) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.ambassador;
+			flag |= userPermissions.ambassador;
+			name ??= userPermissionNames.AMBASSADOR;
 		}
+
+		name ??= userPermissionNames.REGULAR;
 
 		return {
 			flag,
+			name,
 			// eslint-disable-next-line no-bitwise
-			is: (type: keyof typeof User.permissions) => ((flag & User.permissions[type]) !== 0)
+			is: (type: keyof typeof userPermissions) => ((flag & userPermissions[type]) !== 0)
 		};
 	}
 
