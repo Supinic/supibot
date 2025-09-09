@@ -409,12 +409,20 @@ export default declare({
 				};
 			}
 			else {
+				let appendix = "";
+				if (existing.Issued_By !== context.user.ID && !isAdmin) {
+					const userData = await sb.User.get(existing.Issued_By);
+					if (userData) {
+						appendix = ` (this filter has been created by @${userData.Name})`;
+					}
+				}
+
 				await existing.toggle();
 
 				const [prefix, suffix] = (existing.Active) ? ["", " again"] : ["un", ""];
 				return {
 					success: true,
-					reply: `Successfully ${prefix}banned${suffix}.`
+					reply: `Successfully ${prefix}banned${suffix}.${appendix}`
 				};
 			}
 		}
