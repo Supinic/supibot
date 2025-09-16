@@ -1,7 +1,8 @@
 import { SupiError } from "supi-core";
 import * as z from "zod";
+
 import { Context } from "../../../classes/command.js";
-import { typedEntries } from "../../../utils/ts-helpers.js";
+import { typedEntries, typedKeys } from "../../../utils/ts-helpers.js";
 
 const PLATFORMS = {
 	br: ["br", "bra", "brasil", "brazil"],
@@ -45,7 +46,7 @@ export const GAME_RESULT = {
 	END: "GameComplete"
 };
 
-export const NON_STANDARD_CHAMPION_NAMES = {
+export const NON_STANDARD_CHAMPION_NAMES: Record<string, string> = {
 	AurelionSol: "Aurelion Sol",
 	Belveth: "Bel'Veth",
 	Chogath: "Cho'Gath",
@@ -77,7 +78,7 @@ export const TEAM_POSITIONS_MAP = {
 	JUNGLE: "jungle",
 	BOTTOM: "ADC",
 	UTILITY: "support"
-};
+} as const;
 
 const getPUUIdCacheKey = (gameName: string, tagLine: string) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getLeagueEntriesCacheKey = (platform: string, puuid: string) => `moba-league-entries-${platform}-${puuid}`;
@@ -207,7 +208,16 @@ export const getLeagueEntries = async (platform: string, puuid: string) => {
 	return data;
 };
 
-export const parseUserIdentifier = async (context: Context, regionName?: string, identifier?: string) => {
+type UserIdentifierFailure = { success: false, reply: string; };
+type UserIdentifierSuccess = {
+	success: true,
+	puuid: string,
+	gameName: string,
+	tagLine: string,
+	region: keyof typeof REGIONS
+};
+
+export const parseUserIdentifier = async (context: Context, regionName?: string, identifier?: string): Promise<UserIdentifierFailure | UserIdentifierSuccess> => {
 	if (!regionName && !identifier) {
 		const defaultRegion = await context.user.getDataProperty(DEFAULT_REGION_KEY);
 		if (!defaultRegion) {
@@ -223,8 +233,9 @@ export const parseUserIdentifier = async (context: Context, regionName?: string,
 		const targetUserData = await sb.User.get(regionName);
 		if (!targetUserData) {
 			return {
+				success: false,
 				reply: "Invalid user provided!"
-			};
+			} as const;
 		}
 
 		const [defaultRegion, defaultIdentifier] = await Promise.all([
@@ -235,7 +246,7 @@ export const parseUserIdentifier = async (context: Context, regionName?: string,
 			return {
 				success: false,
 				reply: `In order to check someone else's League stats, they must have both the default region and username set up!`
-			};
+			} as const;
 		}
 
 		regionName = defaultRegion;
@@ -248,7 +259,7 @@ export const parseUserIdentifier = async (context: Context, regionName?: string,
 			return {
 				success: false,
 				reply: `You must provide the user identifier!`
-			};
+			} as const;
 		}
 
 		identifier = defaultIdentifier;
@@ -265,7 +276,7 @@ export const parseUserIdentifier = async (context: Context, regionName?: string,
 		return {
 			success: false,
 			reply: `Invalid region provided!`
-		};
+		} as const;
 	}
 
 	let gameName;
@@ -350,9 +361,10 @@ const matchDataSchema = z.object({
 				kills: z.int(),
 				neutralMinionsKilled: z.int(),
 				puuid: z.string(),
-				teamPosition: z.string(),
-				totalMinionsKilled: z.int()
-			}).catchall(z.json())
+				teamPosition: z.enum(typedKeys(TEAM_POSITIONS_MAP)),
+				totalMinionsKilled: z.int(),
+				win: z.boolean()
+			}) // @todo: maybe add loose object or list out more interesting properties for custom usage
 		),
 		queueId: z.number()
 	})
