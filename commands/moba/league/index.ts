@@ -1,12 +1,18 @@
+import { SubcommandCollection } from "../../../classes/command.js";
+import { type MobaGameDefinition, MobaSubcommandDefinition } from "../index.js";
+
 import LastMatchCommand from "./last-match.js";
 import RankCommand from "./rank.js";
 
+const subcommands = [
+	LastMatchCommand,
+	RankCommand
+] satisfies MobaSubcommandDefinition[];
+
+const subcommandCollection = new SubcommandCollection("league", subcommands);
 export default {
 	requiredEnvs: ["API_RIOT_GAMES_KEY"],
-	subcommands: [
-		LastMatchCommand,
-		RankCommand
-	],
+	subcommandCollection,
 	addendum: [
 		"To simplify usage for <code>$league</code>, you can use the <code>$set</code> command to set your region and username:",
 		"<code>$set league-user (username)</code>",
@@ -19,4 +25,4 @@ export default {
 		"<code>$league</code> → Your stats",
 		"<code>$league @Username</code> → Another user's stats"
 	]
-};
+} satisfies MobaGameDefinition;

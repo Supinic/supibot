@@ -1,3 +1,6 @@
+import { SupiDate, SupiError } from "supi-core";
+
+import { type MobaSubcommandDefinition } from "../index.js";
 import {
 	NON_STANDARD_CHAMPION_NAMES,
 	TEAM_POSITIONS_MAP,
@@ -9,12 +12,14 @@ import {
 
 export default {
 	name: "lastMatch",
+	title: "Last played match",
 	aliases: ["last"],
 	description: [
 		"<code>$league last (region) (username)</code>",
 		"<code>$league last EUW Username#Tag</code>",
 		"Fetches quick data about the last match a given user has played (or is currently playing)."
 	],
+	default: false,
 	flags: {
 		default: false
 	},
@@ -36,8 +41,13 @@ export default {
 
 		const { info } = await getMatchData(region, matchIds[0]);
 		const player = info.participants.find(i => i.puuid === puuid);
-		const gameQueue = await getQueueDescription(info.queueId);
+		if (!player) {
+			throw new SupiError({
+			    message: "Assert error: Player not found within participants"
+			});
+		}
 
+		const gameQueue = await getQueueDescription(info.queueId);
 		if (context.params.rawData) {
 			return {
 				reply: "Data is available.",
@@ -55,7 +65,7 @@ export default {
 			};
 		}
 
-		const gameEnd = new sb.Date(info.gameEndTimestamp);
+		const gameEnd = new SupiDate(info.gameEndTimestamp);
 		const gameEndString = `Played ${core.Utils.timeDelta(gameEnd)}`;
 		const gameResultString = (player.win) ? "won as" : "lost as";
 		const gameLengthMinutes = Math.floor(info.gameDuration / 60);
@@ -63,19 +73,21 @@ export default {
 
 		const creepScore = player.totalMinionsKilled + player.neutralMinionsKilled;
 		const creepsPerMinute = core.Utils.round(creepScore / gameLengthMinutes, 1);
+		const gameType = gameQueue.shortName ?? "(unknown)";
 
+		// The ?? operator is probably not necessary here, but just "in case" Riot API receives a new key.
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
-		const gameType = gameQueue.shortName;
-
 		const champName = NON_STANDARD_CHAMPION_NAMES[player.championName] ?? player.championName;
+
 		return {
 			reply: core.Utils.tag.trim `
 				${playerName} ${gameResultString} ${champName} ${position}
 				in ${gameType} ${gameLengthString}.	
 				KDA: ${player.kills}/${player.deaths}/${player.assists},
 				${creepScore} CS (${creepsPerMinute} CS/min).
-				${gameEndString}
+				${gameEndString}.
 			 `
 		};
 	}
-};
+} satisfies MobaSubcommandDefinition;

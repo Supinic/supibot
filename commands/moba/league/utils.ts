@@ -1,3 +1,9 @@
+import { SupiError } from "supi-core";
+import * as z from "zod";
+
+import { Context } from "../../../classes/command.js";
+import { typedEntries, typedKeys } from "../../../utils/ts-helpers.js";
+
 const PLATFORMS = {
 	br: ["br", "bra", "brasil", "brazil"],
 	eun1: ["eune", "eu-north-east"],
@@ -40,7 +46,7 @@ export const GAME_RESULT = {
 	END: "GameComplete"
 };
 
-export const NON_STANDARD_CHAMPION_NAMES = {
+export const NON_STANDARD_CHAMPION_NAMES: Record<string, string> = {
 	AurelionSol: "Aurelion Sol",
 	Belveth: "Bel'Veth",
 	Chogath: "Cho'Gath",
@@ -72,22 +78,32 @@ export const TEAM_POSITIONS_MAP = {
 	JUNGLE: "jungle",
 	BOTTOM: "ADC",
 	UTILITY: "support"
-};
+} as const;
 
-const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
-const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
-const getLeagueEntriesCacheKey = (platform, summonerId) => `moba-league-entries-${platform}-${summonerId}`;
-const getMatchIdsKey = (summonerId) => `moba-league-match-ids-${summonerId}`;
-const getMatchDataKey = (matchId) => `moba-league-match-data-${matchId}`;
+const getPUUIdCacheKey = (gameName: string, tagLine: string) => `moba-league-puuid-${gameName}-${tagLine}`;
+const getLeagueEntriesCacheKey = (platform: string, puuid: string) => `moba-league-entries-${platform}-${puuid}`;
+const getMatchIdsKey = (summonerId: string) => `moba-league-match-ids-${summonerId}`;
+const getMatchDataKey = (matchId: string) => `moba-league-match-data-${matchId}`;
 
-export const getQueueDescription = async (queueId) => {
-	let queueData = await core.Cache.getByPrefix(QUEUE_DATA_CACHE_KEY);
+const queueSchema = z.array(
+	z.object({
+		queueId: z.int(),
+		map: z.string(),
+		description: z.nullable(z.string()),
+		notes: z.nullable(z.string())
+	})
+);
+type QueueItem = z.infer<typeof queueSchema>[number] & { shortName: string | null };
+
+export const getQueueDescription = async (queueId: number) => {
+	let queueData = await core.Cache.getByPrefix(QUEUE_DATA_CACHE_KEY) as QueueItem[] | undefined;
 	if (!queueData) {
 		const response = await core.Got.get("GenericAPI")({
 			url: "https://static.developer.riotgames.com/docs/lol/queues.json"
 		});
 
-		queueData = response.body.map(i => ({
+		const body = queueSchema.parse(response.body);
+		queueData = body.map(i => ({
 			...i,
 			shortName: (i.description)
 				? i.description.replace(/\s*\dv\d\s*/, "").replace(/\s*games\s*/, "")
@@ -101,7 +117,7 @@ export const getQueueDescription = async (queueId) => {
 
 	const queue = queueData.find(i => i.queueId === queueId);
 	if (!queue) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Queue ID not found"
 		});
 	}
@@ -109,10 +125,10 @@ export const getQueueDescription = async (queueId) => {
 	return queue;
 };
 
-export const getPlatform = (identifier) => {
+export const getPlatform = (identifier: string) => {
 	identifier = identifier.toLowerCase();
 
-	for (const [platform, aliases] of Object.entries(PLATFORMS)) {
+	for (const [platform, aliases] of typedEntries(PLATFORMS)) {
 		if (identifier === platform || aliases.includes(identifier)) {
 			return platform;
 		}
@@ -121,9 +137,10 @@ export const getPlatform = (identifier) => {
 	return null;
 };
 
-export const getPUUIDByName = async (gameName, tagLine) => {
+const puuidSchema = z.object({ puuid: z.string() });
+export const getPUUIDByName = async (gameName: string, tagLine: string) => {
 	const key = getPUUIdCacheKey(gameName, tagLine);
-	let puuid = await core.Cache.getByPrefix(key);
+	let puuid = await core.Cache.getByPrefix(key) as string | undefined;
 	if (!puuid) {
 		const response = await core.Got.get("GenericAPI")({
 			url: `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
@@ -137,7 +154,7 @@ export const getPUUIDByName = async (gameName, tagLine) => {
 			return null;
 		}
 		else if (!response.ok) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Could not fetch PUUID",
 				args: {
 					statusCode: response.statusCode
@@ -145,7 +162,7 @@ export const getPUUIDByName = async (gameName, tagLine) => {
 			});
 		}
 
-		puuid = response.body.puuid;
+		puuid = puuidSchema.parse(response.body).puuid;
 
 		await core.Cache.setByPrefix(key, puuid, {
 			expiry: 30 * 864e5 // 30 days
@@ -155,51 +172,34 @@ export const getPUUIDByName = async (gameName, tagLine) => {
 	return puuid;
 };
 
-export const getSummonerId = async (platform, puuid) => {
-	const summonerKey = getSummonerIdCacheKey(puuid);
-	let summonerId = await core.Cache.getByPrefix(summonerKey);
-	if (!summonerId) {
-		const response = await core.Got.get("GenericAPI")({
-			url: `https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
-			throwHttpErrors: false,
-			headers: {
-				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
-			}
-		});
-
-		if (response.statusCode === 404) {
-			return null;
-		}
-		else if (!response.ok) {
-			throw new sb.Error({
-				message: "Could not fetch SID",
-				args: {
-					statusCode: response.statusCode
-				}
-			});
-		}
-
-		summonerId = response.body.id;
-		await core.Cache.setByPrefix(summonerKey, summonerId, {
-			expiry: 30 * 864e5 // 30 days
-		});
-	}
-
-	return summonerId;
-};
-
-export const getLeagueEntries = async (platform, summonerId) => {
-	const key = getLeagueEntriesCacheKey(platform, summonerId);
-	let data = await core.Cache.getByPrefix(key);
+const leagueEntriesSchema = z.array(
+	z.object({
+		leagueId: z.string(),
+		queueType: z.string(),
+		tier: z.string(),
+		rank: z.string(),
+		puuid: z.string(),
+		leaguePoints: z.number(),
+		wins: z.number(),
+		losses: z.number(),
+		veteran: z.boolean(),
+		inactive: z.boolean(),
+		freshBlood: z.boolean(),
+		hotStreak: z.boolean()
+	})
+);
+export const getLeagueEntries = async (platform: string, puuid: string) => {
+	const key = getLeagueEntriesCacheKey(platform, puuid);
+	let data = await core.Cache.getByPrefix(key) as z.infer<typeof leagueEntriesSchema> | undefined;
 	if (!data) {
 		const response = await core.Got.get("GenericAPI")({
-			url: `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
+			url: `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
 			}
 		});
 
-		data = response.body;
+		data = leagueEntriesSchema.parse(response.body);
 		await core.Cache.setByPrefix(key, data, {
 			expiry: 300_000 // 5 minutes
 		});
@@ -208,7 +208,16 @@ export const getLeagueEntries = async (platform, summonerId) => {
 	return data;
 };
 
-export const parseUserIdentifier = async (context, regionName, identifier) => {
+type UserIdentifierFailure = { success: false, reply: string; };
+type UserIdentifierSuccess = {
+	success: true,
+	puuid: string,
+	gameName: string,
+	tagLine: string,
+	region: keyof typeof REGIONS
+};
+
+export const parseUserIdentifier = async (context: Context, regionName?: string, identifier?: string): Promise<UserIdentifierFailure | UserIdentifierSuccess> => {
 	if (!regionName && !identifier) {
 		const defaultRegion = await context.user.getDataProperty(DEFAULT_REGION_KEY);
 		if (!defaultRegion) {
@@ -220,12 +229,13 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 
 		regionName = defaultRegion;
 	}
-	else if (regionName.startsWith("@")) { // Check if the target is a user
+	else if (regionName && regionName.startsWith("@")) { // Check if the target is a user
 		const targetUserData = await sb.User.get(regionName);
 		if (!targetUserData) {
 			return {
+				success: false,
 				reply: "Invalid user provided!"
-			};
+			} as const;
 		}
 
 		const [defaultRegion, defaultIdentifier] = await Promise.all([
@@ -236,7 +246,7 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 			return {
 				success: false,
 				reply: `In order to check someone else's League stats, they must have both the default region and username set up!`
-			};
+			} as const;
 		}
 
 		regionName = defaultRegion;
@@ -249,10 +259,16 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 			return {
 				success: false,
 				reply: `You must provide the user identifier!`
-			};
+			} as const;
 		}
 
 		identifier = defaultIdentifier;
+	}
+
+	if (!regionName) {
+		throw new SupiError({
+		    message: "Assert error: Region name not obtained"
+		});
 	}
 
 	const region = getPlatform(regionName);
@@ -260,7 +276,7 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 		return {
 			success: false,
 			reply: `Invalid region provided!`
-		};
+		} as const;
 	}
 
 	let gameName;
@@ -270,7 +286,7 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 	}
 	else {
 		gameName = identifier;
-		tagLine = region;
+		tagLine = regionName;
 	}
 
 	const puuid = await getPUUIDByName(gameName, tagLine);
@@ -290,18 +306,13 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 	};
 };
 
-/**
- * @param {string} platform
- * @param {string} puuid
- * @param {Object} [options]
- * @param {number} [options.count]
- */
-export const getMatchIds = async (platform, puuid, options = {}) => {
+const matchIdSchema = z.array(z.string());
+export const getMatchIds = async (platform: keyof typeof REGIONS, puuid: string, options: { count?: number } = {}) => {
 	const summonerMatchKey = getMatchIdsKey(puuid);
-	let matchIds = await core.Cache.getByPrefix(summonerMatchKey);
+	let matchIds = await core.Cache.getByPrefix(summonerMatchKey) as string[] | undefined;
 	if (!matchIds) {
 		const searchParams = new URLSearchParams({
-			count: options.count ?? 20
+			count: String(options.count ?? 20)
 		});
 
 		const region = REGIONS[platform];
@@ -315,7 +326,7 @@ export const getMatchIds = async (platform, puuid, options = {}) => {
 		});
 
 		if (!response.ok) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Could not fetch match IDs",
 				args: {
 					statusCode: response.statusCode
@@ -323,7 +334,7 @@ export const getMatchIds = async (platform, puuid, options = {}) => {
 			});
 		}
 
-		matchIds = response.body;
+		matchIds = matchIdSchema.parse(response.body);
 		await core.Cache.setByPrefix(summonerMatchKey, matchIds, {
 			expiry: 300_000 // 5 minutes
 		});
@@ -332,9 +343,37 @@ export const getMatchIds = async (platform, puuid, options = {}) => {
 	return matchIds;
 };
 
-export const getMatchData = async (platform, matchId) => {
+const matchDataSchema = z.object({
+	info: z.object({
+		endOfGameResult: z.string(),
+		gameDuration: z.int(),
+		gameEndTimestamp: z.int(),
+		gameId: z.int(),
+		gameMode: z.string(),
+		gameStartTimestamp: z.int(),
+		gameType: z.string(),
+		gameVersion: z.string(),
+		participants: z.array(
+			z.object({
+				assists: z.int(),
+				championName: z.string(),
+				deaths: z.int(),
+				kills: z.int(),
+				neutralMinionsKilled: z.int(),
+				puuid: z.string(),
+				teamPosition: z.enum(typedKeys(TEAM_POSITIONS_MAP)),
+				totalMinionsKilled: z.int(),
+				win: z.boolean()
+			}) // @todo: maybe add loose object or list out more interesting properties for custom usage
+		),
+		queueId: z.number()
+	})
+});
+type MatchData = z.infer<typeof matchDataSchema>;
+
+export const getMatchData = async (platform: keyof typeof REGIONS, matchId: string) => {
 	const matchDataKey = getMatchDataKey(matchId);
-	let matchData = await core.Cache.getByPrefix(matchDataKey);
+	let matchData = await core.Cache.getByPrefix(matchDataKey) as MatchData | undefined;
 	if (!matchData) {
 		const region = REGIONS[platform];
 		const response = await core.Got.get("GenericAPI")({
@@ -346,7 +385,7 @@ export const getMatchData = async (platform, matchId) => {
 		});
 
 		if (!response.ok) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Could not fetch match data",
 				args: {
 					statusCode: response.statusCode
@@ -354,7 +393,7 @@ export const getMatchData = async (platform, matchId) => {
 			});
 		}
 
-		matchData = response.body;
+		matchData = matchDataSchema.parse(response.body);
 
 		// Only cache matches that are finished
 		if (matchData.info.endOfGameResult === GAME_RESULT.END) {
@@ -376,7 +415,6 @@ export default {
 	getQueueDescription,
 	getPlatform,
 	getPUUIDByName,
-	getSummonerId,
 	getLeagueEntries,
 	getMatchIds,
 	getMatchData,

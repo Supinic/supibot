@@ -1,21 +1,21 @@
-import {
-	parseUserIdentifier,
-	getSummonerId,
-	getLeagueEntries
-} from "./utils.js";
+import { parseUserIdentifier, getLeagueEntries } from "./utils.js";
+import { type MobaSubcommandDefinition } from "../index.js";
 
 const TARGET_LEAGUE = "RANKED_SOLO_5x5";
 
 export default {
 	name: "rank",
+	title: "Rank",
 	aliases: [],
-	description: [
-		"<code>$league (region) (username)</code>",
-		"<code>$league rank (region) (username)</code>",
-		"<code>$league EUW Username#Tag</code>",
-		"<code>$league rank EUW Username#Tag</code>",
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}league (region) (username)</code>`,
+		`<code>${prefix}league rank (region) (username)</code>`,
+		`<code>${prefix}league EUW Username#Tag</code>`,
+		`<code>${prefix}league rank EUW Username#Tag</code>`,
 		"Fetches simple data about a user's tier and rank in the current league."
 	],
+	default: true,
 	flags: {
 		default: true
 	},
@@ -26,15 +26,7 @@ export default {
 		}
 
 		const { puuid, region, gameName } = leagueUser;
-		const summonerId = await getSummonerId(region, puuid);
-		if (!summonerId) {
-			return {
-				success: false,
-				reply: `No such account exists in ${regionName.toUpperCase()}!`
-			};
-		}
-
-		const rawData = await getLeagueEntries(region, summonerId);
+		const rawData = await getLeagueEntries(region, puuid);
 		const data = rawData.find(i => i.queueType === TARGET_LEAGUE);
 		if (!data) {
 			return {
@@ -53,4 +45,4 @@ export default {
 			`
 		};
 	}
-};
+} satisfies MobaSubcommandDefinition;
