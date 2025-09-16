@@ -74,7 +74,7 @@ export default {
 				in ${gameType} ${gameLengthString}.	
 				KDA: ${player.kills}/${player.deaths}/${player.assists},
 				${creepScore} CS (${creepsPerMinute} CS/min).
-				${gameEndString}
+				${gameEndString}.
 			 `
 		};
 	}

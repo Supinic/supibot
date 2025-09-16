@@ -76,7 +76,7 @@ export const TEAM_POSITIONS_MAP = {
 
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
-const getLeagueEntriesCacheKey = (platform, summonerId) => `moba-league-entries-${platform}-${summonerId}`;
+const getLeagueEntriesCacheKey = (platform, puuid) => `moba-league-entries-${platform}-${puuid}`;
 const getMatchIdsKey = (summonerId) => `moba-league-match-ids-${summonerId}`;
 const getMatchDataKey = (matchId) => `moba-league-match-data-${matchId}`;
 
@@ -188,12 +188,12 @@ export const getSummonerId = async (platform, puuid) => {
 	return summonerId;
 };
 
-export const getLeagueEntries = async (platform, summonerId) => {
-	const key = getLeagueEntriesCacheKey(platform, summonerId);
+export const getLeagueEntries = async (platform, puuid) => {
+	const key = getLeagueEntriesCacheKey(platform, puuid);
 	let data = await core.Cache.getByPrefix(key);
 	if (!data) {
 		const response = await core.Got.get("GenericAPI")({
-			url: `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
+			url: `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
 			}

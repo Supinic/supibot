@@ -26,15 +26,7 @@ export default {
 		}
 
 		const { puuid, region, gameName } = leagueUser;
-		const summonerId = await getSummonerId(region, puuid);
-		if (!summonerId) {
-			return {
-				success: false,
-				reply: `No such account exists in ${regionName.toUpperCase()}!`
-			};
-		}
-
-		const rawData = await getLeagueEntries(region, summonerId);
+		const rawData = await getLeagueEntries(region, puuid);
 		const data = rawData.find(i => i.queueType === TARGET_LEAGUE);
 		if (!data) {
 			return {
