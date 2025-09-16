@@ -1,5 +1,3 @@
-import YoutubeStreamHandler from "./youtube-handler.js";
-
 export default {
 	Name: "streaminfo",
 	Aliases: ["si", "uptime", "vod"],
@@ -8,15 +6,11 @@ export default {
 	Description: "Posts stream info about a Twitch channel. Also supports YouTube - check the help article.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
-		{ name: "summary", type: "boolean" },
-		{ name: "youtube", type: "string" }
+		{ name: "rawData", type: "boolean" },
+		{ name: "summary", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Code: (async function streamInfo (context, ...args) {
-		if (context.params.youtube) {
-			return await YoutubeStreamHandler(context, ...args);
-		}
-
 		let targetChannel;
 		if (args.length === 0) {
 			if (context.platform.Name !== "twitch") {
@@ -49,6 +43,13 @@ export default {
 		}
 
 		if (context.params.summary) {
+			if (context.params.rawData) {
+				return {
+					success: false,
+					reply: "Cannot combine the summary and rawData parameters!"
+				};
+			}
+
 			const response = await core.Got.get("TwitchGQL")({
 				body: JSON.stringify([{
 					operationName: "HomeShelfGames",
@@ -113,6 +114,8 @@ export default {
 
 		let vodTitle;
 		const vod = vodResponse.body;
+		const rawData = { vod: null, stream };
+
 		if (vod.data && vod.data.length !== 0) {
 			/**
 			 * @typedef {Object} HelixVideo
@@ -137,6 +140,8 @@ export default {
 
 			/** @type {HelixVideo | undefined} */
 			const data = vod.data[0];
+			rawData.vod = data;
+
 			const vodDurationSeconds = core.Utils.parseDuration(data.duration, { target: "sec" });
 			vodTitle = data.title;
 			vodEnd = new sb.Date(data.created_at).addSeconds(vodDurationSeconds);
@@ -151,6 +156,13 @@ export default {
 			else {
 				vodString = `${data.url}`;
 			}
+		}
+
+		if (context.params.rawData) {
+			return {
+				reply: "Data is available.",
+				data: rawData
+			};
 		}
 
 		if (!stream) {
@@ -267,11 +279,5 @@ export default {
 		`<code>${prefix}streaminfo forsen <u>summary:true</u></code>`,
 		`Posts a list of recently streamed games and categories for a given channel.`,
 		"",
-
-		`<code>${prefix}streaminfo <u>youtube:(channel name)</u></code>`,
-		`<code>${prefix}streaminfo <u>youtube:(channel id)</u></code>`,
-		`Posts info about a YouTube channel's stream`,
-		`You can use the channel name (watch out - name, not display name), or the channel ID directly`,
-		`If the channel has multiple live streams at the same time, this command only posts the more relevant one.`
 	])
 };
