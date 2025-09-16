@@ -270,7 +270,7 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 	}
 	else {
 		gameName = identifier;
-		tagLine = region;
+		tagLine = regionName;
 	}
 
 	const puuid = await getPUUIDByName(gameName, tagLine);
