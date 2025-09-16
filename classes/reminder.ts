@@ -473,25 +473,28 @@ export class Reminder extends TemplateWithId {
 					});
 				}
 
-				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
-				const channelStringName = (isChannelStalkOptedOut === true)
-					? "[EXPUNGED]"
-					: channelData.getFullName();
-
+				// Whether the source channel (where the Reminder was created) is equal to trigger channel (where the Reminder was fired)
+				let isSameChannel = false;
 				let reminderPlatform: Platform | null = null;
 				if (reminder.Channel) {
-					const channelData = Channel.get(reminder.Channel);
-					if (!channelData) {
+					const reminderChannelData = Channel.get(reminder.Channel);
+					if (!reminderChannelData) {
 						throw new SupiError({
 							message: "Invalid Channel in Reminder"
 						});
 					}
 
-					reminderPlatform = channelData.Platform;
+					isSameChannel = (channelData === reminderChannelData);
+					reminderPlatform = reminderChannelData.Platform;
 				}
 				else {
 					reminderPlatform = Platform.get(reminder.Platform);
 				}
+
+				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
+				const channelStringName = (isChannelStalkOptedOut === true && !isSameChannel)
+					? "[EXPUNGED]"
+					: channelData.getFullName();
 
 				const uncheckedAuthorMention = await reminderPlatform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
