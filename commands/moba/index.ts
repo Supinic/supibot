@@ -49,8 +49,14 @@ const mobaCommandDefinition = declare({
 		}
 
 		const { subcommandCollection } = game;
-		const subcommand = subcommandCollection.get(command) ?? subcommandCollection.default;
-		return await subcommand.execute.call(this, context, command, ...args);
+		const subcommand = subcommandCollection.get(command);
+		if (subcommand) {
+			return await subcommand.execute.call(this, context, command, ...args);
+		}
+		else {
+			const defaultSubcommand = subcommandCollection.default;
+			return await defaultSubcommand.execute.call(this, context, defaultSubcommand.name, command, ...args);
+		}
 	}),
 	Dynamic_Description: async () => {
 		const list = [];
