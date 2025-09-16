@@ -55,24 +55,27 @@ export const expectCommandResultFailure = (result: CommandResult, ...includedMes
 };
 
 export class FakeRecordset {
-	private object: string | null = null;
+	private schema: string | null = null;
+	private table: string | null = null;
 	private fields: string[] = [];
-	private conditions: unknown[] = [];
+	private conditions: { condition: string, args: unknown[] }[] = [];
 	private amount: number | null = null;
 	private isSingle: boolean = false;
+	private flatField: string | null = null;
 
 	select (...args: string[]) {
 		this.fields.push(...args);
 		return this;
 	}
 
-	from (object: string) {
-		this.object = object;
+	from (schema: string, object: string) {
+		this.schema = schema;
+		this.table = object;
 		return this;
 	}
 
-	where (...args: unknown[]) {
-		this.conditions.push(...args);
+	where (condition: string, ...args: unknown[]) {
+		this.conditions.push({ condition, args });
 		return this;
 	}
 
@@ -83,6 +86,11 @@ export class FakeRecordset {
 
 	single () {
 		this.isSingle = true;
+		return this;
+	}
+
+	flat (field: string) {
+		this.flatField = field;
 		return this;
 	}
 }
