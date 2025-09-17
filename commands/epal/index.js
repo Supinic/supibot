@@ -16,7 +16,7 @@ export default {
 	Params: [],
 	Whitelist_Response: null,
 	initialize: function () {
-		if (!listenerAddress || !listenerPort) {
+		if (!epalAudioChannels || !listenerAddress || !listenerPort) {
 			console.warn("$epal: TTS not configured - will be unavailable");
 			this.data.listenerEnabled = false;
 		}

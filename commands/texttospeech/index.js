@@ -10,7 +10,7 @@ const {
 	listenerPort,
 	ttsLengthLimit = 30_000,
 	ttsListUrl = "(no address configured)",
-	ttsVolume
+	ttsVolume = 4 // Volume range: <0, 8> for VLC
 } = config.local ?? {};
 
 export default {
