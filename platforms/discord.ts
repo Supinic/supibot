@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { randomBytes } from "node:crypto";
 import {
 	BaseMessageOptions,
@@ -17,7 +18,12 @@ import {
 	escapeMarkdown
 } from "discord.js";
 
-import { BaseConfig, Platform, PlatformVerificationStatus, PrepareMessageOptions } from "./template.js";
+import {
+	BasePlatformConfigSchema,
+	Platform,
+	type PlatformVerificationStatus,
+	type PrepareMessageOptions
+} from "./template.js";
 import type { DiscordEmote, Emote } from "../@types/globals.d.ts";
 import User from "../classes/user.js";
 import { SupiError } from "supi-core";
@@ -74,17 +80,18 @@ const formatEmoji = (emote: Emote) => {
 	}
 };
 
-export interface DiscordConfig extends BaseConfig {
-	selfId: string;
-	platform: {
-		sendVerificationChallenge?: boolean;
-		guildCreateAnnounceChannel?: string | string[] | null;
-	};
-	logging: {
-		messages?: boolean;
-		whispers?: boolean;
-	};
-}
+export const DiscordConfigSchema = BasePlatformConfigSchema.extend({
+	selfId: z.string(),
+	platform: z.object({
+		sendVerificationChallenge: z.boolean().optional(),
+		guildCreateAnnounceChannel: z.union([z.string(), z.array(z.string())]).nullable().optional()
+	}),
+	logging: z.object({
+		messages: z.boolean().optional(),
+		whispers: z.boolean().optional()
+	})
+});
+export type DiscordConfig = z.infer<typeof DiscordConfigSchema>;
 
 export class DiscordPlatform extends Platform<DiscordConfig> {
 	#emoteFetchingPromise: Promise<Emote[]> | null = null;
@@ -164,7 +171,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		}
 
 		if (message) {
-			const emojiNameRegex = /^[\w\d]+$/;
+			const emojiNameRegex = /^\W+$/;
 			const words = message
 				.split(/\s+/)
 				.filter(Boolean)

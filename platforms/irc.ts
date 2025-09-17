@@ -1,9 +1,11 @@
+import * as z from "zod";
+
 // @ts-expect-error Module has no @types repository associated with it. Will use local interface as definition
 import { Client as IrcClient } from "irc-framework";
 import { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
-import { Platform, BaseConfig, PrepareMessageOptions } from "./template.js";
+import { Platform, BaseConfig, PrepareMessageOptions, BasePlatformConfigSchema } from "./template.js";
 import { User } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
@@ -18,7 +20,28 @@ type HandleCommandData = {
 	privateMessage: boolean;
 };
 
-export interface IrcConfig extends BaseConfig {
+export const IrcConfigSchema = BasePlatformConfigSchema.extend({
+	platform: z.object({
+		url: z.string(),
+		port: z.int()
+			.min(1).max(65536)
+			.optional(),
+		secure: z.boolean().optional(),
+		tls: z.boolean().optional(),
+		authentication: z.object({
+			type: z.string(),
+			envVariable: z.string(),
+			user: z.string()
+		})
+	}),
+	logging: z.object({
+		messages: z.boolean().optional(),
+		whispers: z.boolean().optional()
+	})
+});
+export type IrcConfig = z.infer<typeof IrcConfigSchema>;
+
+export interface IrcConfig2 extends BaseConfig {
 	platform: {
 		url: string;
 		port?: number;

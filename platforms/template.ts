@@ -1,7 +1,8 @@
+import * as z from "zod";
 import { type Counter, SupiError } from "supi-core";
 
 import { User } from "../classes/user.js";
-import { Channel, Like as ChannelLike } from "../classes/channel.js";
+import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
 import createMessageLoggingTable from "../utils/create-db-table.js";
@@ -15,19 +16,20 @@ import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
 import type { Emote } from "../@types/globals.d.ts";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-export type Like = Platform | number | string;
-export interface BaseConfig {
-	ID: number;
-	host?: string | null;
-	messageLimit: number;
-	selfId: string | null;
-	selfName: string;
-	active: boolean;
-	platform: unknown;
-	logging: unknown;
-	mirrorIdentifier?: string | null;
-}
+export const BasePlatformConfigSchema = z.object({
+	ID: z.int().positive(),
+	host: z.string().nullable().optional(),
+	messageLimit: z.int().positive(),
+	selfName: z.string(),
+	selfId: z.string().nullable(),
+	active: z.boolean(),
+	mirrorIdentifier: z.string().nullable().optional(),
+	platform: z.unknown(),
+	logging: z.unknown()
+});
+export type BaseConfig = z.infer<typeof BasePlatformConfigSchema>;
 
+export type Like = Platform | number | string;
 export type PrepareMessageOptions = {
 	extraLength?: number;
 	removeEmbeds?: boolean;
