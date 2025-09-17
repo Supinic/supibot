@@ -277,7 +277,7 @@ export default declare({
 
 			let priceString = String(modelData.pricePerMtoken);
 			if (modelData.flatCost) {
-				priceString += `+ flat ${modelData.flatCost}`;
+				priceString += ` + flat ${modelData.flatCost}`;
 			}
 			return core.Utils.tag.trim `
 				<tr>
