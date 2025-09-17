@@ -269,9 +269,11 @@ export default declare({
 		const { outputLimit } = GptConfig;
 
 		const modelListHTML = typedEntries(models).map(([name, modelData]) => {
-			const isDefaultEmoji = (modelData.default) ? "✔" : "❌";
+			const provider = modelData.type;
+			const type = modelData.url.split("/").at(-1) ?? modelData.url;
+			const isDefaultEmoji = (modelData.default) ? "✅" : "-";
+			const isSearchableEmoji = (modelData.search === true) ? "✅" : "-";
 			// const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
-			const searchableEmoji = (modelData.search === true) ? "✔" : "❌";
 
 			let priceString = String(modelData.pricePerMtoken);
 			if (modelData.flatCost) {
@@ -280,10 +282,11 @@ export default declare({
 			return core.Utils.tag.trim `
 				<tr>
 					<td>${name}</td>
-					<td>${modelData.type}</td>
+					<td>${provider}</td>
+					<td>${type}</td>
 					<td>${priceString}</td>
 					<td>${isDefaultEmoji}</td>
-					<td>${searchableEmoji}</td>
+					<td>${isSearchableEmoji}</td>
 				</tr>
 			`;
 		}).join("");
@@ -292,6 +295,7 @@ export default declare({
 			<table>
 				<thead>
 					<th>Name</th>
+					<th>Provider</th>
 					<th>Type</th>
 					<th>Pricing</th>
 					<th>Default</th>
