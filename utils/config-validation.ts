@@ -1,9 +1,9 @@
 /* eslint-disable newline-per-chained-call */
 import * as z from "zod";
 
-import { BasePlatformConfigSchema, ALLOWED_PLATFORM_TYPES } from "../platforms/schema.js";
+import { BasePlatformConfigSchema } from "../platforms/schema.js";
 const PlatformConfigSchema = BasePlatformConfigSchema.extend({
-	type: z.enum(ALLOWED_PLATFORM_TYPES)
+	type: z.string()
 });
 
 const port = z.int().positive().max(65536);
