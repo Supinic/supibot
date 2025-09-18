@@ -283,11 +283,7 @@ export const TwitchConfigSchema = BasePlatformConfigSchema.extend({
 		recentBanThreshold: z.number().optional().nullable(),
 		updateAvailableBotEmotes: z.boolean().optional(),
 		ignoredUserNotices: z.readonly(z.array(z.string())).optional(),
-		rateLimits: z.union([
-			z.literal("default"),
-			z.literal("knownBot"),
-			z.literal("verifiedBot")
-		]).optional(),
+		rateLimits: z.enum(["default", "knownBot", "verifiedBot"]).optional(),
 		emitLiveEventsOnlyForFlaggedChannels: z.boolean().optional(),
 		suspended: z.boolean().optional(),
 		joinChannelsOverride: z.readonly(z.array(z.string())).optional(),
