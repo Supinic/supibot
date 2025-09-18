@@ -10,7 +10,9 @@ import {
 	type Gauge
 } from "supi-core";
 import type { BaseMessageOptions } from "discord.js";
+
 import { ZodError } from "zod";
+import { getConfig } from "../config.js";
 
 type DiscordEmbeds = BaseMessageOptions["embeds"];
 
@@ -33,10 +35,10 @@ import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
 import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
-import config from "../config.json" with { type: "json" };
 import { Emote } from "../@types/globals.js";
 
-const COMMAND_PREFIX = config.modules.commands.prefix;
+const { values: configValues, modules: modulesConfig, responses: configResponses } = getConfig();
+const COMMAND_PREFIX = modulesConfig.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
 type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
@@ -487,8 +489,8 @@ export class Command extends TemplateWithoutId {
 
 	getDetailURL (options: { useCodePath?: boolean } = {}) {
 		const baseURL = (options.useCodePath)
-			? config.values.commandCodeUrlPrefix
-			: config.values.commandDetailUrlPrefix;
+			? configValues.commandCodeUrlPrefix
+			: configValues.commandDetailUrlPrefix;
 
 		return (baseURL)
 			? `${baseURL}/${encodeURIComponent(this.Name)}`
@@ -910,7 +912,7 @@ export class Command extends TemplateWithoutId {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
 				const reply = (channelHasFullErrorMessage)
 					? `Error ID ${errorID} - ${e.message}`
-					: `${config.responses.commandErrorResponse} (error ID ${errorID})`;
+					: `${configResponses.commandErrorResponse} (error ID ${errorID})`;
 
 				execution = {
 					success: false,

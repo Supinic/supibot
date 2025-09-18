@@ -5,9 +5,10 @@ import { Client as IrcClient } from "irc-framework";
 import { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
-import { Platform, PrepareMessageOptions, BasePlatformConfigSchema } from "./template.js";
+import { BasePlatformConfigSchema } from "./schema.js";
+import { Platform, PrepareMessageOptions } from "./template.js";
 import { User } from "../classes/user.js";
-import { Channel, Like as ChannelLike } from "../classes/channel.js";
+import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
 
 const DEFAULT_LOGGING_CONFIG = {

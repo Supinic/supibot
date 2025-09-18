@@ -1,7 +1,6 @@
 import { CronJob } from "cron";
-
-import config from "../config.json" with { type: "json" };
-const { logging } = config;
+import { getConfig } from "../config.js";
+const { logging } = getConfig();
 
 const notified = {
 	lastSeen: false,

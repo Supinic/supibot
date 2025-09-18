@@ -1,5 +1,5 @@
-import config from "../../config.json" with { type: "json" };
-const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
+import { getConfig } from "../../config.js";
+const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
 
 // matches | and > characters if and only if they're not preceded, nor followed by another | or >.
 const PIPE_REGEX = /(?<![|>])[|>](?![|>])/;

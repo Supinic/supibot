@@ -1,8 +1,8 @@
 import DatabaseLogs from "./db-randomline.js";
 import { getRandomChannelLine, getRandomUserLine, isSupported } from "./rustlog.js";
-import config from "../../config.json" with { type: "json" };
 
-const { instances } = config.rustlog;
+import { getConfig } from "../../config.js";
+const { instances } = getConfig().rustlog;
 
 export default {
 	Name: "randomline",

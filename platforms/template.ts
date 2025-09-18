@@ -11,23 +11,13 @@ import type { TwitchConfig, TwitchPlatform } from "./twitch.js";
 import type { DiscordConfig, DiscordPlatform } from "./discord.js";
 import type { CytubeConfig, CytubePlatform } from "./cytube.js";
 import type { IrcConfig, IrcPlatform } from "./irc.js";
-export const ALLOWED_PLATFORM_TYPES = ["twitch", "discord", "cytube", "irc"] as const;
 
 import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
 import type { Emote } from "../@types/globals.d.ts";
+
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-export const BasePlatformConfigSchema = z.object({
-	ID: z.int().positive(),
-	host: z.string().nullable().optional(),
-	messageLimit: z.int().positive(),
-	selfName: z.string(),
-	selfId: z.string().nullable(),
-	active: z.boolean(),
-	mirrorIdentifier: z.string().nullable().optional(),
-	platform: z.unknown(),
-	logging: z.unknown()
-});
+import { BasePlatformConfigSchema } from "./schema.js";
 export type BaseConfig = z.infer<typeof BasePlatformConfigSchema>;
 
 export type Like = Platform | number | string;

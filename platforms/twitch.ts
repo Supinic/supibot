@@ -4,7 +4,8 @@ import WebSocket from "ws";
 import { randomBytes } from "node:crypto";
 import { setTimeout as wait } from "node:timers/promises";
 
-import { Platform, BasePlatformConfigSchema } from "./template.js";
+import { BasePlatformConfigSchema } from "./schema.js";
+import { Platform } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 

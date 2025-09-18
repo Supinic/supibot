@@ -18,16 +18,13 @@ import {
 	escapeMarkdown
 } from "discord.js";
 
-import {
-	BasePlatformConfigSchema,
-	Platform,
-	type PlatformVerificationStatus,
-	type PrepareMessageOptions
-} from "./template.js";
+import { BasePlatformConfigSchema } from "./schema.js";
+import { Platform, type PlatformVerificationStatus, type PrepareMessageOptions } from "./template.js";
 import type { DiscordEmote, Emote } from "../@types/globals.d.ts";
-import User from "../classes/user.js";
+
+import { User } from "../classes/user.js";
 import { SupiError } from "supi-core";
-import Channel from "../classes/channel.js";
+import { Channel } from "../classes/channel.js";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {

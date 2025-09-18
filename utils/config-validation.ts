@@ -1,15 +1,11 @@
 /* eslint-disable newline-per-chained-call */
 import * as z from "zod";
 
-import { BasePlatformConfigSchema, ALLOWED_PLATFORM_TYPES } from "../platforms/template.js";
-import { TwitchConfigSchema } from "../platforms/twitch.js";
-import { DiscordConfigSchema } from "../platforms/discord.js";
-import { CytubeConfigSchema } from "../platforms/cytube.js";
-import { IrcConfigSchema } from "../platforms/irc.js";
-
+import { BasePlatformConfigSchema, ALLOWED_PLATFORM_TYPES } from "../platforms/schema.js";
 const PlatformConfigSchema = BasePlatformConfigSchema.extend({
 	type: z.enum(ALLOWED_PLATFORM_TYPES)
 });
+
 const port = z.int().positive().max(65536);
 const loggingObject = z.discriminatedUnion("enabled", [
 	z.object({ enabled: z.literal(false), cron: z.string().optional() }),
@@ -34,12 +30,13 @@ const rustlogInstances = z.record(z.string(), z.object({
 	url: z.string()
 }));
 
-export default z.object({
-	responses: z.object({
+export default z.strictObject({
+	basePath: z.string(),
+	responses: z.strictObject({
 		defaultBanphrase: z.string(),
 		commandErrorResponse: z.string()
 	}),
-	values: z.object({
+	values: z.strictObject({
 		pendingCommandTimeout: z.int().positive(),
 		pajbotBanphraseRequestTimeout: z.int().positive(),
 		commandCodeUrlPrefix: z.string(),
@@ -60,10 +57,10 @@ export default z.object({
 			});
 		}
 	}),
-	local: z.object({
+	local: z.strictObject({
 		epalAudioChannels: z.array(z.int().positive()).optional().nullable(),
 		listenerAddress: z.string().optional().nullable(),
-		port: port.optional().nullable(),
+		listenerPort: port.optional().nullable(),
 		ttsVolume: z.int().min(0).max(8).optional().nullable(),
 		ttsLengthLimit: z.int().positive().optional().nullable(),
 		ttsListUrl: z.string().optional().nullable(),
@@ -74,11 +71,11 @@ export default z.object({
 		vlcPassword: z.string().optional().nullable(),
 		vlcPort: port.optional().nullable()
 	}).optional(),
-	api: z.object({
+	api: z.strictObject({
 		secure: z.boolean().nullable().optional(),
 		port: port.optional().nullable()
 	}).optional(),
-	rustlog: z.object({
+	rustlog: z.strictObject({
 		instances: rustlogInstances.superRefine((data, context) => {
 			let defaultInstances = 0;
 			const instances = Object.values(data);
@@ -97,13 +94,13 @@ export default z.object({
 			}
 		})
 	}),
-	logging: z.object({
+	logging: z.strictObject({
 		messages: loggingObject,
 		commands: loggingObject,
 		lastSeen: loggingObject,
 		errors: z.object({ enabled: z.boolean() })
 	}),
-	modules: z.object({
+	modules: z.strictObject({
 		"chat-modules": moduleBase("chat-modules"),
 		commands: moduleBase("commands").extend({
 			prefix: z.string(),
@@ -116,26 +113,5 @@ export default z.object({
 			defaultUserAgent: z.string()
 		})
 	}),
-	platforms: z.array(PlatformConfigSchema).superRefine((data, context) => {
-		const platformSchemaMap = {
-			twitch: TwitchConfigSchema,
-			discord: DiscordConfigSchema,
-			cytube: CytubeConfigSchema,
-			irc: IrcConfigSchema
-		};
-
-		for (const platform of data) {
-			const schema = platformSchemaMap[platform.type];
-			try {
-				schema.parse(platform);
-			}
-			catch (e) {
-				context.addIssue({
-					code: "custom",
-					error: e,
-					path: ["platform", platform.type]
-				});
-			}
-		}
-	})
+	platforms: z.array(PlatformConfigSchema)
 } satisfies z.ZodRawShape);

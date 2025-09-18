@@ -1,6 +1,12 @@
 import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const {
+	maxIncomingActiveReminders,
+	maxOutgoingActiveReminders,
+	maxIncomingScheduledReminders,
+	maxOutgoingScheduledReminders
+} = getConfig().values;
 
 import AwayFromKeyboard from "./afk.js";
 import Banphrase from "./banphrase.js";
@@ -710,8 +716,8 @@ export class Reminder extends TemplateWithId {
 			)
 		]);
 
-		const incomingLimit = config.values.maxIncomingActiveReminders;
-		const outgoingLimit = config.values.maxOutgoingActiveReminders;
+		const incomingLimit = maxIncomingActiveReminders;
+		const outgoingLimit = maxOutgoingActiveReminders;
 		const [privateIncoming, publicIncoming] = core.Utils.splitByCondition(incomingData, (i: Item) => i.Private_Message);
 		const [privateOutgoing, publicOutgoing] = core.Utils.splitByCondition(outgoingData, (i: Item) => i.Private_Message);
 
@@ -741,9 +747,8 @@ export class Reminder extends TemplateWithId {
 		}
 
 		if (schedule) {
-			const incomingScheduledLimit = config.values.maxIncomingScheduledReminders;
-			const outgoingScheduledLimit = config.values.maxOutgoingScheduledReminders;
-
+			const incomingScheduledLimit = maxIncomingScheduledReminders;
+			const outgoingScheduledLimit = maxOutgoingScheduledReminders;
 			const [scheduledIncoming, scheduledOutgoing] = await Promise.all([
 				core.Query.getRecordset<number>(rs => rs
 					.select("COUNT(*) AS Count")
