@@ -1,10 +1,17 @@
 import * as z from "zod";
-import raw from "./config.json" with { type: "json" };
-import ConfigSchema from "./utils/config-validation.js";
+import { readFile } from "node:fs/promises";
 
-export type Config = z.infer<typeof ConfigSchema>;
+const raw = await readFile("./config.json");
+import { ConfigSchema } from "./utils/config-validation-schema.js";
+
+type Config = z.infer<typeof ConfigSchema>;
 
 let cached: Config | null = null;
 export function getConfig (): Config {
-	return (cached ??= ConfigSchema.parse(raw));
+	if (!cached) {
+		const rawJson: unknown = JSON.parse(raw.toString());
+		cached = ConfigSchema.parse(rawJson);
+	}
+
+	return cached;
 }

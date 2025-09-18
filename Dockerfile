@@ -14,7 +14,6 @@ COPY --chown=supibot:supibot yarn.lock ./
 
 RUN yarn install
 
-COPY --chown=supibot:supibot config.json ./
 COPY --chown=supibot:supibot master.ts ./
 COPY --chown=supibot:supibot config.ts ./
 COPY --chown=supibot:supibot init ./init
@@ -31,8 +30,6 @@ COPY --chown=supibot:supibot singletons ./singletons
 COPY --chown=supibot:supibot utils ./utils
 
 RUN yarn build
-
-RUN yarn validate:config
 
 COPY docker-entrypoint.sh /usr/local/bin/
 

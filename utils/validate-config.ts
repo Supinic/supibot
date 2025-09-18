@@ -1,14 +1,24 @@
+/* eslint-disable unicorn/no-process-exit */
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
 import { ZodError } from "zod";
-import ConfigSchema from "./config-validation.js";
-import config from "../config.json" with { type: "json" };
+import { ConfigSchema } from "./config-validation-schema.js";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const configPath = path.resolve(here, "..", "config.json");
 
 try {
-	ConfigSchema.parse(config);
+	const raw = await readFile(configPath);
+	const rawJson: unknown = JSON.parse(raw.toString());
+	ConfigSchema.parse(rawJson);
 	console.log("config ok");
 }
 catch (e) {
 	if (!(e instanceof ZodError)) {
-		throw e;
+		console.error(e);
+		process.exit(1);
 	}
 
 	console.error("config invalid");
@@ -17,6 +27,5 @@ catch (e) {
 			`• [${issue.path.join(".") || "(root)"}] ${issue.message}`
 		);
 	}
-	// eslint-disable-next-line unicorn/no-process-exit
 	process.exit(1);
 }

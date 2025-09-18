@@ -10,4 +10,3 @@ else
   echo "Starting in production mode"
   yarn start
 fi
-

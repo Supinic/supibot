@@ -14,7 +14,7 @@
     "Each type is an object that contains the \"cron\" property which defines the cron expression on how often each type will be saved to database.",
     "If you would like the type to not be logged, change the \"enabled\" property to `false`."
   ],
-  "basePath": "/home/supibot",
+  "basePath": "/home/project/supibot",
   "responses": {
     "defaultBanphrase": "[Banphrased]",
     "commandErrorResponse": "An error occured while executing the command!"
@@ -44,8 +44,7 @@
     "vlcPort": null,
     "vlcUrl": null,
     "vlcUsername": null,
-    "vlcBaseUrl": null,
-    "vlcIp": null
+    "vlcBaseUrl": null
   },
   "api": {
     "secure": false,
@@ -165,7 +164,6 @@
     }
   ],
   "rustlog": {
-    "readme": "This config lets you manage your custom list of Rustlog instances for the $randomline command.",
     "instances": {
       "ivr": {
         "url": "logs.ivr.fi",

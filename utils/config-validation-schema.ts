@@ -30,7 +30,8 @@ const rustlogInstances = z.record(z.string(), z.object({
 	url: z.string()
 }));
 
-export default z.strictObject({
+export const ConfigSchema = z.strictObject({
+	usageGuide: z.unknown(),
 	basePath: z.string(),
 	responses: z.strictObject({
 		defaultBanphrase: z.string(),
