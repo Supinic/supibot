@@ -11,6 +11,7 @@ import type { TwitchConfig, TwitchPlatform } from "./twitch.js";
 import type { DiscordConfig, DiscordPlatform } from "./discord.js";
 import type { CytubeConfig, CytubePlatform } from "./cytube.js";
 import type { IrcConfig, IrcPlatform } from "./irc.js";
+export const ALLOWED_PLATFORM_TYPES = ["twitch", "discord", "cytube", "irc"] as const;
 
 import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
 import type { Emote } from "../@types/globals.d.ts";

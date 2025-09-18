@@ -5,7 +5,7 @@ import { Client as IrcClient } from "irc-framework";
 import { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
-import { Platform, BaseConfig, PrepareMessageOptions, BasePlatformConfigSchema } from "./template.js";
+import { Platform, PrepareMessageOptions, BasePlatformConfigSchema } from "./template.js";
 import { User } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
@@ -24,7 +24,8 @@ export const IrcConfigSchema = BasePlatformConfigSchema.extend({
 	platform: z.object({
 		url: z.string(),
 		port: z.int()
-			.min(1).max(65536)
+			.min(1)
+			.max(65536)
 			.optional(),
 		secure: z.boolean().optional(),
 		tls: z.boolean().optional(),
@@ -40,24 +41,6 @@ export const IrcConfigSchema = BasePlatformConfigSchema.extend({
 	})
 });
 export type IrcConfig = z.infer<typeof IrcConfigSchema>;
-
-export interface IrcConfig2 extends BaseConfig {
-	platform: {
-		url: string;
-		port?: number;
-		secure?: boolean;
-		tls?: boolean;
-		authentication: {
-			type: string;
-			envVariable: string;
-			user: string;
-		};
-	};
-	logging: {
-		messages?: boolean;
-		whispers?: boolean;
-	};
-}
 
 type IrcConnectOptions = {
 	nick: string;

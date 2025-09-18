@@ -1,7 +1,10 @@
 import * as supiCore from "supi-core";
+import ConfigValidation from "./utils/config-validation.js";
 import type { GotInstanceDefinition } from "supi-core";
 
-import config from "./config.json" with { type: "json" };
+import rawConfig from "./config.json" with { type: "json" };
+const config = ConfigValidation.parse(rawConfig);
+
 import initializeInternalApi from "./api/index.js";
 
 import commandDefinitions from "./commands/index.js";
