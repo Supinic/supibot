@@ -82,7 +82,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			resultConfig.logging.whispers = DEFAULT_LOGGING_CONFIG.whispers;
 		}
 
-		super("irc", resultConfig);
+		super("irc", IrcConfigSchema.parse(resultConfig));
 
 		if (!this.host) {
 			throw new SupiError({

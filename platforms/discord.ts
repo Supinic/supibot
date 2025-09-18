@@ -25,6 +25,7 @@ import type { DiscordEmote, Emote } from "../@types/globals.d.ts";
 import { User } from "../classes/user.js";
 import { SupiError } from "supi-core";
 import { Channel } from "../classes/channel.js";
+import { CytubeConfigSchema } from "./cytube.js";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {
@@ -103,7 +104,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		resultConfig.platform.sendVerificationChallenge ??= false;
 		resultConfig.platform.guildCreateAnnounceChannel ??= null;
 
-		super("discord", resultConfig);
+		super("discord", DiscordConfigSchema.parse(resultConfig));
 
 		this.client = new Client({
 			intents: [

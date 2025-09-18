@@ -326,7 +326,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 		};
 
-		super("twitch", resultConfig);
+		super("twitch", TwitchConfigSchema.parse(resultConfig));
 
 		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
 	}

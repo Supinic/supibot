@@ -456,7 +456,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			resultConfig.platform.messageDelayThreshold = DEFAULT_PLATFORM_CONFIG.messageDelayThreshold;
 		}
 
-		super("cytube", resultConfig);
+		super("cytube", CytubeConfigSchema.parse(resultConfig));
 	}
 
 	async connect () {
