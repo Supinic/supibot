@@ -7,12 +7,11 @@ import User from "./user.js";
 import type Channel from "./channel.js";
 
 import afkDefinitions from "./afk-definitions.json" with { type: "json" };
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const { responses: configResponses } = getConfig();
+const { responses } = afkDefinitions;
 
 export type Status = "afk" | "gn" | "brb" | "shower" | "poop" | "lurk" | "work" | "study" | "nap" | "food";
-
-const { responses } = afkDefinitions;
-const configResponses = config.responses;
 
 type DurationStatus = {
 	interval: [number, number | null];

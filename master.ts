@@ -1,7 +1,7 @@
 import * as supiCore from "supi-core";
+import { getConfig } from "./config.js";
 import type { GotInstanceDefinition } from "supi-core";
 
-import config from "./config.json" with { type: "json" };
 import initializeInternalApi from "./api/index.js";
 
 import commandDefinitions from "./commands/index.js";
@@ -118,6 +118,7 @@ const MODULE_INITIALIZE_ORDER = [
 	[ChatModule]
 ] as const;
 
+const config = getConfig();
 const platformsConfig = config.platforms;
 if (platformsConfig.length === 0) {
 	throw new Error("No platforms configured! Supibot will now exit.");

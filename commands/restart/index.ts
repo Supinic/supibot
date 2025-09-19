@@ -1,11 +1,10 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
 import { declare } from "../../classes/command.js";
-
-import config from "../../config.json" with { type: "json" };
-
 const shell = promisify(exec);
-const { basePath } = config;
+
+import { getConfig } from "../../config.js";
+const { basePath } = getConfig();
 
 const restartMethods = {
 	pull: {

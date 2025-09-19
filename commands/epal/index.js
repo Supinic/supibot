@@ -1,8 +1,8 @@
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-import config from "../../config.json" with { type: "json" };
-
-const { epalAudioChannels, listenerAddress, listenerPort } = config.local ?? {};
 const { TTS_ENABLED } = cacheKeys;
+
+import { getConfig } from "../../config.js";
+const { epalAudioChannels, listenerAddress, listenerPort } = getConfig().local ?? {};
 
 const PROFILES_CACHE_KEY = "epal-profiles";
 
@@ -16,7 +16,7 @@ export default {
 	Params: [],
 	Whitelist_Response: null,
 	initialize: function () {
-		if (!listenerAddress || !listenerPort) {
+		if (!epalAudioChannels || !listenerAddress || !listenerPort) {
 			console.warn("$epal: TTS not configured - will be unavailable");
 			this.data.listenerEnabled = false;
 		}

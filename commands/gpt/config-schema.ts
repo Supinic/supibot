@@ -6,7 +6,7 @@ const userTokenLimit = z
 	.refine(
 		data => (data.daily > data.hourly),
 		{
-			message: "`daily` must be greater than `hourly`",
+			error: "`daily` must be greater than `hourly`",
 			path: ["daily"]
 		}
 	);
