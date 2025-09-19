@@ -1,7 +1,9 @@
 import { SupiDate, SupiError, type Batch, type Row } from "supi-core";
 import { TemplateWithIdString } from "./template.js";
 
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const { userAdditionCriticalLoadThreshold, userAdditionHighLoadThreshold } = getConfig().values;
+
 import {
 	type UserDataProperty,
 	type UserDataPropertyMap,
@@ -40,6 +42,13 @@ export const permissions = {
 	channelOwner: 0b0000_0100,
 	administrator: 0b1000_0000
 } as const;
+export const permissionNames = {
+	REGULAR: "regular",
+	AMBASSADOR: "ambassador",
+	CHANNEL_OWNER: "channelOwner",
+	ADMINISTRATOR: "administrator"
+} as const satisfies Record<string, keyof typeof permissions>;
+export type PermissionNumbers = (typeof User.permissions[keyof typeof User.permissions]);
 
 export class User extends TemplateWithIdString {
 	readonly ID: number;
@@ -365,11 +374,11 @@ export class User extends TemplateWithIdString {
 		const keys = await core.Cache.getKeysByPrefix(`${HIGH_LOAD_CACHE_PREFIX}*`);
 
 		// If there are too many new users queued (above criticalLoadThreshold), all new users being added are skipped
-		if (keys.length > config.values.userAdditionCriticalLoadThreshold) {
+		if (keys.length > userAdditionCriticalLoadThreshold) {
 			return null;
 		}
 		// If there are many new users queued (above highLoadThreshold), new users will be batched instead
-		else if (keys.length > config.values.userAdditionHighLoadThreshold) {
+		else if (keys.length > userAdditionHighLoadThreshold) {
 			User.pendingNewUsers.set(preparedName, null);
 
 			if (User.highLoadUserBatch) {

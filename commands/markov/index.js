@@ -1,8 +1,9 @@
 import fs from "node:fs/promises";
 import { CronJob } from "cron";
-import config from "../../config.json" with { type: "json" };
 
-const BASE_PATH = config.basePath;
+import { getConfig } from "../../config.js";
+const BASE_PATH = getConfig().basePath;
+
 const MODEL_SIZE_THRESHOLD = 100;
 const WORD_LIMIT = 20;
 const DEFAULT_WORD_AMOUNT = 15;

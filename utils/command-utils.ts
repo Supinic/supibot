@@ -303,7 +303,7 @@ type GoogleGeoData = {
 /**
  * Returns Google Geo Data for given query.
  */
-export const fetchGeoLocationData = async (query: string) => {
+export const fetchGeoLocationData = async (query: string | Coordinates) => {
 	if (!process.env.API_GOOGLE_GEOCODING) {
 		throw new SupiError({
 			message: "No Google geolocation API key configured (API_GOOGLE_GEOCODING)"
@@ -315,12 +315,20 @@ export const fetchGeoLocationData = async (query: string) => {
 		results: GoogleGeoData[];
 	};
 
+	const searchParams: Record<string, string> = {
+		key: process.env.API_GOOGLE_GEOCODING
+	};
+
+	if (typeof query === "string") {
+		searchParams.address = query;
+	}
+	else {
+		searchParams.latlng = `${query.lat},${query.lng}`;
+	}
+
 	const response = await core.Got.get("GenericAPI")<GeoApiResponse>({
 		url: "https://maps.googleapis.com/maps/api/geocode/json",
-		searchParams: {
-			key: process.env.API_GOOGLE_GEOCODING,
-			address: query
-		}
+		searchParams
 	});
 
 	if (response.body.status !== "OK") {

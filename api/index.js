@@ -1,6 +1,7 @@
-import config from "../config.json" with { type: "json" };
 import http from "node:http";
 import https from "node:https";
+
+import { getConfig } from "../config.js";
 
 import AfkDefinition from "./afk.js";
 import ChannelDefinition from "./channel.js";
@@ -25,7 +26,7 @@ const routeDefinitions = {
 };
 
 export default function initialize () {
-	const { api } = config;
+	const { api } = getConfig();
 	if (!api || !api.port || typeof api.secure !== "boolean") {
 		console.warn("Internal API port/security is not configured - internal API will not start");
 		return;

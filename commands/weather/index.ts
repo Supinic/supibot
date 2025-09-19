@@ -6,7 +6,8 @@ import { declare } from "../../classes/command.js";
 import { fetchGeoLocationData, postToHastebin } from "../../utils/command-utils.js";
 
 import {
-	getSunPosition, isWeatherFormatKey,
+	getSunPosition,
+	isWeatherFormatKey,
 	OwmPollutionResponse,
 	OwmWeatherResponse,
 	WeatherFormatObject,
@@ -209,9 +210,9 @@ export default declare({
 		}
 
 		if (!coords || !formattedAddress) {
-			if (args.length === 0) {
+			if (args.length === 0 && !coords) {
 				return {
-					reply: "No place provided!",
+					reply: "No place or data provided!",
 					cooldown: 2500
 				};
 			}
@@ -223,14 +224,20 @@ export default declare({
 			};
 
 			const location = args.join(" ");
-			const geoKey = {
-				type: "coordinates",
-				location
-			};
+			const cacheKey = (location)
+				? `weather-location-${location}`
+				: `weather-coords-${JSON.stringify(coords)}`;
 
-			let geoData = await this.getCacheData(geoKey) as GeoCacheData | undefined;
+			let geoData = await core.Cache.getByPrefix(cacheKey) as GeoCacheData | undefined;
 			if (!geoData) {
-				const data = await fetchGeoLocationData(args.join(" "));
+				let data;
+				if (coords) {
+					data = await fetchGeoLocationData(coords);
+				}
+				else {
+					data = await fetchGeoLocationData(args.join(" "));
+				}
+
 				if (!data.success) {
 					geoData = { empty: true };
 				}
@@ -242,7 +249,7 @@ export default declare({
 					};
 				}
 
-				await this.setCacheData(geoKey, geoData, { expiry: 7 * 864e5 });
+				await this.setCacheData(cacheKey, geoData, { expiry: 7 * 864e5 });
 			}
 
 			if (geoData.empty) {
@@ -267,6 +274,12 @@ export default declare({
 
 			formattedAddress = geoData.formattedAddress;
 			coords = geoData.coords;
+		}
+
+		if (!formattedAddress) {
+			throw new SupiError({
+			    message: "Assert error: Formatted address not filled"
+			});
 		}
 
 		if (context.params.radar) {

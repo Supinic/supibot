@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import config from "../config.json" with { type: "json" };
-const { values } = config;
+import { getConfig } from "../config.js";
+const { values: configValues } = getConfig();
 
 type Identifier = string | number | symbol | null;
 type CooldownConstructorData = {
@@ -144,7 +144,7 @@ export default class CooldownManager {
 		this.data.add(new Pending({
 			user,
 			description,
-			expires: Date.now() + values.pendingCommandTimeout
+			expires: Date.now() + configValues.pendingCommandTimeout
 		}));
 
 		this.prune();

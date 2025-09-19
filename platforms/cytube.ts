@@ -1,7 +1,9 @@
+import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { CytubeConnector, type EmoteObject, type UserObject, type QueueObject, type VideoObject } from "cytube-connector";
 
-import { Platform, BaseConfig, MirrorOptions } from "./template.js";
+import { Platform, MirrorOptions } from "./template.js";
+import { BasePlatformConfigSchema } from "./schema.js";
 import type { Channel } from "../classes/channel.js";
 import type { User } from "../classes/user.js";
 import { Emote } from "../@types/globals.js";
@@ -428,15 +430,16 @@ const DEFAULT_PLATFORM_CONFIG = {
 	messageDelayThreshold: 30000
 };
 
-export interface CytubeConfig extends BaseConfig {
-	platform: {
-		messageDelayThreshold?: number;
-	};
-	logging: {
-		messages?: boolean;
-		whispers?: boolean;
-	};
-}
+export const CytubeConfigSchema = BasePlatformConfigSchema.extend({
+	platform: z.object({
+		messageDelayThreshold: z.int().positive().optional()
+	}),
+	logging: z.object({
+		messages: z.boolean().optional(),
+		whispers: z.boolean().optional()
+	})
+});
+export type CytubeConfig = z.infer<typeof CytubeConfigSchema>;
 
 export class CytubePlatform extends Platform<CytubeConfig> {
 	private readonly clients: Map<Channel["ID"], CytubeClient> = new Map();
@@ -453,7 +456,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			resultConfig.platform.messageDelayThreshold = DEFAULT_PLATFORM_CONFIG.messageDelayThreshold;
 		}
 
-		super("cytube", resultConfig);
+		super("cytube", CytubeConfigSchema.parse(resultConfig));
 	}
 
 	async connect () {

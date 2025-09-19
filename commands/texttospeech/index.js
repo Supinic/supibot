@@ -4,14 +4,14 @@ import locales from "./tts-locales.json" with { type: "json" };
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { TTS_ENABLED, TTS_MULTIPLE_ENABLED } = cacheKeys;
 
-import config from "../../config.json" with { type: "json" };
+import { getConfig } from "../../config.js";
 const {
 	listenerAddress,
 	listenerPort,
 	ttsLengthLimit = 30_000,
 	ttsListUrl = "(no address configured)",
-	ttsVolume
-} = config.local ?? {};
+	ttsVolume = 4 // Volume range: <0, 8> for VLC
+} = getConfig().local ?? {};
 
 export default {
 	Name: "texttospeech",

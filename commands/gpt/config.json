@@ -21,7 +21,43 @@
     }
   },
   "models": {
+    "base": {
+      "url": "gpt-5",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "outputLimit": {
+        "default": 150,
+        "maximum": 500
+      },
+      "pricePerMtoken": 5.50,
+      "usesCompletionTokens": true
+    },
     "mini": {
+      "url": "gpt-5-mini",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "outputLimit": {
+        "default": 150,
+        "maximum": 500
+      },
+      "pricePerMtoken": 1.12,
+      "usesCompletionTokens": true
+    },
+    "nano": {
+      "url": "gpt-5-nano",
+      "type": "openai",
+      "default": true,
+      "inputLimit": 1500,
+      "outputLimit": {
+        "default": 150,
+        "maximum": 500
+      },
+      "pricePerMtoken": 0.22,
+      "usesCompletionTokens": true
+    },
+    "mini-old": {
       "url": "gpt-4.1-mini",
       "type": "openai",
       "default": false,
@@ -32,7 +68,7 @@
       },
       "pricePerMtoken": 0.42
     },
-    "base": {
+    "base-old": {
       "url": "gpt-4.1",
       "type": "openai",
       "default": false,
@@ -43,10 +79,10 @@
       },
       "pricePerMtoken": 1.84
     },
-    "nano": {
+    "nano-old": {
       "url": "gpt-4.1-nano",
       "type": "openai",
-      "default": true,
+      "default": false,
       "inputLimit": 1500,
       "outputLimit": {
         "default": 150,

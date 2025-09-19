@@ -1,6 +1,12 @@
 import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const {
+	maxIncomingActiveReminders,
+	maxOutgoingActiveReminders,
+	maxIncomingScheduledReminders,
+	maxOutgoingScheduledReminders
+} = getConfig().values;
 
 import AwayFromKeyboard from "./afk.js";
 import Banphrase from "./banphrase.js";
@@ -473,25 +479,28 @@ export class Reminder extends TemplateWithId {
 					});
 				}
 
-				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
-				const channelStringName = (isChannelStalkOptedOut === true)
-					? "[EXPUNGED]"
-					: channelData.getFullName();
-
+				// Whether the source channel (where the Reminder was created) is equal to trigger channel (where the Reminder was fired)
+				let isSameChannel = false;
 				let reminderPlatform: Platform | null = null;
 				if (reminder.Channel) {
-					const channelData = Channel.get(reminder.Channel);
-					if (!channelData) {
+					const reminderChannelData = Channel.get(reminder.Channel);
+					if (!reminderChannelData) {
 						throw new SupiError({
 							message: "Invalid Channel in Reminder"
 						});
 					}
 
-					reminderPlatform = channelData.Platform;
+					isSameChannel = (channelData === reminderChannelData);
+					reminderPlatform = reminderChannelData.Platform;
 				}
 				else {
 					reminderPlatform = Platform.get(reminder.Platform);
 				}
+
+				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
+				const channelStringName = (isChannelStalkOptedOut === true && !isSameChannel)
+					? "[EXPUNGED]"
+					: channelData.getFullName();
 
 				const uncheckedAuthorMention = await reminderPlatform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
@@ -707,8 +716,8 @@ export class Reminder extends TemplateWithId {
 			)
 		]);
 
-		const incomingLimit = config.values.maxIncomingActiveReminders;
-		const outgoingLimit = config.values.maxOutgoingActiveReminders;
+		const incomingLimit = maxIncomingActiveReminders;
+		const outgoingLimit = maxOutgoingActiveReminders;
 		const [privateIncoming, publicIncoming] = core.Utils.splitByCondition(incomingData, (i: Item) => i.Private_Message);
 		const [privateOutgoing, publicOutgoing] = core.Utils.splitByCondition(outgoingData, (i: Item) => i.Private_Message);
 
@@ -738,9 +747,8 @@ export class Reminder extends TemplateWithId {
 		}
 
 		if (schedule) {
-			const incomingScheduledLimit = config.values.maxIncomingScheduledReminders;
-			const outgoingScheduledLimit = config.values.maxOutgoingScheduledReminders;
-
+			const incomingScheduledLimit = maxIncomingScheduledReminders;
+			const outgoingScheduledLimit = maxOutgoingScheduledReminders;
 			const [scheduledIncoming, scheduledOutgoing] = await Promise.all([
 				core.Query.getRecordset<number>(rs => rs
 					.select("COUNT(*) AS Count")

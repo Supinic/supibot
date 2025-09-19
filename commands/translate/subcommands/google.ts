@@ -164,13 +164,10 @@ export default {
 		const text = data[0].map(i => i[0]).join(" ");
 
 		const languageID = data[2].replace(/-.*/, "");
-		const fromLanguageName = getName(languageID);
+		let fromLanguageName = getName(languageID);
 		if (!fromLanguageName) {
-			console.warn("$translate - could not get language name", { data, options, languageID });
-			return {
-				success: false,
-				reply: "Language code could not be translated into a name! Please let @Supinic know about this :)"
-			};
+			console.warn("$translate - could not get language name", { data, options, languageID, query });
+			fromLanguageName = `(language code: ${languageID})`;
 		}
 
 		const additionalInfo = [];

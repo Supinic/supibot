@@ -1,12 +1,12 @@
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-import config from "../../config.json" with { type: "json" };
+import { getConfig } from "../../config.js";
 
 const { PLAYSOUNDS_ENABLED } = cacheKeys;
 const {
 	listenerAddress,
 	listenerPort,
 	playsoundListUrl = "(no address configured)"
-} = config.local ?? {};
+} = getConfig().local ?? {};
 
 const BASE_PLAYSOUND_CACHE_KEY = "playsound-cooldown";
 const getPlaysoundCacheKey = (playsoundName) => `${BASE_PLAYSOUND_CACHE_KEY}-${playsoundName}`;

@@ -1,9 +1,13 @@
+import * as z from "zod";
 import WebSocket from "ws";
+
 import { randomBytes } from "node:crypto";
 import { setTimeout as wait } from "node:timers/promises";
 
-import { Platform, type BaseConfig } from "./template.js";
+import { BasePlatformConfigSchema } from "./schema.js";
+import { Platform } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
 import TwitchUtils, {
 	type MessageNotification,
@@ -84,7 +88,6 @@ const DEFAULT_PLATFORM_CONFIG = {
 	recentBanThreshold: null,
 	updateAvailableBotEmotes: false,
 	ignoredUserNotices: [],
-	sameMessageEvasionCharacter: "󠀀",
 	rateLimits: "default",
 	reconnectAnnouncement: null,
 	emitLiveEventsOnlyForFlaggedChannels: false,
@@ -255,45 +258,50 @@ type ConnectOptions = {
 	skipSubscriptions?: boolean;
 };
 
-export interface TwitchConfig extends BaseConfig {
-	selfId: string;
-	logging: {
-		bits?: boolean,
-		messages?: boolean,
-		subs?: boolean,
-		timeouts?: boolean,
-		whispers?: boolean
-		hosts?: boolean;
-	};
-	platform: {
-		modes?: Record<"Write" | "VIP" | "Moderator", {
-			queueSize?: number;
-			cooldown?: number;
-		}>;
-		reconnectAnnouncement?: {
-			channels: string[];
-			string: string;
-		} | null;
-		partChannelsOnPermaban?: boolean;
-		clearRecentBansTimer?: number;
-		recentBanThreshold?: number | null;
-		updateAvailableBotEmotes?: boolean;
-		ignoredUserNotices?: readonly string[];
-		sameMessageEvasionCharacter?: string;
-		rateLimits?: "default" | "knownBot" | "verifiedBot",
-		emitLiveEventsOnlyForFlaggedChannels?: boolean;
-		suspended?: boolean;
-		joinChannelsOverride?: readonly string[];
-		spamPreventionThreshold?: number;
-		sendVerificationChallenge?: boolean;
-		recentBanPartTimeout?: number;
-		trackChannelsLiveStatus?: boolean;
-		whisperMessageLimit?: number;
-		privateMessageResponseFiltered?: string;
-		privateMessageResponseNoCommand?: string;
-		privateMessageResponseUnrelated?: string;
-	};
-}
+const modeSchema = z.object({
+	queueSize: z.int().positive().optional(),
+	cooldown: z.int().positive().optional()
+});
+export const TwitchConfigSchema = BasePlatformConfigSchema.extend({
+	selfId: z.string().regex(/\d+/),
+	logging: z.object({
+		bits: z.boolean().optional(),
+		messages: z.boolean().optional(),
+		subs: z.boolean().optional(),
+		timeouts: z.boolean().optional(),
+		whispers: z.boolean().optional(),
+		hosts: z.boolean().optional()
+	}),
+	platform: z.object({
+		modes: z.object({
+			Write: modeSchema.optional(),
+			VIP: modeSchema.optional(),
+			Moderator: modeSchema.optional()
+		}).optional(),
+		reconnectAnnouncement: z.object({
+			channels: z.array(z.string()),
+			string: z.string()
+		}).optional().nullable(),
+		partChannelsOnPermaban: z.boolean().optional(),
+		clearRecentBansTimer: z.number().optional(),
+		recentBanThreshold: z.number().optional().nullable(),
+		updateAvailableBotEmotes: z.boolean().optional(),
+		ignoredUserNotices: z.readonly(z.array(z.string())).optional(),
+		rateLimits: z.enum(["default", "knownBot", "verifiedBot"]).optional(),
+		emitLiveEventsOnlyForFlaggedChannels: z.boolean().optional(),
+		suspended: z.boolean().optional(),
+		joinChannelsOverride: z.readonly(z.array(z.string())).optional(),
+		spamPreventionThreshold: z.number().optional(),
+		sendVerificationChallenge: z.boolean().optional(),
+		trackChannelsLiveStatus: z.boolean().optional(),
+		whisperMessageLimit: z.int().positive().optional(),
+		privateMessageResponseFiltered: z.string().optional(),
+		privateMessageResponseNoCommand: z.string().optional(),
+		privateMessageResponseUnrelated: z.string().optional()
+		// recentBanPartTimeout: z.number().optional(),
+	})
+});
+export type TwitchConfig = z.infer<typeof TwitchConfigSchema>;
 
 export class TwitchPlatform extends Platform<TwitchConfig> {
 	public readonly supportsMeAction = true;
@@ -321,7 +329,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 		};
 
-		super("twitch", resultConfig);
+		super("twitch", TwitchConfigSchema.parse(resultConfig));
 
 		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000).unref();
 	}
@@ -509,7 +517,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			// Ideally, this is determined by string comparison, but keeping strings of last messages over
 			// thousands of channels isn't exactly memory friendly. So we just keep the lengths and hope it works.
 			if (message.length === length) {
-				message += ` ${this.config.sameMessageEvasionCharacter}`;
+				message += ` ${TWITCH_ANTIPING_CHARACTER}`;
 			}
 		}
 
@@ -527,10 +535,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			data: (MessageSendSuccess | MessageSendFailure)[];
 		};
 
-		const response = await core.Got.get("Helix")<SendMessageResponse>({
-			url: "chat/messages",
+		const response = await core.Got.get("GenericAPI")<SendMessageResponse>({
+			url: "https://api.twitch.tv/helix/chat/messages",
 			method: "POST",
 			throwHttpErrors: false,
+			headers: {
+				Authorization: `Bearer ${await TwitchUtils.getAppAccessToken()}`,
+				"Client-ID": process.env.TWITCH_CLIENT_ID
+			},
 			json: {
 				broadcaster_id: channelData.Specific_ID,
 				sender_id: this.selfId,

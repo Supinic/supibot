@@ -2,7 +2,10 @@ import { SupiError } from "supi-core";
 import { declare, type Context } from "../../classes/command.js";
 import { typedEntries } from "../../utils/ts-helpers.js";
 
-import GptConfig from "./config.json" with { type: "json" };
+import rawGptConfig from "./config.json" with { type: "json" };
+import GptConfigSchema from "./config-schema.js";
+const GptConfig = GptConfigSchema.parse(rawGptConfig);
+
 import GptCache from "./cache-control.js";
 import { determineOutputLimit, GptTemplate, handleHistoryCommand } from "./gpt-template.js";
 import { GptOpenAI } from "./gpt-openai.js";
@@ -13,7 +16,7 @@ import { check as checkModeration } from "./moderation.js";
 
 import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
 
-export type ModelName = keyof typeof GptConfig.models;
+export type ModelName = keyof typeof rawGptConfig.models;
 export type ModelData = {
 	url: string;
 	type: "openai" | "deepinfra" | "nexra" | "nexra-complements";
@@ -33,7 +36,7 @@ export type ModelData = {
 	search?: boolean;
 };
 
-const models = GptConfig.models as Record<ModelName, ModelData>;
+const models = GptConfig.models;
 const defaultModelEntry = typedEntries(models).find(i => i[1].default);
 if (!defaultModelEntry) {
 	throw new SupiError({
@@ -41,7 +44,7 @@ if (!defaultModelEntry) {
 	});
 }
 
-const [defaultModelName] = defaultModelEntry;
+const defaultModelName = defaultModelEntry[0] as ModelName;
 export const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
 
 const handlerMap = {
@@ -269,21 +272,24 @@ export default declare({
 		const { outputLimit } = GptConfig;
 
 		const modelListHTML = typedEntries(models).map(([name, modelData]) => {
-			const isDefaultEmoji = (modelData.default) ? "✔" : "❌";
+			const provider = modelData.type;
+			const type = modelData.url.split("/").at(-1) ?? modelData.url;
+			const isDefaultEmoji = (modelData.default) ? "✅" : "-";
+			const isSearchableEmoji = (modelData.search === true) ? "✅" : "-";
 			// const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
-			const searchableEmoji = (modelData.search === true) ? "✔" : "❌";
 
 			let priceString = String(modelData.pricePerMtoken);
 			if (modelData.flatCost) {
-				priceString += `+ flat ${modelData.flatCost}`;
+				priceString += ` + flat ${modelData.flatCost}`;
 			}
 			return core.Utils.tag.trim `
 				<tr>
 					<td>${name}</td>
-					<td>${modelData.type}</td>
+					<td>${provider}</td>
+					<td>${type}</td>
 					<td>${priceString}</td>
 					<td>${isDefaultEmoji}</td>
-					<td>${searchableEmoji}</td>
+					<td>${isSearchableEmoji}</td>
 				</tr>
 			`;
 		}).join("");
@@ -292,6 +298,7 @@ export default declare({
 			<table>
 				<thead>
 					<th>Name</th>
+					<th>Provider</th>
 					<th>Type</th>
 					<th>Pricing</th>
 					<th>Default</th>

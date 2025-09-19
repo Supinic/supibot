@@ -1,13 +1,8 @@
-import { SupiDate, SupiError } from "supi-core";
-import config from "../../config.json" with { type: "json" };
 import * as z from "zod";
+import { SupiDate, SupiError } from "supi-core";
 
-type InstancesDefinition = Record<string, {
-	url: string;
-	default?: boolean;
-}>;
-
-const { instances } = config.rustlog as { instances: InstancesDefinition; };
+import { getConfig } from "../../config.js";
+const { instances } = getConfig().rustlog;
 
 const instancesCacheKey = "rustlog-supported-channels";
 const instanceNames = Object.keys(instances);

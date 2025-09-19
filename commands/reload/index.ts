@@ -3,10 +3,10 @@ import { promisify } from "node:util";
 import { randomBytes } from "node:crypto";
 import { exec } from "node:child_process";
 import { declare, type CommandDefinition } from "../../classes/command.js";
-import config from "../../config.json" with { type: "json" };
-
 const shell = promisify(exec);
-const BASE_PATH = config.basePath;
+
+import { getConfig } from "../../config.js";
+const BASE_PATH = getConfig().basePath;
 
 export default declare({
 	Name: "reload",

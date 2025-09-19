@@ -2,8 +2,8 @@ import { Agent } from "http2-wrapper";
 import type { Http2Session } from "node:http2";
 import { isGotRequestError, type GotInstanceDefinition } from "supi-core";
 
-import config from "../../config.json" with { type: "json" };
-const { defaultUserAgent } = config.modules.gots;
+import { getConfig } from "../../config.js";
+const { defaultUserAgent } = getConfig().modules.gots;
 
 const agent = new Agent({
 	maxEmptySessions: 100,

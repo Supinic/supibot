@@ -2,13 +2,14 @@ import { TemplateWithId } from "./template.js";
 import type { Channel } from "./channel.js";
 import type Platform from "../platforms/template.js";
 
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const { responses, values } = getConfig();
+
 import regexes from "../utils/regexes.js";
 import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
 import { transliterate as executeTransliteration } from "transliteration";
 import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
-const { responses, values } = config;
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
 const apiResultSymbol: unique symbol = Symbol("banphrase-api-result");
 const inactiveSymbol: unique symbol = Symbol("banphrase-inactive");

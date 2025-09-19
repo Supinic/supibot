@@ -10,7 +10,9 @@ import {
 	type Gauge
 } from "supi-core";
 import type { BaseMessageOptions } from "discord.js";
+
 import { ZodError } from "zod";
+import { getConfig } from "../config.js";
 
 type DiscordEmbeds = BaseMessageOptions["embeds"];
 
@@ -18,7 +20,12 @@ import { TemplateWithoutId, type TemplateDefinition } from "./template.js";
 
 import { Banphrase } from "./banphrase.js";
 import { Filter } from "./filter.js";
-import { User } from "./user.js";
+import {
+	User,
+	permissions as userPermissions,
+	permissionNames as userPermissionNames,
+	type PermissionNumbers
+} from "./user.js";
 import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import { Platform, type GetEmoteOptions } from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
@@ -28,10 +35,10 @@ import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
 import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
-import config from "../config.json" with { type: "json" };
-import type { Emote } from "../@types/globals.js";
+import { Emote } from "../@types/globals.js";
 
-const COMMAND_PREFIX = config.modules.commands.prefix;
+const { values: configValues, modules: modulesConfig, responses: configResponses } = getConfig();
+const COMMAND_PREFIX = modulesConfig.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
 type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
@@ -213,24 +220,31 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			channelOwner: Boolean(data[2])
 		};
 
-		let flag = User.permissions.regular;
+		let name: keyof typeof userPermissions | null = null;
+		let flag: PermissionNumbers = userPermissions.regular;
 		if (flags.administrator) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.administrator;
+			flag |= userPermissions.administrator;
+			name ??= userPermissionNames.ADMINISTRATOR;
 		}
 		if (flags.channelOwner) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.channelOwner;
+			flag |= userPermissions.channelOwner;
+			name ??= userPermissionNames.CHANNEL_OWNER;
 		}
 		if (flags.ambassador) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.ambassador;
+			flag |= userPermissions.ambassador;
+			name ??= userPermissionNames.AMBASSADOR;
 		}
+
+		name ??= userPermissionNames.REGULAR;
 
 		return {
 			flag,
+			name,
 			// eslint-disable-next-line no-bitwise
-			is: (type: keyof typeof User.permissions) => ((flag & User.permissions[type]) !== 0)
+			is: (type: keyof typeof userPermissions) => ((flag & userPermissions[type]) !== 0)
 		};
 	}
 
@@ -473,8 +487,8 @@ export class Command extends TemplateWithoutId {
 
 	getDetailURL (options: { useCodePath?: boolean } = {}) {
 		const baseURL = (options.useCodePath)
-			? config.values.commandCodeUrlPrefix
-			: config.values.commandDetailUrlPrefix;
+			? configValues.commandCodeUrlPrefix
+			: configValues.commandDetailUrlPrefix;
 
 		return (baseURL)
 			? `${baseURL}/${encodeURIComponent(this.Name)}`
@@ -896,7 +910,7 @@ export class Command extends TemplateWithoutId {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
 				const reply = (channelHasFullErrorMessage)
 					? `Error ID ${errorID} - ${e.message}`
-					: `${config.responses.commandErrorResponse} (error ID ${errorID})`;
+					: `${configResponses.commandErrorResponse} (error ID ${errorID})`;
 
 				execution = {
 					success: false,

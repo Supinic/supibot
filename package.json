@@ -37,7 +37,8 @@
     "ncu": "yarn dlx npm-check-updates",
     "test": "node --import ./tests/register-loader.mjs --test",
     "coverage": "nyc yarn test",
-    "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core"
+    "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core",
+    "validate:config": "node ./build/utils/validate-config.js"
   },
   "main": "build/master.js",
   "author": "Supinic <supinic@protonmail.com>",

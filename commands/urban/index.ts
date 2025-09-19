@@ -1,30 +1,34 @@
 import { declare } from "../../classes/command.js";
-
+import * as z from "zod";
 const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
 
-type UrbanItem = {
-	author: string;
-	current_vote: string;
-	defid: number;
-	definition: string;
-	example: string;
-	permalink: string;
-	thumbs_up: number;
-	thumbs_down: number;
-	word: string;
-	written_on: string; // Date string
-};
-type UrbanResponse = {
-	list: UrbanItem[];
-};
+const urbanResponseSchema = z.object({
+	list: z.array(
+		z.object({
+			author: z.string(),
+			current_vote: z.string(),
+			defid: z.int(),
+			definition: z.string(),
+			example: z.string(),
+			permalink: z.string(),
+			thumbs_down: z.int(),
+			thumbs_up: z.int(),
+			word: z.string(),
+			written_on: z.iso.datetime()
+		})
+	)
+});
 
-type UrbanAutocompleteItem = {
-	preview: string;
-	term: string;
-};
-type UrbanAutocompleteResponse = {
-	results: UrbanAutocompleteItem[];
-};
+const urbanAutocompleteResponseSchema = z.object({
+	results: z.array(
+		z.object({
+			preview: z.string(),
+			term: z.string()
+		})
+	)
+});
+
+type UrbanItem = z.infer<typeof urbanResponseSchema>["list"][number];
 
 const prepareItemStrings = (item: UrbanItem) => {
 	const url = new URL(item.permalink);
@@ -53,11 +57,11 @@ export default declare({
 	Whitelist_Response: null,
 	Code: (async function urban (context, ...args) {
 		if (args.length === 0 || args[0] === "random") {
-			const randomResponse = await core.Got.get("GenericAPI")<UrbanResponse>({
+			const randomResponse = await core.Got.get("GenericAPI")({
 				url: "https://api.urbandictionary.com/v0/random"
 			});
 
-			const { list } = randomResponse.body;
+			const { list } = urbanResponseSchema.parse(randomResponse.body);
 			const firstItem = list[0];
 			const { link, thumbs, content } = prepareItemStrings(firstItem);
 
@@ -68,7 +72,7 @@ export default declare({
 		}
 
 		const term = args.join(" ").toLowerCase();
-		const response = await core.Got.get("GenericAPI")<UrbanResponse>({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
 				api_key: URBAN_FAUX_ACCESS_KEY,
@@ -84,7 +88,7 @@ export default declare({
 		});
 
 		if (response.statusCode === 500) {
-			const autocompleteResponse = await core.Got.get("GenericAPI")<UrbanAutocompleteResponse>({
+			const autocompleteResponse = await core.Got.get("GenericAPI")({
 				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
 				searchParams: {
 					api_key: URBAN_FAUX_ACCESS_KEY,
@@ -98,7 +102,8 @@ export default declare({
 				}
 			});
 
-			const match = autocompleteResponse.body.results.find(i => i.term.toLowerCase() === term);
+			const { results } = urbanAutocompleteResponseSchema.parse(autocompleteResponse.body);
+			const match = results.find(i => i.term.toLowerCase() === term);
 			if (match) {
 				return {
 					reply: `Short description: ${match.preview}`
@@ -115,14 +120,15 @@ export default declare({
 			}
 		}
 
-		if (response.body.list.length === 0) {
+		const { list } = urbanResponseSchema.parse(response.body);
+		if (list.length === 0) {
 			return {
 				success: false,
 				reply: "No such definition exists!"
 			};
 		}
 
-		const items = response.body.list
+		const items = list
 			.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase())
 			.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
@@ -135,11 +141,11 @@ export default declare({
 			};
 		}
 
-		const { link, thumbs, content } = prepareItemStrings(item);
+		const { link, content } = prepareItemStrings(item);
 		return {
 			reply: (typeof context.params.index !== "number" && items.length > 1)
-				? `${link} ${thumbs} ${content}`
-				: `${thumbs} ${content}`
+				? `${link} ${content}`
+				: content
 		};
 	}),
 	Dynamic_Description: () => [
