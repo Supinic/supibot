@@ -37,6 +37,7 @@ type OpenAiPayload = {
 	presence_penalty?: number;
 	max_completion_tokens?: number;
 	max_tokens?: number;
+	reasoning_effort?: "minimal" | "low" | "medium" | "high";
 };
 
 const getHistory = async (context: GptContext, query: string, options: { noSystemRole: boolean }) => {
@@ -129,7 +130,8 @@ export const GptOpenAI = {
 		}
 
 		if (modelData.usesCompletionTokens === true) {
-			json.max_completion_tokens = 10_000;
+			json.reasoning_effort = "minimal";
+			json.max_completion_tokens = 1000;
 		}
 		else {
 			json.max_tokens = outputLimit;
