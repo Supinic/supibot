@@ -114,7 +114,7 @@ type WikiItemData = {
 	id: number;
 	name: string;
 	value: number;
-	highalch: number;
+	highalch?: number;
 };
 
 const isAliasName = (input: string): input is keyof typeof aliases => Object.keys(aliases).includes(input);

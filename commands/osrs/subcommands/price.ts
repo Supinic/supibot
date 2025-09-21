@@ -69,12 +69,15 @@ export default {
 			? `Current price of ${item.name}: ${formatPrice(low)} gp`
 			: `Current price range of ${item.name}: ${formatPrice(low)} gp - ${formatPrice(high)} gp`;
 
-		const highAlchValue = formatPrice(item.highalch);
+		const highAlchValueString = (typeof item.highalch === "number")
+			? `HA value: ${formatPrice(item.highalch)} gp`
+			: "";
+
 		const wiki = `https://prices.runescape.wiki/osrs/item/${item.id}`;
 		return {
 			reply: core.Utils.tag.trim `
 				${priceString};
-				HA value: ${highAlchValue} gp
+				${highAlchValueString}
 				${wiki}
 			`
 		};
