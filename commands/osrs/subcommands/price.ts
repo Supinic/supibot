@@ -1,3 +1,4 @@
+import * as z from "zod";
 import type { OsrsSubcommandDefinition } from "../index.js";
 import { fetchItemId } from "./osrs-utils.js";
 
@@ -10,16 +11,16 @@ const formatPrice = (price: number) => {
 	}
 };
 
-export type WikiPriceData<T extends string | number> = {
-	data: {
-		[K in T]?: {
-			high: number;
-			highTime: number;
-			low: number;
-			lowTime: number;
-		};
-	};
-};
+const getResponseSchemaForId = (id: number) => z.object({
+	data: z.object({
+		[String(id)]: z.object({
+			high: z.int(),
+			low: z.int(),
+			highTime: z.int(),
+			lowTime: z.int()
+		}).optional()
+	})
+});
 
 export default {
 	name: "price",
@@ -41,7 +42,7 @@ export default {
 			};
 		}
 
-		const response = await core.Got.get("GenericAPI")<WikiPriceData<typeof item.id>>({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 			throwHttpErrors: false,
 			searchParams: {
@@ -56,7 +57,8 @@ export default {
 			};
 		}
 
-		const itemPriceData = response.body.data[item.id];
+		const { data } = getResponseSchemaForId(item.id).parse(response.body);
+		const itemPriceData = data[item.id];
 		if (!itemPriceData) {
 			return {
 				success: false,
