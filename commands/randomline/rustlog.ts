@@ -21,20 +21,20 @@ if (!defaultInstanceName) {
 }
 
 type InstanceChannelMap = Record<string, string[]>;
-const ChannelListResponse = z.object({
+const channelListSchema = z.object({
 	channels: z.array(z.object({
 		name: z.string(),
 		userID: z.string()
 	}))
 });
-
-const Message = z.object({
-	text: z.string(),
-	displayName: z.string(),
-	timestamp: z.iso.datetime(),
-	username: z.string()
+const messageSchema = z.object({
+	messages: z.array(z.object({
+		text: z.string(),
+		displayName: z.string(),
+		timestamp: z.iso.datetime(),
+		username: z.string()
+	})).min(1)
 });
-const LogsResponse = z.object({ messages: z.array(Message).min(1) });
 
 const channelInstanceMap: Map<string, string> = new Map();
 const getChannelLoggingInstances = async function () {
@@ -58,7 +58,7 @@ const getChannelLoggingInstances = async function () {
 			return;
 		}
 
-		const { channels } = ChannelListResponse.parse(response.body);
+		const { channels } = channelListSchema.parse(response.body);
 		result[instanceKey] = channels.map(i => i.userID);
 	});
 
@@ -156,7 +156,7 @@ export const getRandomChannelLine = async function (channelId: string): Promise<
 		};
 	}
 
-	const message = LogsResponse.parse(response.body).messages.at(0);
+	const message = messageSchema.parse(response.body).messages.at(0);
 	if (!message) {
 		return {
 			success: false,
@@ -209,7 +209,7 @@ export const getRandomUserLine = async function (channelId: string, userId: stri
 		};
 	}
 
-	const [message] = LogsResponse.parse(response.body).messages;
+	const [message] = messageSchema.parse(response.body).messages;
 	return {
 		success: true,
 		date: new SupiDate(message.timestamp),
