@@ -163,8 +163,9 @@ export const fetchItemId = async (query: string) => {
 			return null;
 		}
 
-		const regexLikeQuery = query.replaceAll(/\s+/g, ".*");
-		const regex = new RegExp(`^.*${RegExp.escape(regexLikeQuery)}.*$`, "i");
+		const normalizedQuery = RegExp.escape(query.replaceAll(/\s+/g, " "));
+		const regexLikeQuery = normalizedQuery.replaceAll(String.raw `\x20`, ".*");
+		const regex = new RegExp(`^.*${regexLikeQuery}.*$`, "i");
 
 		const likelyMatches = matches
 			.filter(i => i.includes || regex.test(i.string))
