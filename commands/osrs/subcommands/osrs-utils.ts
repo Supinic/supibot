@@ -114,7 +114,7 @@ type WikiItemData = {
 	id: number;
 	name: string;
 	value: number;
-	highalch: number;
+	highalch?: number;
 };
 
 const isAliasName = (input: string): input is keyof typeof aliases => Object.keys(aliases).includes(input);
@@ -163,8 +163,9 @@ export const fetchItemId = async (query: string) => {
 			return null;
 		}
 
-		const regexLikeQuery = query.replaceAll(/\s+/g, ".*");
-		const regex = new RegExp(`^.*${RegExp.escape(regexLikeQuery)}.*$`, "i");
+		const normalizedQuery = RegExp.escape(query.replaceAll(/\s+/g, " "));
+		const regexLikeQuery = normalizedQuery.replaceAll(String.raw `\x20`, ".*");
+		const regex = new RegExp(`^.*${regexLikeQuery}.*$`, "i");
 
 		const likelyMatches = matches
 			.filter(i => i.includes || regex.test(i.string))

@@ -7,40 +7,40 @@ const { instances } = getConfig().rustlog;
 const instancesCacheKey = "rustlog-supported-channels";
 const instanceNames = Object.keys(instances);
 
-let defaultInstance: string | undefined;
+let defaultInstanceName: string | undefined;
 for (const [name, def] of Object.entries(instances)) {
 	if (def.default) {
-		defaultInstance = name;
+		defaultInstanceName = name;
 	}
 }
 
-if (!defaultInstance) {
+if (!defaultInstanceName) {
 	throw new SupiError({
 		message: "Assert error: No default Rustlog instance set"
 	});
 }
 
 type InstanceChannelMap = Record<string, string[]>;
-const ChannelListResponse = z.object({
+const channelListSchema = z.object({
 	channels: z.array(z.object({
 		name: z.string(),
 		userID: z.string()
 	}))
 });
-
-const Message = z.object({
-	text: z.string(),
-	displayName: z.string(),
-	timestamp: z.iso.datetime(),
-	username: z.string()
+const messageSchema = z.object({
+	messages: z.array(z.object({
+		text: z.string(),
+		displayName: z.string(),
+		timestamp: z.iso.datetime(),
+		username: z.string()
+	})).min(1)
 });
-const LogsResponse = z.object({ messages: z.array(Message).min(1) });
 
 const channelInstanceMap: Map<string, string> = new Map();
 const getChannelLoggingInstances = async function () {
 	const data = await core.Cache.getByPrefix(instancesCacheKey) as InstanceChannelMap | undefined;
 	if (data && Object.keys(data).length !== 0) {
-		return data;
+		return new Map(Object.entries(data));
 	}
 
 	const result: InstanceChannelMap = {};
@@ -58,7 +58,7 @@ const getChannelLoggingInstances = async function () {
 			return;
 		}
 
-		const { channels } = ChannelListResponse.parse(response.body);
+		const { channels } = channelListSchema.parse(response.body);
 		result[instanceKey] = channels.map(i => i.userID);
 	});
 
@@ -68,7 +68,7 @@ const getChannelLoggingInstances = async function () {
 		expiry: 3_600_000 // 1 hour
 	});
 
-	return result;
+	return new Map(Object.entries(result));
 };
 
 const getInstance = async function (channelId: string): Promise<string | null> {
@@ -78,15 +78,27 @@ const getInstance = async function (channelId: string): Promise<string | null> {
 	}
 
 	const instanceMap = await getChannelLoggingInstances();
-	if (instanceMap[defaultInstance].includes(channelId)) {
-		channelInstanceMap.set(channelId, defaultInstance);
-		return defaultInstance;
+	const defaultInstanceIdList = instanceMap.get(defaultInstanceName);
+	if (!defaultInstanceIdList) {
+		throw new SupiError({
+		    message: "Assert error: no default instance exists"
+		});
 	}
 
-	for (const name of instanceNames) {
-		if (instanceMap[name].includes(channelId)) {
-			channelInstanceMap.set(channelId, name);
-			return name;
+	if (defaultInstanceIdList.includes(channelId)) {
+		channelInstanceMap.set(channelId, defaultInstanceName);
+		return defaultInstanceName;
+	}
+
+	for (const instanceName of instanceNames) {
+		const supportedChannelIds = instanceMap.get(instanceName);
+		if (!supportedChannelIds) {
+			continue;
+		}
+
+		if (supportedChannelIds.includes(channelId)) {
+			channelInstanceMap.set(channelId, instanceName);
+			return instanceName;
 		}
 	}
 
@@ -144,7 +156,7 @@ export const getRandomChannelLine = async function (channelId: string): Promise<
 		};
 	}
 
-	const message = LogsResponse.parse(response.body).messages.at(0);
+	const message = messageSchema.parse(response.body).messages.at(0);
 	if (!message) {
 		return {
 			success: false,
@@ -197,7 +209,7 @@ export const getRandomUserLine = async function (channelId: string, userId: stri
 		};
 	}
 
-	const [message] = LogsResponse.parse(response.body).messages;
+	const [message] = messageSchema.parse(response.body).messages;
 	return {
 		success: true,
 		date: new SupiDate(message.timestamp),

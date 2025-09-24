@@ -1,12 +1,14 @@
 const IGNORED_ASSETS = new Set(["VEF"]);
 
-export default async () => {
+export default async (cron) => {
 	if (!process.env.API_CRYPTO_COMPARE) {
+		cron.job.stop();
 		throw new sb.Error({
 			message: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
 		});
 	}
 	if (!process.env.API_FIXER_IO) {
+		cron.job.stop();
 		throw new sb.Error({
 			message: "No FixerIO key configured (API_FIXER_IO)"
 		});

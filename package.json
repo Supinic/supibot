@@ -25,6 +25,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:clean": "rm -r ./build && yarn build",
     "start": "tsc && yarn node --env-file=.env --enable-experimental-regexp-engine ./build/master.js",
     "debug": "tsc && yarn node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./build/master.js",
     "init-database": "tsc && node init/script.js",
