@@ -1,5 +1,5 @@
 import EventEmitter from "node:events";
-import { SupiError, SupiDate } from "supi-core";
+import { SupiError, type SupiDate } from "supi-core";
 
 import {
 	Platform,
@@ -17,7 +17,7 @@ import {
 	saveChannelDataProperty
 } from "./custom-data-properties.js";
 
-import { User } from "./user.js";
+import type { User } from "./user.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
 import { TemplateWithId } from "./template.js";
 import type { Emote } from "../@types/globals.js";

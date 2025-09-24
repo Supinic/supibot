@@ -1,4 +1,4 @@
-import { TwitchEmote } from "../../@types/globals.js";
+import type { TwitchEmote } from "../../@types/globals.js";
 import { declare } from "../../classes/command.js";
 
 export default declare({

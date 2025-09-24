@@ -32,8 +32,8 @@ import TwitchUtils, {
 	type BroadcasterSubscription
 } from "./twitch-utils.js";
 
-import { Channel } from "../classes/channel.js";
-import { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
+import type { User } from "../classes/user.js";
 import { SupiDate, SupiError } from "supi-core";
 import type { Emote, ThirdPartyEmote } from "../@types/globals.d.ts";
 

@@ -1,7 +1,7 @@
 import { it, describe, beforeEach, mock, before } from "node:test";
 import assert from "node:assert/strict";
 
-import { SupiDate } from "supi-core";
+import type { SupiDate } from "supi-core";
 import type { User } from "../../../classes/user.js";
 import { Command } from "../../../classes/command.js";
 import type { Channel } from "../../../classes/channel.js";

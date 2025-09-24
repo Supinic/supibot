@@ -1,4 +1,4 @@
-import { CustomEventDefinition } from "../generic-event.js";
+import type { CustomEventDefinition } from "../generic-event.js";
 
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
 const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id";

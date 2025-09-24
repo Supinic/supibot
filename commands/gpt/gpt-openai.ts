@@ -1,7 +1,15 @@
 import { type GotResponse, SupiError } from "supi-core";
-import { checkInputLimits, determineOutputLimit, getHistoryMode, getTemperature, getUserHash, GptTemplate } from "./gpt-template.js";
+
 import GptHistory from "./history-control.js";
-import { GptContext, ModelData } from "./index.js";
+import type { GptContext, ModelData } from "./index.js";
+import {
+	checkInputLimits,
+	determineOutputLimit,
+	getHistoryMode,
+	getTemperature,
+	getUserHash,
+	type GptTemplate
+} from "./gpt-template.js";
 
 const DEFAULT_SYSTEM_MESSAGE = "Be extremely concise. Do not add URLs to the response.";
 

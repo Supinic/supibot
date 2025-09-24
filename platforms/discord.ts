@@ -1,20 +1,22 @@
 import * as z from "zod";
 import { randomBytes } from "node:crypto";
+import { SupiError } from "supi-core";
 import {
-	BaseMessageOptions,
-	Channel as DiscordChannel,
+	type BaseMessageOptions,
+	type Channel as DiscordChannel,
+	type Emoji as DiscordEmoji,
+	type Guild,
+	type GuildMember,
+	type Message as DiscordMessage,
+	type User as DiscordUser,
 	ChannelType,
 	Client,
 	DiscordAPIError,
-	Emoji as DiscordEmoji,
 	GatewayIntentBits,
-	Guild, GuildMember,
-	Message as DiscordMessage,
 	Partials,
 	PermissionFlagsBits,
 	Routes,
 	TextChannel,
-	User as DiscordUser,
 	escapeMarkdown
 } from "discord.js";
 
@@ -22,9 +24,8 @@ import { BasePlatformConfigSchema } from "./schema.js";
 import { Platform, type PlatformVerificationStatus, type PrepareMessageOptions } from "./template.js";
 import type { DiscordEmote, Emote } from "../@types/globals.d.ts";
 
-import { User } from "../classes/user.js";
-import { SupiError } from "supi-core";
-import { Channel } from "../classes/channel.js";
+import type { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {

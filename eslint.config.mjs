@@ -209,6 +209,7 @@ export default tseslint.config(
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
 
+			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
 				allowNumber: true
 			}],

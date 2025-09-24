@@ -10,13 +10,13 @@ import { definitions as gotDefinitions } from "./gots/index.js";
 import initializeCrons from "./crons/index.js";
 
 import Filter from "./classes/filter.js";
-import { Command, CommandDefinition } from "./classes/command.js";
+import { Command, type CommandDefinition } from "./classes/command.js";
 import User from "./classes/user.js";
 import AwayFromKeyboard from "./classes/afk.js";
 import Banphrase from "./classes/banphrase.js";
 import Channel from "./classes/channel.js";
 import Reminder from "./classes/reminder.js";
-import { ChatModule, ChatModuleDefinition } from "./classes/chat-module.js";
+import { ChatModule, type ChatModuleDefinition } from "./classes/chat-module.js";
 import { VlcConnector } from "./singletons/vlc-client.js";
 
 import Logger from "./singletons/logger.js";

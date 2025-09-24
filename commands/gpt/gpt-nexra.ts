@@ -1,8 +1,8 @@
 import { setTimeout as wait } from "node:timers/promises";
 
-import { GptTemplate, getHistoryMode } from "./gpt-template.js";
+import { type GptTemplate, getHistoryMode } from "./gpt-template.js";
 import { get as getHistoryEntry, add as addHistoryEntry } from "./history-control.js";
-import { GptContext, ModelData } from "./index.js";
+import type { GptContext, ModelData } from "./index.js";
 import type { GotResponse } from "supi-core";
 
 type NexraDetails = { created: number; time: number; duration: string; };

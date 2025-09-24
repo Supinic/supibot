@@ -1,4 +1,4 @@
-import { EventDefinition } from "../generic-event.js";
+import type { EventDefinition } from "../generic-event.js";
 
 import ArchLinuxSubDefinition from "./archlinux.js";
 import BrighterShoresSubDefinition from "./brighter-shores.js";

@@ -1,9 +1,9 @@
 import { SupiError } from "supi-core";
 import { TemplateWithId } from "./template.js";
 
-import { Channel, isChannel, privateMessageChannelSymbol } from "./channel.js";
-import User from "./user.js";
-import type Platform from "../platforms/template.js";
+import { type Channel, isChannel, privateMessageChannelSymbol } from "./channel.js";
+import { User } from "./user.js";
+import type { Platform } from "../platforms/template.js";
 import type { Command } from "./command.js";
 import type { XOR } from "../@types/globals.d.ts";
 import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";

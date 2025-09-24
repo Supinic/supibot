@@ -2,8 +2,8 @@ import { SupiDate, SupiError } from "supi-core";
 import type formulaOneCommandDefinition from "./index.js";
 import { searchYoutube } from "../../utils/command-utils.js";
 
-import { ExtractContext } from "../../classes/command.js";
-import { Coordinates } from "../../@types/globals.js";
+import type { ExtractContext } from "../../classes/command.js";
+import type { Coordinates } from "../../@types/globals.js";
 
 export const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;

@@ -20,22 +20,18 @@ import { TemplateWithoutId, type TemplateDefinition } from "./template.js";
 
 import { Banphrase } from "./banphrase.js";
 import { Filter } from "./filter.js";
-import {
-	User,
-	permissions as userPermissions,
-	permissionNames as userPermissionNames,
-	type PermissionNumbers
-} from "./user.js";
-import { Channel, privateMessageChannelSymbol } from "./channel.js";
-import { Platform, type GetEmoteOptions } from "../platforms/template.js";
-import CooldownManager from "../utils/cooldown-manager.js";
-import { type Language, getLanguage } from "../utils/languages.js";
+import { type Channel, privateMessageChannelSymbol } from "./channel.js";
+import { permissions as userPermissions, permissionNames as userPermissionNames, type PermissionNumbers, type User } from "./user.js";
 
+import type { Platform, GetEmoteOptions } from "../platforms/template.js";
 import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
 import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
+import CooldownManager from "../utils/cooldown-manager.js";
+import { type Language, getLanguage } from "../utils/languages.js";
+
 import { whitespaceRegex } from "../utils/regexes.js";
-import { Emote } from "../@types/globals.js";
+import type { Emote } from "../@types/globals.js";
 
 const { values: configValues, modules: modulesConfig, responses: configResponses } = getConfig();
 const COMMAND_PREFIX = modulesConfig.commands.prefix;

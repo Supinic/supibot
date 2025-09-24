@@ -1,7 +1,7 @@
 import type { User } from "../../classes/user.js";
 import type { Channel } from "../../classes/channel.js";
 import type { Command, Context } from "../../classes/command.js";
-import { SupiDate, SupiError } from "supi-core";
+import { type SupiDate, SupiError } from "supi-core";
 
 export const NESTED_ALIAS_LIMIT = 10;
 export const ALIAS_DESCRIPTION_LIMIT = 250;

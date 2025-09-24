@@ -1,4 +1,4 @@
-import { SpecialEventDefinition } from "../generic-event.js";
+import type { SpecialEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "Suggestion",

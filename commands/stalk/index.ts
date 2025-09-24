@@ -1,4 +1,4 @@
-import { SupiDate, SupiError } from "supi-core";
+import { type SupiDate, SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
 import type { IvrUserData } from "../../@types/globals.js";
 
