@@ -5,7 +5,7 @@ export default {
 	Aliases: [],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Creates a new DALL-E image based on your prompt, or links an already made one, using the search parameter.",
+	Description: "Links a random already-made DALL-E image, or one based on your prompt",
 	Flags: ["mention"],
 	Params: [
 		{ name: "id", type: "string" }
