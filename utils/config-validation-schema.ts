@@ -103,14 +103,14 @@ export const ConfigSchema = z.strictObject({
 	}),
 	modules: z.strictObject({
 		"chat-modules": moduleBase("chat-modules"),
-		commands: moduleBase("commands").extend({
+		commands: moduleBase("commands").safeExtend({
 			prefix: z.string(),
 			bannedCombinations: z.array(
 				z.array(z.string())
 			)
 		}),
 		crons: moduleBase("crons"),
-		gots: moduleBase("gots").extend({
+		gots: moduleBase("gots").safeExtend({
 			defaultUserAgent: z.string()
 		})
 	}),
