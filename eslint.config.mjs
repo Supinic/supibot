@@ -133,7 +133,7 @@ export default tseslint.config(
 				consistent: true
 			}],
 			"object-curly-spacing": ["warn", "always", {
-				arraysInObjects: false,
+				arraysInObjects: true,
 				objectsInObjects: true
 			}],
 			"object-property-newline": ["warn", {
