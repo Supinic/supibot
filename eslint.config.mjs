@@ -219,6 +219,8 @@ export default tseslint.config(
 			"@typescript-eslint/no-unnecessary-condition": "warn", // Only warn for unnecessary conditions  instead of resulting in an error
 			"@typescript-eslint/no-unnecessary-type-conversion": "off", // Maybe re-enable later to force proper types
 
+			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
+
 			"unicorn/prevent-abbreviations": "off",
 			"unicorn/no-null": "off",
 			"unicorn/explicit-length-check": "off",
@@ -235,10 +237,8 @@ export default tseslint.config(
 			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
 			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
 			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
+			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
 			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
-			"unicorn/prefer-switch": ["error", {
-				minimumCases: 4
-			}],
 
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error"

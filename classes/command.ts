@@ -198,13 +198,13 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 
-		const promises: (Promise<boolean | null> | null)[] = [
+		const promises: Promise<boolean | null>[] = [
 			userData.getDataProperty("administrator")
 		];
 		if (channelData) {
 			promises.push(
 				channelData.isUserAmbassador(userData),
-				platformData.isUserChannelOwner(channelData, userData)
+				Promise.resolve(platformData.isUserChannelOwner(channelData, userData))
 			);
 		}
 
