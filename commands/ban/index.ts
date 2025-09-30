@@ -526,7 +526,7 @@ export default declare({
 
 			`<code>$ban <u>noResponse:true</u> (...)</code>`,
 			`If the <code>noResponse</code> parameter is set, this will make it so that the bot will not reply in the case this ban is triggered.`,
-			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not rpely.",
+			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not reply.",
 			"Note: This is not applicable to user-specific bans. In those cases, the user must be reminded that they are indeed banned.",
 			"",
 
