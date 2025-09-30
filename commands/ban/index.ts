@@ -69,16 +69,22 @@ export default declare({
 			Issued_By: context.user.ID
 		};
 
+		const isAdmin = await context.user.getDataProperty("administrator");
 		if (context.params.channel) {
-			const channelData = sb.Channel.get(context.params.channel, context.platform);
-			if (!channelData) {
-				return {
-					success: false,
-					reply: "Channel was not found!"
-				};
+			if (isAdmin && context.params.channel === "global") {
+				options.Channel = null;
 			}
+			else {
+				const channelData = sb.Channel.get(context.params.channel, context.platform);
+				if (!channelData) {
+					return {
+						success: false,
+						reply: "Channel was not found!"
+					};
+				}
 
-			options.Channel = channelData.ID;
+				options.Channel = channelData.ID;
+			}
 		}
 		if (context.params.command) {
 			const commandData = sb.Command.get(context.params.command);
@@ -150,7 +156,6 @@ export default declare({
 			options.User_Alias = userData.ID;
 		}
 
-		const isAdmin = await context.user.getDataProperty("administrator");
 		if (!options.Channel && !isAdmin) {
 			if (!context.channel) {
 				return {
