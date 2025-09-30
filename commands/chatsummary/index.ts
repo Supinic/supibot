@@ -119,7 +119,7 @@ const getRustlogLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUN
 		.filter(Boolean) as Record<string, string>[];
 
 	const text = mappedText
-		.sort((a, b) => new SupiDate(a.date).valueOf() - new SupiDate(b.date).valueOf())
+		.toSorted((a, b) => new SupiDate(a.date).valueOf() - new SupiDate(b.date).valueOf())
 		.map(i => `${i.username}: ${i.message}`)
 		.join("\n");
 

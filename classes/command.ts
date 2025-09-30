@@ -199,13 +199,13 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 
-		const promises: (Promise<boolean | null> | null)[] = [
+		const promises: Promise<boolean | null>[] = [
 			userData.getDataProperty("administrator")
 		];
 		if (channelData) {
 			promises.push(
 				channelData.isUserAmbassador(userData),
-				platformData.isUserChannelOwner(channelData, userData)
+				Promise.resolve(platformData.isUserChannelOwner(channelData, userData))
 			);
 		}
 
@@ -822,7 +822,7 @@ export class Command extends TemplateWithoutId {
 				Channel: channelData?.ID ?? null,
 				Success: true,
 				Invocation: identifier,
-				Arguments: JSON.stringify(args.filter(Boolean)),
+				Arguments: JSON.stringify(argumentArray.filter(Boolean)),
 				Result: result,
 				Execution_Time: core.Utils.round(Number(end - start) / 1_000_000, 3)
 			});
@@ -849,7 +849,7 @@ export class Command extends TemplateWithoutId {
 				Channel: channelData?.ID ?? null,
 				Success: false,
 				Invocation: identifier,
-				Arguments: JSON.stringify(args.filter(Boolean)),
+				Arguments: JSON.stringify(argumentArray.filter(Boolean)),
 				Result: e.message,
 				Execution_Time: null
 			});

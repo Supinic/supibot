@@ -4,8 +4,8 @@ import { declare } from "../../classes/command.js";
 import {
 	isArgumentsData,
 	type CreateData as FilterCreateData,
-	type DbArgumentDescriptor,
-	type Type as FilterType
+	type FilterArgumentDescriptor,
+	type Type as FilterType, FilterArgumentDatabaseShape
 } from "../../classes/filter.js";
 
 import type { Channel } from "../../classes/channel.js";
@@ -69,16 +69,22 @@ export default declare({
 			Issued_By: context.user.ID
 		};
 
+		const isAdmin = await context.user.getDataProperty("administrator");
 		if (context.params.channel) {
-			const channelData = sb.Channel.get(context.params.channel, context.platform);
-			if (!channelData) {
-				return {
-					success: false,
-					reply: "Channel was not found!"
-				};
+			if (isAdmin && context.params.channel === "global") {
+				options.Channel = null;
 			}
+			else {
+				const channelData = sb.Channel.get(context.params.channel, context.platform);
+				if (!channelData) {
+					return {
+						success: false,
+						reply: "Channel was not found!"
+					};
+				}
 
-			options.Channel = channelData.ID;
+				options.Channel = channelData.ID;
+			}
 		}
 		if (context.params.command) {
 			const commandData = sb.Command.get(context.params.command);
@@ -150,7 +156,6 @@ export default declare({
 			options.User_Alias = userData.ID;
 		}
 
-		const isAdmin = await context.user.getDataProperty("administrator");
 		if (!options.Channel && !isAdmin) {
 			if (!context.channel) {
 				return {
@@ -293,7 +298,7 @@ export default declare({
 						await existing.toggle();
 					}
 
-					const newData: DbArgumentDescriptor[] = [...existing.Data];
+					const newData: FilterArgumentDescriptor[] = [...existing.Data];
 					for (const item of existing.Data) {
 						if (item.index === index && item.string === string) {
 							return {
@@ -315,7 +320,8 @@ export default declare({
 						}
 
 						if (changed) {
-							await existing.saveProperty("Data", JSON.stringify(newData));
+							const shape = { args: newData } satisfies FilterArgumentDatabaseShape;
+							await existing.saveProperty("Data", JSON.stringify(shape));
 							return {
 								success: true,
 								reply: `Successfully added a new item to Arguments filter (ID ${existing.ID})`
@@ -338,7 +344,9 @@ export default declare({
 
 							if (condition && item.string === string) {
 								existing.Data.splice(i, 1);
-								await existing.saveProperty("Data");
+
+								const shape = { args: existing.Data } satisfies FilterArgumentDatabaseShape;
+								await existing.saveProperty("Data", JSON.stringify(shape));
 
 								return {
 									success: true,
@@ -353,7 +361,8 @@ export default declare({
 						};
 					}
 					else if (clear) {
-						await existing.saveProperty("Data", "[]");
+						const emptyShape = { args: [] } satisfies FilterArgumentDatabaseShape;
+						await existing.saveProperty("Data", JSON.stringify(emptyShape));
 						return {
 							success: true,
 							reply: `Successfully cleared all items from the Arguments filter (ID ${existing.ID})`
@@ -526,7 +535,7 @@ export default declare({
 
 			`<code>$ban <u>noResponse:true</u> (...)</code>`,
 			`If the <code>noResponse</code> parameter is set, this will make it so that the bot will not reply in the case this ban is triggered.`,
-			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not rpely.",
+			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not reply.",
 			"Note: This is not applicable to user-specific bans. In those cases, the user must be reminded that they are indeed banned.",
 			"",
 
