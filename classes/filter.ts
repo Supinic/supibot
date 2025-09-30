@@ -13,12 +13,13 @@ export type Type =
 	"Cooldown" | "Flags" | "Offline-only" | "Online-only" | "Arguments" | "Reminder-prevention";
 
 type CooldownData = XOR<{ multiplier: number }, { override: number, respect?: boolean }>;
-export type DbArgumentDescriptor = {
+export type FilterArgumentDescriptor = {
 	index?: number | string;
 	range?: number[] | string[] | string;
 	regex?: string | string[] | RegExp;
 	string?: string;
 };
+export type FilterArgumentDatabaseShape = { args: FilterArgumentDescriptor[] };
 
 type StringArgumentDescriptor = XOR<{ string: string; }, { regex: RegExp; }>;
 type NumberArgumentDescriptor = XOR<{ index: number; }, { range: [number, number]; }>;
@@ -260,7 +261,7 @@ export class Filter extends TemplateWithId {
 		}
 
 		if (this.Type === "Arguments") {
-			const { args } = data as { args?: DbArgumentDescriptor[] };
+			const { args } = data as Partial<FilterArgumentDatabaseShape>;
 			if (!args) {
 				console.warn("Invalid Args filter - missing args object");
 				return null;
@@ -649,6 +650,8 @@ export class Filter extends TemplateWithId {
 		return { success: true };
 	}
 
+	// @todo 1) change options.Data to be passed as object
+	// @todo 2) add data validation for specific Filter types (e.g. Arguments, Cooldown)
 	static async create (options: CreateData) {
 		const data = {
 			Platform: options.Platform ?? null,
