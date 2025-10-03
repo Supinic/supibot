@@ -32,7 +32,6 @@ type VodData = z.infer<typeof vodSchema>["data"][number];
 export default declare({
 	Name: "streaminfo",
 	Aliases: ["si", "uptime", "vod"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts information about a Twitch channel's stream, or the current channel if none is provided.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
