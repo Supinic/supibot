@@ -41,26 +41,18 @@ const BaseIvrUserDataSchema = z.object({
 		requireVerifiedAccount: z.boolean(),
 		rules: z.array(z.string())
 	}),
-	stream: z
-		.object({
-			title: z.string(),
-			id: z.string(),
-			createdAt: z.string(),
-			type: z.union([z.literal("live"), z.literal("rerun")]),
-			viewersCount: z.number(),
-			game: z
-				.object({
-					displayName: z.string()
-				})
-				.nullable()
-		})
-		.nullable(),
-	lastBroadcast: z
-		.object({
-			startedAt: z.string(),
-			title: z.string()
-		})
-		.nullable(),
+	stream: z.object({
+		title: z.string(),
+		id: z.string(),
+		createdAt: z.string(),
+		type: z.union([z.literal("live"), z.literal("rerun")]),
+		viewersCount: z.number(),
+		game: z.object({ displayName: z.string() }).nullable()
+	}).nullable(),
+	lastBroadcast: z.object({
+		startedAt: z.string(),
+		title: z.string().nullable()
+	}).nullable(),
 	panels: z.array(z.object({ id: z.string() }))
 });
 

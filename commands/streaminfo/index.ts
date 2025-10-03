@@ -1,14 +1,42 @@
-export default {
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
+import { SupiDate } from "supi-core";
+import { ivrUserDataSchema } from "../../utils/schemas.js";
+
+const streamSchema = z.object({
+	data: z.array(z.object({
+		game_id: z.string(),
+		game_name: z.string(),
+		id: z.string(),
+		is_mature: z.boolean(),
+		language: z.string(),
+		started_at: z.string(),
+		title: z.string().nullable(), // empty string only on error
+		type: z.enum(["live", ""]),
+		viewer_count: z.int().min(0)
+	}))
+});
+
+const vodSchema = z.object({
+	data: z.array(z.object({
+		created_at: z.string(), // RFC 3339
+		duration: z.string(), // ISO 8601
+		title: z.string(),
+		url: z.string()
+	}))
+});
+
+type StreamData = z.infer<typeof streamSchema>["data"][number];
+type VodData = z.infer<typeof vodSchema>["data"][number];
+
+export default declare({
 	Name: "streaminfo",
 	Aliases: ["si", "uptime", "vod"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Posts stream info about a Twitch channel. Also supports YouTube - check the help article.",
+	Description: "Posts information about a Twitch channel's stream, or the current channel if none is provided.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
-	Params: [
-		{ name: "rawData", type: "boolean" },
-		{ name: "summary", type: "boolean" }
-	],
+	Params: [{ name: "rawData", type: "boolean" }] as const,
 	Whitelist_Response: null,
 	Code: (async function streamInfo (context, ...args) {
 		let targetChannel;
@@ -19,7 +47,7 @@ export default {
 					reply: `No Twitch channel provided!`
 				};
 			}
-			else if (context.privateMessage) {
+			else if (!context.channel) {
 				return {
 					success: false,
 					reply: `No channel provided!`
@@ -32,58 +60,13 @@ export default {
 			targetChannel = sb.Channel.normalizeName(args[0]);
 		}
 
-		const platform = sb.Platform.get("twitch");
+		const platform = sb.Platform.getAsserted("twitch");
 		const targetData = await sb.User.get(targetChannel);
 		const channelID = targetData?.Twitch_ID ?? await platform.getUserID(targetChannel);
 		if (!channelID) {
 			return {
 				success: false,
 				reply: "There is no Twitch channel with that name!"
-			};
-		}
-
-		if (context.params.summary) {
-			if (context.params.rawData) {
-				return {
-					success: false,
-					reply: "Cannot combine the summary and rawData parameters!"
-				};
-			}
-
-			const response = await core.Got.get("TwitchGQL")({
-				body: JSON.stringify([{
-					operationName: "HomeShelfGames",
-					extensions: {
-						persistedQuery: {
-							version: 1,
-							sha256Hash: "cb7711739c2b520ebf89f3027863c0f985e8094df91cc5ef28896d57375a9700"
-						}
-					},
-					variables: {
-						channelLogin: targetChannel
-					}
-				}])
-			});
-
-			const { user } = response.body[0].data;
-			if (!user) {
-				return {
-					success: false,
-					reply: `Summary data is not available! Channel is probably banned or inactive.`
-				};
-			}
-
-			const edges = user.channel.home.shelves.categoryShelf.edges ?? [];
-			if (edges.length === 0) {
-				return {
-					success: false,
-					reply: `That channel did not stream in any category recently!`
-				};
-			}
-
-			const games = edges.filter(i => i.node?.displayName).map(i => i.node.displayName).join(", ");
-			return {
-				reply: `Recently streamed categories: ${games}`
 			};
 		}
 
@@ -103,7 +86,7 @@ export default {
 
 		let vodString = "";
 		let vodEnd;
-		const [stream] = streamResponse.body.data;
+		const stream = streamSchema.parse(streamResponse.body).data.at(0);
 
 		const vodResponse = await core.Got.get("Helix")({
 			url: "videos",
@@ -112,39 +95,17 @@ export default {
 			}
 		});
 
-		let vodTitle;
-		const vod = vodResponse.body;
-		const rawData = { vod: null, stream };
+		let vodTitle: string | undefined;
+		const vod = vodSchema.parse(vodResponse.body);
+		const rawData: { vod: VodData | null; stream: StreamData | undefined } = { vod: null, stream };
 
-		if (vod.data && vod.data.length !== 0) {
-			/**
-			 * @typedef {Object} HelixVideo
-			 * @property {string} created_at ISO timestamp
-			 * @property {string} description
-			 * @property {string} duration
-			 * @property {string} id
-			 * @property {string} language
-			 * @property {Array|null} muted_segments
-			 * @property {string} published_at ISO timestamp
-			 * @property {string} stream_id
-			 * @property {string} thubmnail_url
-			 * @property {string} title
-			 * @property {string} type
-			 * @property {string} url
-			 * @property {string} user_id
-			 * @property {string} user_login
-			 * @property {string} user_name
-			 * @property {number} view_count
-			 * @property {string} viewable
-			 */
-
-			/** @type {HelixVideo | undefined} */
+		if (vod.data.length !== 0) {
 			const data = vod.data[0];
 			rawData.vod = data;
 
 			const vodDurationSeconds = core.Utils.parseDuration(data.duration, { target: "sec" });
 			vodTitle = data.title;
-			vodEnd = new sb.Date(data.created_at).addSeconds(vodDurationSeconds);
+			vodEnd = new SupiDate(data.created_at).addSeconds(vodDurationSeconds);
 
 			if (stream) {
 				const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
@@ -154,7 +115,7 @@ export default {
 				vodString = `${data.url}?t=${clampedTimestamp}s`;
 			}
 			else {
-				vodString = `${data.url}`;
+				vodString = data.url;
 			}
 		}
 
@@ -179,11 +140,12 @@ export default {
 				};
 			}
 
-			const [broadcasterData] = broadcasterResponse.body;
-			const { banned, banReason, lastBroadcast } = broadcasterData;
+			const broadcasterData = ivrUserDataSchema.parse(broadcasterResponse.body)[0];
+			const { banned, lastBroadcast } = broadcasterData;
 
 			let status;
 			if (banned) {
+				const { banReason } = broadcasterData;
 				status = (banReason === "DEACTIVATED")
 					? `unavailable (${banReason})`
 					: `banned (${banReason})`;
@@ -192,7 +154,7 @@ export default {
 				status = "offline";
 			}
 
-			if (lastBroadcast.startedAt === null) {
+			if (!lastBroadcast?.startedAt) {
 				if (banned) {
 					return {
 						reply: `Channel is ${status} - never streamed before.`
@@ -210,10 +172,10 @@ export default {
 				}
 			}
 
-			const start = new sb.Date(lastBroadcast.startedAt);
-			if (vodString) {
+			const start = new SupiDate(lastBroadcast.startedAt);
+			if (vodString && vodEnd) {
 				// If the difference between the VOD being created and end of stream is > 1 hour, assume this is
-				// not the correct VOD link and potentiallya random highlight video, or something else.
+				// not the correct VOD link and potentially random highlight video, or something else.
 				// In that case, delete the value of `vodString` so the URL does not appear.
 				const difference = Math.abs(start.valueOf() - vodEnd.valueOf());
 				if (difference > 3_600_000) {
@@ -228,43 +190,25 @@ export default {
 			};
 		}
 		else {
-			const tags = [];
-			if (Array.isArray(stream.tag_ids) && stream.tag_ids.length !== 0) {
-				const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
-				const searchParams = new URLSearchParams(paramsIterable);
-
-				const response = await core.Got.get("Helix")({
-					url: "tags/streams",
-					searchParams
-				});
-
-				const tagDescriptions = response.body.data.map(i => i.localization_names["en-us"]);
-				tags.push(...tagDescriptions);
-			}
-
-			const started = core.Utils.timeDelta(new sb.Date(stream.started_at));
+			const started = core.Utils.timeDelta(new SupiDate(stream.started_at));
 			const viewersSuffix = (stream.viewer_count === 1) ? "" : "s";
 			const broadcast = (stream.game_name)
 				? `playing ${stream.game_name}`
 				: `streaming under no category`;
-			const tagString = (tags.length === 0)
-				? ""
-				: `Current tags: ${tags.join(", ")}`;
 
 			return {
 				reply: core.Utils.tag.trim `
 					${targetChannel} is ${broadcast}, 
 					since ${started} 
 					for ${core.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
-					Title: ${stream.title} 
-					${tagString}
+					Title: ${stream.title ?? "(no title)"} 
 					https://twitch.tv/${targetChannel.toLowerCase()}
 					${vodString}
 				`
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: ((prefix) => [
 		"Fetches the live status of a Twitch or YouTube channel.",
 		"",
 
@@ -278,6 +222,6 @@ export default {
 		`<code>${prefix}streaminfo (channel) <u>summary:true</u></code>`,
 		`<code>${prefix}streaminfo forsen <u>summary:true</u></code>`,
 		`Posts a list of recently streamed games and categories for a given channel.`,
-		"",
+		""
 	])
-};
+});
