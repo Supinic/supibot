@@ -127,10 +127,10 @@ export class FakeRow {
 	}
 }
 
-export class TestWorld <Tables extends object = object> {
+export class TestWorld {
 	public readonly rows: FakeRow[] = [];
 	public readonly recordsets: FakeRecordset[] = [];
-	public readonly tables = new Map<string, Tables[]>();
+	public readonly tables = new Map<string, unknown[]>();
 
 	private readonly specificUserIds = new Map<string, number>();
 	private readonly allowedUsers = new Set<string>();
@@ -213,6 +213,54 @@ export class TestWorld <Tables extends object = object> {
 
 	setUserId (username: string, id: number) {
 		this.specificUserIds.set(username, id);
+	}
+
+	insertRows (schema: string, table: string, rows: unknown[]): void {
+		const tableData = this.ensureTable(schema, table);
+		tableData.push(...rows);
+	}
+
+	clearTable (schema: string, table: string): void {
+		const key = TestWorld.getKey(schema, table);
+		this.tables.set(key, []);
+	}
+
+	/**
+	 * @todo
+	 * Queue the current table snapshot as the next recordset result.
+	 * No SQL matching — you can shape the result with simple options.
+	 */
+	useTable (schema: string, table: string, opts?: { limit?: number; single?: boolean; flat?: string } ): void {
+		const rows = this.snapshot(schema, table);
+
+		let out: unknown = rows;
+
+		if (typeof opts?.limit === "number") {
+			(out as AnyRow[]).splice(opts.limit); // in-place slice to respect insertion order
+		}
+
+		if (opts?.flat) {
+			out = (out as AnyRow[]).map(r => (r as AnyRow)[opts.flat!]);
+		}
+
+		if (opts?.single) {
+			out = (out as AnyRow[])[0] ?? null;
+		}
+
+		this.queueRsData(out);
+	}
+
+
+	private ensureTable (schema: string, table: string): unknown[] {
+		const key = TestWorld.getKey(schema, table);
+		let tableData = this.tables.get(key);
+
+		if (!tableData) {
+			tableData = [];
+			this.tables.set(key, tableData);
+		}
+
+		return tableData;
 	}
 
 	static getKey (schema: string, table: string) { return `${schema}.${table}`; }
