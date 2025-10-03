@@ -209,19 +209,15 @@ export default declare({
 		}
 	}),
 	Dynamic_Description: ((prefix) => [
-		"Fetches the live status of a Twitch or YouTube channel.",
+		"Fetches the live status of a provided Twitch channel.",
+		"Uses the channel you're currently in if you don't provide one.",
+		"This also means you <i>must</i> provide a channel if you're in Twitch whispers or outside of Twitch.",
 		"",
 
 		`<code>${prefix}streaminfo (channel)</code>`,
 		`<code>${prefix}streaminfo forsen</code>`,
 		`Posts info about a Twitch channel's stream.`,
 		`If it is live - posts info about the stream, and details.`,
-		`If not currently live - posts info about the previous stream.`,
-		"",
-
-		`<code>${prefix}streaminfo (channel) <u>summary:true</u></code>`,
-		`<code>${prefix}streaminfo forsen <u>summary:true</u></code>`,
-		`Posts a list of recently streamed games and categories for a given channel.`,
-		""
+		`If not currently live - posts info about the previous stream.`
 	])
 });
