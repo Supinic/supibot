@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
-import type { IvrUserData } from "../../@types/globals.js";
+import { ivrUserDataSchema } from "../../utils/schemas.js";
 
 export default declare({
 	Name: "accountage",
@@ -13,7 +13,7 @@ export default declare({
 	Whitelist_Response: null,
 	Code: (async function accountAge (context, user?: string) {
 		const login = sb.User.normalizeUsername(user ?? context.user.Name).toLowerCase();
-		const response = await core.Got.get("IVR")<IvrUserData[]>({
+		const response = await core.Got.get("IVR")({
 			url: "v2/twitch/user",
 			searchParams: { login }
 		});
@@ -24,7 +24,8 @@ export default declare({
 			};
 		}
 
-		const creationDate = response.body[0].createdAt;
+		const data = ivrUserDataSchema.parse(response.body);
+		const creationDate = data[0].createdAt;
 		const created = new SupiDate(creationDate);
 
 		let anniversary = "";

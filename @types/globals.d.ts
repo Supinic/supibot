@@ -54,8 +54,6 @@ export type TypeExtract<T, U> = {
     [P in OnlyKeysOfType<T, U>]: U;
 };
 
-export type { IvrUserData } from "../utils/schemas.js"
-
 export type IvrClipData = {
     clipKey: string | null;
     clip: {

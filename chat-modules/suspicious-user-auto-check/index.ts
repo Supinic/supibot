@@ -3,10 +3,10 @@ import type {
 	GenericMessageEventData,
 	TwitchMessageEventData
 } from "../../classes/chat-module.js";
-import type { IvrUserData } from "../../@types/globals.js";
 import type { TwitchPlatform } from "../../platforms/twitch.js";
 import type { User } from "../../classes/user.js";
 import { SupiError } from "supi-core";
+import { ivrUserDataSchema } from "../../utils/schemas.js";
 
 type UserAliasRow = Pick<User, "Discord_ID" | "Twitch_ID" | "Name">;
 
@@ -80,7 +80,7 @@ export default {
 				return;
 			}
 
-			const response = await core.Got.get("IVR")<IvrUserData[]>({
+			const response = await core.Got.get("IVR")({
 				url: "v2/twitch/user",
 				searchParams: {
 					id: assumedUserID
@@ -92,7 +92,7 @@ export default {
 				return;
 			}
 
-			const [data] = response.body;
+			const [data] = ivrUserDataSchema.parse(response.body);
 			if (data.login === raw.user) {
 				const logID = await sb.Logger.log(
 					"Twitch.Warning",
