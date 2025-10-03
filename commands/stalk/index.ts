@@ -1,6 +1,6 @@
 import { SupiDate, SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
-import type { IvrUserData } from "../../@types/globals.js";
+import { ivrUserDataSchema } from "../../utils/schemas.js";
 
 const omittedBanReasons = new Set(["TOS_TEMPORARY", "TOS_INDEFINITE"]);
 
@@ -75,7 +75,7 @@ export default declare({
 		// Automated protection of the bot from being banned:
 		// Do not allow stalking of banned Twitch users in Twitch channels - available in Twitch whispers and other platforms.
 		if (targetUser.Twitch_ID && context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
-			const response = await core.Got.get("IVR")<IvrUserData[] | undefined>({
+			const response = await core.Got.get("IVR")({
 				url: "v2/twitch/user",
 				searchParams: {
 					id: targetUser.Twitch_ID
@@ -84,7 +84,7 @@ export default declare({
 
 			// Only refuse to send the message if the ban type ("reason") is a TOS violation.
 			// Memo: possibly also refuse to send when type is `DEACTIVATED`?
-			const userInfo = response.body?.[0];
+			const userInfo = ivrUserDataSchema.parse(response.body).at(0);
 			if (userInfo && userInfo.banned && omittedBanReasons.has(userInfo.banReason)) {
 				return {
 					success: false,
