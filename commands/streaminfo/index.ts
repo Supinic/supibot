@@ -84,7 +84,7 @@ export default declare({
 		}
 
 		let vodString = "";
-		let vodEnd;
+		let vodEnd: SupiDate | undefined;
 		const stream = streamSchema.parse(streamResponse.body).data.at(0);
 
 		const vodResponse = await core.Got.get("Helix")({
