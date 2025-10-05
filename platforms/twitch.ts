@@ -1535,6 +1535,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			this.client.terminate();
 		}
 
+		clearInterval(this.reconnectCheck);
 		this.client = null;
 	}
 
