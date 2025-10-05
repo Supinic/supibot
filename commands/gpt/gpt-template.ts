@@ -4,7 +4,7 @@ import config from "./config.json" with { type: "json" };
 import History from "./history-control.js";
 import type { GptContext, ModelData } from "./index.js";
 
-import type { GotResponse } from "supi-core"; // @todo why error type???
+import { SupiError, type GotResponse } from "supi-core";
 
 type ExecuteFailure = {
 	success: false;
@@ -147,6 +147,10 @@ export const handleHistoryCommand = async (context: GptContext, query: string): 
 	else if (command === "export" || command === "check") {
 		return await History.dump(context.user);
 	}
+
+	throw new SupiError({
+	    message: "Assert error: Unknown history command"
+	});
 };
 
 export const getHistoryMode = async (context: GptContext) => {

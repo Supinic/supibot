@@ -187,7 +187,7 @@ export default class CooldownManager {
 	/**
 	 * Fetches the Pending for given user. Used mostly for their description.
 	 */
-	fetchPending (user: Identifier): Pending | undefined {
+	fetchPending (user: Identifier): Pending | null {
 		for (const inhibitor of this.data) {
 			if (!isPending(inhibitor)) {
 				continue;
@@ -198,6 +198,8 @@ export default class CooldownManager {
 
 			return inhibitor;
 		}
+
+		return null;
 	}
 
 	/**

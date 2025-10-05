@@ -337,6 +337,8 @@ export class User extends TemplateWithIdString {
 				return user;
 			}
 		}
+
+		return null;
 	}
 
 	static normalizeUsername (username: string) {

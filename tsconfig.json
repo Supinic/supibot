@@ -40,6 +40,7 @@
     /* Type Checking */
     "strict": true,                                      /* Enable all strict type-checking options. */
     "noImplicitAny": true,                               /* Enable error reporting for expressions and declarations with an implied 'any' type. */
+    "noImplicitReturns": true,                           /* Enable error reporting for code paths that do not explicitly return in a function. */
     "strictNullChecks": true,                            /* When type checking, take into account 'null' and 'undefined'. */
     "strictFunctionTypes": true,                         /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */
     "strictBindCallApply": true,                         /* Check that the arguments for 'bind', 'call', and 'apply' methods match the original function. */
@@ -50,7 +51,6 @@
     "noUnusedLocals": false,                             /* Enable error reporting when local variables aren't read. */
     // "noUnusedParameters": true,                       /* Raise an error when a function parameter isn't read. */
     // "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
-    // "noImplicitReturns": true,                        /* Enable error reporting for code paths that do not explicitly return in a function. */
     // "noFallthroughCasesInSwitch": true,               /* Enable error reporting for fallthrough cases in switch statements. */
     // "noUncheckedIndexedAccess": true,                 /* Add 'undefined' to a type when accessed using an index. */
     // "noImplicitOverride": true,                       /* Ensure overriding members in derived classes are marked with an override modifier. */
