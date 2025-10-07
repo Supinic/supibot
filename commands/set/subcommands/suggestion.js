@@ -15,10 +15,6 @@ export default {
 		.single()
 		.flat("ID")
 	),
-	set: () => ({
-		success: false,
-		reply: `Use the $suggest command instead!`
-	}),
 	unset: async (context, ID, ...args) => {
 		const row = await core.Query.getRow("data", "Suggestion");
 		try {
