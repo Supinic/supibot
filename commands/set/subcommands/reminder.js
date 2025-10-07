@@ -15,10 +15,6 @@ export default {
 		.single()
 		.flat("ID")
 	),
-	set: () => ({
-		success: false,
-		reply: `Use the $remind command instead!`
-	}),
 	unset: async (context, ID) => {
 		const row = await core.Query.getRow("chat_data", "Reminder");
 		await row.load(ID, true);

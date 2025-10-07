@@ -46,6 +46,7 @@ export default z.object({
 			search: z.boolean().optional(),
 			usesCompletionTokens: z.boolean().optional(),
 			subscriberOnly: z.boolean().optional(),
+			noTemperature: z.boolean().optional(),
 			disabled: z.boolean().optional(),
 			disableReason: z.string().optional()
 		})

@@ -31,7 +31,8 @@
         "maximum": 500
       },
       "pricePerMtoken": 5.50,
-      "usesCompletionTokens": true
+      "usesCompletionTokens": true,
+      "noTemperature": true
     },
     "mini": {
       "url": "gpt-5-mini",
@@ -43,7 +44,8 @@
         "maximum": 500
       },
       "pricePerMtoken": 1.12,
-      "usesCompletionTokens": true
+      "usesCompletionTokens": true,
+      "noTemperature": true
     },
     "nano": {
       "url": "gpt-5-nano",
@@ -55,7 +57,8 @@
         "maximum": 500
       },
       "pricePerMtoken": 0.22,
-      "usesCompletionTokens": true
+      "usesCompletionTokens": true,
+      "noTemperature": true
     },
     "mini-old": {
       "url": "gpt-4.1-mini",

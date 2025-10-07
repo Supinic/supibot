@@ -225,7 +225,13 @@ export const getSunPosition = (data: OwmWeatherResponse) => {
 };
 
 export class WeatherItem {
-	constructor (private item: WeatherDataItem, private minutes: MinutelyWeatherDataItem[]) {}
+	private item: WeatherDataItem;
+	private minutes: MinutelyWeatherDataItem[];
+
+	constructor (item: WeatherDataItem, minutes: MinutelyWeatherDataItem[]) {
+		this.item = item;
+		this.minutes = minutes;
+	}
 
 	get dt () {
 		return this.item.dt;
