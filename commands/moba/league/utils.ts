@@ -258,7 +258,7 @@ export const parseUserIdentifier = async (context: Context, regionName?: string,
 		if (!defaultIdentifier) {
 			return {
 				success: false,
-				reply: `You must provide the user identifier!`
+				reply: `You must provide the region and the user identifier!`
 			} as const;
 		}
 
