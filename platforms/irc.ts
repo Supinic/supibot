@@ -1,12 +1,12 @@
 import * as z from "zod";
 
-// @ts-expect-error Module has no @types repository associated with it. Will use local interface as definition
+// @ts-expect-error Module has no @types repository associated with it. Will use a local interface as definition
 import { Client as IrcClient } from "irc-framework";
-import { EventEmitter } from "node:events";
+import type { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
 import { BasePlatformConfigSchema } from "./schema.js";
-import { Platform, PrepareMessageOptions } from "./template.js";
+import { Platform, type PrepareMessageOptions } from "./template.js";
 import { User } from "../classes/user.js";
 import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";

@@ -1,7 +1,7 @@
-import * as z from "zod";
+import type * as z from "zod";
 import { type Counter, SupiError } from "supi-core";
 
-import { User } from "../classes/user.js";
+import type { User } from "../classes/user.js";
 import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
@@ -17,7 +17,7 @@ import type { Emote } from "../@types/globals.d.ts";
 
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-import { BasePlatformConfigSchema } from "./schema.js";
+import type { BasePlatformConfigSchema } from "./schema.js";
 export type BaseConfig = z.infer<typeof BasePlatformConfigSchema>;
 
 export type Like = Platform | number | string;

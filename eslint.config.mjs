@@ -209,6 +209,7 @@ export default tseslint.config(
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
 
+			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
 				allowNumber: true
 			}],
@@ -242,6 +243,22 @@ export default tseslint.config(
 
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error"
+		}
+	},
+	{
+		files: ["tests/**/*.{test,spec}.ts"],
+		languageOptions: {
+		},
+		rules: {
+			"max-nested-callbacks": "off",
+			"unicorn/prefer-module": "off",
+			"import/extensions": "off",
+			"unicorn/consistent-function-scoping": "off",
+			"unicorn/no-useless-undefined": "off",
+			"unicorn/no-await-expression-member": "off",
+			"@typescript-eslint/no-floating-promises": "off",
+			"@typescript-eslint/no-unused-vars": "off",
+			"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }]
 		}
 	}
 );

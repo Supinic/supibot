@@ -5,7 +5,7 @@ import { GptDeepInfra } from "../gpt/gpt-deepinfra.js";
 import gptConfig from "../gpt/config.json" with { type: "json" };
 
 import { check as checkModeration } from "../gpt/moderation.js";
-import { GptContext, ModelData } from "../gpt/index.js";
+import type { GptContext, ModelData } from "../gpt/index.js";
 
 const { models } = gptConfig;
 const summaryModel = models.maverick as ModelData;
