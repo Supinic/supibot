@@ -142,6 +142,12 @@ export default declare({
 				};
 			}
 		}
+		else if (modelData.noTemperature && typeof context.params.temperature === "number") {
+			return {
+			    success: false,
+			    reply: "This model does not support setting a custom temperature!"
+			};
+		}
 
 		const limitCheckResult = await GptCache.checkLimits(context.user);
 		if (!limitCheckResult.success) {
