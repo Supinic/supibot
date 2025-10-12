@@ -1,9 +1,12 @@
+import { DatabaseSync, type SupportedValueType } from "node:sqlite";
+import assert from "node:assert/strict";
+
 import { Utils } from "supi-core";
 import { Command } from "../classes/command.js";
 import { User } from "../classes/user.js";
 import { TwitchPlatform } from "../platforms/twitch.js";
 
-import assert from "node:assert/strict";
+const tn = (schema: string, table: string) => `"${schema}__${table}"`;
 
 export const createTestUser = (opts: { Name?: string, ID?: number, } = {}) => new User({
 	ID: opts.ID ?? 1,
@@ -37,7 +40,7 @@ export const createTestCommand = (opts: { Name?: string } = {}) => new Command({
 
 type CommandResult = Awaited<ReturnType<Command["execute"]>>;
 export const expectCommandResultSuccess = (result: CommandResult, ...includedMessages: string[]) => {
-	assert.notStrictEqual(result.success, false, "Expected command success");
+	assert.notStrictEqual(result.success, false, `Expected command success: ${JSON.stringify(result)}`);
 	for (const includedMessage of includedMessages) {
 		assert.strictEqual(result.reply?.includes(includedMessage), true, `Message does not contain "${includedMessage}"\n\nMessage: ${result.reply}`);
 	}
@@ -46,7 +49,7 @@ export const expectCommandResultSuccess = (result: CommandResult, ...includedMes
 };
 
 export const expectCommandResultFailure = (result: CommandResult, ...includedMessages: string[]) => {
-	assert.strictEqual(result.success, false, "Expected command failure");
+	assert.strictEqual(result.success, false, `Expected command failure: ${JSON.stringify(result)}`);
 	for (const includedMessage of includedMessages) {
 		assert.strictEqual(result.reply?.includes(includedMessage), true, `Message does not contain "${includedMessage}"\n\nMessage: ${result.reply}`);
 	}
@@ -127,7 +130,193 @@ export class FakeRow {
 	}
 }
 
+type AnyRow = Record<string, SupportedValueType>;
+type WhereFrag = { sql: string; params: SupportedValueType[] };
+
+class SqlRecordsetBuilder {
+	private _schema: string | null = null;
+	private _table: string | null = null;
+	private _fields: string[] = [];
+	private _wheres: WhereFrag[] = [];
+	private _limit: number | null = null;
+	private _single = false;
+	private _flat: string | null = null;
+
+	select (...fields: string[]) {
+		this._fields.push(...fields);
+		return this;
+	}
+
+	from (schema: string, table: string) {
+		this._schema = schema;
+		this._table = table;
+		return this;
+	}
+
+	where (condition: string, ...args: SupportedValueType[]) {
+		// Convert %n to '?' for parameter binding
+		const sql = condition.replaceAll("%n", "?");
+		this._wheres.push({ sql, params: args });
+		return this;
+	}
+
+	limit (n: number) {
+		this._limit = n;
+		return this;
+	}
+
+	single () {
+		this._single = true;
+		return this;
+	}
+
+	flat (field: string) {
+		this._flat = field;
+		return this;
+	}
+
+	// Internal compiler
+	buildSQL () {
+		if (!this._schema || !this._table) {
+			throw new Error("Recordset.from(schema, table) not specified");
+		}
+
+		const select = this._fields.length
+			? this._fields.map(i => `"${i}"`).join(",")
+			: "*";
+
+		const whereSql = this._wheres.length
+			? `WHERE ${this._wheres.map(i => `(${i.sql})`).join(" AND ")}`
+			: "";
+
+		const params = this._wheres.flatMap(w => w.params);
+
+		const lim = (this._single && this._limit === null) ? 1 : this._limit;
+		const limitSql = (lim !== null) ? ` LIMIT ${lim}` : "";
+
+		const sql = `SELECT ${select} FROM ${tn(this._schema, this._table)} ${whereSql} ORDER BY rowid${limitSql}`;
+		return {
+			sql,
+			params,
+			flat: this._flat,
+			single: this._single
+		};
+	}
+}
+
+class SqlRow {
+	private _values: AnyRow = {};
+	private _stored = false;
+	private _loaded = false;
+
+	private world: TestWorld;
+	public readonly schema: string;
+	public readonly table: string;
+
+	constructor (world: TestWorld, schema: string, table: string) {
+		this.world = world;
+		this.schema = schema;
+		this.table = table;
+	}
+
+	setValues (values: AnyRow) {
+		this._values = { ...values };
+	}
+
+	get values () {
+		return this._values;
+	}
+
+	get stored () {
+		return this._stored;
+	}
+
+	get loaded () {
+		return this._loaded;
+	}
+
+	get updated () {
+		return this._loaded && this._stored;
+	}
+
+	save (opts?: { skipLoad?: boolean }) {
+		const db = this.world.db;
+		const keys = Object.keys(this._values);
+		if (keys.length === 0) {
+			return;
+		}
+
+		// Upsert by ID if present, else insert
+		const hasId = Object.prototype.hasOwnProperty.call(this._values, "ID");
+		const tableName = tn(this.schema, this.table);
+
+		db.exec("BEGIN");
+		try {
+			if (hasId) {
+				// Try UPDATE first
+				const setCols = keys.filter(k => k !== "ID").map(k => `"${k}" = ?`).join(",");
+				const setVals = keys.filter(k => k !== "ID").map(k => this._values[k]);
+				const upd = db.prepare(`UPDATE ${tableName} SET ${setCols} WHERE "ID" = ?`);
+
+				const result = upd.run(...setVals, this._values.ID);
+				if (result.changes === 0) {
+					// Fallback INSERT (explicit ID)
+					const cols = keys.map(k => `"${k}"`).join(",");
+					const qs = keys.map(() => "?").join(",");
+					const statement = db.prepare(`INSERT INTO ${tableName} (${cols}) VALUES (${qs})`);
+
+					statement.run(...keys.map(k => this._values[k]));
+				}
+			}
+			else {
+				// Plain INSERT
+				const cols = keys.map(k => `"${k}"`).join(",");
+				const qs = keys.map(() => "?").join(",");
+
+				const statement = db.prepare(`INSERT INTO ${tableName} (${cols}) VALUES (${qs})`);
+				const res = statement.run(...keys.map(k => this._values[k]));
+				this.values.ID = Number(res.lastInsertRowid);
+			}
+			db.exec("COMMIT");
+			this._stored = true;
+		}
+		catch (e) {
+			db.exec("ROLLBACK");
+			throw e;
+		}
+
+		if (!opts?.skipLoad) {
+			// Load freshly stored row back (by ID if available)
+			const byId = this.values.ID;
+			if (byId !== null) {
+				const row = db.prepare(`SELECT * FROM ${tableName} WHERE "ID" = ?`).get(byId) as AnyRow | undefined;
+				if (row) {
+					this._values = row;
+				}
+			}
+
+			this._loaded = true;
+		}
+	}
+
+	load () {
+		// no-op unless an ID is present
+		const byId = this._values.ID;
+		if (byId === null) {
+			return;
+		}
+
+		const row = this.world.db.prepare(`SELECT * FROM ${tn(this.schema, this.table)} WHERE "ID" = ?`).get(byId) as AnyRow | undefined;
+		if (row) {
+			this._values = row;
+			this._loaded = true;
+		}
+	}
+}
+
 export class TestWorld {
+	public readonly db: DatabaseSync;
+
 	public readonly rows: FakeRow[] = [];
 	public readonly recordsets: FakeRecordset[] = [];
 	public readonly tables = new Map<string, unknown[]>();
@@ -135,8 +324,14 @@ export class TestWorld {
 	private readonly specificUserIds = new Map<string, number>();
 	private readonly allowedUsers = new Set<string>();
 	private readonly recordsetQueue: unknown[] = [];
+	private readonly createdTables: Array<{ schema: string; table: string }> = [];
 
 	public failOnEmptyRecordset: boolean = true;
+
+	constructor (fileDbPath = ":memory:") {
+		this.db = new DatabaseSync(fileDbPath);
+		this.db.exec(`PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA foreign_keys = ON;`);
+	}
 
 	install () {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias, unicorn/no-this-assignment
@@ -144,31 +339,29 @@ export class TestWorld {
 		const baseCore = {
 			Utils: new Utils(),
 			Query: {
-				getRecordset () {
-					if (world.recordsetQueue.length === 0) {
-						if (world.failOnEmptyRecordset) {
-							throw new Error("TestWorld.getRecordset - no queued data found");
-						}
+				getRecordset (builder: (rs: SqlRecordsetBuilder) => SqlRecordsetBuilder) {
+					const rs = builder(new SqlRecordsetBuilder());
+					const { sql, params, flat, single } = rs.buildSQL();
+					const rows = world.db.prepare(sql).all(...params) as AnyRow[];
 
-						return;
+					// Shape
+					let out: unknown;
+					if (flat) {
+						const list = rows.map(r => r[flat]);
+						out = single ? list[0] : list;
+					}
+					else if (single) {
+						out = (rows[0] ?? undefined);
+					}
+					else {
+						out = rows;
 					}
 
-					const data = world.recordsetQueue.shift();
-					const rs = new FakeRecordset();
-					world.recordsets.push(rs);
-					return data;
+					return out;
 				},
 
 				getRow (schema: string, table: string) {
-					const row = new FakeRow(world, schema, table);
-					world.rows.push(row);
-
-					const key = `${schema}.${table}`;
-					if (!world.tables.has(key)) {
-						world.tables.set(key, []);
-					}
-
-					return row;
+					return new SqlRow(world, schema, table);
 				}
 			}
 		};
@@ -189,6 +382,25 @@ export class TestWorld {
 
 		globalThis.core = (baseCore as unknown as typeof globalThis.core);
 		globalThis.sb = (baseSb as unknown as typeof globalThis.sb);
+	}
+
+	installSchemas (defs: Array<{ schema: string; table: string; ddl: string }>) {
+		this.db.exec("BEGIN");
+		try {
+			for (const def of defs) {
+				this.db.exec(def.ddl.replaceAll("__TABLE__", tn(def.schema, def.table)));
+				const key = `${def.schema}.${def.table}`;
+				if (!this.createdTables.some(t => `${t.schema}.${t.table}` === key)) {
+					this.createdTables.push({ schema: def.schema, table: def.table });
+				}
+			}
+
+			this.db.exec("COMMIT");
+		}
+		catch (e) {
+			this.db.exec("ROLLBACK");
+			throw e;
+		}
 	}
 
 	reset () {
@@ -215,6 +427,11 @@ export class TestWorld {
 		this.specificUserIds.set(username, id);
 	}
 
+	insertRow (schema: string, table: string, row: unknown): void {
+		const tableData = this.ensureTable(schema, table);
+		tableData.push(row);
+	}
+
 	insertRows (schema: string, table: string, rows: unknown[]): void {
 		const tableData = this.ensureTable(schema, table);
 		tableData.push(...rows);
@@ -225,31 +442,10 @@ export class TestWorld {
 		this.tables.set(key, []);
 	}
 
-	/**
-	 * @todo
-	 * Queue the current table snapshot as the next recordset result.
-	 * No SQL matching — you can shape the result with simple options.
-	 */
-	useTable (schema: string, table: string, opts?: { limit?: number; single?: boolean; flat?: string } ): void {
-		const rows = this.snapshot(schema, table);
-
-		let out: unknown = rows;
-
-		if (typeof opts?.limit === "number") {
-			(out as AnyRow[]).splice(opts.limit); // in-place slice to respect insertion order
-		}
-
-		if (opts?.flat) {
-			out = (out as AnyRow[]).map(r => (r as AnyRow)[opts.flat!]);
-		}
-
-		if (opts?.single) {
-			out = (out as AnyRow[])[0] ?? null;
-		}
-
-		this.queueRsData(out);
+	useTable (schema: string, table: string): void {
+		const rows = this.ensureTable(schema, table);
+		this.queueRsData(rows);
 	}
-
 
 	private ensureTable (schema: string, table: string): unknown[] {
 		const key = TestWorld.getKey(schema, table);

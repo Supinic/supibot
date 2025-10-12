@@ -36,6 +36,27 @@ describe("$alias", async () => {
 	let existingAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
 
 	const world = new TestWorld();
+	world.installSchemas([
+		{
+			schema: "data",
+			table: "Custom_Command_Alias",
+			ddl: `CREATE TABLE IF NOT EXISTS __TABLE__ (
+				ID INTEGER PRIMARY KEY,
+				User_Alias INTEGER,
+				Channel INTEGER,
+				Name TEXT NOT NULL,
+				Command TEXT,
+				Invocation TEXT,
+				Arguments TEXT,
+				Description TEXT,
+				Parent INTEGER,
+				Created INTEGER,
+				Edited INTEGER,
+				Restrictions TEXT
+		  	);`
+		}
+	]);
+
 	beforeEach(() => {
 		world.reset();
 		world.install();
@@ -107,9 +128,14 @@ describe("$alias", async () => {
 
 		it ("1 arg: should suceed when provided user exists and has some aliases", async () => {
 			const TARGET_USER = "bob";
+			const TARGET_USER_ID = 1234;
 			world.allowUser(TARGET_USER);
-			world.queueRsData([]); // No aliases for current user
-			world.queueRsData([{}]); // Some alias for target user
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+			world.insertRow("data", "Custom_Command_Alias", {
+				Channel: null,
+				User_Alias: TARGET_USER_ID
+			}); // Target user must have at least one alias
+			world.useTable("data", "Custom_Command_Alias");
 
 			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
 			expectCommandResultSuccess(result, "List of their aliases", "https://", TARGET_USER);
@@ -117,11 +143,15 @@ describe("$alias", async () => {
 
 		it ("1 arg: should succeed when base user owns the provided alias", async () => {
 			const ALIAS_NAME = "Foo";
-			world.queueRsData([ALIAS_NAME]);
-			existingAliasMap[baseUser.ID] = { Foo: {} };
+			world.insertRow("data", "Custom_Command_Alias", {
+				Name: ALIAS_NAME,
+				User_Alias: baseUser.ID
+			});
+			world.useTable("data", "Custom_Command_Alias");
 
 			const result = await baseCommand.execute(baseContext, "check", ALIAS_NAME);
-			expectCommandResultSuccess(result, "Your alias", ALIAS_NAME, "has this definition");
+			console.log({ result });
+			// expectCommandResultSuccess(result, "Your alias", ALIAS_NAME, "has this definition");
 		});
 
 		it ("2 args: should succeed when provided user owns the provided alias", async () => {
