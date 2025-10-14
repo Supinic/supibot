@@ -225,32 +225,6 @@ export class TestWorld {
 		this.tables.set(key, []);
 	}
 
-	/**
-	 * @todo
-	 * Queue the current table snapshot as the next recordset result.
-	 * No SQL matching — you can shape the result with simple options.
-	 */
-	useTable (schema: string, table: string, opts?: { limit?: number; single?: boolean; flat?: string } ): void {
-		const rows = this.snapshot(schema, table);
-
-		let out: unknown = rows;
-
-		if (typeof opts?.limit === "number") {
-			(out as AnyRow[]).splice(opts.limit); // in-place slice to respect insertion order
-		}
-
-		if (opts?.flat) {
-			out = (out as AnyRow[]).map(r => (r as AnyRow)[opts.flat!]);
-		}
-
-		if (opts?.single) {
-			out = (out as AnyRow[])[0] ?? null;
-		}
-
-		this.queueRsData(out);
-	}
-
-
 	private ensureTable (schema: string, table: string): unknown[] {
 		const key = TestWorld.getKey(schema, table);
 		let tableData = this.tables.get(key);

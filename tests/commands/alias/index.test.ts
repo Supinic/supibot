@@ -520,25 +520,219 @@ describe("$alias", async () => {
 		});
 	});
 
-	it("describe: properly adds descriptions", async () => {
-		// $alias describe -> error
-		// $alias describe (alias not owned) -> error
-		// $alias describe (alias) (description too long) -> error
-		// $alias describe (alias) (none/empty) -> OK, resets description
-		// $alias describe (alias) (text) -> OK, sets description
+	describe("$alias describe", () => {
+		it("0 args: should fail, no alias name provided", async () => {
+			const result = await baseCommand.execute(baseContext, "describe");
+			expectCommandResultFailure(result, "didn't provide", "name", "command");
+		});
+
+		it("1 arg: should fail, alias not owned", async () => {
+			const ALIAS_NAME = "foo";
+			const result = await baseCommand.execute(baseContext, "describe", ALIAS_NAME);
+			expectCommandResultFailure(result, "don't have", ALIAS_NAME);
+		});
+
+		it("1 arg: should succeed with empty description (reset)", async () => {
+			const ALIAS_NAME = "foo";
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: { Name: ALIAS_NAME, Command: null }
+			};
+
+			const result = await baseCommand.execute(baseContext, "describe", ALIAS_NAME);
+			expectCommandResultSuccess(result, "description of your alias", ALIAS_NAME, "reset");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.ok(row.updated, "Expected Row to be updated");
+			assert.strictEqual(row.values.Description, null);
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("2 args: should succeed with literal \"none\" (reset)", async () => {
+			const ALIAS_NAME = "bar";
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: { Name: ALIAS_NAME, Command: null }
+			};
+
+			const result = await baseCommand.execute(baseContext, "describe", ALIAS_NAME, "none");
+			expectCommandResultSuccess(result, "description of your alias", ALIAS_NAME, "reset");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.ok(row.updated, "Expected Row to be updated");
+			assert.strictEqual(row.values.Description, null);
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("2+ args: should fail when description is too long", async () => {
+			const ALIAS_NAME = "foo";
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: { Name: ALIAS_NAME, Command: null }
+			};
+
+			const tooLong = "x".repeat(realAliasUtils.ALIAS_DESCRIPTION_LIMIT + 1);
+			const result = await baseCommand.execute(baseContext, "describe", ALIAS_NAME, tooLong);
+			expectCommandResultFailure(result, "description is too long", String(realAliasUtils.ALIAS_DESCRIPTION_LIMIT));
+		});
+
+		it("2+ args: should succeed and set description", async () => {
+			const ALIAS_NAME = "baz";
+			const DESCRIPTION = "A short, helpful description.";
+
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: { Name: ALIAS_NAME, Command: null }
+			};
+
+			const result = await baseCommand.execute(baseContext, "describe", ALIAS_NAME, DESCRIPTION);
+			expectCommandResultSuccess(result, "description of your alias", ALIAS_NAME, "updated");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.ok(row.updated, "Expected Row to be updated");
+			assert.strictEqual(row.values.Description, DESCRIPTION);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
 	});
 
-	it("duplicate: properly creates identical copies", async () => {
-		// $alias duplicate -> error
-		// $alias duplicate (old alias) -> error
-		// $alias duplicate (old alias) (new illegal alias name) -> error
-		// $alias duplicate (unowned old alias) (new alias) -> error
-		// $alias duplicate (linked alias) (new alias) -> error
-		// $alias duplicate (old alias) (already existing new alias) -> error
-		// $alias duplicate (old alias) (new alias) -> OK, check object
+	describe("$alias duplicate", () => {
+		it("0 args: should fail, no alias name(s) provided", async () => {
+			const result = await baseCommand.execute(baseContext, "duplicate");
+			expectCommandResultFailure(result, "didn't provide", "alias", "name");
+		});
+
+		it("1 arg: should fail, no new alias name provided", async () => {
+			const result = await baseCommand.execute(baseContext, "duplicate", "foo");
+			expectCommandResultFailure(result, "didn't provide", "new", "name");
+		});
+
+		it("2 args: should fail when new alias name is illegal", async () => {
+			const OLD = "foo";
+			existingAliasMap[BASE_USER_ID] = {
+				[OLD]: {
+					Name: OLD,
+					User_Alias: BASE_USER_ID,
+					Command: "echo",
+					Invocation: "foo",
+					Arguments: "bar baz",
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "duplicate", OLD, "$$$");
+			expectCommandResultFailure(result, "duplicated alias", "name", "not valid");
+		});
+
+		it("2 args: should fail when old alias is not owned", async () => {
+			const result = await baseCommand.execute(baseContext, "duplicate", "foo", "bar");
+			expectCommandResultFailure(result, "don't have", "foo");
+		});
+
+		it("2 args: should fail when old alias is linked", async () => {
+			const OLD = "linked";
+			existingAliasMap[BASE_USER_ID] = {
+				[OLD]: {
+					Name: OLD,
+					User_Alias: BASE_USER_ID,
+					Parent: 1,
+					Command: null,
+					Invocation: null,
+					Channel: null,
+					Arguments: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "duplicate", OLD, "newname");
+			expectCommandResultFailure(result, "cannot duplicate", "links", "aliases");
+		});
+
+		it("2 args: should fail when new alias already exists", async () => {
+			const OLD = "foo";
+			const NEW = "bar";
+			existingAliasMap[BASE_USER_ID] = {
+				[OLD]: {
+					Name: OLD,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: "call",
+					Arguments: "x y",
+					Parent: null,
+					Channel: null
+				},
+				[NEW]: {
+					Name: NEW,
+					User_Alias: BASE_USER_ID,
+					Command: "other"
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "duplicate", OLD, NEW);
+			expectCommandResultFailure(result, "already", "have", NEW);
+		});
+
+		it("2 args: should succeed and create a duplicate linked to the original", async () => {
+			const OLD = "foo";
+			const NEW = "bar";
+			const OLD_ID = 777;
+
+			existingAliasMap[BASE_USER_ID] = {
+				[OLD]: {
+					ID: OLD_ID,
+					Name: OLD,
+					User_Alias: BASE_USER_ID,
+					Command: "echo",
+					Invocation: "foo",
+					Arguments: "bar baz",
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "duplicate", OLD, NEW);
+			expectCommandResultSuccess(result, "duplicated", OLD, NEW);
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.strictEqual(row.values.Command, "echo");
+			assert.strictEqual(row.values.Invocation, "foo");
+			assert.strictEqual(row.values.Arguments, "bar baz");
+			assert.strictEqual(row.values.Description, null);
+			assert.strictEqual(row.values.Parent, OLD_ID);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
 	});
 
-	it("edit: properly edits existing aliases", async () => {
+	describe("$alias edit", () => {
+		it("0 args: should fail, no alias name provided", async () => {
+			const result = await baseCommand.execute(baseContext, "edit");
+			expectCommandResultFailure(result, "No alias", "command", "name provided");
+		});
+
+		it("1 arg: should fail, no command provided", async () => {
+			const ALIAS_NAME = "foo";
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "oldcmd",
+					Invocation: "old",
+					Arguments: "a b",
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "edit", ALIAS_NAME);
+			expectCommandResultFailure(result, "No alias", "command", "name provided");
+		});
+
+		it("2 args: should fail when alias is not owned", async () => {
+			const result = await baseCommand.execute(baseContext, "edit", "notmine", "ping");
+			expectCommandResultFailure(result, "don't have", "notmine");
+		});
+
 		// $alias edit -> error
 		// $alias edit (alias) -> error
 		// $alias edit (unowned alias) -> error
@@ -547,7 +741,7 @@ describe("$alias", async () => {
 		// $alias edit (alias) (command) -> OK, check object
 	});
 
-	it("inspect: properly edits existing aliases", async () => {
+	describe("$alias inspect", async () => {
 		// $alias inspect -> error
 		// $alias inspect (unowned alias) -> error
 		// $alias inspect (nonexistent user) (alias) -> error
@@ -556,7 +750,7 @@ describe("$alias", async () => {
 		// $alias inspect (user) (alias with description) -> OK
 	});
 
-	it("link: properly links aliases together", async () => {
+	describe("$alias link", async () => {
 		// $alias link -> error
 		// $alias link (string) -> error
 		// $alias link (string) (already owned alias name) -> error
@@ -574,7 +768,7 @@ describe("$alias", async () => {
 		// $alias linkplace (string) (already owned alias name) (custom name) -> OK
 	});
 
-	it("publish: properly (un)publishes existing aliases", async () => {
+	describe("$alias publish", async () => {
 		// $alias publish [not in a channel] -> error
 		// $alias publish [user not privileged] -> error
 		// $alias publish -> error
@@ -595,13 +789,13 @@ describe("$alias", async () => {
 		// $alias unpublish (owned alias) (username) [channel has alias published] -> OK
 	});
 
-	it("published: properly lists published aliases", async () => {
+	describe("$alias published", async () => {
 		it.skip("published");
 		// $alias published [not in a channel] -> error
 		// $alias published [in a channel] -> OK
 	});
 
-	it("remove: properly deletes existing aliases", async () => {
+	describe("$alias remove", async () => {
 		it.skip("remove");
 		// $alias remove -> error
 		// $alias remove (unowned alias) -> error
@@ -609,7 +803,7 @@ describe("$alias", async () => {
 		// $alias remove (owned alias) [published in channels] -> OK, check that publishes get removed + message
 	});
 
-	it("rename: properly renames existing aliases", async () => {
+	describe("$alias rename", async () => {
 		it.skip("rename");
 		// $alias rename -> error
 		// $alias rename (string) -> error
@@ -617,7 +811,7 @@ describe("$alias", async () => {
 		// $alias rename (unowned alias) (new name) -> error
 	});
 
-	it("restrict: properly restricts existing aliases", async () => {
+	describe("$alias restrict", async () => {
 		it.skip("restrict");
 		// $alias restrict -> error
 		// $alias restrict (string) -> error
@@ -640,7 +834,7 @@ describe("$alias", async () => {
 		// $alias unrestrict (owned both-restricted alias) (copy) -> OK
 	});
 
-	it("run: properly executes aliases", async () => {
+	describe("$alias run", async () => {
 		it.skip("run");
 		// $alias run -> error
 		// $alias try -> error
@@ -659,7 +853,7 @@ describe("$alias", async () => {
 		// Maybe: $alias run (valid alias) -> OK
 	});
 
-	it("transfer: properly transfers aliases between linked user aliases", async () => {
+	describe("$alias transfer", async () => {
 		it.skip("transfer");
 		// $alias transfer [not a Twitch user] -> error
 		// $alias transfer -> error
