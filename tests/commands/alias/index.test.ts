@@ -82,95 +82,7 @@ describe("$alias", async () => {
 		expectCommandResultFailure(result, "Invalid sub-command", "Check", "help", "https://");
 	});
 
-	describe("$alias check", () => {
-		it ("0 args: should post a link when nothing is provided", async () => {
-			const result = await baseCommand.execute(baseContext, "check");
-			expectCommandResultSuccess(result, "List of your aliases", BASE_USERNAME);
-		});
-
-		it ("1 arg: should fail when neither user nor alias exists", async () => {
-			world.queueRsData([]); // No aliases for current user
-
-			const result = await baseCommand.execute(baseContext, "check", "NO_COMMAND");
-			expectCommandResultFailure(result, "Could not match your input", "username", "your aliases");
-		});
-
-		it ("1 arg: should fail when provided user exists but has no aliases", async () => {
-			const TARGET_USER = "bob";
-			world.allowUser(TARGET_USER);
-			world.queueRsData([]); // No aliases for current user
-			world.queueRsData([]); // No aliases for target user
-
-			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
-			expectCommandResultFailure(result, "Could not match your input", "username", "your aliases");
-		});
-
-		it ("1 arg: should suceed when provided user exists and has some aliases", async () => {
-			const TARGET_USER = "bob";
-			world.allowUser(TARGET_USER);
-			world.queueRsData([]); // No aliases for current user
-			world.queueRsData([{}]); // Some alias for target user
-
-			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
-			expectCommandResultSuccess(result, "List of their aliases", "https://", TARGET_USER);
-		});
-
-		it ("1 arg: should succeed when base user owns the provided alias", async () => {
-			const ALIAS_NAME = "Foo";
-			world.queueRsData([ALIAS_NAME]);
-			existingAliasMap[baseUser.ID] = { Foo: {} };
-
-			const result = await baseCommand.execute(baseContext, "check", ALIAS_NAME);
-			expectCommandResultSuccess(result, "Your alias", ALIAS_NAME, "has this definition");
-		});
-
-		it ("2 args: should succeed when provided user owns the provided alias", async () => {
-			const ALIAS_NAME = "Foo";
-			const TARGET_USER = "Bob";
-			const TARGET_USER_ID = 123;
-			const BASE_ALIAS_COMMAND = "test";
-
-			world.queueRsData([]);
-			world.queueRsData([ALIAS_NAME]);
-			world.allowUser(TARGET_USER);
-			world.setUserId(TARGET_USER, TARGET_USER_ID);
-
-			existingAliasMap[TARGET_USER_ID] = {
-				[ALIAS_NAME]: { Command: BASE_ALIAS_COMMAND }
-			};
-
-			const result = await baseCommand.execute(baseContext, "check", TARGET_USER, ALIAS_NAME);
-			console.log({ result });
-			expectCommandResultSuccess(result, "Their alias", ALIAS_NAME, "has this definition");
-		});
-
-		it ("2 args: should fail when provided user does not own the provided alias", async () => {
-			const ALIAS_NAME = "Foo";
-			const DIFFERENT_ALIAS_NAME = "Bar";
-			const TARGET_USER = "Bob";
-			const TARGET_USER_ID = 123;
-
-			world.queueRsData([]);
-			world.queueRsData([ALIAS_NAME]);
-			world.allowUser(TARGET_USER);
-			world.setUserId(TARGET_USER, TARGET_USER_ID);
-
-			existingAliasMap[TARGET_USER_ID] = {
-				[DIFFERENT_ALIAS_NAME]: {}
-			};
-
-			const result = await baseCommand.execute(baseContext, "check", TARGET_USER, ALIAS_NAME);
-			expectCommandResultFailure(result, "They don't have", ALIAS_NAME, "alias");
-		});
-
-		// alias definition + message = too long -> link
-		// different result for $alias code -> should post definition and no fluff
-		// checking user - user doesn't exist
-		// checking linked alias -> exists
-		// checking linked alias -> original is deleted
-	});
-
-	describe("$alias add", () => {
+	describe("add", () => {
 		it("0 args: should fail, no alias name provided", async () => {
 			const result = await baseCommand.execute(baseContext, "add");
 			expectCommandResultFailure(result, "didn't provide", "name", "command");
@@ -268,7 +180,95 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias copy", () => {
+	describe("check", () => {
+		it ("0 args: should post a link when nothing is provided", async () => {
+			const result = await baseCommand.execute(baseContext, "check");
+			expectCommandResultSuccess(result, "List of your aliases", BASE_USERNAME);
+		});
+
+		it ("1 arg: should fail when neither user nor alias exists", async () => {
+			world.queueRsData([]); // No aliases for current user
+
+			const result = await baseCommand.execute(baseContext, "check", "NO_COMMAND");
+			expectCommandResultFailure(result, "Could not match your input", "username", "your aliases");
+		});
+
+		it ("1 arg: should fail when provided user exists but has no aliases", async () => {
+			const TARGET_USER = "bob";
+			world.allowUser(TARGET_USER);
+			world.queueRsData([]); // No aliases for current user
+			world.queueRsData([]); // No aliases for target user
+
+			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
+			expectCommandResultFailure(result, "Could not match your input", "username", "your aliases");
+		});
+
+		it ("1 arg: should suceed when provided user exists and has some aliases", async () => {
+			const TARGET_USER = "bob";
+			world.allowUser(TARGET_USER);
+			world.queueRsData([]); // No aliases for current user
+			world.queueRsData([{}]); // Some alias for target user
+
+			const result = await baseCommand.execute(baseContext, "check", TARGET_USER);
+			expectCommandResultSuccess(result, "List of their aliases", "https://", TARGET_USER);
+		});
+
+		it ("1 arg: should succeed when base user owns the provided alias", async () => {
+			const ALIAS_NAME = "Foo";
+			world.queueRsData([ALIAS_NAME]);
+			existingAliasMap[baseUser.ID] = { Foo: {} };
+
+			const result = await baseCommand.execute(baseContext, "check", ALIAS_NAME);
+			expectCommandResultSuccess(result, "Your alias", ALIAS_NAME, "has this definition");
+		});
+
+		it ("2 args: should succeed when provided user owns the provided alias", async () => {
+			const ALIAS_NAME = "Foo";
+			const TARGET_USER = "Bob";
+			const TARGET_USER_ID = 123;
+			const BASE_ALIAS_COMMAND = "test";
+
+			world.queueRsData([]);
+			world.queueRsData([ALIAS_NAME]);
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[ALIAS_NAME]: { Command: BASE_ALIAS_COMMAND }
+			};
+
+			const result = await baseCommand.execute(baseContext, "check", TARGET_USER, ALIAS_NAME);
+			console.log({ result });
+			expectCommandResultSuccess(result, "Their alias", ALIAS_NAME, "has this definition");
+		});
+
+		it ("2 args: should fail when provided user does not own the provided alias", async () => {
+			const ALIAS_NAME = "Foo";
+			const DIFFERENT_ALIAS_NAME = "Bar";
+			const TARGET_USER = "Bob";
+			const TARGET_USER_ID = 123;
+
+			world.queueRsData([]);
+			world.queueRsData([ALIAS_NAME]);
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[DIFFERENT_ALIAS_NAME]: {}
+			};
+
+			const result = await baseCommand.execute(baseContext, "check", TARGET_USER, ALIAS_NAME);
+			expectCommandResultFailure(result, "They don't have", ALIAS_NAME, "alias");
+		});
+
+		// alias definition + message = too long -> link
+		// different result for $alias code -> should post definition and no fluff
+		// checking user - user doesn't exist
+		// checking linked alias -> exists
+		// checking linked alias -> original is deleted
+	});
+
+	describe("copy", () => {
 		it("0 args: should fail, no user name provided", async () => {
 			const resultCopy = await baseCommand.execute(baseContext, "copy");
 			expectCommandResultFailure(resultCopy, "No", "username");
@@ -520,7 +520,7 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias describe", () => {
+	describe("describe", () => {
 		it("0 args: should fail, no alias name provided", async () => {
 			const result = await baseCommand.execute(baseContext, "describe");
 			expectCommandResultFailure(result, "didn't provide", "name", "command");
@@ -595,15 +595,15 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias duplicate", () => {
+	describe("duplicate", () => {
 		it("0 args: should fail, no alias name(s) provided", async () => {
 			const result = await baseCommand.execute(baseContext, "duplicate");
-			expectCommandResultFailure(result, "didn't provide", "alias", "name");
+			expectCommandResultFailure(result, "must provide", "existing", "new", "alias", "name");
 		});
 
 		it("1 arg: should fail, no new alias name provided", async () => {
 			const result = await baseCommand.execute(baseContext, "duplicate", "foo");
-			expectCommandResultFailure(result, "didn't provide", "new", "name");
+			expectCommandResultFailure(result, "must provide", "existing", "new", "alias", "name");
 		});
 
 		it("2 args: should fail when new alias name is illegal", async () => {
@@ -621,7 +621,7 @@ describe("$alias", async () => {
 			};
 
 			const result = await baseCommand.execute(baseContext, "duplicate", OLD, "$$$");
-			expectCommandResultFailure(result, "duplicated alias", "name", "not valid");
+			expectCommandResultFailure(result, "alias", "name", "not valid");
 		});
 
 		it("2 args: should fail when old alias is not owned", async () => {
@@ -704,7 +704,7 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias edit", () => {
+	describe("edit", () => {
 		it("0 args: should fail, no alias name provided", async () => {
 			const result = await baseCommand.execute(baseContext, "edit");
 			expectCommandResultFailure(result, "No alias", "command", "name provided");
@@ -729,35 +729,188 @@ describe("$alias", async () => {
 		});
 
 		it("2 args: should fail when alias is not owned", async () => {
-			const result = await baseCommand.execute(baseContext, "edit", "notmine", "ping");
-			expectCommandResultFailure(result, "don't have", "notmine");
+			const [cmd] = EXISTING_COMMANDS;
+			const aliasName = "notmine";
+			const result = await baseCommand.execute(baseContext, "edit", aliasName, cmd);
+			expectCommandResultFailure(result, "don't have", aliasName);
 		});
 
-		// $alias edit -> error
-		// $alias edit (alias) -> error
-		// $alias edit (unowned alias) -> error
-		// $alias edit (alias) (nonexistent command) -> error
-		// $alias edit (linked alias) (command) -> error
+		it("2 args: should fail when command does not exist", async () => {
+			const ALIAS_NAME = "bar";
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "old_command",
+					Invocation: "old",
+					Arguments: null,
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "edit", ALIAS_NAME, "definitely_not_a_command");
+			expectCommandResultFailure(result, "command", "does not exist");
+		});
+
+		it("2 args: should fail when alias is linked", async () => {
+			const [cmd] = EXISTING_COMMANDS;
+			const aliasName = "linked";
+			existingAliasMap[BASE_USER_ID] = {
+				[aliasName]: {
+					Name: aliasName,
+					User_Alias: BASE_USER_ID,
+					Command: null,
+					Invocation: null,
+					Arguments: null,
+					Parent: 123,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "edit", aliasName, cmd);
+			expectCommandResultFailure(result, "cannot edit", "links", "aliases");
+		});
+
+		it("2 args: should succeed and update command without arguments", async () => {
+			const ALIAS_NAME = "baz";
+			const [cmd] = EXISTING_COMMANDS;
+
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "oldcmd",
+					Invocation: "old",
+					Arguments: "x y",
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "edit", ALIAS_NAME, cmd);
+			expectCommandResultSuccess(result, "alias", ALIAS_NAME, "successfully", "edited");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.ok(row.updated, "Expected Row to be updated");
+			assert.strictEqual(row.values.Command, cmd);
+			assert.strictEqual(row.values.Invocation, cmd);
+			assert.strictEqual(row.values.Arguments, null);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("2 args: should succeed and update command with arguments", async () => {
+			const ALIAS_NAME = "baz";
+			const [cmd] = EXISTING_COMMANDS;
+
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "oldcmd",
+					Invocation: "old",
+					Arguments: "x y",
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const ALIAS_ARGUMENTS = ["1", "2", "3"];
+			const result = await baseCommand.execute(baseContext, "edit", ALIAS_NAME, cmd, ...ALIAS_ARGUMENTS);
+			expectCommandResultSuccess(result, "alias", ALIAS_NAME, "successfully", "edited");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.ok(row.updated, "Expected Row to be updated");
+			assert.strictEqual(row.values.Command, cmd);
+			assert.strictEqual(row.values.Invocation, cmd);
+			assert.strictEqual(row.values.Arguments, JSON.stringify(ALIAS_ARGUMENTS));
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
 		// $alias edit (alias) (command) -> OK, check object
 	});
 
-	describe("$alias inspect", async () => {
-		// $alias inspect -> error
-		// $alias inspect (unowned alias) -> error
-		// $alias inspect (nonexistent user) (alias) -> error
-		// $alias inspect (user) (unowned alias) -> error
-		// $alias inspect (user) (alias without description) -> OK
-		// $alias inspect (user) (alias with description) -> OK
+	describe("inspect", () => {
+		it("0 args: should fail, no alias/user provided", async () => {
+			const result = await baseCommand.execute(baseContext, "inspect");
+			expectCommandResultFailure(result, "didn't provide", "alias", "user name");
+		});
+
+		it("1 arg: should fail when alias is not owned", async () => {
+			const result = await baseCommand.execute(baseContext, "inspect", "foo");
+			expectCommandResultFailure(result, "don't have", "foo");
+		});
+
+		it("2 args: should fail when provided user does not exist", async () => {
+			const result = await baseCommand.execute(baseContext, "inspect", "bob", "foo");
+			expectCommandResultFailure(result, "Provided user does not exist!");
+		});
+
+		it("2 args: should fail when user exists but does not own the alias", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_USER_ID = 222;
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "inspect", TARGET_USER, "foo");
+			expectCommandResultFailure(result, "don't have", "foo");
+		});
+
+		it("2 args: should succeed when alias has no description", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_USER_ID = 223;
+			const ALIAS_NAME = "foo";
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[ALIAS_NAME]: {
+					Name: ALIAS_NAME,
+					User_Alias: TARGET_USER_ID,
+					Description: null
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "inspect", TARGET_USER, ALIAS_NAME);
+			expectCommandResultSuccess(result, "Alias", ALIAS_NAME, "has no description");
+		});
+
+		it("2 args: should succeed and print the description", async () => {
+			const TARGET_USER = "bob";
+			const TARGET_USER_ID = 224;
+			const ALIAS_NAME = "bar";
+			const DESC = "A helpful description.";
+
+			existingAliasMap[TARGET_USER_ID] = {
+				[ALIAS_NAME]: {
+					Name: ALIAS_NAME,
+					User_Alias: TARGET_USER_ID,
+					Description: DESC
+				}
+			};
+
+			world.allowUser(TARGET_USER);
+			world.setUserId(TARGET_USER, TARGET_USER_ID);
+
+			const result = await baseCommand.execute(baseContext, "inspect", TARGET_USER, ALIAS_NAME);
+			expectCommandResultSuccess(result, ALIAS_NAME, DESC);
+		});
 	});
 
-	describe("$alias link", async () => {
+	describe("$alias link", () => {
 		// $alias link -> error
 		// $alias link (string) -> error
 		// $alias link (string) (already owned alias name) -> error
 		// $alias link (nonexistent user) (string) -> error
 		// $alias link (username) (unowned alias name) -> error
 		// $alias link (username) (link-restricted alias name) -> error
-		// $alias link (username) (linked alias name) -> OK, mention the nested link
+		// $alias link (username) (already linked alias name) -> OK, but mention the link is a reference
 		// $alias link (username) (dangling linked alias name) -> error, original is deleted
 		// $alias link (username) (dangling linked alias name) -> error, original is deleted
 		// $alias link (username) (illegal alias name) -> error
@@ -768,7 +921,7 @@ describe("$alias", async () => {
 		// $alias linkplace (string) (already owned alias name) (custom name) -> OK
 	});
 
-	describe("$alias publish", async () => {
+	describe("$alias publish", () => {
 		// $alias publish [not in a channel] -> error
 		// $alias publish [user not privileged] -> error
 		// $alias publish -> error
@@ -789,13 +942,13 @@ describe("$alias", async () => {
 		// $alias unpublish (owned alias) (username) [channel has alias published] -> OK
 	});
 
-	describe("$alias published", async () => {
+	describe("$alias published", () => {
 		it.skip("published");
 		// $alias published [not in a channel] -> error
 		// $alias published [in a channel] -> OK
 	});
 
-	describe("$alias remove", async () => {
+	describe("$alias remove", () => {
 		it.skip("remove");
 		// $alias remove -> error
 		// $alias remove (unowned alias) -> error
@@ -803,7 +956,7 @@ describe("$alias", async () => {
 		// $alias remove (owned alias) [published in channels] -> OK, check that publishes get removed + message
 	});
 
-	describe("$alias rename", async () => {
+	describe("$alias rename", () => {
 		it.skip("rename");
 		// $alias rename -> error
 		// $alias rename (string) -> error
@@ -811,7 +964,7 @@ describe("$alias", async () => {
 		// $alias rename (unowned alias) (new name) -> error
 	});
 
-	describe("$alias restrict", async () => {
+	describe("$alias restrict", () => {
 		it.skip("restrict");
 		// $alias restrict -> error
 		// $alias restrict (string) -> error
@@ -834,7 +987,7 @@ describe("$alias", async () => {
 		// $alias unrestrict (owned both-restricted alias) (copy) -> OK
 	});
 
-	describe("$alias run", async () => {
+	describe("$alias run", () => {
 		it.skip("run");
 		// $alias run -> error
 		// $alias try -> error
@@ -853,7 +1006,7 @@ describe("$alias", async () => {
 		// Maybe: $alias run (valid alias) -> OK
 	});
 
-	describe("$alias transfer", async () => {
+	describe("$alias transfer", () => {
 		it.skip("transfer");
 		// $alias transfer [not a Twitch user] -> error
 		// $alias transfer -> error
