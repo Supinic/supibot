@@ -55,6 +55,7 @@ export default {
 			};
 		}
 
+		/* node:coverage ignore next 6 */
 		if (!isClassicAlias(oldAlias)) {
 			throw new SupiError({
 			    message: "Assert error: Alias is not classic-type",
