@@ -108,6 +108,7 @@ export default {
 
 		const row = await getLinkedAliasRow();
 		if (existingAlias) {
+			/* node:coverage ignore next 5 */
 			if (subInvocation !== "linkplace") {
 				throw new SupiError({
 					message: "Assert error: sanity check - reached linkplace without $alias linkplace"

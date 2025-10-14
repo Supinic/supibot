@@ -37,7 +37,7 @@ export const createTestCommand = (opts: { Name?: string } = {}) => new Command({
 
 type CommandResult = Awaited<ReturnType<Command["execute"]>>;
 export const expectCommandResultSuccess = (result: CommandResult, ...includedMessages: string[]) => {
-	assert.notStrictEqual(result.success, false, "Expected command success");
+	assert.notStrictEqual(result.success, false, `Expected command success: ${JSON.stringify(result)});`);
 	for (const includedMessage of includedMessages) {
 		assert.strictEqual(result.reply?.includes(includedMessage), true, `Message does not contain "${includedMessage}"\n\nMessage: ${result.reply}`);
 	}
@@ -46,7 +46,7 @@ export const expectCommandResultSuccess = (result: CommandResult, ...includedMes
 };
 
 export const expectCommandResultFailure = (result: CommandResult, ...includedMessages: string[]) => {
-	assert.strictEqual(result.success, false, "Expected command failure");
+	assert.strictEqual(result.success, false, `Expected command failure: ${JSON.stringify(result)});`);
 	for (const includedMessage of includedMessages) {
 		assert.strictEqual(result.reply?.includes(includedMessage), true, `Message does not contain "${includedMessage}"\n\nMessage: ${result.reply}`);
 	}
@@ -183,6 +183,40 @@ export class TestWorld {
 
 					const ID = this.specificUserIds.get(name);
 					return createTestUser({ Name: name, ID });
+				},
+
+				getAsserted: (identifier: string | number) => {
+					let name: string | undefined;
+					let id: number | undefined;
+					if (typeof identifier === "string") {
+						const isAllowed = (this.allowedUsers.has(identifier));
+						if (!isAllowed) {
+							throw new Error("Test assert error: User not allowed");
+						}
+
+						const potentialId = this.specificUserIds.get(identifier);
+						if (!potentialId) {
+							throw new Error("Test assert error: User ID does not exist");
+						}
+
+						name = identifier;
+						id = potentialId;
+					}
+					else {
+						for (const [mapName, mapId] of this.specificUserIds.entries()) {
+							if (mapId === identifier) {
+								name = mapName;
+								id = mapId;
+								break;
+							}
+						}
+
+						if (!name || !id) {
+							throw new Error("Test assert error: User ID does not exist");
+						}
+					}
+
+					return createTestUser({ Name: name, ID: id });
 				}
 			}
 		};

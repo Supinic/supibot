@@ -54,6 +54,28 @@ describe("$alias", async () => {
 
 				return userAliases[aliasName] ?? null;
 			},
+			getParentAlias: (alias: AliasData) => {
+				if (alias.Parent === null) {
+					return null;
+				}
+
+				for (const userAliases of Object.values(existingAliasMap)) {
+					if (!userAliases) {
+						continue;
+					}
+
+					for (const potentialParent of Object.values(userAliases)) {
+						if (alias === potentialParent) {
+							continue;
+						}
+						if (alias.Parent === potentialParent.ID) {
+							return potentialParent;
+						}
+					}
+				}
+
+				return null;
+			},
 			parseCommandName: (name: string) => (EXISTING_COMMANDS.includes(name)) ? createTestCommand({ Name: name }) : null
 		}
 	});
@@ -903,22 +925,375 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias link", () => {
-		// $alias link -> error
-		// $alias link (string) -> error
-		// $alias link (string) (already owned alias name) -> error
-		// $alias link (nonexistent user) (string) -> error
-		// $alias link (username) (unowned alias name) -> error
-		// $alias link (username) (link-restricted alias name) -> error
-		// $alias link (username) (already linked alias name) -> OK, but mention the link is a reference
-		// $alias link (username) (dangling linked alias name) -> error, original is deleted
-		// $alias link (username) (dangling linked alias name) -> error, original is deleted
-		// $alias link (username) (illegal alias name) -> error
-		// $alias link (username) (alias name) -> OK, check object
-		// $alias link (username) (alias name) (custom name) -> OK, check object + custom name mentioned
-		// $alias link (username) (alias name) (custom name) -> OK, check object + custom name mentioned
-		// $alias linkplace (string) (already owned alias name) -> OK
-		// $alias linkplace (string) (already owned alias name) (custom name) -> OK
+	describe("link", () => {
+		it("0 args: should fail, no parameters provided", async () => {
+			const result = await baseCommand.execute(baseContext, "link");
+			expectCommandResultFailure(result, "didn't provide", "user", "alias");
+		});
+
+		it("1 arg: should fail, missing alias name", async () => {
+			const result = await baseCommand.execute(baseContext, "link", "someone");
+			expectCommandResultFailure(result, "didn't provide", "alias", "name");
+		});
+
+		it("2 args: should fail when you already own an alias with that name", async () => {
+			const REMOTE_USER = "alice";
+			const REMOTE_USER_ID = 501;
+			const ALIAS = "foo";
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			// You (BASE_USER_ID) already own "foo"
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS]: { Name: ALIAS, User_Alias: BASE_USER_ID, Command: "echo", Parent: null }
+			};
+			// Remote user also has "foo" (the one we want to link)
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS]: { ID: 9001, Name: ALIAS, User_Alias: REMOTE_USER_ID, Command: "echo", Parent: null }
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ALIAS);
+			expectCommandResultFailure(result, "Cannot", "link", "already have", "with this name");
+		});
+
+		it("2 args: should fail when provided user does not exist", async () => {
+			const result = await baseCommand.execute(baseContext, "link", "nobody", "foo");
+			expectCommandResultFailure(result, "Provided user does not exist!");
+		});
+
+		it("2 args: should fail when target user does not have the alias", async () => {
+			const REMOTE_USER = "bob";
+			const REMOTE_USER_ID = 502;
+			const ALIAS_NAME = "missing";
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			existingAliasMap[REMOTE_USER_ID] = {};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ALIAS_NAME);
+			expectCommandResultFailure(result, "user", "does not have", ALIAS_NAME);
+		});
+
+		it("2 args: should fail when the target alias is link-restricted", async () => {
+			const REMOTE_USER = "carol";
+			const REMOTE_USER_ID = 503;
+			const ALIAS = "locked";
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS]: {
+					ID: 9100,
+					Name: ALIAS,
+					User_Alias:
+					REMOTE_USER_ID,
+					Command: "doit",
+					Parent: null,
+					Restrictions: ["link"]
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ALIAS);
+			expectCommandResultFailure(result, "cannot", "link", "prevented new links"); // tweak tokens if needed
+		});
+
+		it("2 args: should succeed when linking an alias that is itself a link and mention the fact", async () => {
+			const REMOTE_USER = "dave";
+			const REMOTE_USER_ID = 504;
+			const ORIGINAL_ID = 9200;
+			const ORIGINAL_ALIAS = "origin";
+			const LINKED_ID = 9201;
+			const LINKED_ALIAS = "ref";
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			existingAliasMap[REMOTE_USER_ID] = {
+				// alias "ref" is itself a link to "origin"
+				[LINKED_ALIAS]: {
+					ID: LINKED_ID,
+					Name: LINKED_ALIAS,
+					User_Alias: REMOTE_USER_ID,
+					Command: null,
+					Invocation: null,
+					Arguments: null,
+					Channel: null,
+					Parent: ORIGINAL_ID
+				},
+				// The original exists (not dangling)
+				[ORIGINAL_ALIAS]: {
+					ID: ORIGINAL_ID,
+					Name: ORIGINAL_ALIAS,
+					User_Alias: REMOTE_USER_ID,
+					Command: "run",
+					Invocation: ORIGINAL_ALIAS,
+					Arguments: "a b",
+					Channel: null,
+					Parent: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, LINKED_ALIAS);
+			expectCommandResultSuccess(result, "Successfully linked", "tried to create a link", "already linked", "alias", LINKED_ALIAS, REMOTE_USER);
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			// New link should point to the same ORIGINAL_ID (not to dave's linked alias id)
+			assert.strictEqual(row.values.Parent, ORIGINAL_ID);
+			assert.notStrictEqual(row.values.Parent, LINKED_ID);
+			assert.strictEqual(row.values.Name, LINKED_ALIAS);
+			assert.strictEqual(row.values.User_Alias, BASE_USER_ID);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("2 args: should fail when target alias is a link to a deleted original", async () => {
+			const REMOTE_USER = "erin";
+			const REMOTE_USER_ID = 505;
+			const ALIAS = "danglingA";
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			// A link whose Parent does not exist in storage
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS]: {
+					ID: 9301,
+					Name: ALIAS,
+					User_Alias: REMOTE_USER_ID,
+					Command: null,
+					Channel: null,
+					Parent: 999999 // missing
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ALIAS);
+			expectCommandResultFailure(result, "cannot link", "the original", "links to", "deleted");
+		});
+
+		it("2 args: should fail when provided alias name is illegal", async () => {
+			const REMOTE_USER = "gail";
+			const REMOTE_USER_ID = 507;
+			const ILLEGAL_NAME = "$$$";
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ILLEGAL_NAME]: {
+					ID: 9301,
+					Name: ILLEGAL_NAME,
+					User_Alias: REMOTE_USER_ID,
+					Command: "run",
+					Channel: null,
+					Parent: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ILLEGAL_NAME);
+			expectCommandResultFailure(result, "alias", "name", "not valid");
+		});
+
+		it("2 args: should fail when attempting to link a zombie alias", async () => {
+			const ALIAS_NAME = "foo";
+			const REMOTE_USER = "gail2";
+			const REMOTE_USER_ID = 508;
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			// Zombie alias - doesn't have Command = should be a link; but also doesn't have Parent anymore = zombie
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: 9301,
+					Name: ALIAS_NAME,
+					User_Alias: REMOTE_USER_ID,
+					Command: null,
+					Channel: null,
+					Parent: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ALIAS_NAME);
+			expectCommandResultFailure(result, "original alias", "been removed");
+		});
+
+		it("2 args: should succeed and create a link with the same name", async () => {
+			const REMOTE_USER = "helen";
+			const REMOTE_USER_ID = 508;
+			const ALIAS = "util";
+			const ORIG_ID = 9400;
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS]: {
+					ID: ORIG_ID,
+					Name: ALIAS,
+					User_Alias: REMOTE_USER_ID,
+					Command: "echo",
+					Invocation: "util",
+					Arguments: "x y",
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ALIAS);
+			expectCommandResultSuccess(result, "Successfully", "linked", "When", "original changes", "so will yours");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.strictEqual(row.values.Name, ALIAS);
+			assert.strictEqual(row.values.Parent, ORIG_ID);
+			assert.strictEqual(row.values.Command, null);
+			assert.strictEqual(row.values.Invocation, null);
+			assert.strictEqual(row.values.Arguments, null);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("3 args: should succeed and create a link with a custom name", async () => {
+			const REMOTE_USER = "irene";
+			const REMOTE_USER_ID = 509;
+			const ALIAS = "build";
+			const CUSTOM_NAME = "buildx";
+			const ORIG_ID = 9500;
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS]: {
+					ID: ORIG_ID,
+					Name: ALIAS,
+					User_Alias: REMOTE_USER_ID,
+					Command: "run",
+					Invocation: "build",
+					Arguments: "a b c",
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "link", REMOTE_USER, ALIAS, CUSTOM_NAME);
+			expectCommandResultSuccess(result, "linked", "custom name", CUSTOM_NAME);
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.strictEqual(row.values.Name, CUSTOM_NAME);
+			assert.strictEqual(row.values.Parent, ORIG_ID);
+			assert.strictEqual(row.values.Command, null);
+			assert.strictEqual(row.values.Invocation, null);
+			assert.strictEqual(row.values.Arguments, null);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("2 args (linkplace): should succeed when linking an alias with a conflicting name", async () => {
+			const ALIAS_NAME = "home";
+			const REMOTE_USER = "jane";
+			const REMOTE_USER_ID = 510;
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			const REMOTE_USER_ALIAS_ID = 9701;
+			const EXISTING_ALIAS_ID = 9700;
+
+			// Remote user owns "home"
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: REMOTE_USER_ALIAS_ID,
+					Name: ALIAS_NAME,
+					User_Alias: REMOTE_USER_ID,
+					Command: "ALIAS_NAME",
+					Invocation: ALIAS_NAME,
+					Arguments: "",
+					Parent: null
+				}
+			};
+			// Base user also already owns "home" - will be overwritten
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: EXISTING_ALIAS_ID,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "go",
+					Invocation: ALIAS_NAME,
+					Arguments: "",
+					Parent: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "linkplace", REMOTE_USER, ALIAS_NAME);
+			expectCommandResultSuccess(result, "Successfully", "linked and replaced");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.strictEqual(row.values.Parent, REMOTE_USER_ALIAS_ID);
+			assert.strictEqual(row.values.Name, ALIAS_NAME);
+			assert.strictEqual(row.values.Command, null);
+			assert.strictEqual(row.values.Invocation, null);
+			assert.strictEqual(row.values.Arguments, null);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("3 args (linkplace): should succeed when linking a local alias by name with a custom name", async () => {
+			const ALIAS_NAME = "home";
+			const CUSTOM_NAME = "foobar";
+			const REMOTE_USER = "kate";
+			const REMOTE_USER_ID = 510;
+
+			world.allowUser(REMOTE_USER);
+			world.setUserId(REMOTE_USER, REMOTE_USER_ID);
+
+			const REMOTE_USER_ALIAS_ID = 9701;
+			const EXISTING_ALIAS_ID = 9700;
+
+			// Remote user owns "home"
+			existingAliasMap[REMOTE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: REMOTE_USER_ALIAS_ID,
+					Name: ALIAS_NAME,
+					User_Alias: REMOTE_USER_ID,
+					Command: "ALIAS_NAME",
+					Invocation: ALIAS_NAME,
+					Arguments: "",
+					Parent: null
+				}
+			};
+			// Base user already owns "foobar" - will be overwritten by custom name
+			existingAliasMap[BASE_USER_ID] = {
+				[CUSTOM_NAME]: {
+					ID: EXISTING_ALIAS_ID,
+					Name: CUSTOM_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "go",
+					Invocation: CUSTOM_NAME,
+					Arguments: "",
+					Parent: null
+				}
+			};
+
+			const result = await baseCommand.execute(baseContext, "linkplace", REMOTE_USER, ALIAS_NAME, CUSTOM_NAME);
+			expectCommandResultSuccess(result, "Successfully", "linked and replaced", "custom name", CUSTOM_NAME);
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.strictEqual(row.values.Parent, REMOTE_USER_ALIAS_ID);
+			assert.strictEqual(row.values.Name, CUSTOM_NAME);
+			assert.strictEqual(row.values.Command, null);
+			assert.strictEqual(row.values.Invocation, null);
+			assert.strictEqual(row.values.Arguments, null);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
 	});
 
 	describe("$alias publish", () => {
