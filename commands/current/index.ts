@@ -118,8 +118,21 @@ export default declare({
 			}
 
 			const userData = await sb.User.get(playing.User);
-			const { length, time } = await sb.VideoLANConnector.getUpdatedStatus();
+			let vlcData;
+			try {
+				vlcData = await sb.VideoLANConnector.getUpdatedStatus();
+			}
+			catch (e) {
+				console.warn(e);
+				void core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 
+				return {
+					success: false,
+					reply: "VLC is not responding at the moment! Turning song requests off."
+				};
+			}
+
+			const { length, time } = vlcData;
 			let currentPosition = time;
 			let segmentLength = length;
 			if (playing.Start_Time || playing.End_Time) {

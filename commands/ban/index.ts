@@ -5,7 +5,8 @@ import {
 	isArgumentsData,
 	type CreateData as FilterCreateData,
 	type FilterArgumentDescriptor,
-	type Type as FilterType, FilterArgumentDatabaseShape
+	type Type as FilterType,
+	type FilterArgumentDatabaseShape
 } from "../../classes/filter.js";
 
 import type { Channel } from "../../classes/channel.js";

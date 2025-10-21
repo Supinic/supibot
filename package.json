@@ -11,7 +11,7 @@
     "chrono-node": "^2.9.0",
     "cron": "^4.3.3",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "^14.22.1",
+    "discord.js": "^14.23.2",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
@@ -19,7 +19,7 @@
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
     "ws": "^8.18.3",
-    "zod": "^4.1.11"
+    "zod": "^4.1.12"
   },
   "engines": {
     "node": ">= 24.0"
@@ -51,14 +51,14 @@
     "@babel/core": "^7.28.4",
     "@babel/eslint-parser": "^7.28.4",
     "@types/xml2js": "^0.4.14",
-    "eslint": "^9.36.0",
+    "eslint": "^9.38.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-unicorn": "^61.0.2",
     "globals": "^16.4.0",
     "nyc": "^17.1.0",
     "supi-db-init": "supinic/supi-db-init",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.45.0"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
   },
   "nyc": {
     "all": false,
@@ -67,5 +67,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.10.3"
 }
