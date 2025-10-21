@@ -15,6 +15,7 @@ import {
 	expectCommandResultSuccess,
 	TestWorld
 } from "../../test-utils.js";
+import { getChannelAlias } from "../../../commands/alias/alias-utils.js";
 
 const EXISTING_COMMANDS = ["EXISTING_COMMAND"];
 
@@ -35,12 +36,14 @@ type AliasData = {
 
 describe("$alias", async () => {
 	let existingAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
+	let channelAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
 
 	const world = new TestWorld();
 	beforeEach(() => {
 		world.reset();
 		world.install();
 		existingAliasMap = {};
+		channelAliasMap = {};
 	});
 
 	const realAliasUtils = await import("../../../commands/alias/alias-utils.js");
@@ -54,6 +57,14 @@ describe("$alias", async () => {
 				}
 
 				return userAliases[aliasName] ?? null;
+			},
+			getChannelAlias: (aliasName: string, channelId: number) => {
+				const channelAliases = existingAliasMap[channelId];
+				if (!channelAliases) {
+					return null;
+				}
+
+				return channelAliases[aliasName] ?? null;
 			},
 			getParentAlias: (alias: AliasData) => {
 				if (alias.Parent === null) {
@@ -1332,15 +1343,68 @@ describe("$alias", async () => {
 			expectCommandResultFailure(result, "No alias name provided!");
 		});
 
-		it("1 arg: should fail when user doesn't own the alias", async () => {
-			const context = createPublishContext(2, true);
+		it("1 arg: should fail when current user doesn't own the alias", async () => {
+			const CHANNEL_ID = 2;
+			const context = createPublishContext(CHANNEL_ID, true);
+
 			const result = await baseCommand.execute(context, "publish", "does_not_exist");
 			expectCommandResultFailure(result, "That user does not have an alias with that name!");
 		});
 
-		// $alias publish (string) (nonexistent user) -> error
-		// $alias publish (unowned alias) (username) -> error
-		// $alias publish (owned alias) [channel does not have alias published] -> OK
+		it("2 args: should fail when target user doesn't exist", async () => {
+			const CHANNEL_ID = 3;
+			const context = createPublishContext(CHANNEL_ID, true);
+
+			const result = await baseCommand.execute(context, "publish", "does_not_exist", "user_does_not_exist");
+			expectCommandResultFailure(result, "Provided user does not exist!");
+		});
+
+		it("2 args: should fail when user target user doesn't own alias", async () => {
+			const CHANNEL_ID = 4;
+			const context = createPublishContext(CHANNEL_ID, true);
+
+			const TARGET_USER_NAME = "foo";
+			world.allowUser(TARGET_USER_NAME);
+
+			const result = await baseCommand.execute(context, "publish", "does_not_exist", TARGET_USER_NAME);
+			expectCommandResultFailure(result, "That user does not have an alias with that name!");
+		});
+
+		it("2 args: should succeed when current user owns the alias", async () => {
+			const CHANNEL_ID = 5;
+			const context = createPublishContext(CHANNEL_ID, true);
+
+			const ALIAS_NAME = "foo";
+			const ALIAS_ID = 1;
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: ALIAS_ID,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "bar",
+					Invocation: ALIAS_NAME,
+					Arguments: "",
+					Parent: null
+				}
+			};
+
+			const result = await baseCommand.execute(context, "publish", ALIAS_NAME);
+			expectCommandResultSuccess(result, "Successfully published", ALIAS_NAME, "use", "directly");
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be saved");
+			assert.strictEqual(row.values.Name, ALIAS_NAME);
+			assert.strictEqual(row.values.Channel, CHANNEL_ID);
+			assert.strictEqual(row.values.Parent, ALIAS_ID);
+
+			// Not explicitly set by `$alias publish`, so make sure they are falsy, "not there"
+			assert.ok(!row.values.User_Alias);
+			assert.ok(!row.values.Invocation);
+			assert.ok(!row.values.Command);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
 		// $alias publish (owned alias, illegal name) -> error
 		// $alias publish (owned alias) [channel already has this alias published] -> error
 		// $alias publish (owned alias) (username) [channel already has this alias published] -> error
