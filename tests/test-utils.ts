@@ -1,6 +1,8 @@
 import { Utils } from "supi-core";
+import { Channel } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
 import { User } from "../classes/user.js";
+import { type Platform } from "../platforms/template.js";
 import { TwitchPlatform } from "../platforms/twitch.js";
 
 import assert from "node:assert/strict";
@@ -21,6 +23,24 @@ export const createTestPlatform = () => new TwitchPlatform({
 	messageLimit: 500,
 	selfName: "Foo",
 	active: true
+});
+
+export const createTestChannel = (id: number, platform: Platform) => new Channel({
+	ID: id,
+	Name: `test-channel-${id}`,
+	Mode: "Write",
+	Specific_ID: null,
+	Description: null,
+	Banphrase_API_URL: null,
+	Banphrase_API_Downtime: null,
+	Banphrase_API_Type: null,
+	Message_Limit: null,
+	Links_Allowed: true,
+	Logging: [],
+	Mention: true,
+	Mirror: null,
+	NSFW: false,
+	Platform: platform.ID
 });
 
 export const createTestCommand = (opts: { Name?: string } = {}) => new Command({
@@ -217,7 +237,9 @@ export class TestWorld {
 					}
 
 					return createTestUser({ Name: name, ID: id });
-				}
+				},
+
+				permissions: User.permissions
 			}
 		};
 

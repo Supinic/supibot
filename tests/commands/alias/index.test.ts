@@ -2,13 +2,14 @@ import { it, describe, beforeEach, mock, before } from "node:test";
 import assert from "node:assert/strict";
 
 import type { SupiDate } from "supi-core";
-import type { User } from "../../../classes/user.js";
-import { Command } from "../../../classes/command.js";
+import { type User, permissions as userPermissions } from "../../../classes/user.js";
+import { Command, type Context } from "../../../classes/command.js";
 import type { Channel } from "../../../classes/channel.js";
 
 import {
 	createTestPlatform,
 	createTestUser,
+	createTestChannel,
 	createTestCommand,
 	expectCommandResultFailure,
 	expectCommandResultSuccess,
@@ -1296,11 +1297,47 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias publish", () => {
-		// $alias publish [not in a channel] -> error
-		// $alias publish [user not privileged] -> error
-		// $alias publish -> error
-		// $alias publish (unowned alias) -> error
+	describe("publish", () => {
+		const createPublishContext = (channel: number | null, isPrivileged: boolean) => {
+			const context = Command.createFakeContext(baseCommand, {
+				platformSpecificData: null,
+				user: baseUser,
+				platform: basePlatform,
+				channel: (channel === null) ? null : createTestChannel(channel, basePlatform)
+			});
+
+			context.getUserPermissions = (() => Promise.resolve((isPrivileged)
+				? { flag: userPermissions.channelOwner }
+				: { flag: userPermissions.regular }
+			)) as unknown as Context["getUserPermissions"];
+
+			return context;
+		};
+
+		it("0 args (not in a channel): should fail", async () => {
+			const privateMessageContext = createPublishContext(null, false);
+			const result = await baseCommand.execute(privateMessageContext, "publish");
+			expectCommandResultFailure(result, "This subcommand can only be used in the channel you want the alias to be global in!");
+		});
+
+		it("0 args (in channel but not privileged): should fail", async () => {
+			const context = createPublishContext(1, false);
+			const result = await baseCommand.execute(context, "publish");
+			expectCommandResultFailure(result, "Only the owner and ambassadors of this channel can use this subcommand!");
+		});
+
+		it("0 args: should fail, no alias name provided", async () => {
+			const context = createPublishContext(2, true);
+			const result = await baseCommand.execute(context, "publish");
+			expectCommandResultFailure(result, "No alias name provided!");
+		});
+
+		it("1 arg: should fail when user doesn't own the alias", async () => {
+			const context = createPublishContext(2, true);
+			const result = await baseCommand.execute(context, "publish", "does_not_exist");
+			expectCommandResultFailure(result, "That user does not have an alias with that name!");
+		});
+
 		// $alias publish (string) (nonexistent user) -> error
 		// $alias publish (unowned alias) (username) -> error
 		// $alias publish (owned alias) [channel does not have alias published] -> OK
