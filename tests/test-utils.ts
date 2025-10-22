@@ -6,6 +6,7 @@ import { type Platform } from "../platforms/template.js";
 import { TwitchPlatform } from "../platforms/twitch.js";
 
 import assert from "node:assert/strict";
+import { typedEntries } from "../utils/ts-helpers.js";
 
 export const createTestUser = (opts: { Name?: string, ID?: number, } = {}) => new User({
 	ID: opts.ID ?? 1,
@@ -115,6 +116,7 @@ export class FakeRecordset {
 	}
 }
 
+type RowKey = string | number;
 export class FakeRow {
 	private readonly world: TestWorld;
 
@@ -138,8 +140,17 @@ export class FakeRow {
 		this.stored = true;
 	}
 
-	load () {
+	load (key: RowKey) {
 		this.loaded = true;
+
+		const tableKey = TestWorld.getKey(this.schema, this.table);
+		const worldRowsData = this.world.tablesData.get(tableKey);
+		if (worldRowsData) {
+			const rowData = worldRowsData.get(key);
+			if (rowData) {
+				this.setValues(rowData);
+			}
+		}
 	}
 
 	get updated () {
@@ -150,7 +161,7 @@ export class FakeRow {
 export class TestWorld {
 	public readonly rows: FakeRow[] = [];
 	public readonly recordsets: FakeRecordset[] = [];
-	public readonly tables = new Map<string, unknown[]>();
+	public readonly tablesData = new Map<string, Map<RowKey, Record<string, unknown>>>();
 
 	private readonly specificUserIds = new Map<string, number>();
 	private readonly allowedUsers = new Set<string>();
@@ -184,8 +195,8 @@ export class TestWorld {
 					world.rows.push(row);
 
 					const key = `${schema}.${table}`;
-					if (!world.tables.has(key)) {
-						world.tables.set(key, []);
+					if (!world.tablesData.has(key)) {
+						world.tablesData.set(key, new Map());
 					}
 
 					return row;
@@ -255,39 +266,45 @@ export class TestWorld {
 		this.specificUserIds.clear();
 	}
 
-	clearTables () {
-		this.tables.clear();
-	}
-
-	queueRsData (data: unknown) {
+	queueRsData (data: unknown): void {
 		this.recordsetQueue.push(data);
 	}
 
-	allowUser (username: string) {
+	allowUser (username: string): void {
 		this.allowedUsers.add(username);
 	}
 
-	setUserId (username: string, id: number) {
+	setUserId (username: string, id: number): void {
 		this.specificUserIds.set(username, id);
 	}
 
-	insertRows (schema: string, table: string, rows: unknown[]): void {
+	setRow (schema: string, table: string, rowId: RowKey, rowData: Record<string, unknown>): void {
 		const tableData = this.ensureTable(schema, table);
-		tableData.push(...rows);
+		tableData.set(rowId, rowData);
+	}
+
+	setRows (schema: string, table: string, rows: Record<RowKey, Record<string, unknown>>): void {
+		for (const [key, data] of typedEntries(rows)) {
+			this.setRow(schema, table, key, data);
+		}
 	}
 
 	clearTable (schema: string, table: string): void {
 		const key = TestWorld.getKey(schema, table);
-		this.tables.set(key, []);
+		this.tablesData.delete(key);
 	}
 
-	private ensureTable (schema: string, table: string): unknown[] {
+	clearTables (): void {
+		this.tablesData.clear();
+	}
+
+	private ensureTable (schema: string, table: string) {
 		const key = TestWorld.getKey(schema, table);
-		let tableData = this.tables.get(key);
+		let tableData = this.tablesData.get(key);
 
 		if (!tableData) {
-			tableData = [];
-			this.tables.set(key, tableData);
+			tableData = new Map();
+			this.tablesData.set(key, tableData);
 		}
 
 		return tableData;
