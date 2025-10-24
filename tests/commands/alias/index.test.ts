@@ -15,7 +15,6 @@ import {
 	expectCommandResultSuccess,
 	TestWorld
 } from "../../test-utils.js";
-import { getChannelAlias } from "../../../commands/alias/alias-utils.js";
 
 const EXISTING_COMMANDS = ["EXISTING_COMMAND"];
 
@@ -59,7 +58,7 @@ describe("$alias", async () => {
 				return userAliases[aliasName] ?? null;
 			},
 			getChannelAlias: (aliasName: string, channelId: number) => {
-				const channelAliases = existingAliasMap[channelId];
+				const channelAliases = channelAliasMap[channelId];
 				if (!channelAliases) {
 					return null;
 				}
@@ -1405,8 +1404,145 @@ describe("$alias", async () => {
 			assert.strictEqual(world.rows.length, 0);
 		});
 
-		// $alias publish (owned alias, illegal name) -> error
-		// $alias publish (owned alias) [channel already has this alias published] -> error
+		it("2 args: should fail when current user owns an illegally named alias", async () => {
+			const CHANNEL_ID = 6;
+			const context = createPublishContext(CHANNEL_ID, true);
+
+			const ILLEGAL_ALIAS_NAME = "$$";
+			const ALIAS_ID = 1;
+			existingAliasMap[BASE_USER_ID] = {
+				[ILLEGAL_ALIAS_NAME]: {
+					ID: ALIAS_ID,
+					Name: ILLEGAL_ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "bar",
+					Invocation: ILLEGAL_ALIAS_NAME,
+					Arguments: "",
+					Parent: null
+				}
+			};
+
+			const result = await baseCommand.execute(context, "publish", ILLEGAL_ALIAS_NAME);
+			expectCommandResultFailure(result, "Published alias name", "not valid");
+		});
+
+		it("2 args: should fail when same name alias is already published (by current user)", async () => {
+			const CHANNEL_ID = 7;
+			const context = createPublishContext(CHANNEL_ID, true);
+
+			const ALIAS_NAME = "foo";
+			const EXISTING_ALIAS_ID = 1;
+
+			const CHANNEL_ALIAS_ID = 2;
+			const CHANNEL_ALIAS = {
+				ID: CHANNEL_ALIAS_ID,
+				Name: ALIAS_NAME,
+				Command: null,
+				Invocation: null,
+				Parent: EXISTING_ALIAS_ID
+			};
+			channelAliasMap[CHANNEL_ID] = {
+				[ALIAS_NAME]: CHANNEL_ALIAS
+			};
+
+			// Set up some previously existing alias, bound to EXISTING_USER_ID
+			const EXISTING_USER_NAME = "foobar";
+			const EXISTING_USER_ID = 2345;
+			const EXISTING_ALIAS = {
+				ID: EXISTING_ALIAS_ID,
+				Name: ALIAS_NAME,
+				User_Alias: EXISTING_USER_ID,
+				Command: "bar",
+				Invocation: ALIAS_NAME,
+				Arguments: "",
+				Parent: null
+			};
+
+			// Set up current user to have the same alias (identical, for simplicity)
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: EXISTING_ALIAS
+			};
+
+			world.allowUser(EXISTING_USER_NAME);
+			world.setUserId(EXISTING_USER_NAME, EXISTING_USER_ID);
+
+			world.setRow("data", "Custom_Command_Alias", EXISTING_ALIAS_ID, EXISTING_ALIAS);
+			world.setRow("data", "Custom_Command_Alias", CHANNEL_ALIAS_ID, CHANNEL_ALIAS);
+
+			const result = await baseCommand.execute(context, "publish", ALIAS_NAME);
+			expectCommandResultFailure(result, "The alias", ALIAS_NAME, `by ${EXISTING_USER_NAME}`, "version made by you", "unpublish");
+		});
+
+		it("3 args: should fail when same name alias is already published (by target user)", async () => {
+			const CHANNEL_ID = 8;
+			const context = createPublishContext(CHANNEL_ID, true);
+
+			const ALIAS_NAME = "bar";
+			const EXISTING_ALIAS_ID = 11;
+			const ANOTHER_ALIAS_ID = 12;
+
+			const CHANNEL_ALIAS_ID = 22;
+			const CHANNEL_ALIAS = {
+				ID: CHANNEL_ALIAS_ID,
+				Name: ALIAS_NAME,
+				Command: null,
+				Invocation: null,
+				Parent: EXISTING_ALIAS_ID
+			};
+			channelAliasMap[CHANNEL_ID] = {
+				[ALIAS_NAME]: CHANNEL_ALIAS
+			};
+
+			const EXISTING_USER_NAME = "foobar1";
+			const EXISTING_USER_ID = 3456;
+			world.allowUser(EXISTING_USER_NAME);
+			world.setUserId(EXISTING_USER_NAME, EXISTING_USER_ID);
+
+			// Bind the existing alias to a user
+			const EXISTING_ALIAS = {
+				ID: EXISTING_ALIAS_ID,
+				Name: ALIAS_NAME,
+				User_Alias: EXISTING_USER_ID,
+				Command: "bar",
+				Invocation: ALIAS_NAME,
+				Arguments: "",
+				Parent: null
+			};
+			existingAliasMap[EXISTING_USER_ID] = {
+				[ALIAS_NAME]: EXISTING_ALIAS
+			};
+
+			const ANOTHER_USER_NAME = "foobar2";
+			const ANOTHER_USER_ID = 4567;
+			world.allowUser(ANOTHER_USER_NAME);
+			world.setUserId(ANOTHER_USER_NAME, ANOTHER_USER_ID);
+
+			// Bind another alias to another user (identical to the above one, for simplicity)
+			const ANOTHER_ALIAS = {
+				ID: ANOTHER_ALIAS_ID,
+				Name: ALIAS_NAME,
+				User_Alias: ANOTHER_USER_ID,
+				Command: "bar",
+				Invocation: ALIAS_NAME,
+				Arguments: "",
+				Parent: null
+			};
+			existingAliasMap[ANOTHER_USER_ID] = {
+				[ALIAS_NAME]: ANOTHER_ALIAS
+			};
+
+			world.setRow("data", "Custom_Command_Alias", EXISTING_ALIAS_ID, EXISTING_ALIAS);
+			world.setRow("data", "Custom_Command_Alias", ANOTHER_USER_ID, ANOTHER_ALIAS);
+			world.setRow("data", "Custom_Command_Alias", CHANNEL_ALIAS_ID, CHANNEL_ALIAS);
+
+			const result = await baseCommand.execute(context, "publish", ALIAS_NAME, ANOTHER_USER_NAME);
+			expectCommandResultFailure(result, "The alias", ALIAS_NAME, `by ${EXISTING_USER_NAME}`, `version made by ${ANOTHER_USER_NAME}`, "unpublish");
+		});
+
+		it("3 args: should fail when same name alias is already published (by target user)", async () => {
+
+		});
+
 		// $alias publish (owned alias) (username) [channel already has this alias published] -> error
 		// $alias publish (owned alias) [channel already has same name alias published] -> error
 		// $alias publish (owned alias) (username) [channel already has same name alias published] -> error

@@ -262,8 +262,11 @@ export class TestWorld {
 		this.rows.length = 0;
 		this.recordsets.length = 0;
 		this.recordsetQueue.length = 0;
+
 		this.allowedUsers.clear();
 		this.specificUserIds.clear();
+
+		this.clearTables();
 	}
 
 	queueRsData (data: unknown): void {

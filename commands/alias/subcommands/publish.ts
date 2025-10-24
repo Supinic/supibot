@@ -77,11 +77,13 @@ export default {
 				await sourceAlias.load(existing.Parent);
 
 				const sourceAuthorData = await sb.User.getAsserted(sourceAlias.values.User_Alias);
+				const potentialAuthorName = (userData === context.user) ? "you" : userData.Name;
+
 				return {
 					success: false,
 					reply: core.Utils.tag.trim `
 						The alias name "${aliasName}" (by ${sourceAuthorData.Name}) is already published in this channel!
-						If you want to publish the version made by ${userData.Name}, you must unpublish the other one first.
+						If you want to publish the version made by ${potentialAuthorName}, you must unpublish the other one first.
 					`
 				};
 			}
