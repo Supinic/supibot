@@ -1,7 +1,9 @@
-FROM node:latest
+FROM node:25
+
+RUN npm install -g --force corepack
+RUN npm install -g typescript
 
 RUN corepack enable
-RUN npm install -g typescript
 
 RUN useradd -m supibot
 USER supibot
