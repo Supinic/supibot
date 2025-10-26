@@ -1654,98 +1654,79 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias remove", () => {
-		it("0 args: should fail, missing alias name", async () => {
-			const result = await baseCommand.execute(baseContext, "remove");
-			expectCommandResultFailure(result, "No alias name provided");
+	describe("rename", () => {
+		it("0 args: should fail, both names not provided", async () => {
+			const result = await baseCommand.execute(baseContext, "rename");
+			expectCommandResultFailure(result, "must provide", "current alias name", "new one");
 		});
 
-		it("1 arg: should fail when user does not own the alias", async () => {
-			const ALIAS_NAME = "foo";
-			const result = await baseCommand.execute(baseContext, "remove", ALIAS_NAME);
-			expectCommandResultFailure(result, "don't have", ALIAS_NAME);
+		it("1 arg: should fail, missing new alias name", async () => {
+			const result = await baseCommand.execute(baseContext, "rename", "foo");
+			expectCommandResultFailure(result, "must provide", "current alias name", "new one");
 		});
 
-		it("1 arg: should remove user alias", async () => {
-			const ALIAS_NAME = "foo";
-			const ALIAS_ID = 1001;
+		it("2 args: should fail when the new alias name is illegal", async () => {
+			const result = await baseCommand.execute(baseContext, "rename", "foo", "$$$");
+			expectCommandResultFailure(result, "new alias name", "not valid");
+		});
 
-			const OWNED_ALIAS = {
-				ID: ALIAS_ID,
-				Name: ALIAS_NAME,
-				User_Alias: BASE_USER_ID,
-				Command: "bar",
-				Invocation: ALIAS_NAME,
-				Arguments: "",
-				Parent: null
+		it("2 args: should fail when you don't own the alias", async () => {
+			const OLD_ALIAS = "foo";
+			const NEW_ALIAS = "bar";
+			const result = await baseCommand.execute(baseContext, "rename", OLD_ALIAS, NEW_ALIAS);
+			expectCommandResultFailure(result, "don't have", OLD_ALIAS);
+		});
+
+		it("2 args: should fail when you already have the new alias", async () => {
+			const OLD_ALIAS = "foo";
+			const NEW_ALIAS = "bar";
+
+			// Seed an owned alias and also a conflicting alias with the new name
+			existingAliasMap[BASE_USER_ID] = {
+				[OLD_ALIAS]: { ID: 1, Name: OLD_ALIAS, User_Alias: BASE_USER_ID, Command: "cmd", Invocation: OLD_ALIAS, Arguments: "" },
+				[NEW_ALIAS]: { ID: 2, Name: NEW_ALIAS, User_Alias: BASE_USER_ID, Command: "cmd2", Invocation: NEW_ALIAS, Arguments: "" }
 			};
-			existingAliasMap[BASE_USER_ID] = { [ALIAS_NAME]: OWNED_ALIAS };
-			world.setRow("data", "Custom_Command_Alias", ALIAS_ID, OWNED_ALIAS);
-			world.queueRsData([]); // Return an empty array for a list of published aliases
 
-			const result = await baseCommand.execute(baseContext, "remove", ALIAS_NAME);
-			expectCommandResultSuccess(result, "successfully", "removed", ALIAS_NAME);
+			const result = await baseCommand.execute(baseContext, "rename", OLD_ALIAS, NEW_ALIAS);
+			expectCommandResultFailure(result, "already have", NEW_ALIAS);
+		});
+
+		it("2 args: should succeed and rename the alias", async () => {
+			const OLD_ALIAS = "foo";
+			const NEW_ALIAS = "bar";
+			const ALIAS_ID = 123;
+			const ORIGINAL_ALIAS = {
+				ID: ALIAS_ID,
+				Name: OLD_ALIAS,
+				User_Alias: BASE_USER_ID,
+				Command: "echo",
+				Invocation: OLD_ALIAS,
+				Arguments: "x y",
+				Parent: null,
+				Channel: null
+			};
+
+			existingAliasMap[BASE_USER_ID] = {
+				[OLD_ALIAS]: { ...ORIGINAL_ALIAS }
+			};
+
+			world.setRow("data", "Custom_Command_Alias", ALIAS_ID, { ...ORIGINAL_ALIAS });
+
+			const result = await baseCommand.execute(baseContext, "rename", OLD_ALIAS, NEW_ALIAS);
+			expectCommandResultSuccess(result, "successfully", "renamed", OLD_ALIAS, NEW_ALIAS);
 
 			const row = world.rows.pop();
-			assert.ok(row, "Expected a Row to be processed");
-			assert.ok(row.deleted);
-			assert.strictEqual(row.values.ID, ALIAS_ID);
+			assert.ok(row, "Expected a Row to be saved");
+			assert.ok(row.updated, "Expected Row to be updated");
+			assert.strictEqual(row.values.Name, NEW_ALIAS);
+			assert.strictEqual(row.values.Command, ORIGINAL_ALIAS.Command);
+			assert.strictEqual(row.values.Invocation, ORIGINAL_ALIAS.Invocation);
+			assert.strictEqual(row.values.Arguments, ORIGINAL_ALIAS.Arguments);
+			assert.strictEqual(row.values.User_Alias, ORIGINAL_ALIAS.User_Alias);
+			assert.strictEqual(row.values.ID, ORIGINAL_ALIAS.ID);
 
 			assert.strictEqual(world.rows.length, 0);
 		});
-
-		it("1 arg: should remove published aliases and mention this", async () => {
-			const ALIAS_NAME = "foo";
-			const ALIAS_ID = 2002;
-
-			const OWNED_ALIAS = {
-				ID: ALIAS_ID,
-				Name: ALIAS_NAME,
-				User_Alias: BASE_USER_ID,
-				Command: "bar",
-				Invocation: ALIAS_NAME,
-				Arguments: "",
-				Parent: null
-			};
-			existingAliasMap[BASE_USER_ID] = { [ALIAS_NAME]: OWNED_ALIAS };
-			world.setRow("data", "Custom_Command_Alias", ALIAS_ID, OWNED_ALIAS);
-
-			const CHANNEL_ID = 30;
-			const CHANNEL_ALIAS_ID1 = 3001;
-			const CHANNEL_ALIAS_ID2 = 3002;
-			const CHANNEL_ALIAS1 = { ID: CHANNEL_ALIAS_ID1, Name: ALIAS_NAME, Command: null, Invocation: null, Parent: ALIAS_ID, Channel: CHANNEL_ID };
-			const CHANNEL_ALIAS2 = { ID: CHANNEL_ALIAS_ID2, Name: ALIAS_NAME, Command: null, Invocation: null, Parent: ALIAS_ID, Channel: CHANNEL_ID };
-			world.setRow("data", "Custom_Command_Alias", CHANNEL_ALIAS_ID1, CHANNEL_ALIAS1);
-			world.setRow("data", "Custom_Command_Alias", CHANNEL_ALIAS_ID2, CHANNEL_ALIAS2);
-			world.queueRsData([CHANNEL_ALIAS_ID1, CHANNEL_ALIAS_ID2]);
-
-			const result = await baseCommand.execute(baseContext, "remove", ALIAS_NAME);
-			expectCommandResultSuccess(result, "successfully", "removed", ALIAS_NAME, "also published in", "2 channels");
-
-			const rd = world.recordDeleters.pop();
-			assert.ok(rd);
-			assert.strictEqual(rd.schema, "data");
-			assert.strictEqual(rd.table, "Custom_Command_Alias");
-
-			assert.strictEqual(rd.conditions.length, 3);
-			const [idCond, channelCond, parentCond] = rd.conditions;
-			assert.deepStrictEqual(idCond.args[0], [CHANNEL_ALIAS_ID1, CHANNEL_ALIAS_ID2]);
-			assert.strictEqual(parentCond.args[0], ALIAS_ID);
-
-			const row = world.rows.pop();
-			assert.ok(row);
-			assert.ok(row.deleted);
-			assert.strictEqual(world.rows.length, 0);
-			assert.strictEqual(world.recordDeleters.length, 0);
-		});
-	});
-
-	describe("$alias rename", () => {
-		it.skip("rename");
-		// $alias rename -> error
-		// $alias rename (string) -> error
-		// $alias rename (string) (illegal new name) -> error
-		// $alias rename (unowned alias) (new name) -> error
 	});
 
 	describe("$alias restrict", () => {
