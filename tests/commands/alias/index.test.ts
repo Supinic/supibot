@@ -105,6 +105,9 @@ describe("$alias", async () => {
 		platform: basePlatform
 	});
 
+	// eslint-disable-next-line @typescript-eslint/no-misused-spread
+	const cloneContext = (context: Context): Context => Command.createFakeContext(context.command, { ...context });
+
 	it("provides link to details when no subcommand provided", async () => {
 		const result = await baseCommand.execute(baseContext);
 		expectCommandResultSuccess(result, "This command", "create", "command aliases", "https://");
@@ -387,7 +390,7 @@ describe("$alias", async () => {
 					Parent: null,
 					Command: "foo",
 					Channel: null,
-					Restrictions: ["copy"]
+					Restrictions: ["copy"] as ("link" | "copy")[]
 				}
 			};
 
@@ -1004,7 +1007,7 @@ describe("$alias", async () => {
 						REMOTE_USER_ID,
 						Command: "doit",
 						Parent: null,
-						Restrictions: ["link"]
+						Restrictions: ["link"] as ("link" | "copy")[]
 					}
 				};
 
@@ -1729,27 +1732,331 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias restrict", () => {
-		it.skip("restrict");
-		// $alias restrict -> error
-		// $alias restrict (string) -> error
-		// $alias restrict (string) (not link/copy) -> error
-		// $alias restrict (unowned alias) (link/copy) -> error
-		// $alias restrict (owned unrestricted alias) (link/copy) -> OK
+	describe("restrict/unrestrict", () => {
+		describe("common", () => {
+			it("0 args: should fail, missing name and type", async () => {
+				const result = await baseCommand.execute(baseContext, "restrict");
+				expectCommandResultFailure(result, "didn't provide", "name", "restriction type");
+			});
 
-		// $alias restrict (owned link-restricted alias) (copy) -> OK
-		// $alias restrict (owned copy-restricted alias) (link) -> OK
-		// $alias restrict (owned link-restricted alias) (link) -> error, already restricted
-		// $alias restrict (owned copy-restricted alias) (copy) -> error, already restricted
-		// $alias restrict (owned both-restricted alias) (link) -> error, already restricted
-		// $alias restrict (owned both-restricted alias) (copy) -> error, already restricted
+			it("1 arg: should fail, missing type", async () => {
+				const result = await baseCommand.execute(baseContext, "restrict", "foo");
+				expectCommandResultFailure(result, "didn't provide", "name", "restriction type");
+			});
 
-		// $alias unrestrict (owned link-restricted alias) (copy) -> error, not restricted
-		// $alias unrestrict (owned link-restricted alias) (link) -> OK
-		// $alias unrestrict (owned copy-restricted alias) (link) -> error, not restricted
-		// $alias unrestrict (owned copy-restricted alias) (copy) -> OK
-		// $alias unrestrict (owned both-restricted alias) (link) -> OK
-		// $alias unrestrict (owned both-restricted alias) (copy) -> OK
+			it("2 args: should fail on invalid restriction type", async () => {
+				const result = await baseCommand.execute(baseContext, "restrict", "foo", "invalid");
+				expectCommandResultFailure(result, "didn't provide", "restriction type");
+			});
+
+			it("2 args: should fail when alias not owned", async () => {
+				const result = await baseCommand.execute(baseContext, "restrict", "foo", "link");
+				expectCommandResultFailure(result, "don't have", "foo");
+			});
+		});
+
+		describe("restrict", () => {
+			it("should add link restriction to unrestricted alias", async () => {
+				const name = "foo";
+				const id = 201;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: null
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "restrict", name, "link");
+				expectCommandResultSuccess(result, "successfully", "restricted", "linked");
+
+				const row = world.rows.pop();
+				assert.ok(row);
+				assert.ok(row.updated);
+				assert.deepStrictEqual(row.values.Restrictions, ["link"]);
+				assert.strictEqual(world.rows.length, 0);
+			});
+
+			it("should add copy restriction to link-restricted alias", async () => {
+				const name = "foo";
+				const id = 202;
+
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["link"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "restrict", name, "copy");
+				expectCommandResultSuccess(result, "successfully", "restricted", "copied");
+
+				const row = world.rows.pop();
+				assert.ok(row);
+				assert.ok(row.updated);
+				assert.deepStrictEqual(row.values.Restrictions, ["link", "copy"]);
+				assert.strictEqual(world.rows.length, 0);
+			});
+
+			it("should add link restriction to copy-restricted alias", async () => {
+				const name = "foo";
+				const id = 203;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["copy"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "restrict", name, "link");
+				expectCommandResultSuccess(result, "successfully", "restricted", "linked");
+
+				const row = world.rows.pop();
+				assert.ok(row);
+				assert.ok(row.updated);
+				assert.deepStrictEqual(row.values.Restrictions, ["copy", "link"]);
+				assert.strictEqual(world.rows.length, 0);
+			});
+
+			it("should fail when alias already restricted (copy)", async () => {
+				const name = "foo";
+				const id = 204;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["copy"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "restrict", name, "copy");
+				expectCommandResultFailure(result, "already", "restricted", "copied");
+			});
+
+			it("should fail when alias already restricted (link)", async () => {
+				const name = "foo";
+				const id = 205;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["link"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+				const result = await baseCommand.execute(baseContext, "restrict", name, "link");
+				expectCommandResultFailure(result, "already", "restricted", "linked");
+			});
+
+			it("should fail when alias already fully restricted", async () => {
+				const name = "foo";
+				const id = 206;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["link", "copy"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const firstContext = cloneContext(baseContext);
+				const result1 = await baseCommand.execute(firstContext, "restrict", name, "link");
+				expectCommandResultFailure(result1, "already", "restricted", "linked");
+
+				const secondContext = cloneContext(baseContext);
+				const result2 = await baseCommand.execute(secondContext, "restrict", name, "copy");
+				expectCommandResultFailure(result2, "already", "restricted", "copied");
+			});
+		});
+
+		describe("unrestrict", () => {
+			it("should fail when unrestricting copy on link-restricted alias", async () => {
+				const name = "foo";
+				const id = 207;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["link"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "unrestrict", name, "copy");
+				expectCommandResultFailure(result, "already", "unrestricted", "copied");
+			});
+
+			it("should succeed when unrestricting link on link-restricted alias", async () => {
+				const name = "foo";
+				const id = 208;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["link"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "unrestrict", name, "link");
+				expectCommandResultSuccess(result, "successfully", "unrestrict", "linked");
+
+				const row = world.rows.pop();
+				assert.ok(row);
+				assert.ok(row.updated);
+				assert.strictEqual(row.values.Restrictions, null);
+				assert.strictEqual(world.rows.length, 0);
+			});
+
+			it("should fail when unrestricting link on copy-restricted alias", async () => {
+				const name = "foo";
+				const id = 209;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["copy"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "unrestrict", name, "link");
+				expectCommandResultFailure(result, "already", "unrestricted", "linked");
+			});
+
+			it("should succeed when unrestricting copy on copy-restricted alias", async () => {
+				const name = "foo";
+				const id = 210;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["copy"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "unrestrict", name, "copy");
+				expectCommandResultSuccess(result, "successfully", "unrestrict", "copied");
+
+				const row = world.rows.pop();
+				assert.ok(row);
+				assert.ok(row.updated);
+				assert.strictEqual(row.values.Restrictions, null);
+				assert.strictEqual(world.rows.length, 0);
+			});
+
+			it("should succeed when unrestricting link on both-restricted alias", async () => {
+				const name = "foo";
+				const id = 211;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["copy", "link"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "unrestrict", name, "link");
+				expectCommandResultSuccess(result, "successfully", "unrestrict", "linked");
+
+				const row = world.rows.pop();
+				assert.ok(row);
+				assert.ok(row.updated);
+				assert.deepStrictEqual(row.values.Restrictions, ["copy"]);
+				assert.strictEqual(world.rows.length, 0);
+			});
+
+			it("should succeed when unrestricting copy on both-restricted alias", async () => {
+				const name = "foo";
+				const id = 212;
+				const aliasData = {
+					ID: id,
+					Name: name,
+					User_Alias: BASE_USER_ID,
+					Command: "cmd",
+					Invocation: name,
+					Arguments: "",
+					Parent: null,
+					Channel: null,
+					Restrictions: ["copy", "link"] as ("link" | "copy")[]
+				};
+				existingAliasMap[BASE_USER_ID] = { [name]: { ...aliasData } };
+				world.setRow("data", "Custom_Command_Alias", id, { ...aliasData });
+
+				const result = await baseCommand.execute(baseContext, "unrestrict", name, "copy");
+				expectCommandResultSuccess(result, "successfully", "unrestrict", "copied");
+
+				const row = world.rows.pop();
+				assert.ok(row);
+				assert.ok(row.updated);
+				assert.deepStrictEqual(row.values.Restrictions, ["link"]);
+				assert.strictEqual(world.rows.length, 0);
+			});
+		});
 	});
 
 	describe("$alias run", () => {
