@@ -56,7 +56,7 @@ export default {
 		await row.delete();
 
 		return {
-			success: false,
+			success: true,
 			reply: `Your alias "${name}" has been successfully removed.${publishString}`
 		};
 	}

@@ -75,6 +75,27 @@ export const expectCommandResultFailure = (result: CommandResult, ...includedMes
 	return result;
 };
 
+export class FakeRecordDeleter {
+	public schema: string | null = null;
+	public table: string | null = null;
+	public conditions: { condition: string, args: unknown[] }[] = [];
+
+	delete (): this {
+		return this;
+	}
+
+	from (schema: string, object: string): this {
+		this.schema = schema;
+		this.table = object;
+		return this;
+	}
+
+	where (condition: string, ...args: unknown[]): this {
+		this.conditions.push({ condition, args });
+		return this;
+	}
+}
+
 export class FakeRecordset {
 	private schema: string | null = null;
 	private table: string | null = null;
@@ -123,6 +144,7 @@ export class FakeRow {
 	values: Record<string, unknown> = {};
 	stored: boolean = false;
 	loaded: boolean = false;
+	deleted: boolean = false;
 	readonly schema: string;
 	readonly table: string;
 
@@ -153,6 +175,10 @@ export class FakeRow {
 		}
 	}
 
+	delete () {
+		this.deleted = true;
+	}
+
 	get updated () {
 		return (this.loaded && this.stored);
 	}
@@ -161,6 +187,7 @@ export class FakeRow {
 export class TestWorld {
 	public readonly rows: FakeRow[] = [];
 	public readonly recordsets: FakeRecordset[] = [];
+	public readonly recordDeleters: FakeRecordDeleter[] = [];
 	public readonly tablesData = new Map<string, Map<RowKey, Record<string, unknown>>>();
 
 	private readonly specificUserIds = new Map<string, number>();
@@ -188,6 +215,12 @@ export class TestWorld {
 					const rs = new FakeRecordset();
 					world.recordsets.push(rs);
 					return data;
+				},
+
+				getRecordDeleter (callback: (rd: FakeRecordDeleter) => FakeRecordDeleter) {
+					const rd = new FakeRecordDeleter();
+					callback(rd);
+					world.recordDeleters.push(rd);
 				},
 
 				getRow (schema: string, table: string) {
