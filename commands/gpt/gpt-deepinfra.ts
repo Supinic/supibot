@@ -1,7 +1,7 @@
 import { type GotResponse, SupiError } from "supi-core";
-import { GptTemplate, getHistoryMode, getTemperature, determineOutputLimit } from "./gpt-template.js";
+import { getHistoryMode, getTemperature, determineOutputLimit, type GptTemplate } from "./gpt-template.js";
 import { get as getHistoryEntry, add as addHistoryEntry } from "./history-control.js";
-import { GptContext, ModelData } from "./index.js";
+import type { GptContext, ModelData } from "./index.js";
 
 type DeepinfraResponse = {
 	created: number;

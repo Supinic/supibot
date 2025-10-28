@@ -7,7 +7,7 @@ import GptConfigSchema from "./config-schema.js";
 const GptConfig = GptConfigSchema.parse(rawGptConfig);
 
 import GptCache from "./cache-control.js";
-import { determineOutputLimit, GptTemplate, handleHistoryCommand } from "./gpt-template.js";
+import { determineOutputLimit, handleHistoryCommand, type GptTemplate } from "./gpt-template.js";
 import { GptOpenAI } from "./gpt-openai.js";
 import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
 import { GptDeepInfra } from "./gpt-deepinfra.js";

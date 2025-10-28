@@ -1,4 +1,4 @@
-import * as z from "zod";
+import type * as z from "zod";
 import { readFile } from "node:fs/promises";
 
 const raw = await readFile("./config.json");
