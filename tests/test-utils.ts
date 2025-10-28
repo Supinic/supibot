@@ -1,6 +1,6 @@
 import { Utils } from "supi-core";
 import { Channel } from "../classes/channel.js";
-import { Command } from "../classes/command.js";
+import { Command, type CommandDefinition } from "../classes/command.js";
 import { User } from "../classes/user.js";
 import { type Platform } from "../platforms/template.js";
 import { TwitchPlatform } from "../platforms/twitch.js";
@@ -44,14 +44,14 @@ export const createTestChannel = (id: number, platform: Platform) => new Channel
 	Platform: platform.ID
 });
 
-export const createTestCommand = (opts: { Name?: string } = {}) => new Command({
+export const createTestCommand = (opts: Partial<CommandDefinition> = {}) => new Command({
 	Name: opts.Name ?? "TEST_COMMAND",
-	Aliases: [],
-	Code: () => ({ reply: null }),
+	Aliases: opts.Aliases ?? [],
+	Code: opts.Code ?? (() => ({ reply: null })),
+	Params: opts.Params ?? [],
 	Description: null,
 	Cooldown: null,
 	Flags: [],
-	Params: [],
 	Whitelist_Response: null,
 	Dynamic_Description: () => []
 });

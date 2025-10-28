@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import type { SupiDate } from "supi-core";
 import { type User, permissions as userPermissions } from "../../../classes/user.js";
-import { Command, type Context } from "../../../classes/command.js";
+import { Command, type Context, type ContextData } from "../../../classes/command.js";
 import type { Channel } from "../../../classes/channel.js";
 
 import {
@@ -36,6 +36,7 @@ type AliasData = {
 describe("$alias", async () => {
 	let existingAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
 	let channelAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
+	let commandMap = new Map<string, Command>();
 
 	const world = new TestWorld();
 	beforeEach(() => {
@@ -87,7 +88,14 @@ describe("$alias", async () => {
 
 				return null;
 			},
-			parseCommandName: (name: string) => (EXISTING_COMMANDS.includes(name)) ? createTestCommand({ Name: name }) : null
+			parseCommandName: (name: string) => {
+				const mapCommand = commandMap.get(name);
+				if (mapCommand) {
+					return mapCommand;
+				}
+
+				return (EXISTING_COMMANDS.includes(name)) ? createTestCommand({ Name: name }) : null;
+			}
 		}
 	});
 
@@ -105,8 +113,10 @@ describe("$alias", async () => {
 		platform: basePlatform
 	});
 
-	// eslint-disable-next-line @typescript-eslint/no-misused-spread
-	const cloneContext = (context: Context): Context => Command.createFakeContext(context.command, { ...context });
+	const cloneContext = (context: Context, extra: Partial<ContextData> = {}): Context => (
+		// eslint-disable-next-line @typescript-eslint/no-misused-spread
+		Command.createFakeContext(context.command, { ...context, ...extra })
+	);
 
 	it("provides link to details when no subcommand provided", async () => {
 		const result = await baseCommand.execute(baseContext);
@@ -2219,11 +2229,95 @@ describe("$alias", async () => {
 				expectCommandResultFailure(result, "archived, retired, or removed");
 			});
 
-			// run a linked alias - should proc the "auto-fill try" branch
-			// run with bad params - should error
-			// run a pipe-illegal command
+			it("2 args: should fail when running alias with illegal arguments", async () => {
+				const ALIAS_NAME = "fine";
+				const aliasData = {
+					ID: 503,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "foo",
+					Invocation: "foo",
+					Arguments: `["\${2..3+}"]`,
+					Parent: null,
+					Channel: null
+				};
+				world.queueRsData([aliasData]);
+
+				const result = await baseCommand.execute(baseContext, "run", ALIAS_NAME);
+				expectCommandResultFailure(result, "Cannot combine", "argument symbols");
+			});
+
+			it("2 args: should fail when pipe-illegal command in pipe", async () => {
+				const context = cloneContext(baseContext, {
+					append: { pipe: true }
+				});
+
+				const COMMAND_NAME = "foo";
+				commandMap.set(COMMAND_NAME, createTestCommand({
+					Name: COMMAND_NAME,
+					Flags: []
+				}));
+
+				const ALIAS_NAME = "fine";
+				const aliasData = {
+					ID: 504,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: COMMAND_NAME,
+					Invocation: COMMAND_NAME,
+					Arguments: null,
+					Parent: null,
+					Channel: null
+				};
+				world.queueRsData([aliasData]);
+
+				const result = await baseCommand.execute(context, "run", ALIAS_NAME);
+				expectCommandResultFailure(result, "Cannot", "use", "inside of a pipe");
+			});
+
+		/*
+			it("for later", async () => {
+				return it.skip();
+				let executionData: unknown;
+				const SAMPLE_REPLY = "foobarbaz";
+				const COMMAND_SUCCESS = true;
+				before(() => {
+					sb.Command.checkAndExecute = ((...args: unknown[]) => {
+						executionData = args;
+						return { reply: SAMPLE_REPLY, success: COMMAND_SUCCESS };
+					}) as unknown as typeof sb.Command.checkAndExecute;
+				});
+
+				const COMMAND_NAME = "foo";
+				commandMap.set(COMMAND_NAME, createTestCommand({
+					Name: COMMAND_NAME,
+					Params: [{ name: "bar", type: "number" }]
+				}));
+
+				const ALIAS_NAME = "fine";
+				const aliasData = {
+					ID: 503,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: COMMAND_NAME,
+					Invocation: COMMAND_NAME,
+					Arguments: `["\${2..3+}"]`,
+					Parent: null,
+					Channel: null
+				};
+				world.queueRsData([aliasData]);
+
+
+				const result = await baseCommand.execute(baseContext, "run", ALIAS_NAME);
+				console.log({ executionData });
+
+				expectCommandResultFailure(result, "Cannot combine", "argument symbols");
+			});
+		*/
+
 			// run alias with too many nested calls
 			// actually run a legal alias
+			// run a linked alias - should proc the "auto-fill try" branch
 		});
 
 		describe("try", () => {
