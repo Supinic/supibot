@@ -1657,6 +1657,92 @@ describe("$alias", async () => {
 		});
 	});
 
+	describe("remove", () => {
+		it("0 args: should fail, missing alias name", async () => {
+			const result = await baseCommand.execute(baseContext, "remove");
+			expectCommandResultFailure(result, "No alias name provided");
+		});
+
+		it("1 arg: should fail when user does not own the alias", async () => {
+			const ALIAS_NAME = "foo";
+			const result = await baseCommand.execute(baseContext, "remove", ALIAS_NAME);
+			expectCommandResultFailure(result, "don't have", ALIAS_NAME);
+		});
+
+		it("1 arg: should remove user alias", async () => {
+			const ALIAS_NAME = "foo";
+			const ALIAS_ID = 1001;
+
+			const OWNED_ALIAS = {
+				ID: ALIAS_ID,
+				Name: ALIAS_NAME,
+				User_Alias: BASE_USER_ID,
+				Command: "bar",
+				Invocation: ALIAS_NAME,
+				Arguments: "",
+				Parent: null
+			};
+			existingAliasMap[BASE_USER_ID] = { [ALIAS_NAME]: OWNED_ALIAS };
+			world.setRow("data", "Custom_Command_Alias", ALIAS_ID, OWNED_ALIAS);
+			world.queueRsData([]); // Return an empty array for a list of published aliases
+
+			const result = await baseCommand.execute(baseContext, "remove", ALIAS_NAME);
+			expectCommandResultSuccess(result, "successfully", "removed", ALIAS_NAME);
+
+			const row = world.rows.pop();
+			assert.ok(row, "Expected a Row to be processed");
+			assert.ok(row.deleted);
+			assert.strictEqual(row.values.ID, ALIAS_ID);
+
+			assert.strictEqual(world.rows.length, 0);
+		});
+
+		it("1 arg: should remove published aliases and mention this", async () => {
+			const ALIAS_NAME = "foo";
+			const ALIAS_ID = 2002;
+
+			const OWNED_ALIAS = {
+				ID: ALIAS_ID,
+				Name: ALIAS_NAME,
+				User_Alias: BASE_USER_ID,
+				Command: "bar",
+				Invocation: ALIAS_NAME,
+				Arguments: "",
+				Parent: null
+			};
+			existingAliasMap[BASE_USER_ID] = { [ALIAS_NAME]: OWNED_ALIAS };
+			world.setRow("data", "Custom_Command_Alias", ALIAS_ID, OWNED_ALIAS);
+
+			const CHANNEL_ID = 30;
+			const CHANNEL_ALIAS_ID1 = 3001;
+			const CHANNEL_ALIAS_ID2 = 3002;
+			const CHANNEL_ALIAS1 = { ID: CHANNEL_ALIAS_ID1, Name: ALIAS_NAME, Command: null, Invocation: null, Parent: ALIAS_ID, Channel: CHANNEL_ID };
+			const CHANNEL_ALIAS2 = { ID: CHANNEL_ALIAS_ID2, Name: ALIAS_NAME, Command: null, Invocation: null, Parent: ALIAS_ID, Channel: CHANNEL_ID };
+			world.setRow("data", "Custom_Command_Alias", CHANNEL_ALIAS_ID1, CHANNEL_ALIAS1);
+			world.setRow("data", "Custom_Command_Alias", CHANNEL_ALIAS_ID2, CHANNEL_ALIAS2);
+			world.queueRsData([CHANNEL_ALIAS_ID1, CHANNEL_ALIAS_ID2]);
+
+			const result = await baseCommand.execute(baseContext, "remove", ALIAS_NAME);
+			expectCommandResultSuccess(result, "successfully", "removed", ALIAS_NAME, "also published in", "2 channels");
+
+			const rd = world.recordDeleters.pop();
+			assert.ok(rd);
+			assert.strictEqual(rd.schema, "data");
+			assert.strictEqual(rd.table, "Custom_Command_Alias");
+
+			assert.strictEqual(rd.conditions.length, 3);
+			const [idCond, channelCond, parentCond] = rd.conditions;
+			assert.deepStrictEqual(idCond.args[0], [CHANNEL_ALIAS_ID1, CHANNEL_ALIAS_ID2]);
+			assert.strictEqual(parentCond.args[0], ALIAS_ID);
+
+			const row = world.rows.pop();
+			assert.ok(row);
+			assert.ok(row.deleted);
+			assert.strictEqual(world.rows.length, 0);
+			assert.strictEqual(world.recordDeleters.length, 0);
+		});
+	});
+
 	describe("rename", () => {
 		it("0 args: should fail, both names not provided", async () => {
 			const result = await baseCommand.execute(baseContext, "rename");
