@@ -1,4 +1,4 @@
-import { Utils } from "supi-core";
+import { Utils, Metrics } from "supi-core";
 import { Channel } from "../classes/channel.js";
 import { Command, type CommandDefinition } from "../classes/command.js";
 import { User } from "../classes/user.js";
@@ -201,6 +201,11 @@ export class TestWorld {
 		const world = this;
 		const baseCore = {
 			Utils: new Utils(),
+			Metrics: {
+				get: () => ({
+					inc: () => {}
+				})
+			},
 			Query: {
 				getRecordset () {
 					if (world.recordsetQueue.length === 0) {
@@ -288,6 +293,10 @@ export class TestWorld {
 
 			Command: {
 				prefix: "$"
+			},
+
+			Logger: {
+				logCommandExecution: () => {}
 			}
 		};
 

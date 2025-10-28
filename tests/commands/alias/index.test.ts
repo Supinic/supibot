@@ -1,4 +1,4 @@
-import { it, describe, beforeEach, mock, before } from "node:test";
+import { it, describe, beforeEach, mock, afterEach } from "node:test";
 import assert from "node:assert/strict";
 
 import type { SupiDate } from "supi-core";
@@ -2275,49 +2275,71 @@ describe("$alias", async () => {
 				expectCommandResultFailure(result, "Cannot", "use", "inside of a pipe");
 			});
 
-		/*
-			it("for later", async () => {
-				return it.skip();
-				let executionData: unknown;
-				const SAMPLE_REPLY = "foobarbaz";
-				const COMMAND_SUCCESS = true;
-				before(() => {
-					sb.Command.checkAndExecute = ((...args: unknown[]) => {
-						executionData = args;
-						return { reply: SAMPLE_REPLY, success: COMMAND_SUCCESS };
-					}) as unknown as typeof sb.Command.checkAndExecute;
+			it("2 args: fails on alias that nests aliases too much", async () => {
+				const COMMAND_NAME = "foo";
+				const ALIAS_NAME = "bar";
+				const context = cloneContext(baseContext, {
+					append: { aliasCount: realAliasUtils.NESTED_ALIAS_LIMIT + 1 }
 				});
 
-				const COMMAND_NAME = "foo";
-				commandMap.set(COMMAND_NAME, createTestCommand({
-					Name: COMMAND_NAME,
-					Params: [{ name: "bar", type: "number" }]
-				}));
-
-				const ALIAS_NAME = "fine";
 				const aliasData = {
 					ID: 503,
 					Name: ALIAS_NAME,
 					User_Alias: BASE_USER_ID,
 					Command: COMMAND_NAME,
 					Invocation: COMMAND_NAME,
-					Arguments: `["\${2..3+}"]`,
+					Arguments: null,
 					Parent: null,
 					Channel: null
 				};
 				world.queueRsData([aliasData]);
 
+				const fauxCommand = createTestCommand({ Name: COMMAND_NAME });
+				commandMap.set(COMMAND_NAME, fauxCommand);
 
-				const result = await baseCommand.execute(baseContext, "run", ALIAS_NAME);
-				console.log({ executionData });
-
-				expectCommandResultFailure(result, "Cannot combine", "argument symbols");
+				const result = await baseCommand.execute(context, "run", ALIAS_NAME);
+				expectCommandResultFailure(result, "cannot continue", "causes more than", "alias calls", "reduce the complexity");
 			});
-		*/
 
-			// run alias with too many nested calls
-			// actually run a legal alias
-			// run a linked alias - should proc the "auto-fill try" branch
+			describe("actually running mocked commands", () => {
+				beforeEach(() => {
+					sb.Command = Command;
+				});
+
+				it("2 args: succeeds on properly made alias", async () => {
+					const COMMAND_NAME = "foo";
+					const ALIAS_NAME = "bar";
+					const SAMPLE_REPLY = "foobarbaz";
+					const COMMAND_SUCCESS = true;
+
+					const fauxCommand = createTestCommand({
+						Name: COMMAND_NAME,
+						Params: [],
+						Code: () => ({ reply: SAMPLE_REPLY, success: COMMAND_SUCCESS })
+					});
+
+					commandMap.set(COMMAND_NAME, fauxCommand);
+					sb.Command.data.set(COMMAND_NAME, fauxCommand);
+					world.failOnEmptyRecordset = false;
+
+					const aliasData = {
+						ID: 503,
+						Name: ALIAS_NAME,
+						User_Alias: BASE_USER_ID,
+						Command: COMMAND_NAME,
+						Invocation: COMMAND_NAME,
+						Arguments: null,
+						Parent: null,
+						Channel: null
+					};
+					world.queueRsData([aliasData]);
+
+					const result = await baseCommand.execute(baseContext, "run", ALIAS_NAME);
+					expectCommandResultSuccess(result, SAMPLE_REPLY);
+				});
+
+				// run a linked alias - should proc the "auto-fill try" branch
+			});
 		});
 
 		describe("try", () => {
