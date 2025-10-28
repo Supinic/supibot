@@ -417,11 +417,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			await this.handleReconnect(message);
 		}
 		else if (isRevocationMessage(message)) {
-			console.warn("Subscription revoked", { data });
-
+			console.warn("Subscription revoked", { message });
 			await sb.Logger.log(
 				"Twitch.Warning",
-				`Subscription revoked: ${JSON.stringify(data)}`,
+				`Subscription revoked: ${JSON.stringify(message)}`,
 				null,
 				null
 			);
