@@ -2145,23 +2145,112 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias run", () => {
-		it.skip("run");
-		// $alias run -> error
-		// $alias try -> error
-		// $alias try (nonexistent user) -> error
-		// $alias run (unowned alias) -> error
-		// $alias try (username) (unowned alias) -> error
-		// $alias run (linked alias, target deleted) -> error
-		// $alias try (username) (linked alias, target deleted) -> error
-		// $alias run (alias containing a legacy command) -> error
-		// $alias try (username) (alias containing a legacy command) -> error
-		// $alias run (alias containing pipe-only command) -> error
-		// $alias try (username) (alias containing pipe-only command) -> error
-		// $alias run (alias with too many nested calls) -> error
-		// $alias run (alias with disallowed command combination) -> error
+	describe("run/try", () => {
+		it("0 args: should fail, no input provided", async () => {
+			const result = await baseCommand.execute(baseContext, "run");
+			expectCommandResultFailure(result, "No input provided");
+		});
 
-		// Maybe: $alias run (valid alias) -> OK
+		describe("run", () => {
+			it("2 args: should fail when alias not found", async () => {
+				world.queueRsData([]);
+				const ALIAS_NAME = "foo";
+
+				const result = await baseCommand.execute(baseContext, "run", ALIAS_NAME);
+				expectCommandResultFailure(result, "don't have", ALIAS_NAME);
+			});
+
+			it("2 args: should fail with deleted original", async () => {
+				const ALIAS_NAME = "zombie";
+				const aliasData = {
+					ID: 500,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: null,
+					Invocation: null,
+					Arguments: "",
+					Parent: null,
+					Channel: null
+				};
+				world.queueRsData([aliasData]);
+
+				const result = await baseCommand.execute(baseContext, "run", ALIAS_NAME);
+				expectCommandResultFailure(result, "original has been deleted");
+			});
+
+			it("2 args: should fail with deleted original", async () => {
+				const REMOTE_USER = "charlie";
+				const REMOTE_ID = 402;
+				world.allowUser(REMOTE_USER);
+				world.setUserId(REMOTE_USER, REMOTE_ID);
+
+				const ALIAS_NAME = "zombie2";
+				const aliasData = {
+					ID: 501,
+					Name: ALIAS_NAME,
+					User_Alias: REMOTE_ID,
+					Command: null,
+					Invocation: null,
+					Arguments: "",
+					Parent: null,
+					Channel: null
+				};
+				world.queueRsData([aliasData]);
+
+				const result = await baseCommand.execute(baseContext, "try", REMOTE_USER, ALIAS_NAME);
+				expectCommandResultFailure(result, "original has been deleted");
+			});
+
+			it("2 args: should fail when running a legacy command", async () => {
+				const ALIAS_NAME = "legacy";
+				const aliasData = {
+					ID: 502,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "anything",
+					Invocation: "OLD_CMD",
+					Arguments: "",
+					Parent: null,
+					Channel: null
+				};
+				world.queueRsData([aliasData]);
+
+				const result = await baseCommand.execute(baseContext, "run", ALIAS_NAME);
+				expectCommandResultFailure(result, "archived, retired, or removed");
+			});
+
+			// run a linked alias - should proc the "auto-fill try" branch
+			// run with bad params - should error
+			// run a pipe-illegal command
+			// run alias with too many nested calls
+			// actually run a legal alias
+		});
+
+		describe("try", () => {
+			it("1 arg: should fail on no alias provided", async () => {
+				const result = await baseCommand.execute(baseContext, "try", "alice");
+				expectCommandResultFailure(result, "didn't provide", "alias to try");
+			});
+
+			it("2 args: should fail with nonexistent user", async () => {
+				const result = await baseCommand.execute(baseContext, "try", "alice", "foo");
+				expectCommandResultFailure(result, "Provided user does not exist");
+			});
+
+			it("2 args: should fail when alias not found for user", async () => {
+				const REMOTE_USER = "bob";
+				const REMOTE_ID = 401;
+				world.allowUser(REMOTE_USER);
+				world.setUserId(REMOTE_USER, REMOTE_ID);
+				world.queueRsData([]);
+
+				const ALIAS_NAME = "foo";
+				const result = await baseCommand.execute(baseContext, "try", REMOTE_USER, ALIAS_NAME);
+				expectCommandResultFailure(result, "don't have", ALIAS_NAME);
+			});
+
+			// try a nested alias - dependencies must work
+		});
 	});
 
 	describe("$alias transfer", () => {

@@ -284,6 +284,10 @@ export class TestWorld {
 				},
 
 				permissions: User.permissions
+			},
+
+			Command: {
+				prefix: "$"
 			}
 		};
 
