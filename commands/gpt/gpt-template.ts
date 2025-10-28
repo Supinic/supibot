@@ -3,8 +3,7 @@ import { createHash } from "node:crypto";
 import config from "./config.json" with { type: "json" };
 import History from "./history-control.js";
 import type { GptContext, ModelData } from "./index.js";
-
-import { SupiError, type GotResponse } from "supi-core";
+import { type GotResponse } from "supi-core";
 
 type ExecuteFailure = {
 	success: false;
@@ -116,6 +115,10 @@ export const handleHistoryCommand = async (context: GptContext, query: string): 
 	}
 
 	const command = context.params.history;
+	if (command === "ignore") {
+		return;
+	}
+
 	const historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? config.defaultHistoryMode;
 	if (command === "enable" || command === "disable") {
 		if (historyMode === command) {
@@ -148,9 +151,11 @@ export const handleHistoryCommand = async (context: GptContext, query: string): 
 		return await History.dump(context.user);
 	}
 
-	throw new SupiError({
-	    message: "Assert error: Unknown history command encountered"
-	});
+	return {
+		success: false,
+		reply: "Invalid history command used!",
+		cooldown: 2500
+	};
 };
 
 export const getHistoryMode = async (context: GptContext) => {
