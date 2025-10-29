@@ -331,7 +331,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		super("twitch", TwitchConfigSchema.parse(resultConfig));
 
 		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
-		this.liveChannelsCheck = setInterval(() => this.#recheckLiveChannels(), 300_000);
+		this.liveChannelsCheck = setInterval(() => void this.#recheckLiveChannels(), 300_000);
 	}
 
 	async connect (options: ConnectOptions = {}) {
