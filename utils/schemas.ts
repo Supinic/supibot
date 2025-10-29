@@ -3,6 +3,7 @@ import * as z from "zod";
 
 const BaseIvrUserDataSchema = z.object({
 	login: z.string(),
+	displayName: z.string(),
 	id: z.string(),
 	bio: z.string().nullable(),
 	follows: z.null(),
@@ -18,11 +19,11 @@ const BaseIvrUserDataSchema = z.object({
 	roles: z.object({
 		isAffiliate: z.boolean(),
 		isPartner: z.boolean(),
-		isStaff: z.boolean()
+		isStaff: z.boolean().nullable()
 	}),
 	badges: z.array(
 		z.object({
-			setId: z.string(),
+			setID: z.string(),
 			title: z.string(),
 			description: z.string(),
 			version: z.string()
@@ -71,7 +72,7 @@ const BannedIvrUserDataSchema = BaseIvrUserDataSchema.extend({
 });
 
 export const ivrUserDataSchema = z.array(
-	z.union([RegularIvrUserDataSchema, 	BannedIvrUserDataSchema])
+	z.union([RegularIvrUserDataSchema, BannedIvrUserDataSchema])
 );
 
 export type IvrUserData = z.infer<typeof ivrUserDataSchema>;
