@@ -45,6 +45,7 @@ const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const MESSAGE_MODERATION_CODES = new Set(["channel_settings", "automod_held"]);
+const STREAM_SLICE_PAGE = 100;
 
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
 const PRIVATE_COMMAND_FILTERED_RESPONSE = "That command is not available via private messages.";
@@ -304,6 +305,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	public readonly supportsMeAction = true;
 	public readonly dynamicChannelAddition = true;
 	private readonly reconnectCheck: NodeJS.Timeout;
+	private readonly liveChannelsCheck: NodeJS.Timeout;
 	private readonly previousMessageMeta: Map<Channel["ID"], { time: number; length: number; }> = new Map();
 	private readonly userCommandSpamPrevention: Map<User["ID"], number> = new Map();
 
@@ -329,6 +331,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		super("twitch", TwitchConfigSchema.parse(resultConfig));
 
 		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
+		this.liveChannelsCheck = setInterval(() => this.#recheckLiveChannels(), 300_000);
 	}
 
 	async connect (options: ConnectOptions = {}) {
@@ -1496,6 +1499,61 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		client.ping();
 	}
 
+	async #recheckLiveChannels () {
+		const client = this.client;
+		if (!client) {
+			return;
+		}
+
+		const cacheLiveChannelIds = await this.getLiveChannelIdList();
+		if (cacheLiveChannelIds.length === 0) {
+			return;
+		}
+
+		const simpleSchema = z.object({
+			data: z.array(z.object({ user_id: z.string() }))
+		});
+
+		const currentlyLiveChannelsSet = new Set<string>();
+		for (let slice = 0; slice < cacheLiveChannelIds.length; slice += STREAM_SLICE_PAGE) {
+			const channelIds = cacheLiveChannelIds.slice(slice * STREAM_SLICE_PAGE, (slice + 1) * STREAM_SLICE_PAGE);
+			const searchParams = new URLSearchParams({
+				type: "live",
+				first: String(STREAM_SLICE_PAGE)
+			});
+
+			for (const channelId of channelIds) {
+				searchParams.append("user_id", channelId);
+			}
+
+			const response = await core.Got.get("Helix")({
+				url: "streams",
+				searchParams
+			});
+
+			const { data } = simpleSchema.parse(response.body);
+			for (const stream of data) {
+				currentlyLiveChannelsSet.add(stream.user_id);
+			}
+		}
+
+		const cacheLiveChannelsSet = new Set(cacheLiveChannelIds);
+		const missedChannels = cacheLiveChannelsSet.difference(currentlyLiveChannelsSet);
+		for (const channelId of missedChannels) {
+			const channelData = sb.Channel.getBySpecificId(channelId, this);
+			if (!channelData) {
+				continue;
+			}
+
+			channelData.events.emit("offline", {
+				event: "offline",
+				channel: channelData
+			});
+
+			await this.removeLiveChannelIdList(channelId);
+		}
+	}
+
 	async fixChannelRename (channelData: Channel, twitchChanelName: string, channelId: string) {
 		const existingChannelName = await core.Query.getRecordset<string | undefined>(rs => rs
 			.select("Name")
@@ -1535,6 +1593,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		clearInterval(this.reconnectCheck);
+		clearInterval(this.liveChannelsCheck);
+
 		this.client = null;
 	}
 
