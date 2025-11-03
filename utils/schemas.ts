@@ -51,7 +51,7 @@ const BaseIvrUserDataSchema = z.object({
 		game: z.object({ displayName: z.string() }).nullable()
 	}).nullable(),
 	lastBroadcast: z.object({
-		startedAt: z.string(),
+		startedAt: z.string().nullable(),
 		title: z.string().nullable()
 	}).nullable(),
 	panels: z.array(z.object({ id: z.string() }))
