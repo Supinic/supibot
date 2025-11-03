@@ -11,7 +11,7 @@ const BaseIvrUserDataSchema = z.object({
 	profileViewCount: z.null(),
 	chatColor: z.string(),
 	logo: z.string(),
-	banner: z.string(),
+	banner: z.string().nullable(),
 	verifiedBot: z.null(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
