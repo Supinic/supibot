@@ -164,7 +164,7 @@ export default declare({
 				const plausibleResults = await core.Query.getRecordset<{ ID: number, Name: string }[]>(rs => {
 					rs.select("ID", "Name");
 					rs.from("data", "Steam_Game");
-					rs.limit(25);
+					rs.limit(250); // Limit to not query the entire table, but also high enough to account for DLC-heavy games
 					rs.orderBy("ID ASC");
 
 					for (const word of args) {
