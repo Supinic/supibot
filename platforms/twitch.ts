@@ -361,6 +361,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
+			await TwitchUtils.ensureInitialChannelId(this);
 			const existingSubs = await TwitchUtils.getExistingSubscriptions(false);
 
 			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");

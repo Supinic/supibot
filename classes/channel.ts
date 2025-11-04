@@ -29,7 +29,7 @@ type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
 type LogType = "Lines" | "Meta";
 
 type EditableProperty = "Name" | "Mode" | "Mention" | "NSFW" | "Mirror" | "Description"
-	| "Links_Allowed" | "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL";
+	| "Links_Allowed" | "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL" | "Specific_ID";
 type ConstructorData = Pick<Channel,
 	"ID" | "Name" | "Specific_ID" | "Mode" | "Mention" | "Message_Limit"
 	| "NSFW" | "Mirror" | "Description" | "Links_Allowed"

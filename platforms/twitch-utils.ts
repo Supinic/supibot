@@ -805,6 +805,25 @@ const initSubCacheCheckInterval = () => {
 
 const sanitizeMessage = (string: string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");
 
+const ensureInitialChannelId = async (platform: TwitchPlatform) => {
+	const initialChannel = process.env.INITIAL_TWITCH_CHANNEL;
+	if (!initialChannel) {
+		return;
+	}
+
+	const channelData = sb.Channel.get(initialChannel, platform);
+	if (!channelData || channelData.Specific_ID) {
+		return;
+	}
+
+	const channelId = await platform.getUserID(initialChannel);
+	if (!channelId) {
+		return;
+	}
+
+	await channelData.saveProperty("Specific_ID", channelId);
+};
+
 export default {
 	getConduitId,
 	getAppAccessToken,
@@ -825,5 +844,6 @@ export default {
 	populateUserChannelActivity,
 	initTokenCheckInterval,
 	initSubCacheCheckInterval,
-	sanitizeMessage
+	sanitizeMessage,
+	ensureInitialChannelId
 };
