@@ -1,10 +1,19 @@
-export default {
+import { declare } from "../../classes/command.js";
+import { type NewAfkData } from "../../classes/afk.js";
+import { SupiDate } from "supi-core";
+
+const RESUME_AFK_THRESHOLD_SEC = 120;
+
+type AfkData = NewAfkData & {
+	Ended: SupiDate | null;
+};
+
+export default declare({
 	Name: "resumeafk",
-	Aliases: ["rafk","cafk","continueafk"],
-	Author: "supinic",
-	Cooldown: 120000,
-	Description: "Resumes your AFK status, if used within 5 minutes of coming back from AFK. This command can only be used once every 2 minutes (!) globally.",
-	Flags: ["mention","pipe"],
+	Aliases: ["rafk", "cafk", "continueafk"],
+	Cooldown: 60_000,
+	Description: "Resumes your AFK status, if used shortly after coming back from an AFK. The time period is global, not just in the channel you came back from AFK in.",
+	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function resumeAFK (context) {
@@ -15,14 +24,14 @@ export default {
 			};
 		}
 
-		const lastAFK = (await core.Query.getRecordset(rs => rs
-			.select("ID", "Text", "Started", "Ended", "Status", "Interrupted_ID")
+		const lastAFK = await core.Query.getRecordset<AfkData | undefined>(rs => rs
+			.select("*")
 			.from("chat_data", "AFK")
 			.where("User_Alias = %n", context.user.ID)
 			.orderBy("ID DESC")
 			.limit(1)
 			.single()
-		));
+		);
 
 		if (!lastAFK) {
 			return {
@@ -36,9 +45,12 @@ export default {
 				cooldown: 10_000
 			};
 		}
-		else if (lastAFK.Ended <= new sb.Date().addMinutes(-5).valueOf()) {
+
+		const now = new SupiDate().valueOf();
+		const threshold = lastAFK.Ended.addSeconds(RESUME_AFK_THRESHOLD_SEC).valueOf();
+		if (threshold <= now) {
 			return {
-				reply: "You cannot resume your AFK status, because it ended more than 5 minutes ago!",
+				reply: "You cannot resume your AFK status, because it ended too long ago!",
 				cooldown: 10_000
 			};
 		}
@@ -54,7 +66,6 @@ export default {
 			User_Alias: context.user.ID,
 			Text: lastAFK.Text,
 			Started: lastAFK.Started,
-			Active: true,
 			Status: lastAFK.Status
 		});
 
@@ -79,4 +90,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+});

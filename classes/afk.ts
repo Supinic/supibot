@@ -32,7 +32,7 @@ type ConstructorData = {
 };
 type DatabaseConstructorData = ConstructorData & { Active: boolean; };
 
-type NewAfkData = ConstructorData & {
+export type NewAfkData = ConstructorData & {
 	Interrupted_ID?: AwayFromKeyboard["ID"] | null;
 };
 
@@ -231,6 +231,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 	static async set (userData: User, data: Partial<NewAfkData> = {}) {
 		const now = new SupiDate();
 		const afkData = {
+			Active: true,
 			User_Alias: userData.ID,
 			Text: data.Text ?? null,
 			Silent: Boolean(data.Silent),
