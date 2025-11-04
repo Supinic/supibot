@@ -1,6 +1,7 @@
 import { EventDefinition } from "../generic-event.js";
 
 import ArchLinuxSubDefinition from "./archlinux.js";
+import AsahiLinuxSubDefinition from "./asahilinux.js";
 import BrighterShoresSubDefinition from "./brighter-shores.js";
 import BunSubDefinition from "./bun.js";
 import ChangelogSubDefinition from "./changelog.js";
@@ -21,6 +22,7 @@ import V8SubDefinition from "./v8.js";
 
 export default [
 	ArchLinuxSubDefinition,
+	AsahiLinuxSubDefinition,
 	BrighterShoresSubDefinition,
 	BunSubDefinition,
 	ChangelogSubDefinition,
