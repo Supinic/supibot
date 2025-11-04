@@ -39,12 +39,6 @@ describe("$alias", async () => {
 	let commandMap = new Map<string, Command>();
 
 	const world = new TestWorld();
-	beforeEach(() => {
-		world.reset();
-		world.install();
-		existingAliasMap = {};
-		channelAliasMap = {};
-	});
 
 	const realAliasUtils = await import("../../../commands/alias/alias-utils.js");
 	mock.module("../../../commands/alias/alias-utils.js", {
@@ -104,7 +98,7 @@ describe("$alias", async () => {
 	const BASE_USERNAME = "test_user";
 	const BASE_USER_ID = 1337;
 
-	const baseCommand = new Command(aliasCommandDefinition);
+	let baseCommand = new Command(aliasCommandDefinition);
 	const baseUser = createTestUser({ Name: BASE_USERNAME, ID: BASE_USER_ID });
 	const basePlatform = createTestPlatform();
 	const baseContext = Command.createFakeContext(baseCommand, {
@@ -117,6 +111,14 @@ describe("$alias", async () => {
 		// eslint-disable-next-line @typescript-eslint/no-misused-spread
 		Command.createFakeContext(context.command, { ...context, ...extra })
 	);
+
+	beforeEach(() => {
+		baseCommand = new Command(aliasCommandDefinition);
+		world.reset();
+		world.install();
+		existingAliasMap = {};
+		channelAliasMap = {};
+	});
 
 	it("provides link to details when no subcommand provided", async () => {
 		const result = await baseCommand.execute(baseContext);
@@ -2338,7 +2340,97 @@ describe("$alias", async () => {
 					expectCommandResultSuccess(result, SAMPLE_REPLY);
 				});
 
-				// run a linked alias - should proc the "auto-fill try" branch
+				it("2 args: succeeds on running a linked alias", async () => {
+					const FINAL_COMMAND_NAME = "ping";
+					const FAUX_COMMAND_REPLY = "FOO_BAR_BAZ";
+					const fauxCommand = createTestCommand({
+						Name: FINAL_COMMAND_NAME,
+						Params: [],
+						Code: () => ({ reply: FAUX_COMMAND_REPLY, success: true })
+					});
+
+					commandMap.set(FINAL_COMMAND_NAME, fauxCommand);
+					sb.Command.data.set(FINAL_COMMAND_NAME, fauxCommand);
+					commandMap.set("alias", baseCommand);
+					sb.Command.data.set("alias", baseCommand);
+					world.failOnEmptyRecordset = false;
+
+					const ANOTHER_USER_NAME = "other_user";
+					const ANOTHER_USER_ID = 4567;
+					world.allowUser(ANOTHER_USER_NAME);
+					world.setUserId(ANOTHER_USER_NAME, ANOTHER_USER_ID);
+
+					const CURRENT_USER_ALIAS_ID_1 = 699;
+					const CURRENT_USER_ALIAS_ID_2 = 600;
+					const ANOTHER_USER_ALIAS_ID_1 = 610;
+					const ANOTHER_USER_ALIAS_ID_2 = 619;
+
+					const currentUserAlias1 = {
+						ID: CURRENT_USER_ALIAS_ID_1,
+						Name: "start",
+						User_Alias: BASE_USER_ID,
+						Command: "alias",
+						Invocation: "alias",
+						Arguments: JSON.stringify(["run", "foo"]),
+						Channel: null,
+						Parent: null
+					};
+					const currentUserAlias2 = {
+						ID: CURRENT_USER_ALIAS_ID_2,
+						Name: "foo",
+						User_Alias: BASE_USER_ID,
+						Command: null,
+						Invocation: null,
+						Channel: null,
+						Parent: ANOTHER_USER_ALIAS_ID_1
+					};
+					const otherUserAlias1 = {
+						ID: ANOTHER_USER_ALIAS_ID_1,
+						Name: "bar",
+						User_Alias: ANOTHER_USER_ID,
+						Command: "alias",
+						Invocation: "alias",
+						Arguments: JSON.stringify(["run", "baz"]),
+						Channel: null,
+						Parent: null
+					};
+					const otherUserAlias2 = {
+						ID: ANOTHER_USER_ALIAS_ID_2,
+						Name: "bar",
+						User_Alias: ANOTHER_USER_ID,
+						Command: "ping",
+						Invocation: "ping",
+						Arguments: "",
+						Channel: null,
+						Parent: null
+					};
+
+					world.setRows("data", "Custom_Command_Alias", {
+						[CURRENT_USER_ALIAS_ID_1]: currentUserAlias1,
+						[CURRENT_USER_ALIAS_ID_2]: currentUserAlias2,
+						[ANOTHER_USER_ALIAS_ID_1]: otherUserAlias1,
+						[ANOTHER_USER_ALIAS_ID_2]: otherUserAlias2
+					});
+					existingAliasMap[BASE_USER_ID] = {
+						start: currentUserAlias1,
+						foo: currentUserAlias2
+					};
+					existingAliasMap[ANOTHER_USER_ID] = {
+						bar: otherUserAlias1,
+						baz: otherUserAlias2
+					};
+
+					world.queueRsData([currentUserAlias1]);
+					world.queueRsData([]);
+					world.queueRsData([]);
+					world.queueRsData([otherUserAlias1]);
+					world.queueRsData([]);
+					world.queueRsData([]);
+					world.queueRsData([otherUserAlias2]);
+
+					const result = await baseCommand.execute(baseContext, "run", "start");
+					expectCommandResultSuccess(result, FAUX_COMMAND_REPLY);
+				});
 			});
 		});
 

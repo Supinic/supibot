@@ -1,4 +1,4 @@
-import { Utils, Metrics } from "supi-core";
+import { Utils } from "supi-core";
 import { Channel } from "../classes/channel.js";
 import { Command, type CommandDefinition } from "../classes/command.js";
 import { User } from "../classes/user.js";
@@ -296,7 +296,8 @@ export class TestWorld {
 			},
 
 			Logger: {
-				logCommandExecution: () => {}
+				logCommandExecution: () => {},
+				logError: (...args: unknown[]) => { console.log(...args); }
 			}
 		};
 

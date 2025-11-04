@@ -132,6 +132,7 @@ export default {
 		if (alias.Command === null && alias.Parent !== null) {
 			const parentAlias = await getAliasByIdAsserted(alias.Parent);
 			if (!parentAlias.User_Alias) {
+				/* node:coverage ignore next 4 */
 				throw new SupiError({
 				    message: "Assert error: Parent alias does not belong to a user",
 					args: { parentAlias, alias }
@@ -158,6 +159,7 @@ export default {
 		}
 
 		if (!isClassicAlias(alias)) {
+			/* node:coverage ignore next 4 */
 			throw new SupiError({
 			    message: "Assert error: No classic alias obtained",
 				args: { alias }
