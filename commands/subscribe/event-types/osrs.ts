@@ -19,6 +19,7 @@ const jagexRssSchema = z.object({
 
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
 const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id-list";
+const SLIDING_CACHE_SIZE = 20;
 
 type OsrsResponse = {
 	newsItems: {
@@ -61,7 +62,11 @@ export default {
 		const previousArticleIds = new Set(previousArticleIdList);
 		const currentArticleIds = new Set(newsItems.map(i => i.newsId));
 
-		await core.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, [...currentArticleIds], {
+		const cacheArray = [...previousArticleIds.union(currentArticleIds)]
+			.sort((a, b) => b - a)
+			.slice(0, SLIDING_CACHE_SIZE);
+
+		await core.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, cacheArray, {
 			expiry: 14 * 864e5 // 14 days
 		});
 
