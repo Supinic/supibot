@@ -16,7 +16,7 @@ const restartMethods = {
 	},
 	yarn: {
 		message: "yarn",
-		commands: ["yarn"]
+		commands: ["COREPACK_ENABLE_DOWNLOAD_PROMPT=0 yarn"]
 	},
 	build: {
 		message: "yarn build",
