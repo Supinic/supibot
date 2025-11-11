@@ -2461,12 +2461,39 @@ describe("$alias", async () => {
 		});
 	});
 
-	describe("$alias transfer", () => {
+	describe("transfer", () => {
+		const discordContext = cloneContext(baseContext, {
+			user: createTestUser({ Name: "DISCORD_USER", Discord_ID: "123" })
+		});
+		const twitchContext = cloneContext(baseContext, {
+			user: createTestUser({ Name: "TWITCH_USER", Twitch_ID: "234" })
+		});
+
+		it("0 args: should fail, not a Twitch user", async () => {
+			const result = await baseCommand.execute(discordContext, "transfer");
+			expectCommandResultFailure(result, "only works", "Twitch users");
+		});
+
+		it("0 args: should fail, no input", async () => {
+			const result = await baseCommand.execute(twitchContext, "transfer");
+			expectCommandResultFailure(result, "must provide", "previous username");
+		});
+
+		it("1 arg: should fail on invalid username", async () => {
+			const result = await baseCommand.execute(twitchContext, "transfer", "DOES_NOT_EXIST");
+			expectCommandResultFailure(result, "not seen", "that user", "Twitch");
+		});
+
+		it("1 arg: should fail on different twitch ID username", async () => {
+			const TARGET_USER = "foobar";
+			const targetDifferentUser = createTestUser({ Name: TARGET_USER, Twitch_ID: "999" });
+			world.prepareUser(targetDifferentUser);
+
+			const result = await baseCommand.execute(twitchContext, "transfer", TARGET_USER);
+			expectCommandResultFailure(result, "Your", "Twitch ID", "not the same");
+		});
+
 		it.skip("transfer");
-		// $alias transfer [not a Twitch user] -> error
-		// $alias transfer -> error
-		// $alias transfer (nonexistent old username) -> error
-		// $alias transfer (old username) [Twitch ID mismatch] -> error
 		// $alias transfer (old username) [conflicting new/old aliases] -> error
 		// $alias transfer (old username) -> OK, check aliases changing user
 	});

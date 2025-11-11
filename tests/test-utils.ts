@@ -8,11 +8,11 @@ import { TwitchPlatform } from "../platforms/twitch.js";
 import assert from "node:assert/strict";
 import { typedEntries } from "../utils/ts-helpers.js";
 
-export const createTestUser = (opts: { Name?: string, ID?: number, } = {}) => new User({
+export const createTestUser = (opts: { Name?: string, ID?: number, Twitch_ID?: string, Discord_ID?: string } = {}) => new User({
 	ID: opts.ID ?? 1,
 	Name: opts.Name ?? "sample_user",
-	Discord_ID: null,
-	Twitch_ID: null,
+	Discord_ID: opts.Discord_ID ?? null,
+	Twitch_ID: opts.Twitch_ID ?? null,
 	Started_Using: null
 });
 
@@ -194,6 +194,8 @@ export class TestWorld {
 	private readonly allowedUsers = new Set<string>();
 	private readonly recordsetQueue: unknown[] = [];
 
+	private readonly users = new Map<string, User>();
+
 	public failOnEmptyRecordset: boolean = true;
 
 	install () {
@@ -245,6 +247,11 @@ export class TestWorld {
 		const baseSb = {
 			User: {
 				get: (name: string) => {
+					const preparedUser = this.users.get(name);
+					if (preparedUser) {
+						return preparedUser;
+					}
+
 					const isAllowed = (this.allowedUsers.has(name));
 					if (!isAllowed) {
 						return null;
@@ -322,6 +329,10 @@ export class TestWorld {
 
 	allowUser (username: string): void {
 		this.allowedUsers.add(username);
+	}
+
+	prepareUser (userData: User): void {
+		this.users.set(userData.Name, userData);
 	}
 
 	setUserId (username: string, id: number): void {
