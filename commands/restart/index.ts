@@ -21,6 +21,10 @@ const restartMethods = {
 	build: {
 		message: "yarn build",
 		commands: ["yarn build"]
+	},
+	yarn: {
+		message: "yarn",
+		commands: ["yarn"]
 	}
 } as const;
 const isRestartMethod = (input: string): input is keyof typeof restartMethods => (
