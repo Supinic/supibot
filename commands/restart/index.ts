@@ -14,17 +14,13 @@ const restartMethods = {
 			`git -C ${basePath} pull origin master`
 		]
 	},
-	prodUpdate: {
-		message: "yarn prod-update",
-		commands: ["yarn prod-update"]
+	yarn: {
+		message: "yarn",
+		commands: ["yarn"]
 	},
 	build: {
 		message: "yarn build",
 		commands: ["yarn build"]
-	},
-	yarn: {
-		message: "yarn",
-		commands: ["yarn"]
 	}
 } as const;
 const isRestartMethod = (input: string): input is keyof typeof restartMethods => (
@@ -67,7 +63,7 @@ export default declare({
 		};
 	},
 	Dynamic_Description: () => [
-		"Restarts the process of Supibot or the supinic.com website.",
+		"Exits the bot process, relying on a wrapping service to restart it.",
 		"Only usable by administrators and whitelisted users.",
 		"The subcommands, except for \"all\" can be combined between each other",
 		"",
@@ -80,8 +76,8 @@ export default declare({
 		"Runs <code>git pull</code>, then exits the process.",
 		"",
 
-		"<code>$restart bot prodUpdate</code>",
-		"Runs <code>yarn prod-update</code>, then exits the process.",
+		"<code>$restart yarn</code>",
+		"Runs <code>yarn</code>, then exits the process.",
 		"",
 
 		"<code>$restart bot build</code>",
@@ -89,6 +85,6 @@ export default declare({
 		"",
 
 		"<code>$restart bot all</code>",
-		"Combination of all commands in this order: pull, prod-update, build, exit."
+		"Combination of all commands in this order: pull, yarn, build, exit."
 	]
 });
