@@ -717,7 +717,7 @@ export class Filter extends TemplateWithId {
 		for (const user of unpingUsers) {
 			// Only unping usernames if they are not followed by a specific set of characters.
 			// This refers to "." and "@" - these are usually parts of URLs or e-mail addresses.
-			const regex = new RegExp(`(?<![\\/=])\\b(${user.Name})(?![.@]\\w+)`, "gi");
+			const regex = new RegExp(String.raw `(?<![\/=])\b(${user.Name})(?![.@]\w+)`, "gi");
 			string = string.replace(regex, (name: string) => `${name[0]}${TWITCH_ANTIPING_CHARACTER}${name.slice(1)}`);
 		}
 
