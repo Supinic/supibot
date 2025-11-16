@@ -9,7 +9,7 @@ const BaseIvrUserDataSchema = z.object({
 	follows: z.null(),
 	followers: z.number(),
 	profileViewCount: z.null(),
-	chatColor: z.string(),
+	chatColor: z.string().nullable(),
 	logo: z.string(),
 	banner: z.string().nullable(),
 	verifiedBot: z.null(),
