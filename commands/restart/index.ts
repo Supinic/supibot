@@ -4,6 +4,7 @@ import { declare } from "../../classes/command.js";
 const shell = promisify(exec);
 
 import { getConfig } from "../../config.js";
+import { hasKey } from "../../utils/ts-helpers.js";
 const { basePath } = getConfig();
 
 const restartMethods = {
@@ -23,9 +24,6 @@ const restartMethods = {
 		commands: ["yarn build"]
 	}
 } as const;
-const isRestartMethod = (input: string): input is keyof typeof restartMethods => (
-	Object.keys(restartMethods).includes(input)
-);
 
 export default declare({
 	Name: "restart",
@@ -37,7 +35,7 @@ export default declare({
 	Whitelist_Response: "Only available to administrators or helpers!",
 	Code: async function restart (context, ...commands) {
 		for (const name of commands) {
-			if (!isRestartMethod(name)) {
+			if (!hasKey(restartMethods, name)) {
 				return {
 					success: false,
 					reply: `Incorrect reload command provided! Use one of: ${Object.keys(restartMethods).join(", ")}`
