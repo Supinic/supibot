@@ -65,12 +65,14 @@ export default {
 				extensions: {
 					persistedQuery: {
 						version: 1,
-						sha256Hash: "823772cac91efa0a24f86a80463f37f0377cb216d7ce57a4ab90b61d1e01de8b"
+						sha256Hash: "80c53fe04c79a6414484104ea573c28d6a8436e031a235fc6908de63f51c74fd"
 					}
 				},
 				variables: {
 					channelID,
 					channelLogin: channelName,
+					badgeSourceChannelID: channelID,
+					badgeSourceChannelLogin: channelName,
 					giftRecipientLogin: userName,
 					hasChannelID: true,
 					isViewerBadgeCollectionEnabled: true,
