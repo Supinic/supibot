@@ -142,7 +142,7 @@ export const GptOpenAI = {
 		}
 
 		if (modelData.usesCompletionTokens === true) {
-			json.reasoning_effort = "minimal";
+			json.reasoning_effort = "low";
 			json.max_completion_tokens = 1000;
 		}
 		else {
