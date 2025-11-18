@@ -307,6 +307,11 @@
       "name": "farming",
       "emoji": "‍🌽",
       "aliases": ["farm"]
+    },
+    {
+      "name": "sailing",
+      "emoji": "⚓",
+      "aliases": ["sail"]
     }
   ]
 }
