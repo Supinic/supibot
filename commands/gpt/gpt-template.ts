@@ -146,6 +146,9 @@ export const handleHistoryCommand = async (context: GptContext, query: string): 
 				reply: "Successfully cleared your ChatGPT history."
 			};
 		}
+		else {
+			return;
+		}
 	}
 	else if (command === "export" || command === "check") {
 		return await History.dump(context.user);
