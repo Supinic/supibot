@@ -149,7 +149,6 @@ import SongRequestCommand from "./songrequest/index.js";
 import SongRequestQueueCommand from "./songrequestqueue/index.js";
 import SortCommand from "./sort/index.js";
 import SpeedrunCommand from "./speedrun/index.js";
-import StackOverflowSearchCommand from "./stackoverflowsearch/index.js";
 import StalkCommand from "./stalk/index.js";
 import StatisticsCommand from "./statistics/index.js";
 import SteamGamePlayersCommand from "./steamgameplayers/index.js";
@@ -343,7 +342,6 @@ export default [
 	SongRequestQueueCommand,
 	SortCommand,
 	SpeedrunCommand,
-	StackOverflowSearchCommand,
 	StalkCommand,
 	StatisticsCommand,
 	SteamGamePlayersCommand,
