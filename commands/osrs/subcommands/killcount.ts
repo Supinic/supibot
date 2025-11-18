@@ -99,10 +99,14 @@ export default {
 			? "Seasonal user"
 			: core.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));
 
+		const rankString = (rank === null) ? `unranked` : `rank #${rank}`;
 		return {
-			reply: (rank === null)
+			// As of 2025-11-18, the Jagex API no longer produces "-1" for activities of unranked accounts.
+			// It always provides value ("killcount") but rank can still be null.
+			// I'm leaving the check here, but if the API doesn't change, it can be removed.
+			reply: (rank === null && value === null)
 				? `${ironman} ${username} is not ranked for ${name}.`
-				: `${ironman} ${username}'s KC for ${name}: ${value} - rank #${rank}.`
+				: `${ironman} ${username}'s KC for ${name}: ${value} - ${rankString}.`
 		};
 	}
 } satisfies OsrsSubcommandDefinition;
