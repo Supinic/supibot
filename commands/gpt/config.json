@@ -22,7 +22,7 @@
   },
   "models": {
     "base": {
-      "url": "gpt-5.1",
+      "url": "gpt-5",
       "type": "openai",
       "default": false,
       "inputLimit": 1500,
