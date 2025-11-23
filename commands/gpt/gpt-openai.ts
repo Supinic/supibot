@@ -74,8 +74,6 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 		const contextSystemMessage = core.Utils.tag.trim `
 			You are being queried on behalf of ${platform.selfName},
 			a chat bot running on ${platform.name}${channelString}.
-			Don't reference the chat bot directly, but rather assume its position,
-			and reply in first person when queried via name.
 		`;
 
 		return [
