@@ -63,7 +63,7 @@ const SteamRecommendationSchema = z.object({
 				recommendations_up: z.int().min(0),
 				recommendations_down: z.int().min(0)
 			})
-		)
+		).optional()
 	}).optional()
 });
 const fetchRecommendationData = async (gameId: string | number) => {
@@ -77,7 +77,7 @@ const fetchRecommendationData = async (gameId: string | number) => {
 			result: "Could not fetch reviews data!"
 		};
 	}
-	else if (!results) {
+	else if (!results || !results.rollups) {
 		return {
 			result: "This game has no reviews!"
 		};
