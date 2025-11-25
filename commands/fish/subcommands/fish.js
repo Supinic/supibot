@@ -248,9 +248,6 @@ export default {
 				user: context.user,
 				channel: context.channel,
 				platform: context.platform,
-				params: {
-					temperature: 1
-				}
 			});
 
 			try {
