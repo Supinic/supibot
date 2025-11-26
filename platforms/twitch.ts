@@ -807,10 +807,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification") as boolean | undefined;
 				if (!notified) {
 					const replyMessage = core.Utils.tag.trim `
-						@${userData.Name}, you have been flagged as suspicious.
-						This is because I have seen your Twitch username on a different account before.
-						This is usually caused by renaming into an account that existed before.
-						To remedy this, head into Supinic's channel chat twitch.tv/supinic and mention this.												
+						@${userData.Name}, I can't reply to your commands any more. 
+						This is because I have seen your username used on a different account.
+						To fix this: Go into my chat at twitch.tv/supibot then say the word "username" and I'll guide you through.
+						This takes just a minute at most :)
 					`;
 
 					if (channelData) {
