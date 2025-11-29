@@ -1,5 +1,5 @@
-import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 import { declare } from "../../classes/command.js";
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SONG_REQUESTS_STATE } = cacheKeys;
 
 export default declare({
@@ -10,7 +10,7 @@ export default declare({
 	Flags: ["developer", "mention", "pipe", "whitelist"],
 	Params: [{ name: "linkOnly", type: "boolean" }] as const,
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
-	Code: async function current () {
+	Code: async function current (context) {
 		if (!sb.MpvClient) {
 			return {
 				success: false,
@@ -35,6 +35,13 @@ export default declare({
 		}
 
 		const { current } = status;
+		if (context.params.linkOnly) {
+			return {
+			    success: true,
+			    reply: current.url
+			};
+		}
+
 		let requesterData = null;
 		if (current.user) {
 			requesterData = await sb.User.get(current.user);
@@ -47,6 +54,7 @@ export default declare({
 			: "";
 
 		return {
+			success: true,
 			reply: core.Utils.tag.trim `
 				Currently playing:
 				${current.description ?? current.url}
