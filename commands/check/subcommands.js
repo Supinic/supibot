@@ -7,7 +7,7 @@ import GptCache from "../gpt/cache-control.js";
 import CookieLogic from "../cookie/cookie-logic.js";
 
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_MPV_PAUSED } = cacheKeys;
 
 export default [
 	{
@@ -612,29 +612,6 @@ export default [
 		execute: () => ({
 			reply: `Check all winners here: https://supinic.com/data/slots-winner/leaderboard`
 		})
-	},
-	{
-		name: "sr",
-		aliases: ["songrequests"],
-		description: `For supinic's Twitch channel, checks the current status of song requests.`,
-		execute: async (context) => {
-			if (context.channel?.ID !== 38) {
-				return {
-					success: false,
-					reply: "Only usable in Supinic's Twitch channel!"
-				};
-			}
-
-			const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
-			const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
-			const pauseString = (state === "vlc" && pauseState === true)
-				? "Song requests are paused at the moment."
-				: "";
-
-			return {
-				reply: `Current song requests status: ${state}. ${pauseString}`
-			};
-		}
 	},
 	{
 		name: "subscription",
