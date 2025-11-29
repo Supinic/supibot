@@ -8,11 +8,28 @@ import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-ut
 import getLinkParser from "../../utils/link-parser.js";
 
 import { type User } from "../../classes/user.js";
-import { type DatabaseVideo } from "../../singletons/vlc-client.js";
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+const { SONG_REQUESTS_STATE } = cacheKeys;
 
 const REQUEST_TIME_LIMIT = 900;
 const REQUEST_AMOUNT_LIMIT = 10;
+
+// @todo remove and rely specifically on mpv playlist
+type DatabaseVideo = {
+	Added: SupiDate;
+	Duration: number | null;
+	End_Time: number | null;
+	ID: number;
+	Length: number | null;
+	Link: string;
+	Name: string;
+	Notes: string | null;
+	Start_Time: number | null;
+	Started: SupiDate;
+	Status: "Current" | "Inactive" | "Queued";
+	User_Alias: number;
+	VLC_ID: number;
+	Video_Type: number;
+};
 
 const checkLimits = (userData: User, playlist: DatabaseVideo[]) => {
 	const userRequests = playlist.filter(i => i.User_Alias === userData.ID);
@@ -74,10 +91,10 @@ export default declare({
 	] as const,
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequest (context, ...args) {
-		if (!sb.VideoLANConnector) {
+		if (!sb.MpvClient) {
 			return {
 				success: false,
-				reply: "VLC connector is not available! Check configuration if this is required."
+				reply: "mpv client is not available! Check configuration if this is required."
 			};
 		}
 
@@ -101,18 +118,9 @@ export default declare({
 				reply: "Song requests are currently turned off."
 			};
 		}
-		else if (state === "vlc-read") {
-			return {
-				reply: `Song requests are currently read-only. You can check what's playing with the "current" command, but not queue anything.`
-			};
-		}
-		else if (state === "vlc") {
-			// Simply make sure the VLC client is running if a song is being requested into it
-			sb.VideoLANConnector.startClient();
-		}
 
 		// Determine the user's and global limits - both duration and video amount
-		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
+		const queue = await sb.MpvClient.getNormalizedPlaylist();
 		const limits = checkLimits(context.user, queue);
 		if (!limits.canRequest) {
 			return {
@@ -408,26 +416,15 @@ export default declare({
 			}
 		}
 
-		// Actually attempt to request the video into VLC
-		let id = null;
-		try {
-			let vlcLink = data.link;
-
-			// Extreme hard-coded exception! Apparently, some YouTube videos do not play properly in VLC if and only
-			// if they are queued with HTTPS. This is a temporary solution and should be removed as soon as a proper
-			// fix exists. Probably upgrading to VLC 4.x will work.
-			// Reference: https://forum.videolan.org/viewtopic.php?t=111579
-			if (data.type === "youtube") {
-				vlcLink = vlcLink.replace("https://", "http://");
-			}
-
-			id = await sb.VideoLANConnector.add(vlcLink, { startTime, endTime });
-		}
-		catch (e) {
-			console.warn("sr error", e);
+		// Actually attempt to request the video into mpv
+		const addResult = await sb.MpvClient.add(data.link, context.user.ID, {
+			description: data.name,
+			duration: data.duration
+		});
+		if (!addResult.success) {
 			await core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			return {
-				reply: `The desktop listener is currently turned off! Turning song requests off.`
+				reply: `The desktop listener is not currently running! Turning song requests off.`
 			};
 		}
 
@@ -455,7 +452,7 @@ export default declare({
 		// Log the request into database
 		const row = await core.Query.getRow("chat_data", "Song_Request");
 		row.setValues({
-			VLC_ID: id,
+			VLC_ID: addResult.id,
 			Link: data.ID,
 			Name: core.Utils.wrapString(data.name, 100),
 			Video_Type: videoType,
@@ -469,25 +466,8 @@ export default declare({
 		await row.save();
 
 		let when = "right now";
-		const status = await sb.VideoLANConnector.getUpdatedStatus();
-		if (queue.length > 0) {
-			const current = queue.find(i => i.Status === "Current");
-			const { time: currentVideoPosition, length } = status;
-			const endTime = current?.End_Time ?? length;
-
-			const playingDate = new SupiDate().addSeconds(endTime - currentVideoPosition);
-			const inQueue = queue.filter(i => i.Status === "Queued");
-
-			for (const item of inQueue) {
-				playingDate.addSeconds(item.Duration ?? 0);
-			}
-
-			if (playingDate.valueOf() <= SupiDate.now()) {
-				when = "right now";
-			}
-			else {
-				when = core.Utils.timeDelta(playingDate);
-			}
+		if (addResult.timeUntil !== 0) {
+			when = core.Utils.timeDelta(addResult.timeUntil);
 		}
 
 		const seek = [];
@@ -498,9 +478,9 @@ export default declare({
 			seek.push(`ending at ${core.Utils.formatTime(endTime, true)}`);
 		}
 
-		const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
-		const pauseString = (pauseState === true)
-			? "Song requests are paused at the moment."
+		const status = await sb.MpvClient.getUpdatedStatus();
+		const pauseString = (status.paused)
+			? "The song request is paused at the moment."
 			: "";
 		const seekString = (seek.length > 0)
 			? `Your video is ${seek.join(" and ")}.`
@@ -508,7 +488,7 @@ export default declare({
 
 		return {
 			reply: core.Utils.tag.trim `
-				Video "${data.name}"${authorString} successfully added to queue with ID ${id}!
+				Video "${data.name}"${authorString} successfully added to queue with ID ${addResult.id}!
 				It is playing ${when}.
 				${seekString}
 				${pauseString}

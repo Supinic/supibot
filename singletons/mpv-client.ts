@@ -23,10 +23,32 @@ type ConstructorOptions = {
 	port: number;
 };
 type MpvStatus = {
-	current: z.infer<typeof dataSchemas.playlist>["data"][number] | null;
+	current: null | {
+		url: string;
+		user: number | null;
+		description: string | null;
+		playing: boolean;
+		id: number;
+		order: number;
+	};
+	paused: boolean;
 	playlistCount: number;
 	position: number | null;
 	duration: number | null;
+};
+type MpvItem = {
+	id: number;
+	url: string;
+	user: number | null;
+	description: string | null;
+	duration: number | null;
+};
+
+type AddOptions = {
+	duration?: number | null;
+	description?: string | null;
+	startTime?: number;
+	endTime?: number;
 };
 
 const PROPERTY_NA = "property unavailable";
@@ -38,15 +60,16 @@ const dataSchemas = {
 	}),
 
 	add: z.object({ playlist_entry_id: z.int() }),
-	duration: z.int(),
-	position: z.int(),
+	duration: z.number(),
+	position: z.number(),
 	playlistCount: z.int(),
+	pause: z.boolean(),
 	playlist: z.object({
 		data: z.array(z.object({
+			id: z.int(),
 			filename: z.string(),
-			playing: z.boolean(),
-			current: z.boolean(),
-			id: z.int()
+			playing: z.boolean().optional(),
+			current: z.boolean().optional()
 		}))
 	})
 };
@@ -56,12 +79,7 @@ export class MpvClient {
 	private readonly port: number;
 
 	private counter = 0;
-	private readonly urlMap = new Map<string, {
-		id: number;
-		url: string;
-		user: number | null;
-		description: string | null;
-	}>();
+	private readonly urlMap = new Map<string, MpvItem>();
 
 	private lastStatus: MpvStatus | null = null;
 
@@ -71,13 +89,14 @@ export class MpvClient {
 	}
 
 	private async send (command: unknown[], skipError: boolean = false) {
-		const url = new URL(`${this.host}:${this.port}/`);
-		url.searchParams.set("mpv", JSON.stringify(command));
+		const response = await core.Got.get("GenericAPI")({
+			url: `${this.host}:${this.port}`,
+			searchParams: {
+				mpv: JSON.stringify(command)
+			}
+		});
 
-		const response = await fetch(url);
-		const raw: unknown = await response.json();
-		const data = dataSchemas.generic.parse(raw);
-
+		const data = dataSchemas.generic.parse(response.body);
 		if (!skipError && data.error !== "success") {
 			throw new SupiError({
 			    message: `mpv command failure: ${data.error}`,
@@ -105,7 +124,7 @@ export class MpvClient {
 		);
 	}
 
-	public async add (url: string, user: number | null, options: { description?: string | null; startTime?: number, endTime?: number } = {}) {
+	public async add (url: string, user: number | null, options: AddOptions = {}) {
 		// @todo seeking
 		if (options.startTime || options.endTime) {
 			throw new SupiError({
@@ -121,16 +140,35 @@ export class MpvClient {
 		}
 
 		const id = this.counter++;
-		const { playlistCount } = await this.getUpdatedStatus();
-		const type = (playlistCount === 0) ? "append-play" : "append";
+		const [playlist, status] = await Promise.all([this.getPlaylist(), this.getUpdatedStatus()]);
+		const type = (playlist.length === 0) ? "append-play" : "append";
+
+		let timeUntil = (status.duration && status.position)
+			? status.duration - status.position
+			: 0;
+
+		for (const item of this.urlMap.values()) {
+			timeUntil += item.duration ?? 0;
+		}
 
 		const raw = await this.send(["loadfile", url, type]);
 		const order = dataSchemas.add.parse(raw.data).playlist_entry_id;
 		const description = options.description ?? null;
 
-		this.urlMap.set(url, { id, url, user, description });
+		this.urlMap.set(url, {
+			id,
+			url,
+			user,
+			description,
+			duration: options.duration ?? null
+		});
 
-		return { success: true, order };
+		return {
+			success: true,
+			id,
+			order,
+			timeUntil
+		};
 	}
 
 	public async removeById (targetId: number, targetUser: number | null) {
@@ -162,7 +200,7 @@ export class MpvClient {
 		const playlist = await this.getPlaylist();
 		for (const item of playlist) {
 			if (item.filename === targetItem.url) {
-				targetOrder = item.id;
+				targetOrder = item.order;
 				break;
 			}
 		}
@@ -226,6 +264,13 @@ export class MpvClient {
 		return this.lastStatus;
 	}
 
+	public async getPosition () {
+		const rawPosition = await this.send(["get_property", "time-pos"], true);
+		const position = (rawPosition.error === PROPERTY_NA) ? null : dataSchemas.position.parse(rawPosition.data);
+
+		return position;
+	}
+
 	public async getPlaylist () {
 		const raw = await this.send(["get_property", "playlist"], true);
 		if (raw.error !== "success") {
@@ -243,19 +288,29 @@ export class MpvClient {
 			this.urlMap.delete(url);
 		}
 
-		return data;
+		return data.map(i => {
+			const extraData = this.urlMap.get(i.filename);
+			return {
+				order: i.id,
+				playing: i.playing,
+				current: i.current,
+				filename: i.filename,
+				...extraData
+			};
+		});
 	}
 
 	public async getUpdatedStatus (): Promise<MpvStatus> {
-		const [rawPosition, rawDuration, rawPlaylistCount, playlist] = await Promise.all([
-			this.send(["get_property", "time-pos"], true),
+		const [position, rawDuration, rawPlaylistCount, rawPause, playlist] = await Promise.all([
+			this.getPosition(),
 			this.send(["get_property", "duration"], true),
 			this.send(["get_property", "playlist-count"], true),
+			this.send(["get_property", "pause"], true),
 			this.getPlaylist()
 		]);
 
-		const position = (rawPosition.error === PROPERTY_NA) ? null : dataSchemas.position.parse(rawPosition.data);
-		const duration = (rawPosition.error === PROPERTY_NA) ? null : dataSchemas.duration.parse(rawDuration.data);
+		const duration = (rawDuration.error === PROPERTY_NA) ? null : dataSchemas.duration.parse(rawDuration.data);
+		const paused = dataSchemas.pause.parse(rawPause.data);
 		const playlistCount = dataSchemas.playlistCount.parse(rawPlaylistCount.data);
 
 		let extraCurrent;
@@ -265,9 +320,17 @@ export class MpvClient {
 		}
 
 		this.lastStatus = {
-			current: (mpvCurrent)
-				? { ...mpvCurrent, ...extraCurrent }
+			current: (mpvCurrent && extraCurrent)
+				? {
+					url: mpvCurrent.filename,
+					description: extraCurrent.description,
+					user: extraCurrent.user,
+					id: extraCurrent.id,
+					order: mpvCurrent.order,
+					playing: mpvCurrent.playing ?? false
+				}
 				: null,
+			paused,
 			position,
 			duration,
 			playlistCount

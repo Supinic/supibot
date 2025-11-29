@@ -1,5 +1,5 @@
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_MPV_PAUSED } = cacheKeys;
 
 export default {
 	Name: "songrequestqueue",
@@ -32,21 +32,21 @@ export default {
 			}
 		}
 
-		const data = await sb.VideoLANConnector.getNormalizedPlaylist();
+		const data = await sb.MpvClient.getNormalizedPlaylist();
 		if (data.length === 0) {
 			return {
 				reply: "No songs are currently queued. Check history here: https://supinic.com/stream/song-request/history"
 			};
 		}
 
-		const status = sb.VideoLANConnector.getCurrentStatus();
+		const status = sb.MpvClient.getCurrentStatus();
 		const total = data.reduce((acc, cur) => acc + cur.Duration, 0);
 		const current = data.find(i => i.Status === "Current");
 
-		const length = total - (current?.End_Time ?? status.time);
+		const length = total - (current?.End_Time ?? status.position);
 		const delta = core.Utils.timeDelta(Math.round(sb.Date.now() + length * 1000), true);
 
-		const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_MPV_PAUSED);
 		const pauseString = (pauseState === true)
 			? "Song requests are paused at the moment."
 			: "";

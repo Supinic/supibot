@@ -12,7 +12,7 @@ import { SupiDate, SupiError } from "supi-core";
 import type { VlcPlaylistNode, VlcPlaylistRoot, VlcStatus, VlcTopPlaylist } from "./vlc-types.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
-const { SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+const { SONG_REQUESTS_MPV_PAUSED } = cacheKeys;
 
 const get = (options: http.RequestOptions) => new Promise((resolve, reject) => {
 	http.get(options, response => {
@@ -443,12 +443,12 @@ export class VlcConnector {
 	}
 
 	private async onStatusChange (before: VlcStatus, after: VlcStatus) {
-		const currentPauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		const currentPauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_MPV_PAUSED);
 		if (currentPauseStatus && after.state === "playing") {
-			await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, false);
+			await core.Cache.setByPrefix(SONG_REQUESTS_MPV_PAUSED, false);
 		}
 		else if (!currentPauseStatus && after.state === "paused") {
-			await core.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, true);
+			await core.Cache.setByPrefix(SONG_REQUESTS_MPV_PAUSED, true);
 		}
 
 		const previous = before.currentplid;

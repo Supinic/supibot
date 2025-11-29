@@ -58,7 +58,7 @@ export const ConfigSchema = z.strictObject({
 			});
 		}
 	}),
-	local: z.strictObject({
+	local: z.object({
 		epalAudioChannels: z.array(z.int().positive()).optional().nullable(),
 		listenerAddress: z.string().optional().nullable(),
 		listenerPort: port.optional().nullable(),
@@ -66,6 +66,7 @@ export const ConfigSchema = z.strictObject({
 		ttsLengthLimit: z.int().positive().optional().nullable(),
 		ttsListUrl: z.string().optional().nullable(),
 		playsoundListUrl: z.string().optional().nullable(),
+		mpvListenerUrl: z.string().optional().nullable(),
 		vlcBaseUrl: z.string().optional().nullable(),
 		vlcUrl: z.string().optional().nullable(),
 		vlcUsername: z.string().optional().nullable(),
