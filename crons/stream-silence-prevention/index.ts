@@ -1,71 +1,49 @@
 // import { randomInt } from "node:crypto";
 // import getLinkParser from "../../utils/link-parser.js";
 
+import { SupiDate } from "supi-core";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SONG_REQUESTS_STATE } = sharedKeys;
 
-const repeats = [];
+const repeats: string[] = [];
 const repeatAmount = 100;
-// const bannedLinks = [
-// 	"BaMcFghlVEU", // Gachillmuchi
-// 	"QO0CRvQ0WRA" // Gachillmuchi reupload by DJ Gachi
-// ];
 
 export default {
 	name: "stream-silence-prevention",
 	expression: "*/5 * * * * *",
 	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
 	code: (async function preventStreamSilence () {
-		// early return - avoid errors during modules loading
-		if (!sb.Channel || !sb.Platform || !sb.VideoLANConnector) {
+		if (!sb.MpvClient) {
 			return;
 		}
 
-		// const twitch = sb.Platform.get("twitch");
-		const cytube = sb.Platform.get("cytube");
-		const channelData = sb.Channel.get("supinic", "twitch");
-		const cytubeChannelData = sb.Channel.get(49);
-
 		// Don't auto-request when stream is offline
+		const channelData = sb.Channel.getAsserted("supinic", "twitch");
 		if (!await channelData.isLive()) {
 			return;
 		}
 
-		// Don't auto-request in an unsupported song-request state
+		// Don't auto-request outside of mpv
 		const state = await core.Cache.getByPrefix(SONG_REQUESTS_STATE);
-		if (state !== "vlc") {
+		if (state !== "mpv") {
 			return;
 		}
 
-		let repeatsArray;
-		let isQueueEmpty = false;
-		if (state === "vlc") {
-			const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
-			isQueueEmpty = (queue.length === 0);
-
-			repeatsArray = await core.Query.getRecordset(rs => rs
-				.select("Link")
-				.from("chat_data", "Song_Request")
-				.orderBy("ID DESC")
-				.limit(repeatAmount)
-				.flat("Link")
-			);
-		}
-
 		// Don't auto-request if the queue is not empty
-		if (!isQueueEmpty) {
+		const playlist = await sb.MpvClient.getPlaylist();
+		if (playlist.length === 0) {
 			return;
 		}
 
 		// let link;
-		const videoData = await core.Query.getRecordset(rs => rs
+		const videoData = await core.Query.getRecordset<{Link: string; Notes: string;}>(rs => rs
 			.select("Link", "Notes")
 			.from("personal", "Favourite_Track")
 			.where("Video_Type = %n", 15)
 			.where(
-				{ condition: (repeatsArray.length !== 0) },
+				{ condition: (repeats.length !== 0) },
 				"Link NOT IN %s+",
-				repeatsArray
+				repeats
 			)
 			.orderBy("RAND()")
 			.limit(1)
@@ -74,23 +52,26 @@ export default {
 
 		const file = videoData.Link.split("\\").at(-1);
 		const vlcEligibleLink = encodeURI(`file:///${videoData.Link}`);
-		const vlcId = await sb.VideoLANConnector.add(vlcEligibleLink);
+		const addResult = await sb.MpvClient.add(vlcEligibleLink, null, { duration: null });
 
-		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
+		const queue = await sb.MpvClient.getNormalizedPlaylist();
 		const row = await core.Query.getRow("chat_data", "Song_Request");
 		row.setValues({
-			VLC_ID: vlcId,
+			VLC_ID: addResult.id,
 			Link: videoData.Link,
 			Name: file,
 			Video_Type: 15,
 			Length: null,
 			Status: (queue.length === 0) ? "Current" : "Queued",
-			Started: (queue.length === 0) ? new sb.Date() : null,
+			Started: (queue.length === 0) ? new SupiDate() : null,
 			User_Alias: 1,
 			Start_Time: null,
 			End_Time: null
 		});
 		await row.save();
+
+		repeats.unshift(videoData.Link);
+		repeats.splice(repeatAmount); // Clamp array to first X elements
 
 		/*
 		let videoID;
