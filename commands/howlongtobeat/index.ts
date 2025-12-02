@@ -91,6 +91,56 @@ const fetchToken = async () => {
 	return token;
 };
 
+const fetchData = async (query: string[]) => {
+	const token = await fetchToken();
+	if (!token) {
+		return {
+			success: false,
+			reply: "Could not fetch game data! The API has likely changed (again?!)"
+		} as const;
+	}
+
+	const response = await core.Got.get("FakeAgent")({
+		url: `https://howlongtobeat.com/api/search`,
+		method: "POST",
+		throwHttpErrors: false,
+		headers: {
+			Referer: "https://howlongtobeat.com",
+			"X-Auth-Token": token
+		},
+		// All the default values (e.g. empty strings, nulls, zeroes) must be filled,
+		// else the API fails with 500 Internal Server Error.
+		json: {
+			searchType: "games",
+			searchTerms: [...query],
+			searchPage: 1,
+			searchOptions: {
+				filter: "",
+				games: {
+					gameplay: {
+						perspective: "",
+						flow: "",
+						genre: "",
+						difficulty: ""
+					},
+					modifier: "",
+					platform: "",
+					rangeCategory: "main",
+					rangeTime: { min: null, max: null },
+					rangeYear: { min: "", max: "" },
+					sortCategory: "popular",
+					userId: 0
+				},
+				randomizer: 0,
+				sort: 0
+			},
+			size: 1
+		}
+	});
+
+	return response;
+};
+
 export default declare({
 	Name: "howlongtobeat",
 	Aliases: ["hltb"],
@@ -107,58 +157,24 @@ export default declare({
 			};
 		}
 
-		const token = await fetchToken();
-		if (!token) {
-			return {
-			    success: false,
-			    reply: "Could not fetch game data! The API has likely changed (again?!)"
-			};
+		let response = await fetchData(args);
+		if ("success" in response) {
+			return response;
 		}
-
-		const response = await core.Got.get("FakeAgent")({
-			url: `https://howlongtobeat.com/api/search`,
-			method: "POST",
-			throwHttpErrors: false,
-			headers: {
-				Referer: "https://howlongtobeat.com",
-				"X-Auth-Token": token
-			},
-			// All the default values (e.g. empty strings, nulls, zeroes) must be filled,
-			// else the API fails with 500 Internal Server Error.
-			json: {
-				searchType: "games",
-				searchTerms: [...args],
-				searchPage: 1,
-				searchOptions: {
-					filter: "",
-					games: {
-						gameplay: {
-							perspective: "",
-							flow: "",
-							genre: "",
-							difficulty: ""
-						},
-						modifier: "",
-						platform: "",
-						rangeCategory: "main",
-						rangeTime: { min: null, max: null },
-						rangeYear: { min: "", max: "" },
-						sortCategory: "popular",
-						userId: 0
-					},
-					randomizer: 0,
-					sort: 0
-				},
-				size: 1
-			}
-		});
 
 		if (!response.ok) {
 			await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, null);
-			return {
-				success: false,
-				reply: "Could not fetch game data! Resetting cache - try again, please."
-			};
+			response = await fetchData(args);
+
+			if ("success" in response) {
+				return response;
+			}
+			else if (!response.ok) {
+				return {
+				    success: false,
+				    reply: "Could not fetch data after resetting the token! The API has likely changed (again?!)"
+				};
+			}
 		}
 
 		const { data } = hltbDataSchema.parse(response.body);
@@ -175,10 +191,23 @@ export default declare({
 			plus: core.Utils.round(gameData.comp_plus / 3600, 1),
 			full: core.Utils.round(gameData.comp_100 / 3600, 1),
 			all: core.Utils.round(gameData.comp_all / 3600, 1)
-		};
+		} as const;
 
 		const url = `https://howlongtobeat.com/game/${gameData.game_id}`;
+		const totalCheck = Object.values(hours).reduce((acc, cur) => acc + cur, 0);
+		if (totalCheck === 0) {
+			return {
+			    success: true,
+			    reply: core.Utils.tag.trim `
+					${gameData.game_name} (${gameData.release_world})
+					currently does not have any data about completion times. 
+					${url}
+				`
+			};
+		}
+
 		return {
+			success: true,
 			reply: core.Utils.tag.trim `
 				Average time to beat ${gameData.game_name} (${gameData.release_world}):
 				Main story - ${hours.main} hours;
