@@ -67,7 +67,7 @@ export default declare({
 		}
 
 		let timeUntil = (status.duration - status.position);
-		for (let i = 0; i < target.order; i++) {
+		for (let i = 0; i < target.index; i++) {
 			timeUntil += playlist[i].duration ?? 0;
 		}
 

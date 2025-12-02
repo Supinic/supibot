@@ -379,20 +379,6 @@ export default declare({
 			};
 		}
 
-		const exists = queue.find(i => (
-			i.Link === data.ID
-			&& i.Start_Time === startTime
-			&& i.End_Time === endTime
-		));
-
-		const existsString = "";
-		if (exists) {
-			return {
-				success: false,
-				reply: `This video is already queued as ID ${exists.VLC_ID}!`
-			};
-		}
-
 		const authorString = (data.author) ? ` by ${data.author}` : "";
 		const segmentLength = (endTime ?? length ?? 0) - (startTime ?? 0);
 
@@ -416,15 +402,26 @@ export default declare({
 			}
 		}
 
-		// Actually attempt to request the video into mpv
-		const addResult = await sb.MpvClient.add(data.link, context.user.ID, {
-			description: data.name,
-			duration: data.duration
-		});
-		if (!addResult.success) {
+		let addResult;
+		try {
+			addResult = await sb.MpvClient.add(data.link, {
+				user: context.user.ID,
+				description: data.name,
+				duration: data.duration
+			});
+		}
+		catch (e) {
+			console.warn(e);
 			await core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			return {
 				reply: `The desktop listener is not currently running! Turning song requests off.`
+			};
+		}
+
+		if (!addResult.success) {
+			return {
+			    success: false,
+			    reply: `Could not request: ${addResult.reason}`
 			};
 		}
 
@@ -467,7 +464,8 @@ export default declare({
 
 		let when = "right now";
 		if (addResult.timeUntil !== 0) {
-			when = core.Utils.timeDelta(addResult.timeUntil);
+			const deltaDate = new SupiDate().addSeconds(addResult.timeUntil);
+			when = core.Utils.timeDelta(deltaDate);
 		}
 
 		const seek = [];
@@ -492,7 +490,6 @@ export default declare({
 				It is playing ${when}.
 				${seekString}
 				${pauseString}
-				${existsString}
 				(slots: ${limits.requests + 1}/${limits.amount}, length: ${Math.round(limits.totalTime + segmentLength)}/${limits.time})
 				${bonusString}
 			`

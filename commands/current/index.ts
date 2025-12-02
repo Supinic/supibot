@@ -47,8 +47,11 @@ export default declare({
 			requesterData = await sb.User.get(current.user);
 		}
 
+		const position = (status.position) ? core.Utils.round(status.position) : "(N/A)";
+		const duration = (status.duration) ? core.Utils.round(status.duration) : "(N/A)";
+		const positionString = `Current position: ${position}/${duration}s.`;
+
 		const requesterUsername = requesterData?.Name ?? "(N/A)";
-		const positionString = `Current position: ${status.position}/${status.duration}s.`;
 		const pauseString = (status.paused)
 			? "The song request is paused at the moment."
 			: "";

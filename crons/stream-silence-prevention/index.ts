@@ -51,8 +51,11 @@ export default {
 		);
 
 		const file = videoData.Link.split("\\").at(-1);
-		const vlcEligibleLink = encodeURI(`file:///${videoData.Link}`);
-		const addResult = await sb.MpvClient.add(vlcEligibleLink, null, { duration: null });
+		const eligibleLink = encodeURI(`file:///${videoData.Link}`);
+		const addResult = await sb.MpvClient.add(eligibleLink, { duration: null });
+		if (!addResult.success) {
+			return;
+		}
 
 		const queue = await sb.MpvClient.getNormalizedPlaylist();
 		const row = await core.Query.getRow("chat_data", "Song_Request");
@@ -72,89 +75,5 @@ export default {
 
 		repeats.unshift(videoData.Link);
 		repeats.splice(repeatAmount); // Clamp array to first X elements
-
-		/*
-		let videoID;
-		const roll = randomInt(1, 100);
-		if (roll < 100) {
-			const videoData = await core.Query.getRecordset(rs => rs
-				.select("Link", "Video_Type")
-				.from("personal", "Favourite_Track")
-				.where(
-					{ condition: (repeatsArray.length !== 0) },
-					"Link NOT IN %s+",
-					repeatsArray
-				)
-				.where({ condition: roll % 2 === 0 }, "Video_Type = %n", 3)
-				.where({ condition: roll % 2 !== 0 }, "Video_Type <> %n", 3)
-				.orderBy("RAND()")
-				.limit(1)
-				.single()
-			);
-
-			const prefix = await core.Query.getRecordset(rs => rs
-				.select("Link_Prefix")
-				.from("data", "Video_Type")
-				.where("ID = %n", videoData.Video_Type)
-				.limit(1)
-				.single()
-				.flat("Link_Prefix")
-			);
-
-			videoID = videoData.Link;
-			link = prefix.replace("$", videoData.Link);
-		}
-		else {
-			videoID = await core.Query.getRecordset(rs => rs
-				.select("Link")
-				.from("music", "Track")
-				.join({
-					toDatabase: "music",
-					toTable: "Track_Tag",
-					on: "Track_Tag.Track = Track.ID"
-				})
-				.where("Track.Video_Type = %n", 1)
-				.where("Track_Tag.Tag = %n OR Track_Tag.Tag = %n", 6, 20)
-				.where("Track.Available = %b", true)
-				.where(
-					{ condition: ([].length !== 0) },
-					"Link NOT IN %s+",
-					[]
-				)
-				.orderBy("RAND()")
-				.single()
-				.flat("Link")
-			);
-
-			link = `https://youtu.be/${videoID}`;
-		}
-
-		// If the rolled video is in the banned list, exit early and repeat later
-		if (bannedLinks.includes(videoID)) {
-			return;
-		}
-
-		if (state === "vlc") {
-			const self = await sb.User.get("supibot");
-			const sr = sb.Command.get("sr");
-
-			const fakeContext = sb.Command.createFakeContext(sr, {
-				user: self,
-				channel: channelData,
-				platform: twitch
-			});
-
-			await sr.execute(fakeContext, link);
-		}
-		else if (state === "cytube") {
-			const linkParser = await getLinkParser();
-			const videoID = linkParser.parseLink(link);
-			const client = cytube.clients.get(cytubeChannelData.ID);
-
-			// noinspection ES6MissingAwait
-			client.queue("yt", videoID);
-			repeatsArray.push(videoID);
-		}
-		 */
 	})
 };

@@ -24,12 +24,11 @@ type ConstructorOptions = {
 };
 type MpvStatus = {
 	current: null | {
+		id: number;
 		url: string;
 		user: number | null;
 		description: string | null;
 		playing: boolean;
-		id: number;
-		order: number;
 	};
 	paused: boolean;
 	playlistCount: number;
@@ -45,10 +44,30 @@ type MpvItem = {
 };
 
 type AddOptions = {
+	user?: number | null;
 	duration?: number | null;
 	description?: string | null;
 	startTime?: number;
 	endTime?: number;
+};
+
+type Failure = {
+	success: false;
+	reason: string;
+};
+type Success = { success: true; };
+
+type AddSuccess = Success & {
+	id: number;
+	/** Time until the added media file plays, in seconds */
+	timeUntil: number;
+};
+type RemoveSuccess = Success & {
+	id: number;
+	order: number;
+	url: string;
+	user: number | null;
+	description: string | null;
 };
 
 const PROPERTY_NA = "property unavailable";
@@ -74,12 +93,17 @@ const dataSchemas = {
 	})
 };
 
+export async function logRequest () {
+	// @todo finish or integrate
+}
+
+// @todo integrate a self-caching system that stores current item data map to Redis on all updates
+// and restores it on load (if available and relevant)
+
 export class MpvClient {
 	private readonly host: string;
 	private readonly port: number;
-
-	private counter = 0;
-	private readonly urlMap = new Map<string, MpvItem>();
+	private readonly itemData = new Map<number, MpvItem>();
 
 	private lastStatus: MpvStatus | null = null;
 
@@ -124,7 +148,7 @@ export class MpvClient {
 		);
 	}
 
-	public async add (url: string, user: number | null, options: AddOptions = {}) {
+	public async add (url: string, options: AddOptions = {}): Promise<Failure | AddSuccess> {
 		// @todo seeking
 		if (options.startTime || options.endTime) {
 			throw new SupiError({
@@ -132,14 +156,15 @@ export class MpvClient {
 			});
 		}
 
-		const existing = this.urlMap.get(url);
-		if (typeof existing !== "undefined") {
-			throw new SupiError({
-			    message: `URL is already queued with ID ${existing.id}`
-			});
+		for (const item of this.itemData.values()) {
+			if (item.url === url) {
+				return {
+				    success: false,
+				    reason: `URL is already queued with ID ${item.id}`
+				};
+			}
 		}
 
-		const id = this.counter++;
 		const [playlist, status] = await Promise.all([this.getPlaylist(), this.getUpdatedStatus()]);
 		const type = (playlist.length === 0) ? "append-play" : "append";
 
@@ -147,65 +172,47 @@ export class MpvClient {
 			? status.duration - status.position
 			: 0;
 
-		for (const item of this.urlMap.values()) {
+		for (const item of this.itemData.values()) {
 			timeUntil += item.duration ?? 0;
 		}
 
 		const raw = await this.send(["loadfile", url, type]);
-		const order = dataSchemas.add.parse(raw.data).playlist_entry_id;
-		const description = options.description ?? null;
+		const id = dataSchemas.add.parse(raw.data).playlist_entry_id;
 
-		this.urlMap.set(url, {
+		this.itemData.set(id, {
 			id,
 			url,
-			user,
-			description,
+			description: options.description ?? null,
+			user: options.user ?? null,
 			duration: options.duration ?? null
 		});
 
 		return {
 			success: true,
 			id,
-			order,
 			timeUntil
 		};
 	}
 
-	public async removeById (targetId: number, targetUser: number | null) {
-		let targetItem;
-		for (const item of this.urlMap.values()) {
-			const { id, user } = item;
-			if (id !== targetId) {
-				continue;
-			}
-
-			if (targetUser !== null && user !== targetUser) {
-				return {
-					success: false,
-					reason: "Video was not requested by user"
-				};
-			}
-
-			targetItem = item;
-			break;
-		}
-
+	public async removeById (targetId: number, targetUser: number | null): Promise<Failure | RemoveSuccess> {
+		const targetItem = this.itemData.get(targetId);
 		if (!targetItem) {
-			throw new SupiError({
-			    message: "No valid url found with this index"
-			});
+			return {
+			    success: false,
+			    reason: "Target ID is not in playlist"
+			};
 		}
 
-		let targetOrder;
+		if (targetUser !== null && targetItem.user !== targetUser) {
+			return {
+			    success: false,
+				reason: "Video was not requested by user"
+			};
+		}
+
 		const playlist = await this.getPlaylist();
-		for (const item of playlist) {
-			if (item.filename === targetItem.url) {
-				targetOrder = item.order;
-				break;
-			}
-		}
-
-		if (typeof targetOrder !== "number") {
+		const targetOrder = playlist.findIndex(i => i.id === targetItem.id);
+		if (targetOrder === -1) {
 			throw new SupiError({
 			    message: "Assert error: No media order found"
 			});
@@ -223,9 +230,9 @@ export class MpvClient {
 		};
 	}
 
-	public async removeUserFirst (targetUser: number) {
+	public async removeUserFirst (targetUser: number): Promise<Failure | RemoveSuccess> {
 		let targetId;
-		for (const { user, id } of this.urlMap.values()) {
+		for (const { user, id } of this.itemData.values()) {
 			if (user !== targetUser) {
 				continue;
 			}
@@ -244,12 +251,12 @@ export class MpvClient {
 		return await this.removeById(targetId, targetUser);
 	}
 
-	public async playNext () {
+	public async playNext (): Promise<Success> {
 		await this.send(["playlist-next", "force"]);
 		return { success: true };
 	}
 
-	public async stop () {
+	public async stop (): Promise<Success> {
 		await this.send(["stop", "keep-playlist"]);
 		return { success: true };
 	}
@@ -280,22 +287,25 @@ export class MpvClient {
 		const { data } = dataSchemas.playlist.parse(raw);
 		const urls = new Set(data.map(i => i.filename));
 
-		for (const url of this.urlMap.keys()) {
-			if (urls.has(url)) {
+		for (const [id, item] of this.itemData.entries()) {
+			if (urls.has(item.url)) {
 				continue;
 			}
 
-			this.urlMap.delete(url);
+			this.itemData.delete(id);
 		}
 
-		return data.map(i => {
-			const extraData = this.urlMap.get(i.filename);
+		return data.map((i, index) => {
+			const extraData = this.itemData.get(i.id);
 			return {
-				order: i.id,
+				id: i.id,
+				index,
 				playing: i.playing,
 				current: i.current,
-				filename: i.filename,
-				...extraData
+				url: i.filename,
+				description: extraData?.description ?? null,
+				duration: extraData?.duration ?? null,
+				user: extraData?.user ?? null
 			};
 		});
 	}
@@ -316,17 +326,16 @@ export class MpvClient {
 		let extraCurrent;
 		const mpvCurrent = playlist.at(0) ?? null;
 		if (mpvCurrent) {
-			extraCurrent = this.urlMap.get(mpvCurrent.filename);
+			extraCurrent = this.itemData.get(mpvCurrent.id);
 		}
 
 		this.lastStatus = {
 			current: (mpvCurrent && extraCurrent)
 				? {
-					url: mpvCurrent.filename,
+					url: mpvCurrent.url,
 					description: extraCurrent.description,
 					user: extraCurrent.user,
 					id: extraCurrent.id,
-					order: mpvCurrent.order,
 					playing: mpvCurrent.playing ?? false
 				}
 				: null,
