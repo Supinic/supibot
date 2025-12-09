@@ -42,6 +42,11 @@ type MpvItem = {
 	description: string | null;
 	duration: number | null;
 };
+export type MpvPlaylistItem = MpvItem & {
+	index: number;
+	playing: boolean;
+	current: boolean;
+};
 
 type AddOptions = {
 	user?: number | null;
@@ -278,7 +283,7 @@ export class MpvClient {
 		return position;
 	}
 
-	public async getPlaylist () {
+	public async getPlaylist (): Promise<MpvPlaylistItem[]> {
 		const raw = await this.send(["get_property", "playlist"], true);
 		if (raw.error !== "success") {
 			return [];
@@ -300,9 +305,9 @@ export class MpvClient {
 			return {
 				id: i.id,
 				index,
-				playing: i.playing,
-				current: i.current,
 				url: i.filename,
+				playing: i.playing ?? false,
+				current: i.current ?? false,
 				description: extraData?.description ?? null,
 				duration: extraData?.duration ?? null,
 				user: extraData?.user ?? null

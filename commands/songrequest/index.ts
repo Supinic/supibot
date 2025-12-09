@@ -8,52 +8,27 @@ import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-ut
 import getLinkParser from "../../utils/link-parser.js";
 
 import { type User } from "../../classes/user.js";
+import { type MpvPlaylistItem } from "../../singletons/mpv-client.js";
+
 const { SONG_REQUESTS_STATE } = cacheKeys;
 
 const REQUEST_TIME_LIMIT = 900;
 const REQUEST_AMOUNT_LIMIT = 10;
 
-// @todo remove and rely specifically on mpv playlist
-type DatabaseVideo = {
-	Added: SupiDate;
-	Duration: number | null;
-	End_Time: number | null;
-	ID: number;
-	Length: number | null;
-	Link: string;
-	Name: string;
-	Notes: string | null;
-	Start_Time: number | null;
-	Started: SupiDate;
-	Status: "Current" | "Inactive" | "Queued";
-	User_Alias: number;
-	VLC_ID: number;
-	Video_Type: number;
-};
-
-const checkLimits = (userData: User, playlist: DatabaseVideo[]) => {
-	const userRequests = playlist.filter(i => i.User_Alias === userData.ID);
+const checkLimits = (userData: User, playlist: MpvPlaylistItem[]) => {
+	const userRequests = playlist.filter(i => i.user === userData.ID);
 	if (userRequests.length >= REQUEST_AMOUNT_LIMIT) {
 		return {
-			canRequest: false,
-			reason: `Maximum amount of videos queued! (${userRequests.length}/${REQUEST_AMOUNT_LIMIT})`
+			success: false,
+			reply: `Maximum amount of videos queued! Limit: ${REQUEST_AMOUNT_LIMIT}`
 		} as const;
 	}
 
-	let totalTime = 0;
-	for (const request of userRequests) {
-		totalTime += (request.End_Time ?? request.Length ?? 0) - (request.Start_Time ?? 0);
-	}
-
-	totalTime = Math.ceil(totalTime);
-
+	const totalTime = userRequests.reduce((acc, cur) => acc + (cur.duration ?? 0), 0);
 	return {
-		canRequest: true,
+		success: true,
 		totalTime,
-		requests: userRequests.length,
-		reason: null,
-		time: REQUEST_TIME_LIMIT,
-		amount: REQUEST_AMOUNT_LIMIT
+		requests: userRequests.length
 	} as const;
 };
 
@@ -120,11 +95,12 @@ export default declare({
 		}
 
 		// Determine the user's and global limits - both duration and video amount
-		const queue = await sb.MpvClient.getNormalizedPlaylist();
+		const queue = await sb.MpvClient.getPlaylist();
 		const limits = checkLimits(context.user, queue);
-		if (!limits.canRequest) {
+		if (!limits.success) {
 			return {
-				reply: limits.reason
+				success: false,
+				reply: limits.reply
 			};
 		}
 
@@ -382,26 +358,6 @@ export default declare({
 		const authorString = (data.author) ? ` by ${data.author}` : "";
 		const segmentLength = (endTime ?? length ?? 0) - (startTime ?? 0);
 
-		let bonusString = "";
-		const bonusLimit = await context.user.getDataProperty("supinicStreamSongRequestExtension") ?? 0;
-		if ((limits.totalTime + segmentLength) > limits.time) {
-			const excess = core.Utils.round((limits.totalTime + segmentLength) - limits.time, 1);
-			if (excess > bonusLimit) {
-				return {
-					success: false,
-					reply: core.Utils.tag.trim `
-						Your video would exceed the total video limit by ${excess} seconds!.
-						You can change the start and end points of the video with these arguments, e.g.: start:0 end:${limits.totalTime - limits.time}
-					`
-				};
-			}
-			else {
-				const remainingBonus = core.Utils.round(bonusLimit - excess, 1);
-				await context.user.setDataProperty("supinicStreamSongRequestExtension", remainingBonus);
-				bonusString = `Used up ${excess} seconds from your extension, ${remainingBonus} remaining.`;
-			}
-		}
-
 		let addResult;
 		try {
 			addResult = await sb.MpvClient.add(data.link, {
@@ -490,8 +446,8 @@ export default declare({
 				It is playing ${when}.
 				${seekString}
 				${pauseString}
-				(slots: ${limits.requests + 1}/${limits.amount}, length: ${Math.round(limits.totalTime + segmentLength)}/${limits.time})
-				${bonusString}
+				Your videos: ${limits.requests + 1}/${REQUEST_AMOUNT_LIMIT}
+				Length of your videos: ${Math.round(limits.totalTime + segmentLength)}/${REQUEST_TIME_LIMIT}
 			`
 		};
 	}),
