@@ -152,23 +152,6 @@ export class MpvClient {
 		return data;
 	}
 
-	public async getNormalizedPlaylist () {
-		return await core.Query.getRecordset<DatabaseVideo[]>(rs => rs
-			.select("*")
-			.select(`
-				(CASE 
-					WHEN (Start_Time IS NOT NULL AND End_Time IS NOT NULL) THEN (End_Time - Start_Time)
-					WHEN (Start_Time IS NOT NULL AND End_Time IS NULL) THEN (Length - Start_Time)
-					WHEN (Start_Time IS NULL AND End_Time IS NOT NULL) THEN (End_Time)
-					ELSE Length
-					END
-				) AS Duration
-			`)
-			.from("chat_data", "Song_Request")
-			.where("Status <> %s", "Inactive")
-		);
-	}
-
 	public async add (url: string, options: AddOptions = {}): Promise<Failure | AddSuccess> {
 		const {
 			name = null,
