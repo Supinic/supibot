@@ -1,7 +1,3 @@
-// import { randomInt } from "node:crypto";
-// import getLinkParser from "../../utils/link-parser.js";
-
-import { SupiDate } from "supi-core";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SONG_REQUESTS_STATE } = sharedKeys;
 
@@ -35,7 +31,7 @@ export default {
 			return;
 		}
 
-		// let link;
+		// @todo port the database table into some kind of a configuration, some kidn of json array or something
 		const videoData = await core.Query.getRecordset<{Link: string; Notes: string;}>(rs => rs
 			.select("Link", "Notes")
 			.from("personal", "Favourite_Track")
@@ -50,28 +46,12 @@ export default {
 			.single()
 		);
 
-		const file = videoData.Link.split("\\").at(-1);
+		const name = videoData.Link.split("/").at(-1);
 		const eligibleLink = encodeURI(`file:///${videoData.Link}`);
-		const addResult = await sb.MpvClient.add(eligibleLink, { duration: null });
+		const addResult = await sb.MpvClient.add(eligibleLink, { duration: null, name });
 		if (!addResult.success) {
 			return;
 		}
-
-		const queue = await sb.MpvClient.getNormalizedPlaylist();
-		const row = await core.Query.getRow("chat_data", "Song_Request");
-		row.setValues({
-			VLC_ID: addResult.id,
-			Link: videoData.Link,
-			Name: file,
-			Video_Type: 15,
-			Length: null,
-			Status: (queue.length === 0) ? "Current" : "Queued",
-			Started: (queue.length === 0) ? new SupiDate() : null,
-			User_Alias: 1,
-			Start_Time: null,
-			End_Time: null
-		});
-		await row.save();
 
 		repeats.unshift(videoData.Link);
 		repeats.splice(repeatAmount); // Clamp array to first X elements
