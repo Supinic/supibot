@@ -362,7 +362,7 @@ export default declare({
 		try {
 			addResult = await sb.MpvClient.add(data.link, {
 				user: context.user.ID,
-				description: data.name,
+				name: data.name,
 				duration: data.duration
 			});
 		}

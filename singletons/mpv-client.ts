@@ -27,7 +27,7 @@ type MpvStatus = {
 		id: number;
 		url: string;
 		user: number | null;
-		description: string | null;
+		name: string | null;
 		playing: boolean;
 	};
 	paused: boolean;
@@ -39,19 +39,34 @@ type MpvItem = {
 	id: number;
 	url: string;
 	user: number | null;
-	description: string | null;
+	name: string | null;
 	duration: number | null;
 };
+
 export type MpvPlaylistItem = MpvItem & {
 	index: number;
 	playing: boolean;
 	current: boolean;
 };
+type MediaRequest = {
+	pid: DatabaseMediaRequestRow["PID"];
+	url: DatabaseMediaRequestRow["URL"];
+	name: DatabaseMediaRequestRow["Name"];
+	user: DatabaseMediaRequestRow["Requester"];
+	duration: DatabaseMediaRequestRow["Duration"];
+};
+type DatabaseMediaRequestRow = {
+	PID: number;
+	URL: string;
+	Name: string | null;
+	Requester: number | null;
+	Duration: number | null;
+};
 
 type AddOptions = {
 	user?: number | null;
 	duration?: number | null;
-	description?: string | null;
+	name?: string | null;
 	startTime?: number;
 	endTime?: number;
 };
@@ -72,7 +87,7 @@ type RemoveSuccess = Success & {
 	order: number;
 	url: string;
 	user: number | null;
-	description: string | null;
+	name: string | null;
 };
 
 const PROPERTY_NA = "property unavailable";
@@ -109,8 +124,9 @@ export class MpvClient {
 	private readonly host: string;
 	private readonly port: number;
 	private readonly itemData = new Map<number, MpvItem>();
-
 	private lastStatus: MpvStatus | null = null;
+
+	private static loggingTableExists: boolean | null = null;
 
 	public constructor (options: ConstructorOptions) {
 		this.host = options.host;
@@ -154,8 +170,15 @@ export class MpvClient {
 	}
 
 	public async add (url: string, options: AddOptions = {}): Promise<Failure | AddSuccess> {
-		// @todo seeking
-		if (options.startTime || options.endTime) {
+		const {
+			name = null,
+			user = null,
+			duration = null,
+			startTime,
+			endTime
+		} = options;
+
+		if (startTime || endTime) {
 			throw new SupiError({
 			    message: "Seeking with start/end times is currently not supported"
 			});
@@ -187,9 +210,17 @@ export class MpvClient {
 		this.itemData.set(id, {
 			id,
 			url,
-			description: options.description ?? null,
-			user: options.user ?? null,
-			duration: options.duration ?? null
+			name,
+			user,
+			duration
+		});
+
+		await MpvClient.logMediaRequest({
+			pid: id,
+			duration,
+			user,
+			url,
+			name
 		});
 
 		return {
@@ -229,7 +260,7 @@ export class MpvClient {
 			success: true,
 			url: targetItem.url,
 			user: targetItem.user,
-			description: targetItem.description,
+			name: targetItem.name,
 			order: targetOrder,
 			id: targetId
 		};
@@ -308,7 +339,7 @@ export class MpvClient {
 				url: i.filename,
 				playing: i.playing ?? false,
 				current: i.current ?? false,
-				description: extraData?.description ?? null,
+				name: extraData?.name ?? null,
 				duration: extraData?.duration ?? null,
 				user: extraData?.user ?? null
 			};
@@ -338,10 +369,10 @@ export class MpvClient {
 			current: (mpvCurrent && extraCurrent)
 				? {
 					url: mpvCurrent.url,
-					description: extraCurrent.description,
+					name: extraCurrent.name,
 					user: extraCurrent.user,
 					id: extraCurrent.id,
-					playing: mpvCurrent.playing ?? false
+					playing: mpvCurrent.playing
 				}
 				: null,
 			paused,
@@ -351,5 +382,31 @@ export class MpvClient {
 		};
 
 		return this.lastStatus;
+	}
+
+	public static async logMediaRequest (data: MediaRequest): Promise<void> {
+		if (MpvClient.loggingTableExists === null) {
+			const exists = await core.Query.isTablePresent("stream", "Media_Request");
+			if (!exists) {
+				// @todo maybe create the table here
+			}
+
+			MpvClient.loggingTableExists = exists;
+		}
+
+		if (!MpvClient.loggingTableExists) {
+			return;
+		}
+
+		const row = await core.Query.getRow<DatabaseMediaRequestRow>("stream", "Media_Request");
+		row.setValues({
+			PID: data.pid,
+			Requester: data.user,
+			URL: data.url,
+			Name: data.name,
+			Duration: data.duration
+		});
+
+		await row.save({ skipLoad: true });
 	}
 }
