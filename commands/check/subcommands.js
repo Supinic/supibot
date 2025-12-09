@@ -6,9 +6,6 @@ import handleErrorInspection from "./inspect-errors.js";
 import GptCache from "../gpt/cache-control.js";
 import CookieLogic from "../cookie/cookie-logic.js";
 
-import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_MPV_PAUSED } = cacheKeys;
-
 export default [
 	{
 		name: "afk",

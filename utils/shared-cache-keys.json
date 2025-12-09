@@ -1,7 +1,6 @@
 {
   "LATEST_NODE_JS_VERSION": "nodejs-latest-version",
   "SONG_REQUESTS_STATE": "song-requests-state",
-  "SONG_REQUESTS_MPV_PAUSED": "song-requests-mpv-pause-status",
   "SOUNDCLOUD_CLIENT_ID": "soundcloud-client-id",
   "PLAYSOUNDS_ENABLED": "playsounds-enabled",
   "TTS_ENABLED": "text-to-speech-state",
