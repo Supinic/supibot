@@ -60,7 +60,7 @@ export default declare({
 			success: true,
 			reply: core.Utils.tag.trim `
 				Currently playing:
-				${current.description ?? current.url}
+				${current.name ?? current.url}
 				(ID ${current.id}) - requested by ${requesterUsername}.
 				${positionString}
 				${pauseString}

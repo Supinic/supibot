@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_MPV_PAUSED } = cacheKeys;
+const { SONG_REQUESTS_STATE } = cacheKeys;
 
 export default declare({
 	Name: "songrequestqueue",
@@ -36,14 +36,13 @@ export default declare({
 			};
 		}
 
-		const { position } = await sb.MpvClient.getUpdatedStatus();
+		const { position, paused } = await sb.MpvClient.getUpdatedStatus();
 		const total = playlist.reduce((acc, cur) => acc + (cur.duration ?? 0), 0);
 
 		const length = total - (position ?? 0);
 		const delta = core.Utils.timeDelta(Math.round(SupiDate.now() + length * 1000), true);
-		const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_MPV_PAUSED);
-		const pauseString = (pauseState === true)
-			? "Song requests are paused at the moment."
+		const pauseString = (paused)
+			? "The song request is paused at the moment."
 			: "";
 
 		return {

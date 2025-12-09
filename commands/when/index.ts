@@ -1,7 +1,8 @@
 import { SupiError } from "supi-core";
+
 import { declare } from "../../classes/command.js";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_MPV_PAUSED } = cacheKeys;
+const { SONG_REQUESTS_STATE } = cacheKeys;
 
 export default declare({
 	Name: "when",
@@ -46,7 +47,7 @@ export default declare({
 		let prepend = "";
 		let target = personal[0];
 		if (target.current) {
-			const name = target.description ?? target.url;
+			const name = target.name ?? target.url;
 			if (personal.length === 1) {
 				return {
 					success: true,
@@ -73,14 +74,13 @@ export default declare({
 
 		const delta = core.Utils.formatTime(Math.round(timeUntil));
 		const bridge = (prepend) ? "Then," : "Your next video";
-
-		const pauseStatus = await core.Cache.getByPrefix(SONG_REQUESTS_MPV_PAUSED);
-		const pauseString = (pauseStatus === true)
-			? "Song requests are paused at the moment."
+		const pauseString = (status.paused)
+			? "The song request is paused at the moment."
 			: "";
 
-		const name = target.description ?? target.url;
+		const name = target.name ?? target.url;
 		return {
+			success: true,
 			reply: `${prepend} ${bridge} "${name}" is playing in ${delta}. ${pauseString}`
 		};
 	}),

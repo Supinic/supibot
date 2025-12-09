@@ -34,6 +34,7 @@ export default declare({
 
 		if (!result.success) {
 			return {
+				success: false,
 				reply: (target)
 					? "Target video ID was not found, or it wasn't requested by you!"
 					: "You don't currently have any videos in the playlist!"
@@ -42,7 +43,8 @@ export default declare({
 
 		const action = (result.order === 0) ? "skipped" : "removed from the playlist";
 		return {
-			reply: `Your request "${result.description ?? result.url}" (ID ${result.id}) has been successfully ${action}.`
+			success: true,
+			reply: `Your request "${result.name ?? result.url}" (ID ${result.id}) has been successfully ${action}.`
 		};
 	}),
 	Dynamic_Description: (prefix) => [
