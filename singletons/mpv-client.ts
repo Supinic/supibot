@@ -121,6 +121,19 @@ export class MpvClient {
 	private readonly itemData = new Map<number, MpvItem>();
 	private lastStatus: MpvStatus | null = null;
 
+	// eslint-disable-next-line unicorn/consistent-function-scoping,@typescript-eslint/no-misused-promises
+	private readonly finishedSongPlaylistClearInterval = setInterval(async () => {
+		const playlist = await this.getPlaylist();
+		const current = playlist.findIndex(i => i.current);
+		if (current === -1) {
+			return;
+		}
+		if (current !== 0) {
+			await this.send(["playlist-remove", 0]);
+			await this.play();
+		}
+	}, 500);
+
 	private static loggingTableExists: boolean | null = null;
 
 	public constructor (options: ConstructorOptions) {
@@ -195,8 +208,11 @@ export class MpvClient {
 			}
 		}
 
-		const [playlist, status] = await Promise.all([this.getPlaylist(), this.getUpdatedStatus()]);
-		const type = (playlist.length === 0) ? "append-play" : "append";
+		// const [playlist, status] = await Promise.all([this.getPlaylist(), this.getUpdatedStatus()]);
+		// const type = (playlist.length === 0) ? "append-play" : "append-play";
+
+		const status = await this.getUpdatedStatus();
+		const type = "append-play";
 
 		let timeUntil = (status.duration && status.position)
 			? status.duration - status.position
@@ -299,6 +315,16 @@ export class MpvClient {
 		return { success: true };
 	}
 
+	public async pause (): Promise<Success> {
+		await this.send(["set_property", "pause", true]);
+		return { success: true };
+	}
+
+	public async play (): Promise<Success> {
+		await this.send(["set_property", "pause", false]);
+		return { success: true };
+	}
+
 	public getCurrentStatus (): MpvStatus {
 		if (!this.lastStatus) {
 			throw new SupiError({
@@ -384,6 +410,10 @@ export class MpvClient {
 		};
 
 		return this.lastStatus;
+	}
+
+	public destroy () {
+		clearInterval(this.finishedSongPlaylistClearInterval);
 	}
 
 	public static async logMediaRequest (data: MediaRequest): Promise<void> {
