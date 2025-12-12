@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
+import { MapEntries } from "../utils/ts-helpers.js";
 
 export type DatabaseVideo = {
 	Added: SupiDate;
@@ -90,6 +91,7 @@ type RemoveSuccess = Success & {
 	name: string | null;
 };
 
+const ITEM_DATA_CACHE_KEY = "mpv-item-data";
 const PROPERTY_NA = "property unavailable";
 const dataSchemas = {
 	generic: z.object({
@@ -113,13 +115,6 @@ const dataSchemas = {
 	})
 };
 
-export async function logRequest () {
-	// @todo finish or integrate
-}
-
-// @todo integrate a self-caching system that stores current item data map to Redis on all updates
-// and restores it on load (if available and relevant)
-
 export class MpvClient {
 	private readonly host: string;
 	private readonly port: number;
@@ -131,6 +126,8 @@ export class MpvClient {
 	public constructor (options: ConstructorOptions) {
 		this.host = options.host;
 		this.port = options.port;
+
+		void this.loadCache();
 	}
 
 	private async send (command: unknown[], skipError: boolean = false) {
@@ -150,6 +147,28 @@ export class MpvClient {
 		}
 
 		return data;
+	}
+
+	private async loadCache (clearExisting: boolean = false) {
+		const data = await core.Cache.getByPrefix(ITEM_DATA_CACHE_KEY) as MapEntries<typeof this.itemData> | undefined;
+		if (!data) {
+			return;
+		}
+
+		if (clearExisting) {
+			this.itemData.clear();
+		}
+
+		for (const [key, value] of data) {
+			this.itemData.set(key, value);
+		}
+	}
+
+	private async saveCache () {
+		const data = [...this.itemData.entries()] satisfies MapEntries<typeof this.itemData>;
+		await core.Cache.setByPrefix(ITEM_DATA_CACHE_KEY, data, {
+			expiry: 12 * 36e5 // 12 hours
+		});
 	}
 
 	public async add (url: string, options: AddOptions = {}): Promise<Failure | AddSuccess> {
@@ -198,13 +217,10 @@ export class MpvClient {
 			duration
 		});
 
-		await MpvClient.logMediaRequest({
-			pid: id,
-			duration,
-			user,
-			url,
-			name
-		});
+		await Promise.all([
+			MpvClient.logMediaRequest({ pid: id, duration, user, url, name }),
+			this.saveCache()
+		]);
 
 		return {
 			success: true,
@@ -238,6 +254,7 @@ export class MpvClient {
 		}
 
 		await this.send(["playlist-remove", targetOrder]);
+		await this.saveCache();
 
 		return {
 			success: true,
@@ -272,6 +289,8 @@ export class MpvClient {
 
 	public async playNext (): Promise<Success> {
 		await this.send(["playlist-next", "force"]);
+		await this.saveCache();
+
 		return { success: true };
 	}
 
