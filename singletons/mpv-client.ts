@@ -121,7 +121,6 @@ export class MpvClient {
 	private readonly itemData = new Map<number, MpvItem>();
 	private lastStatus: MpvStatus | null = null;
 
-	// eslint-disable-next-line unicorn/consistent-function-scoping,@typescript-eslint/no-misused-promises
 	private readonly finishedSongPlaylistClearInterval = setInterval(async () => {
 		const playlist = await this.getPlaylist();
 		const current = playlist.findIndex(i => i.current);
@@ -130,7 +129,7 @@ export class MpvClient {
 		}
 		if (current !== 0) {
 			await this.send(["playlist-remove", 0]);
-			await this.play();
+			setTimeout(() => void this.play(), 2000);
 		}
 	}, 500);
 

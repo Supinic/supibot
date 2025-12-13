@@ -25,9 +25,9 @@ export default {
 			return;
 		}
 
-		// Don't auto-request if the queue is not empty
+		// Don't auto-request if the queue already has at least one thing queued
 		const playlist = await sb.MpvClient.getPlaylist();
-		if (playlist.length === 0) {
+		if (playlist.length >= 1) {
 			return;
 		}
 
