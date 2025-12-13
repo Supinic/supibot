@@ -303,7 +303,7 @@ export class Banphrase extends TemplateWithId {
 		let isExternallyBanphrased: boolean | null = null;
 		try {
 			const responseData = await Banphrase.executeExternalAPI(
-				message.slice(0, 1000),
+				resultMessage.slice(0, 1000),
 				channelData.Banphrase_API_Type,
 				channelData.Banphrase_API_URL,
 				{ fullResponse: true }
@@ -317,7 +317,7 @@ export class Banphrase extends TemplateWithId {
 					API: channelData.Banphrase_API_URL,
 					Channel: channelData.ID,
 					Platform: channelData.Platform.ID,
-					Message: message,
+					Message: resultMessage,
 					Response: JSON.stringify(responseData[apiDataSymbol])
 				});
 
@@ -338,14 +338,14 @@ export class Banphrase extends TemplateWithId {
 			switch (channelData.Banphrase_API_Downtime) {
 				case "Ignore":
 					return {
-						string: message,
+						string: resultMessage,
 						passed: true,
 						warn: true
 					};
 
 				case "Notify":
 					return {
-						string: `⚠ ${message}`,
+						string: `⚠ ${resultMessage}`,
 						passed: true,
 						warn: true
 					};
@@ -382,7 +382,7 @@ export class Banphrase extends TemplateWithId {
 
 				case "Whisper": {
 					return {
-						string: `Banphrase failed, your command result: ${message}.`,
+						string: `Banphrase failed, your command result: ${resultMessage}.`,
 						passed: true,
 						privateMessage: true,
 						warn: true
@@ -402,7 +402,7 @@ export class Banphrase extends TemplateWithId {
 					continue;
 				}
 
-				const result = await banphrase.execute(message);
+				const result = await banphrase.execute(resultMessage);
 				if (typeof result === "string") {
 					return {
 						string: result,

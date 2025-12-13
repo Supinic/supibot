@@ -1,117 +1,144 @@
+import * as z from "zod";
+import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
 
-// Need to fetch a randomized hash to attach to the ~~api/search~~ ~~api/find~~ ~~api/lookup~~ ~~api/s~~ ~~api/ouch~~ ~~api/seek~~ api/locate endpoint
-// Reference: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/issues/25
-// Reference from `search` to `find`: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/pull/35
-// Reference from `find` to `lookup`: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/pull/38
-const HLTB_JS_FILE_HASH_KEY = "hltb-file-hash";
-const HLTB_ENDPOINT_HASH_KEY = "hltb-endpoint-hash";
+const HLTB_TOKEN_CACHE_KEY = "hltb-token-cache";
 
-const FILE_PREFIX = "_next/static/chunks/pages";
-const FILE_HASH_REGEX = /static\/chunks\/pages\/(_app-\w+?\.js)/;
-const ENDPOINT_HASH_REGEX = /\/api\/locate\/".concat\("(\w+)"\)\s*(.concat\("(\w+)"\))?/;
+const initSchema = z.object({ token: z.string() });
+const hltbGameSchema = z.object({
+	comp_100: z.number(),
+	comp_100_count: z.number(),
+	comp_all: z.number(),
+	comp_all_count: z.number(),
+	comp_lvl_co: z.number(),
+	comp_lvl_combine: z.number(),
+	comp_lvl_mp: z.number(),
+	comp_lvl_sp: z.number(),
+	comp_main: z.number(),
+	comp_main_count: z.number(),
+	comp_plus: z.number(),
+	comp_plus_count: z.number(),
+	count_backlog: z.number(),
+	count_comp: z.number(),
+	count_playing: z.number(),
+	count_retired: z.number(),
+	count_review: z.number(),
+	count_speedrun: z.number(),
+	game_alias: z.string(),
+	game_id: z.number(),
+	game_image: z.string(),
+	game_name: z.string(),
+	game_name_date: z.number(),
+	game_type: z.string(),
+	invested_co: z.number(),
+	invested_co_count: z.number(),
+	invested_mp: z.number(),
+	invested_mp_count: z.number(),
+	profile_platform: z.string(),
+	profile_popular: z.number(),
+	release_world: z.number(),
+	review_score: z.number()
+});
+const hltbDataSchema = z.object({
+	category: z.string(),
+	color: z.string(),
+	count: z.number(),
+	data: z.array(hltbGameSchema),
+	displayModifier: z.unknown(),
+	pageCurrent: z.number(),
+	pageSize: z.number(),
+	pageTotal: z.number(),
+	title: z.string(),
+	userData: z.array(z.unknown())
+});
 
-const fetchFileHash = async (force: boolean = false) => {
-	const existing = await core.Cache.getByPrefix(HLTB_JS_FILE_HASH_KEY) as string | undefined;
-	if (!force && existing) {
+/**
+ * This comment chain is no longer relevant after the latest changes, made on 2025-11-17:
+ *
+ * // Need to fetch a randomized hash to attach to the ~~api/search~~ ~~api/find~~ ~~api/lookup~~ ~~api/s~~ ~~api/ouch~~ ~~api/seek~~ api/locate endpoint
+ * // Reference: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/issues/25
+ * // Reference from `search` to `find`: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/pull/35
+ * // Reference from `find` to `lookup`: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/pull/38
+ */
+
+/**
+ * Fetches the "authentication token" - either from cache, or refreshes it.
+ */
+const fetchToken = async () => {
+	const existing = await core.Cache.getByPrefix(HLTB_TOKEN_CACHE_KEY) as string | undefined;
+	if (existing) {
 		return existing;
 	}
 
+	const now = SupiDate.now();
 	const response = await core.Got.get("FakeAgent")({
-		url: "https://howlongtobeat.com/",
-		responseType: "text"
+		url: `https://howlongtobeat.com/api/search/init?t=${now}`,
+		responseType: "json",
+		headers: {
+			Referer: "https://howlongtobeat.com/"
+		}
 	});
 
 	if (!response.ok) {
 		return null;
 	}
 
-	const match = response.body.match(FILE_HASH_REGEX);
-	if (!match) {
-		return null;
-	}
-
-	await core.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, match[1], {
+	const { token } = initSchema.parse(response.body);
+	await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, token, {
 		expiry: 864e5 // 1 day
 	});
 
-	return match[1];
+	return token;
 };
 
-const fetchEndpointHash = async (fileHash: string, force: boolean = false) => {
-	const existing = await core.Cache.getByPrefix(HLTB_ENDPOINT_HASH_KEY) as string | undefined;
-	if (!force && existing) {
-		return existing;
+const fetchData = async (query: string[]) => {
+	const token = await fetchToken();
+	if (!token) {
+		return {
+			success: false,
+			reply: "Could not fetch game data! The API has likely changed (again?!)"
+		} as const;
 	}
 
 	const response = await core.Got.get("FakeAgent")({
-		url: `https://howlongtobeat.com/${FILE_PREFIX}/${fileHash}`,
-		responseType: "text"
+		url: `https://howlongtobeat.com/api/search`,
+		method: "POST",
+		throwHttpErrors: false,
+		headers: {
+			Referer: "https://howlongtobeat.com",
+			"X-Auth-Token": token
+		},
+		// All the default values (e.g. empty strings, nulls, zeroes) must be filled,
+		// else the API fails with 500 Internal Server Error.
+		json: {
+			searchType: "games",
+			searchTerms: [...query],
+			searchPage: 1,
+			searchOptions: {
+				filter: "",
+				games: {
+					gameplay: {
+						perspective: "",
+						flow: "",
+						genre: "",
+						difficulty: ""
+					},
+					modifier: "",
+					platform: "",
+					rangeCategory: "main",
+					rangeTime: { min: null, max: null },
+					rangeYear: { min: "", max: "" },
+					sortCategory: "popular",
+					userId: 0
+				},
+				randomizer: 0,
+				sort: 0
+			},
+			size: 1
+		}
 	});
 
-	if (!response.ok) {
-		await core.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, null);
-		return null;
-	}
-
-	const match = response.body.match(ENDPOINT_HASH_REGEX);
-	if (!match) {
-		return null;
-	}
-
-	const hash = (match[3]) ? `${match[1]}${match[3]}` : match[1];
-	await core.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, hash, {
-		expiry: 864e5 // 1 day
-	});
-
-	return hash;
-};
-
-type HltbGame = {
-	comp_100: number;
-	comp_100_count: number;
-	comp_all: number;
-	comp_all_count: number;
-	comp_lvl_co: number;
-	comp_lvl_combine: number;
-	comp_lvl_mp: number;
-	comp_lvl_sp: number;
-	comp_main: number;
-	comp_main_count: number;
-	comp_plus: number;
-	comp_plus_count: number;
-	count_backlog: number;
-	count_comp: number;
-	count_playing: number;
-	count_retired: number;
-	count_review: number;
-	count_speedrun: number;
-	game_alias: string;
-	game_id: number;
-	game_image: string;
-	game_name: string;
-	game_name_date: number;
-	game_type: string;
-	invested_co: number;
-	invested_co_count: number;
-	invested_mp: number;
-	invested_mp_count: number;
-	profile_platform: string;
-	profile_popular: number;
-	release_world: number;
-	review_score: number;
-};
-type HltbData = {
-	category: string;
-	color: string;
-	count: number;
-	data: HltbGame[];
-	displayModifier: unknown;
-	pageCurrent: number;
-	pageSize: number;
-	pageTotal: number;
-	title: string;
-	userData: unknown[];
+	return response;
 };
 
 export default declare({
@@ -130,68 +157,27 @@ export default declare({
 			};
 		}
 
-		const fileHash = await fetchFileHash();
-		if (!fileHash) {
-			return {
-				success: false,
-				reply: "Cannot fetch game data - file hash!"
-			};
+		let response = await fetchData(args);
+		if ("success" in response) {
+			return response;
 		}
-
-		const endpointHash = await fetchEndpointHash(fileHash);
-		if (!endpointHash) {
-			return {
-				success: false,
-				reply: "Cannot fetch game data - endpoint hash!"
-			};
-		}
-
-		const response = await core.Got.get("FakeAgent")<HltbData>({
-			url: `https://howlongtobeat.com/api/locate/${endpointHash}`,
-			method: "POST",
-			throwHttpErrors: false,
-			headers: {
-				Referer: "https://howlongtobeat.com"
-			},
-			// All the default values (e.g. empty strings, nulls, zeroes) must be filled,
-			// else the API fails with 500 Internal Server Error.
-			json: {
-				searchType: "games",
-				searchTerms: [...args],
-				searchPage: 1,
-				searchOptions: {
-					filter: "",
-					games: {
-						gameplay: {
-							perspective: "",
-							flow: "",
-							genre: "",
-							difficulty: ""
-						},
-						modifier: "",
-						platform: "",
-						rangeCategory: "main",
-						rangeTime: { min: null, max: null },
-						rangeYear: { min: "", max: "" },
-						sortCategory: "popular",
-						userId: 0
-					},
-					randomizer: 0,
-					sort: 0
-				},
-				size: 1
-			}
-		});
 
 		if (!response.ok) {
-			await core.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, null);
-			return {
-				success: false,
-				reply: "Could not fetch game data! Resetting cache - try again, please."
-			};
+			await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, null);
+			response = await fetchData(args);
+
+			if ("success" in response) {
+				return response;
+			}
+			else if (!response.ok) {
+				return {
+				    success: false,
+				    reply: "Could not fetch data after resetting the token! The API has likely changed (again?!)"
+				};
+			}
 		}
 
-		const { data } = response.body;
+		const { data } = hltbDataSchema.parse(response.body);
 		if (data.length === 0) {
 			return {
 				success: false,
@@ -205,10 +191,23 @@ export default declare({
 			plus: core.Utils.round(gameData.comp_plus / 3600, 1),
 			full: core.Utils.round(gameData.comp_100 / 3600, 1),
 			all: core.Utils.round(gameData.comp_all / 3600, 1)
-		};
+		} as const;
 
 		const url = `https://howlongtobeat.com/game/${gameData.game_id}`;
+		const totalCheck = Object.values(hours).reduce((acc, cur) => acc + cur, 0);
+		if (totalCheck === 0) {
+			return {
+			    success: true,
+			    reply: core.Utils.tag.trim `
+					${gameData.game_name} (${gameData.release_world})
+					currently does not have any data about completion times. 
+					${url}
+				`
+			};
+		}
+
 		return {
+			success: true,
 			reply: core.Utils.tag.trim `
 				Average time to beat ${gameData.game_name} (${gameData.release_world}):
 				Main story - ${hours.main} hours;
