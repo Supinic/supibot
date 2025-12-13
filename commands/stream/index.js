@@ -7,7 +7,7 @@ const {
 	SONG_REQUESTS_STATE
 } = cacheKeys;
 
-const AVAILABLE_SONG_REQUEST_STATES = new Set(["vlc", "vlc-read", "off"]);
+const AVAILABLE_SONG_REQUEST_STATES = new Set(["mpv", "off"]);
 
 export default {
 	Name: "stream",
@@ -76,13 +76,6 @@ export default {
 					return {
 						reply: "Invalid song request state!"
 					};
-				}
-
-				if (value === "vlc") {
-					sb.VideoLANConnector.startClient();
-				}
-				else {
-					sb.VideoLANConnector.stopClient();
 				}
 
 				await core.Cache.setByPrefix(SONG_REQUESTS_STATE, value);
