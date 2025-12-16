@@ -6,6 +6,7 @@ import BrighterShoresSubDefinition from "./brighter-shores.js";
 import BunSubDefinition from "./bun.js";
 import ChangelogSubDefinition from "./changelog.js";
 import ChannelLiveSubDefinition from "./channel-live.js";
+import CloudflareDevSubDefinition from "./cloudflare-dev.js";
 import DenoSubDefinition from "./deno.js";
 import DotnetSubDefinition from "./dotnet.js";
 import FactorioSubDefinition from "./factorio.js";
@@ -27,6 +28,7 @@ export default [
 	BunSubDefinition,
 	ChangelogSubDefinition,
 	ChannelLiveSubDefinition,
+	CloudflareDevSubDefinition,
 	DenoSubDefinition,
 	DotnetSubDefinition,
 	FactorioSubDefinition,
