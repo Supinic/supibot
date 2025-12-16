@@ -551,10 +551,17 @@
         "helpers": []
       },
       {
-        "name": "Google aggregate",
-        "url": "https://news.google.com",
-        "path": "rss/topics",
-        "endpoints": ["CAAqIQgKIhtDQkFTRGdvSUwyMHZNRE0xY1hrU0FtVnNLQUFQAQ?hl=el&gl=GR&ceid=GR:el"],
+        "name": "Η Καθημερινή",
+        "url": "https://feeds.feedburner.com",
+        "path": "kathimerini",
+        "endpoints": ["DJpy"],
+        "helpers": ["l7mon"]
+      },
+      {
+        "name": "ThePressProject",
+        "url": "https://thepressproject.gr",
+        "path": null,
+        "endpoints": ["feed"],
         "helpers": ["l7mon"]
       }
     ]
