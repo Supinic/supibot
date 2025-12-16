@@ -47,7 +47,7 @@ export default {
 		);
 
 		const name = videoData.Link.split("/").at(-1);
-		const eligibleLink = encodeURI(`file:///${videoData.Link}`);
+		const eligibleLink = encodeURI(`/${videoData.Link}`);
 		const addResult = await sb.MpvClient.add(eligibleLink, { duration: null, name });
 		if (!addResult.success) {
 			return;
