@@ -401,8 +401,8 @@
       {
         "name": "Nieuwsblad",
         "url": "https://www.nieuwsblad.be",
-        "path": "rss/section",
-        "endpoints": ["55178e67-15a8-4ddd-a3d8-bfe5708f8932"],
+        "path": null,
+        "endpoints": ["rss"],
         "helpers": ["unitedfingers"]
       }
     ]
@@ -695,7 +695,15 @@
   {
     "code": "mn",
     "language": "mongolian",
-    "sources": []
+    "sources": [
+      {
+        "name": "MNB.mn",
+        "url": "https://www.mnb.mn",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["supinic"]
+      }
+    ]
   },
   {
     "code": "in",
@@ -893,18 +901,26 @@
   {
     "code": "li",
     "language": "German",
-    "sources": []
+    "sources": [
+      {
+        "name": "lie:zeit",
+        "url": "https://www.lie-zeit.li",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["supinic"]
+      }
+    ]
   },
   {
     "code": "sa",
     "language": "Arabic",
     "sources": [
       {
-        "name": "العربية (Al Arabiya)",
-        "url": "https://www.alarabiya.net",
-        "path": "feed/rss2/ar",
-        "endpoints": ["saudi-today.xml"],
-        "helpers": ["ALazyMeme"]
+        "name": "جريدة الرياض (Al-Riyadh)",
+        "url": "https://www.alriyadh.com",
+        "path": null,
+        "endpoints": ["section.main.xml"],
+        "helpers": ["supinic"]
       }
     ]
   },
@@ -1056,7 +1072,7 @@
   },
   {
     "code": "osrs",
-    "language": "english",
+    "language": "English",
     "sources": [
       {
         "name": "OSRS",

@@ -39,7 +39,7 @@ describe("valid RSS news definitions", function () {
 
 					for (const url of urls) {
 						it(`${url} should be a valid RSS feed`, async function () {
-							this.timeout(5000);
+							this.timeout(7500);
 
 							let dataLength;
 							let response;
