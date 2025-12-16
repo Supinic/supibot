@@ -305,21 +305,21 @@
     "language": "ukrainian",
     "sources": [
       {
-        "name": "Radio Svoboda",
+        "name": "Радіо Свобода (Radio Svoboda)",
         "url": "https://www.radiosvoboda.org",
         "path": "api",
         "endpoints": ["zrqiteuuir", "zjmkrey$ko"],
         "helpers": ["boring_nick"]
       },
       {
-        "name": "Obozrevatel",
+        "name": "OBOZ.ua (Obozrevatel)",
         "url": "https://www.obozrevatel.com",
         "path": "ukr/out/rss",
         "endpoints": ["lastnews.xml"],
         "helpers": ["boring_nick"]
       },
       {
-        "name": "Suspilne",
+        "name": "Суспільне (Suspilne)",
         "url": "https://suspilne.media",
         "path": "rss",
         "endpoints": ["ukrnet.rss"],
@@ -432,7 +432,7 @@
     "language": "persian",
     "sources": [
       {
-        "name": "رادیو فردا",
+        "name": "رادیو فردا (Radio Farda)",
         "url": "https://www.radiofarda.com",
         "path": "api",
         "endpoints": ["zpoqie-kqp"],
@@ -544,14 +544,14 @@
     "language": "greek",
     "sources": [
       {
-        "name": "Skai.gr",
+        "name": "ΣΚΑΪ (Skai.gr)",
         "url": "https://feeds.feedburner.com",
         "path": "skai",
         "endpoints": ["PLwa"],
         "helpers": []
       },
       {
-        "name": "Η Καθημερινή",
+        "name": "Η Καθημερινή (Kathimerini)",
         "url": "https://feeds.feedburner.com",
         "path": "kathimerini",
         "endpoints": ["DJpy"],
@@ -618,7 +618,7 @@
     "language": "macedonian",
     "sources": [
       {
-        "name": "Канал 5 ТВ",
+        "name": "Канал 5 ТВ (Kanal 5 TV)",
         "url": "https://kanal5.com.mk",
         "path": null,
         "endpoints": ["rss.aspx?id=2", "rss.aspx?id=7"],
@@ -632,7 +632,7 @@
         "helpers": ["supinic"]
       },
       {
-        "name": "Макфакс",
+        "name": "Макфакс (Makfax)",
         "url": "https://makfax.com.mk",
         "path": null,
         "endpoints": ["makedonija/feed", "crna-hronika/feed"],
@@ -658,7 +658,7 @@
     "language": "russian",
     "sources": [
       {
-        "name": "Интерфакс",
+        "name": "Интерфакс (Interfax)",
         "url": "https://www.interfax.ru",
         "path": null,
         "endpoints": ["rss.asp"],
@@ -684,7 +684,7 @@
     "language": "hebrew",
     "sources": [
       {
-        "name": "מעריב אונליין",
+        "name": "מעריב אונליין (Maariv)",
         "url": "https://www.maariv.co.il",
         "path": "Rss",
         "endpoints": ["RssFeedsChadashotBaArez"],
@@ -849,21 +849,14 @@
     "language": "Thai",
     "sources": [
       {
-        "name": "ประชาชาติ",
-        "url": "https://prachachat.net",
-        "path": null,
-        "endpoints": ["feed"],
-        "helpers": ["rod41732"]
-      },
-      {
-        "name": "แนวหน้า",
+        "name": "แนวหน้า (Naewna)",
         "url": "https://naewna.com",
         "path": null,
         "endpoints": ["rss.php"],
         "helpers": ["doge41732"]
       },
       {
-        "name": "ไทยรัฐออนไลน์",
+        "name": "ไทยรัฐออนไลน์ (Thairath)",
         "url": "https://www.thairath.co.th",
         "path": "rss",
         "endpoints": ["news"],
@@ -907,7 +900,7 @@
     "language": "Arabic",
     "sources": [
       {
-        "name": "Al Arabiya",
+        "name": "العربية (Al Arabiya)",
         "url": "https://www.alarabiya.net",
         "path": "feed/rss2/ar",
         "endpoints": ["saudi-today.xml"],
@@ -1053,7 +1046,7 @@
     "language": "Georgian",
     "sources": [
       {
-        "name": "ალია",
+        "name": "ალია (Alia)",
         "url": "https://alia.ge",
         "path": null,
         "endpoints": ["feed"],
