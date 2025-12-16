@@ -25,6 +25,12 @@ export default {
 			return;
 		}
 
+		// Ping if mpv is actually running
+		const checkMpv = await sb.MpvClient.ping();
+		if (!checkMpv) {
+			return;
+		}
+
 		// Don't auto-request if the queue already has at least one thing queued
 		const playlist = await sb.MpvClient.getPlaylist();
 		if (playlist.length >= 1) {

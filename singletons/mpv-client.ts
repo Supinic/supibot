@@ -76,10 +76,12 @@ type RemoveSuccess = Success & {
 
 const ITEM_DATA_CACHE_KEY = "mpv-item-data";
 const PROPERTY_NA = "property unavailable";
+const TIMED_OUT_REGEX = /^MPV request #\d+ timed out$/;
+
 const dataSchemas = {
 	generic: z.object({
 		data: z.unknown(),
-		request_id: z.int(),
+		request_id: z.int().optional(),
 		error: z.string()
 	}),
 
@@ -102,10 +104,76 @@ export class MpvClient {
 	private readonly host: string;
 	private readonly port: number;
 	private readonly itemData = new Map<number, MpvItem>();
+	private readonly finishedSongPlaylistClearInterval = setInterval(() => void this.trimPlaylist(), 500);
+
+	private running: boolean = false;
 	private lastStatus: MpvStatus | null = null;
 
-	// eslint-disable-next-line unicorn/consistent-function-scoping,@typescript-eslint/no-misused-promises
-	private readonly finishedSongPlaylistClearInterval = setInterval(async () => {
+	private static loggingTableExists: boolean | null = null;
+
+	public constructor (options: ConstructorOptions) {
+		this.host = options.host;
+		this.port = options.port;
+
+		void this.loadCache();
+	}
+
+	private async send (command: unknown[], skipError: boolean = false) {
+		const response = await core.Got.get("GenericAPI")({
+			url: `${this.host}:${this.port}`,
+			searchParams: {
+				mpv: JSON.stringify(command)
+			}
+		});
+
+		const data = dataSchemas.generic.parse(response.body);
+		if (!skipError && data.error !== "success") {
+			if (typeof data.request_id === "number") {
+				// MPV is listening, but the command failed
+				throw new SupiError({
+					message: `mpv command failure: ${data.error}`,
+					args: { error: data.error, id: data.request_id }
+				});
+			}
+			else if (data.error && TIMED_OUT_REGEX.test(data.error)) {
+				// MPV is unreachable
+				this.running = false;
+			}
+		}
+		else {
+			this.running = true;
+		}
+
+		return data;
+	}
+
+	private async loadCache (clearExisting: boolean = false) {
+		const data = await core.Cache.getByPrefix(ITEM_DATA_CACHE_KEY) as MapEntries<typeof this.itemData> | undefined;
+		if (!data) {
+			return;
+		}
+
+		if (clearExisting) {
+			this.itemData.clear();
+		}
+
+		for (const [key, value] of data) {
+			this.itemData.set(key, value);
+		}
+	}
+
+	private async saveCache () {
+		const data = [...this.itemData.entries()] satisfies MapEntries<typeof this.itemData>;
+		await core.Cache.setByPrefix(ITEM_DATA_CACHE_KEY, data, {
+			expiry: 12 * 36e5 // 12 hours
+		});
+	}
+
+	private async trimPlaylist () {
+		if (!this.running) {
+			return;
+		}
+
 		const playlist = await this.getPlaylist();
 		const currentIndex = playlist.findIndex(i => i.current);
 		if (currentIndex === -1) {
@@ -136,56 +204,6 @@ export class MpvClient {
 			await this.saveCache();
 			setTimeout(() => void this.play(), 2000);
 		}
-	}, 500);
-
-	private static loggingTableExists: boolean | null = null;
-
-	public constructor (options: ConstructorOptions) {
-		this.host = options.host;
-		this.port = options.port;
-
-		void this.loadCache();
-	}
-
-	private async send (command: unknown[], skipError: boolean = false) {
-		const response = await core.Got.get("GenericAPI")({
-			url: `${this.host}:${this.port}`,
-			searchParams: {
-				mpv: JSON.stringify(command)
-			}
-		});
-
-		const data = dataSchemas.generic.parse(response.body);
-		if (!skipError && data.error !== "success") {
-			throw new SupiError({
-				message: `mpv command failure: ${data.error}`,
-				args: { error: data.error, id: data.request_id }
-			});
-		}
-
-		return data;
-	}
-
-	private async loadCache (clearExisting: boolean = false) {
-		const data = await core.Cache.getByPrefix(ITEM_DATA_CACHE_KEY) as MapEntries<typeof this.itemData> | undefined;
-		if (!data) {
-			return;
-		}
-
-		if (clearExisting) {
-			this.itemData.clear();
-		}
-
-		for (const [key, value] of data) {
-			this.itemData.set(key, value);
-		}
-	}
-
-	private async saveCache () {
-		const data = [...this.itemData.entries()] satisfies MapEntries<typeof this.itemData>;
-		await core.Cache.setByPrefix(ITEM_DATA_CACHE_KEY, data, {
-			expiry: 12 * 36e5 // 12 hours
-		});
 	}
 
 	public async add (url: string, options: AddOptions = {}): Promise<Failure | AddSuccess> {
@@ -349,6 +367,7 @@ export class MpvClient {
 	public async getPlaylist (): Promise<MpvPlaylistItem[]> {
 		const raw = await this.send(["get_property", "playlist"], true);
 		if (raw.error !== "success") {
+			this.running = false;
 			return [];
 		}
 
@@ -414,6 +433,12 @@ export class MpvClient {
 		};
 
 		return this.lastStatus;
+	}
+
+	public async ping () {
+		const result = await this.send(["get_property", "idle-active"], true);
+		this.running = (result.error === "success");
+		return this.running;
 	}
 
 	public destroy () {

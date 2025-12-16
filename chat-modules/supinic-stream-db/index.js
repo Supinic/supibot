@@ -58,7 +58,8 @@ export default {
 			}
 		}
 		else if (context.event === "offline") {
-			await core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
+			void core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
+			void sb.MpvClient?.ping();
 
 			// No stream data - stream is already offline
 			// Try and find an unfinished stream - look up by date and look for unfinished ones (End IS NULL)

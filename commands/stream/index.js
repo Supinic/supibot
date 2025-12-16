@@ -79,6 +79,10 @@ export default {
 				}
 
 				await core.Cache.setByPrefix(SONG_REQUESTS_STATE, value);
+				if (value === "mpv" && sb.MpvClient) {
+					void sb.MpvClient.ping();
+				}
+
 				return {
 					reply: `Song requests are now set to ${value}`
 				};

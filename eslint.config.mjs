@@ -219,6 +219,7 @@ export default tseslint.config(
 			"@typescript-eslint/no-unnecessary-type-conversion": "off", // Maybe re-enable later to force proper types
 
 			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
+			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
 
 			"unicorn/prevent-abbreviations": "off",
 			"unicorn/no-null": "off",
