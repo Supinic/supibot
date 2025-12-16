@@ -1083,5 +1083,25 @@
         "includeLink": true
       }
     ]
+  },
+  {
+    "code": "CY",
+    "language": "Greek",
+    "sources": [
+      {
+        "name": "Πολίτης (Politis)",
+        "url": "https://www.politis.com.cy",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["l7mon"]
+      },
+      {
+        "name": "Philenews",
+        "url": "https://www.philenews.com",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["l7mon"]
+      }
+    ]
   }
 ]
