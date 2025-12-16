@@ -1,3 +1,5 @@
+export type MapEntries <T extends Map<unknown, unknown>> = T extends Map<infer U, infer V> ? [U, V][] : never;
+
 export const typedKeys = <T extends object> (object: T): (keyof T)[] => (
 	Object.keys(object) as (keyof T)[]
 );
