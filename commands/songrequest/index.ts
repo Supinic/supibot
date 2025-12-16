@@ -402,22 +402,6 @@ export default declare({
 			videoType = dbVideoType;
 		}
 
-		// Log the request into database
-		const row = await core.Query.getRow("chat_data", "Song_Request");
-		row.setValues({
-			VLC_ID: addResult.id,
-			Link: data.ID,
-			Name: core.Utils.wrapString(data.name, 100),
-			Video_Type: videoType,
-			Length: (data.duration) ? Math.ceil(data.duration) : null,
-			Status: (queue.length === 0) ? "Current" : "Queued",
-			Started: (queue.length === 0) ? new SupiDate() : null,
-			User_Alias: context.user.ID,
-			Start_Time: startTime ?? null,
-			End_Time: endTime ?? null
-		});
-		await row.save();
-
 		let when = "right now";
 		if (addResult.timeUntil !== 0) {
 			const deltaDate = new SupiDate().addSeconds(addResult.timeUntil);

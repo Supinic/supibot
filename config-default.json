@@ -39,8 +39,7 @@
     "ttsVolume": null,
     "ttsLengthLimit": null,
     "ttsListUrl": null,
-    "playsoundListUrl": null,
-    "mpvApiUrl": null
+    "playsoundListUrl": null
   },
   "api": {
     "secure": false,

@@ -1,23 +1,6 @@
 import * as z from "zod";
-import { SupiDate, SupiError } from "supi-core";
+import { SupiError } from "supi-core";
 import { MapEntries } from "../utils/ts-helpers.js";
-
-export type DatabaseVideo = {
-	Added: SupiDate;
-	Duration: number | null;
-	End_Time: number | null;
-	ID: number;
-	Length: number | null;
-	Link: string;
-	Name: string;
-	Notes: string | null;
-	Start_Time: number | null;
-	Started: SupiDate;
-	Status: "Current" | "Inactive" | "Queued";
-	User_Alias: number;
-	VLC_ID: number;
-	Video_Type: number;
-};
 
 type ConstructorOptions = {
 	host: string;

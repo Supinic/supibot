@@ -65,13 +65,7 @@ export const ConfigSchema = z.strictObject({
 		ttsVolume: z.int().min(0).max(8).optional().nullable(),
 		ttsLengthLimit: z.int().positive().optional().nullable(),
 		ttsListUrl: z.string().optional().nullable(),
-		playsoundListUrl: z.string().optional().nullable(),
-		mpvListenerUrl: z.string().optional().nullable(),
-		vlcBaseUrl: z.string().optional().nullable(),
-		vlcUrl: z.string().optional().nullable(),
-		vlcUsername: z.string().optional().nullable(),
-		vlcPassword: z.string().optional().nullable(),
-		vlcPort: port.optional().nullable()
+		playsoundListUrl: z.string().optional().nullable()
 	}).optional(),
 	api: z.strictObject({
 		secure: z.boolean().nullable().optional(),
