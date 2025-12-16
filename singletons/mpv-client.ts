@@ -124,11 +124,31 @@ export class MpvClient {
 	// eslint-disable-next-line unicorn/consistent-function-scoping,@typescript-eslint/no-misused-promises
 	private readonly finishedSongPlaylistClearInterval = setInterval(async () => {
 		const playlist = await this.getPlaylist();
-		const current = playlist.findIndex(i => i.current);
-		if (current === -1) {
+		const currentIndex = playlist.findIndex(i => i.current);
+		if (currentIndex === -1) {
 			return;
 		}
-		if (current !== 0) {
+
+		let skip = false;
+		if (playlist.length === 1 && currentIndex === 0) {
+			const { position, duration, paused } = await this.getUpdatedStatus();
+
+			// When there is only one media in the playlist, and it's at the end, we need to change
+			// the heuristic to try and figure out if it's ended. If the status is paused, and the
+			// difference between `position` and `duration` is less than ~1 second, it's probably finished.
+			if (paused && position !== null && duration !== null) {
+				const probablyEnded = Math.abs(Math.trunc(duration) - Math.trunc(position)) <= 1;
+				if (probablyEnded) {
+					skip = true;
+				}
+			}
+		}
+		else if (currentIndex !== 0) {
+			// If the currently playing media is not at the head of the playlist, remove the head of the playlist.
+			skip = true;
+		}
+
+		if (skip) {
 			await this.send(["playlist-remove", 0]);
 			setTimeout(() => void this.play(), 2000);
 		}
@@ -154,7 +174,7 @@ export class MpvClient {
 		const data = dataSchemas.generic.parse(response.body);
 		if (!skipError && data.error !== "success") {
 			throw new SupiError({
-			    message: `mpv command failure: ${data.error}`,
+				message: `mpv command failure: ${data.error}`,
 				args: { error: data.error, id: data.request_id }
 			});
 		}
@@ -195,15 +215,15 @@ export class MpvClient {
 
 		if (startTime || endTime) {
 			throw new SupiError({
-			    message: "Seeking with start/end times is currently not supported"
+				message: "Seeking with start/end times is currently not supported"
 			});
 		}
 
 		for (const item of this.itemData.values()) {
 			if (item.url === url) {
 				return {
-				    success: false,
-				    reason: `URL is already queued with ID ${item.id}`
+					success: false,
+					reason: `URL is already queued with ID ${item.id}`
 				};
 			}
 		}
@@ -249,14 +269,14 @@ export class MpvClient {
 		const targetItem = this.itemData.get(targetId);
 		if (!targetItem) {
 			return {
-			    success: false,
-			    reason: "Target ID is not in playlist"
+				success: false,
+				reason: "Target ID is not in playlist"
 			};
 		}
 
 		if (targetUser !== null && targetItem.user !== targetUser) {
 			return {
-			    success: false,
+				success: false,
 				reason: "Video was not requested by user"
 			};
 		}
@@ -265,7 +285,7 @@ export class MpvClient {
 		const targetOrder = playlist.findIndex(i => i.id === targetItem.id);
 		if (targetOrder === -1) {
 			throw new SupiError({
-			    message: "Assert error: No media order found"
+				message: "Assert error: No media order found"
 			});
 		}
 
@@ -295,8 +315,8 @@ export class MpvClient {
 
 		if (typeof targetId !== "number") {
 			return {
-			    success: false,
-			    reason: "No media queued by user"
+				success: false,
+				reason: "No media queued by user"
 			};
 		}
 
