@@ -108,7 +108,6 @@ export class MpvClient {
 
 	private running: boolean = false;
 	private lastStatus: MpvStatus | null = null;
-
 	private static loggingTableExists: boolean | null = null;
 
 	public constructor (options: ConstructorOptions) {
@@ -357,7 +356,7 @@ export class MpvClient {
 		return this.lastStatus;
 	}
 
-	public async getPosition () {
+	public async getPosition (): Promise<number | null> {
 		const rawPosition = await this.send(["get_property", "time-pos"], true);
 		const position = (rawPosition.error === PROPERTY_NA) ? null : dataSchemas.position.parse(rawPosition.data);
 
@@ -435,13 +434,13 @@ export class MpvClient {
 		return this.lastStatus;
 	}
 
-	public async ping () {
+	public async ping (): Promise<boolean> {
 		const result = await this.send(["get_property", "idle-active"], true);
 		this.running = (result.error === "success");
 		return this.running;
 	}
 
-	public destroy () {
+	public destroy (): void {
 		clearInterval(this.finishedSongPlaylistClearInterval);
 	}
 
