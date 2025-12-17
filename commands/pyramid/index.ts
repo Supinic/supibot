@@ -3,6 +3,7 @@ import { declare } from "../../classes/command.js";
 import { setTimeout } from "node:timers/promises";
 
 const REASONABLE_PYRAMID_MAXIMUM = 10;
+const DEFAULT_DELAY = 250;
 
 export default declare({
 	Name: "pyramid",
@@ -11,7 +12,9 @@ export default declare({
 	Cooldown: 60000,
 	Description: "Creates a pyramid in chat. Only usable in chats where Supibot is a VIP or a Moderator.",
 	Flags: ["developer","whitelist"],
-	Params: [],
+	Params: [
+		{ name: "delay", type: "number" }
+	] as const,
 	Whitelist_Response: null,
 	Code: (async function pyramid (context, ...args) {
 		if (!context.channel) {
@@ -48,6 +51,25 @@ export default declare({
 			};
 		}
 
+		let delay = DEFAULT_DELAY;
+		if (typeof context.params.delay === "number") {
+			const permissions = await context.getUserPermissions();
+			if (!permissions.is("administrator")) {
+				return {
+				    success: false,
+				    reply: "Only administrators can change the pyramid message delay!"
+				};
+			}
+
+			delay = context.params.delay;
+			if (delay <= 0 || delay >= 10_000) {
+				return {
+				    success: false,
+				    reply: "Provided delay is out of practical bounds!"
+				};
+			}
+		}
+
 		// sanity check
 		if (words.length === 0) {
 			throw new SupiError({
@@ -66,12 +88,12 @@ export default declare({
 
 		for (let i = 1; i <= size; i++) {
 			await context.channel.send(text.repeat(i));
-			await setTimeout(250);
+			await setTimeout(delay);
 		}
 
 		for (let i = (size - 1); i > 0; i--) {
 			await context.channel.send(text.repeat(i));
-			await setTimeout(250);
+			await setTimeout(delay);
 		}
 
 		return {
