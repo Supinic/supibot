@@ -1,6 +1,6 @@
 import { SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
-import { setTimeout } from "node:timers/promises";
+import { setTimeout as sleep } from "node:timers/promises";
 
 const REASONABLE_PYRAMID_MAXIMUM = 10;
 const DEFAULT_DELAY = 250;
@@ -13,7 +13,8 @@ export default declare({
 	Description: "Creates a pyramid in chat. Only usable in chats where Supibot is a VIP or a Moderator.",
 	Flags: ["developer","whitelist"],
 	Params: [
-		{ name: "delay", type: "number" }
+		{ name: "delay", type: "number" },
+		{ name: "wait", type: "boolean" }
 	] as const,
 	Whitelist_Response: null,
 	Code: (async function pyramid (context, ...args) {
@@ -86,14 +87,23 @@ export default declare({
 			};
 		}
 
+		const awaitPromise = context.params.wait ?? true;
 		for (let i = 1; i <= size; i++) {
-			await context.channel.send(text.repeat(i));
-			await setTimeout(delay);
+			const promise = context.channel.send(text.repeat(i));
+			if (awaitPromise) {
+				await promise;
+			}
+
+			await sleep(delay);
 		}
 
 		for (let i = (size - 1); i > 0; i--) {
-			await context.channel.send(text.repeat(i));
-			await setTimeout(delay);
+			const promise = context.channel.send(text.repeat(i));
+			if (awaitPromise) {
+				await promise;
+			}
+
+			await sleep(delay);
 		}
 
 		return {
