@@ -1,0 +1,83 @@
+import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
+import { setTimeout } from "node:timers/promises";
+
+const REASONABLE_PYRAMID_MAXIMUM = 10;
+
+export default declare({
+	Name: "pyramid",
+	Aliases: null,
+	Author: "supinic",
+	Cooldown: 60000,
+	Description: "Creates a pyramid in chat. Only usable in chats where Supibot is a VIP or a Moderator.",
+	Flags: ["developer","whitelist"],
+	Params: [],
+	Whitelist_Response: null,
+	Code: (async function pyramid (context, ...args) {
+		if (!context.channel) {
+			return {
+				success: false,
+				reply: `Cannot use this command in private messages!`
+			};
+		}
+		else if (context.channel.Mode !== "Moderator" && context.channel.Mode !== "VIP") {
+			return {
+				success: false,
+				reply: "Cannot create pyramids in a non-VIP/Moderator chat!"
+			};
+		}
+		else if (args.length < 2) {
+			return {
+			    success: false,
+			    reply: "You must provide some text to pyramid-ify and the syze of the pyramid!"
+			};
+		}
+
+		const words = [...args];
+		const size = Number(words.pop());
+		if (Number.isNaN(size)) {
+			return {
+			    success: false,
+			    reply: "You must provide the size as the last parameter!"
+			};
+		}
+		else if (!core.Utils.isValidInteger(size, 0) || size >= REASONABLE_PYRAMID_MAXIMUM) {
+			return {
+				success: false,
+				reply: `Your provided pyramid height is not a positive integer, or is larger than the maximum of (${REASONABLE_PYRAMID_MAXIMUM})!`
+			};
+		}
+
+		// sanity check
+		if (words.length === 0) {
+			throw new SupiError({
+			    message: "Assert error: words array is empty"
+			});
+		}
+
+		const text = `${words.join(" ")} `; // add space for easier concatenation and length checking
+		const limit = context.channel.Message_Limit ?? context.platform.Message_Limit;
+		if ((text.length * size) > limit) {
+			return {
+				success: false,
+				reply: `Your pyramid is too wide! The longest line wouldn't fit into one message (${(text.length * size)}/${limit}})`
+			};
+		}
+
+		for (let i = 1; i <= size; i++) {
+			await context.channel.send(text.repeat(i));
+			await setTimeout(250);
+		}
+
+		for (let i = (size - 1); i > 0; i--) {
+			await context.channel.send(text.repeat(i));
+			await setTimeout(250);
+		}
+
+		return {
+			success: true,
+			reply: null
+		};
+	}),
+	Dynamic_Description: null
+});
