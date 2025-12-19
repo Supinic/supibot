@@ -1,6 +1,9 @@
+import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
 import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+import { ivrErrorSchema, ivrFoundersSchema } from "../../utils/schemas.js";
 
-export default {
+export default declare({
 	Name: "channelfounderlist",
 	Aliases: ["cfl", "founders"],
 	Author: "supinic",
@@ -34,36 +37,29 @@ export default {
 		const response = await core.Got.get("IVR")(`v2/twitch/founders/${channel}`);
 
 		if (response.statusCode === 404) {
-			const { error } = response.body;
-			if (!error || !error.message) {
-				return {
-					success: false,
-					reply: `Could not load any founders for the provided channel!`
-				};
-			}
-			else if (error.message.includes("does not exist")) {
+			const { error } = ivrErrorSchema.parse(response.body);
+			if (error.message.includes("does not exist")) {
 				return {
 					success: false,
 					reply: `There is no such channel with that name!`
 				};
 			}
+			else if (error.message.startsWith("Specified user")) {
+				// "Specified user has no founders" and "Specified user does not exist"
+				return {
+				    success: false,
+				    reply: `${error.message}!`
+				};
+			}
 			else {
-				// Mostly concerns the "has no founders" error
 				return {
 					success: false,
-					reply: error.message
+					reply: "Could not load the founders list for the provided channel!"
 				};
 			}
 		}
 
-		const { founders } = response.body;
-		if (!founders) {
-			return {
-				success: false,
-				reply: `Could not load any founders for the provided channel!`
-			};
-		}
-
+		const { founders } = ivrFoundersSchema.parse(response.body);
 		const separator = (context.params.subStatus) ? " " : ", ";
 		const foundersString = founders.map(i => {
 			let message = `${i.login[0]}${TWITCH_ANTIPING_CHARACTER}${i.login.slice(1)}`;
@@ -72,7 +68,7 @@ export default {
 				message = `${stillSubbed} ${message}`;
 			}
 			if (context.params.includeDates) {
-				const date = new sb.Date(i.entitlementStart);
+				const date = new SupiDate(i.entitlementStart);
 				message += ` (${date.format("Y-m-d")})`;
 			}
 
@@ -86,7 +82,7 @@ export default {
 			reply: `Current founders list: ${foundersString}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Fetches the list of current founders of a given (or current) Twitch channel",
 		"",
 
@@ -107,5 +103,5 @@ export default {
 		`<code>${prefix}cfl <u>subStatus:true</u></code>`,
 		`<code>${prefix}cfl (channel) <u>subStatus:true</u></code>`,
 		`Also provides whether or not that user is still subscribed`
-	])
-};
+	]
+});

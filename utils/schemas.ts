@@ -1,6 +1,13 @@
 // @todo figure out where to place this file properly within the project
 import * as z from "zod";
 
+export const ivrErrorSchema = z.object({
+	statusCode: z.int().min(400).max(599),
+	error: z.object({
+		message: z.string()
+	})
+});
+
 const BaseIvrUserDataSchema = z.object({
 	login: z.string(),
 	displayName: z.string(),
@@ -76,3 +83,13 @@ export const ivrUserDataSchema = z.array(
 );
 
 export type IvrUserData = z.infer<typeof ivrUserDataSchema>;
+
+export const ivrFoundersSchema = z.object({
+	founders: z.array(z.object({
+		isSubscribed: z.boolean(),
+		id: z.string(),
+		login: z.string(),
+		displayName: z.string(),
+		entitlementStart: z.iso.datetime()
+	}))
+});
