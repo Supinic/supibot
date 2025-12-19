@@ -21,6 +21,9 @@ export default {
 		if (msg.includes("become famous?")) {
 			reason = "becoming famous";
 		}
+		else if (msg.includes("the void")) {
+			reason = "advertising into the void";
+		}
 		else if (msg.includes("get raided")) {
 			reason = "getting raided";
 		}
