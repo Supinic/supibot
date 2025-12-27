@@ -1,16 +1,22 @@
+import { SupiDate, SupiError } from "supi-core";
+
 import { postToHastebin } from "../../../utils/command-utils.js";
 import getLinkParser from "../../../utils/link-parser.js";
+import type { BadAppleSubcommandDefinition, BadAppleRow } from "../index.js";
 
 export default {
 	name: "check",
 	aliases: ["add"],
-	description: "Checks if your provided link is in the database, and creates a suggestion to add, if it isn't.",
+	title: "New video",
+	default: false,
+	description: [
+		"Checks if your provided link is in the database, and creates a suggestion to add, if it isn't."
+	],
 	execute: async (context, ...args) => {
 		const linkParser = await getLinkParser();
 		const processed = new Set();
 		const results = [];
 
-		/** @type {string[]} */
 		const fixedArgs = args.flatMap(i => i.split(/\s+/).filter(Boolean));
 		for (const input of fixedArgs) {
 			const type = linkParser.autoRecognize(input);
@@ -26,7 +32,7 @@ export default {
 				processed.add(link);
 			}
 
-			const existing = await core.Query.getRecordset(rs => rs
+			const existing = await core.Query.getRecordset<BadAppleRow | undefined>(rs => rs
 				.select("ID", "Device", "Link", "Timestamp")
 				.from("data", "Bad_Apple")
 				.where(`Link = %s OR JSON_SEARCH(Reuploads, "one", %s) IS NOT NULL`, link, link)
@@ -66,11 +72,18 @@ export default {
 				Device: data.name,
 				Status: "Pending approval",
 				Type: null,
-				Published: data.created,
+				Published: (data.created) ? new SupiDate(data.created) : null,
 				Notes: `Added to the list by ${context.user.Name}\n---\n${data.description ?? "No description"}`
 			});
 
-			const { insertId } = await row.save();
+			const saveResult = await row.save();
+			if (!saveResult) {
+				throw new SupiError({
+				    message: "Assert error: No updated columns in Row"
+				});
+			}
+
+			const { insertId } = saveResult;
 			results.push({
 				input,
 				reply: `Link added to the rendition list, pending approval: https://supinic.com/data/bad-apple/detail/${insertId}`
@@ -103,4 +116,4 @@ export default {
 			};
 		}
 	}
-};
+} satisfies BadAppleSubcommandDefinition;
