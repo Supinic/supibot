@@ -6,7 +6,6 @@ const createCacheKey = (type: string, id: number) => `error-${type}-stack-link-$
 export default {
 	name: "error",
 	title: "Inspect a Supibot Error by its ID",
-	default: false,
 	aliases: [],
 	description: ["If you have been granted access, you can check the full text of an error within Supibot, based on its ID."],
 	execute: async (context, rawIdentifier) => {

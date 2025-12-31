@@ -11,7 +11,6 @@ const deeplUsageSchema = z.object({
 export default {
 	name: "deepl",
 	title: "DeepL usage limits",
-	default: false,
 	aliases: ["DeepL"],
 	description: ["Checks the current usage limits of the DeepL translation engine in $translate."],
 	execute: async () => {

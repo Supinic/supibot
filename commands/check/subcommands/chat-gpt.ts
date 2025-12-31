@@ -8,7 +8,6 @@ export default {
 	name: "chatgpt",
 	title: "ChatGPT token usage",
 	aliases: ["chat-gpt", "gpt"],
-	default: false,
 	description: ["Posts either: how many tokens you (or someone else) have used recently in the $gpt command; if used with \"total\", shows your total token amount overall."],
 	execute: async (context, target) => {
 		if (target === "total") {

@@ -4,7 +4,6 @@ export default {
 	name: "changelog",
 	title: "Supibot changelog",
 	aliases: [],
-	default: false,
 	description: ["Posts a link to the Supibot changelog on Discord/website; or posts details about a single change, based on its ID."],
 	execute: async (context, identifier) => {
 		if (!identifier) {

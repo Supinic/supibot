@@ -31,7 +31,6 @@ export const TwitchLottoDescriptionSubcommand = {
 	name: "twitchlottodescription",
 	aliases: ["tld"],
 	title: "Description of a TwitchLotto link",
-	default: false,
 	description: ["Checks the posted description of a provided TwitchLotto link, if it exists."],
 	execute: async (context, link) => {
 		if (!link) {

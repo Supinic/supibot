@@ -7,7 +7,6 @@ export default {
 	name: "afk",
 	title: "AFK status",
 	aliases: [],
-	default: false,
 	description: ["Use this on a user to see if they are AFK or not."],
 	execute: async (context, identifier) => {
 		if (!identifier) {

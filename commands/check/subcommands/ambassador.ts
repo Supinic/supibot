@@ -5,7 +5,6 @@ export default {
 	name: "ambassador",
 	aliases: ["ambassadors"],
 	title: "Channel ambassadors",
-	default: false,
 	description: ["Check who is the Supibot ambassador of a channel (or the current one, if none provided)."],
 	execute: async (context, identifier) => {
 		if (!identifier && !context.channel) {

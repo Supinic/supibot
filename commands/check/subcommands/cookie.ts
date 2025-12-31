@@ -6,7 +6,6 @@ import CookieLogic from "../../cookie/cookie-logic.js";
 export default {
 	name: "cookie",
 	title: "Cookie status",
-	default: false,
 	aliases: [],
 	description: ["Checks if someone (or you, if not provided) has their fortune cookie available for today."],
 	execute: async (context, identifier) => {

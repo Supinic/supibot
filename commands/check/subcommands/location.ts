@@ -3,7 +3,6 @@ import type { CheckSubcommandDefinition } from "../index.js";
 export default {
 	name: "location",
 	title: "User location",
-	default: false,
 	aliases: [],
 	description: ["Checks your or someone else's location, as set up within Supibot. Respects private locations."],
 	execute: async (context, identifier) => {

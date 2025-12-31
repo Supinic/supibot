@@ -9,7 +9,6 @@ export default {
 	name: "reminder",
 	aliases: ["reminders"],
 	title: "Reminder status and info",
-	default: false,
 	description: ["Check the status and info of a reminder created by you or for you. You can use \"last\" instead of an ID to check the last one you made."],
 	execute: async (context, rawIdentifier) => {
 		let identifier: number | string | undefined = rawIdentifier;
