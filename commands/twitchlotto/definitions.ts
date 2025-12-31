@@ -10,11 +10,9 @@ export const taggingGuide = [
 	"The exceptions are the \"None\" and the \"Bait\" tags - see below for full explanation."
 ] as const;
 
-export const createRecentUseCacheKey = (context: Context) => ({
-	type: "recent-use",
-	user: context.user.ID,
-	channel: context.channel?.ID ?? null
-});
+export const createRecentUseCacheKey = (context: Context) => (
+	`twitch-lotto-recent-use-${context.user.ID}-${context.channel?.ID ?? "PM"}`
+);
 
 export const formatScore = (score: number | null) => (score === null)
 	? "N/A"
