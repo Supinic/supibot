@@ -1,10 +1,12 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "comment",
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches a random comment from a set of 10 thousand randomly generated YouTube videos.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function comment () {
@@ -17,8 +19,9 @@ export default {
 		const comment = $("#comment").text();
 
 		return {
-			reply: comment ?? "No comment was available to fetch"
+			success: true,
+			reply: comment
 		};
 	}),
 	Dynamic_Description: null
-};
+});
