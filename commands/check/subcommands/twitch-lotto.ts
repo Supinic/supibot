@@ -27,7 +27,7 @@ export const TwitchLottoBlacklistSubcommand = {
 	}
 } satisfies CheckSubcommandDefinition;
 
-export const TwitchLottoDescriptionCommand = {
+export const TwitchLottoDescriptionSubcommand = {
 	name: "twitchlottodescription",
 	aliases: ["tld"],
 	title: "Description of a TwitchLotto link",
@@ -41,18 +41,9 @@ export const TwitchLottoDescriptionCommand = {
 			};
 		}
 
-		// @todo refactor this and similar usages to a common place
 		if (link.toLowerCase() === "last") {
-			const tl = sb.Command.get("tl");
-			if (!tl) {
-				return {
-				    success: false,
-				    reply: "The $twitchlotto command is not available!"
-				};
-			}
-
 			const key = createRecentUseCacheKey(context);
-			const cacheData = await tl.getCacheData(key) as string | undefined;
+			const cacheData = await core.Cache.getByPrefix(key) as string | undefined;
 			if (!cacheData) {
 				return {
 					success: false,
