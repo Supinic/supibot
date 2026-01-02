@@ -7,7 +7,12 @@ export const TwitchLottoBlacklistSubcommand = {
 	name: "twitchlottoblacklist",
 	aliases: ["tlbl"],
 	title: "TwitchLotto blacklist info",
-	description: ["If the current channel has a TwitchLotto blacklist setup, this will post it."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check tlbl</code>`,
+		`<code>${prefix}check twitchlottoblacklist</code>`,
+		"If the current channel has a TwitchLotto blacklist setup, this will post it."
+	],
 	execute: async (context) => {
 		if (!context.channel) {
 			return {
@@ -30,7 +35,12 @@ export const TwitchLottoDescriptionSubcommand = {
 	name: "twitchlottodescription",
 	aliases: ["tld"],
 	title: "Description of a TwitchLotto link",
-	description: ["Checks the posted description of a provided TwitchLotto link, if it exists."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check tld</code>`,
+		`<code>${prefix}check twitchlottodescription</code>`,
+		"Checks the posted description of a provided TwitchLotto link, if it exists."
+	],
 	execute: async (context, link) => {
 		if (!link) {
 			return {

@@ -13,7 +13,11 @@ export default {
 	name: "mariadb",
 	title: "MariaDB process memory usage",
 	aliases: ["maria"],
-	description: ["Checks for the current memory usage of the MariaDB database process, running on Supinic's Raspberry Pi 4."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check mariadb</code>`,
+		`Checks for the current memory usage of the MariaDB database process, running on Supinic's Raspberry Pi 4.`
+	],
 	execute: async () => {
 		const response = await core.Got.get("RaspberryPi4")({
 			url: "maria/memoryUsage",

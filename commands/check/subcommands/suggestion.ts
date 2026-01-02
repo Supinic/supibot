@@ -15,7 +15,12 @@ export default {
 	name: "suggest",
 	aliases: ["suggestion", "suggestions"],
 	title: "Details and info about suggestions",
-	description: ["Checks the status and info of a suggestion that you made. You can use \"last\" instead of an ID to check the last one you made."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check suggest</code>`,
+		`<code>${prefix}check suggestion</code>`,
+		"Checks the status and info of a suggestion that you made. You can use \"last\" instead of an ID to check the last one you made."
+	],
 	execute: async (context, rawIdentifier) => {
 		let identifier: number | string | undefined = rawIdentifier;
 		if (!identifier) {

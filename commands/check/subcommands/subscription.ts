@@ -4,7 +4,12 @@ export default {
 	name: "subscription",
 	aliases: ["subscriptions", "sub", "subs"],
 	title: "Subscription events within Supibot",
-	description: ["Fetches the list of your active event subscriptions within Supibot."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check subs</code>`,
+		`<code>${prefix}check subscriptions</code>`,
+		"Fetches the list of your active event subscriptions within Supibot."
+	],
 	execute: async (context) => {
 		const types = await core.Query.getRecordset<string[]>(rs => rs
 			.select("Type")

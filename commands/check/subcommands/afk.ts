@@ -7,7 +7,15 @@ export default {
 	name: "afk",
 	title: "AFK status",
 	aliases: [],
-	description: ["Use this on a user to see if they are AFK or not."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check afk (username)</code>`,
+		`Checks if the specified user is currently AFK.`,
+		"",
+
+		`<code>${prefix}check ambassadors (your own username)</code>`,
+		`Checks if you're AFK - only usable within private messages, because otherwise you certainly wouldn't be AFK anymore.`
+	],
 	execute: async (context, identifier) => {
 		if (!identifier) {
 			return {

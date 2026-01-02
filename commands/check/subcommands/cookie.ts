@@ -6,7 +6,18 @@ export default {
 	name: "cookie",
 	title: "Cookie status",
 	aliases: [],
-	description: ["Checks if someone (or you, if not provided) has their fortune cookie available for today."],
+	description: [],
+	getDescription: (prefix) => [
+		`Checks the availability of fortune cookies as used in the <a href="/bot/command/detail/cookie">${prefix}cookie</a> command.`,
+		"",
+
+		`<code>${prefix}check cookie</code>`,
+		`Checks if you have a fortune cookie ready for today.`,
+		"",
+
+		`<code>${prefix}check cookie (username)</code>`,
+		`Checks if someone else has a fortune cookie ready for today.`
+	],
 	execute: async (context, identifier) => {
 		const targetUser = (identifier)
 			? await sb.User.get(identifier, true)

@@ -5,7 +5,15 @@ export default {
 	name: "ambassador",
 	aliases: ["ambassadors"],
 	title: "Channel ambassadors",
-	description: ["Check who is the Supibot ambassador of a channel (or the current one, if none provided)."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check ambassadors</code>`,
+		`Posts a list of Supibot Ambassadors in the current channel.`,
+		"",
+
+		`<code>${prefix}check ambassadors (channel name)</code>`,
+		`Posts a list of Supibot Ambassadors in provided channel.`
+	],
 	execute: async (context, identifier) => {
 		if (!identifier && !context.channel) {
 			return {

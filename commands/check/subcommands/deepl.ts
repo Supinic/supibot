@@ -12,7 +12,11 @@ export default {
 	name: "deepl",
 	title: "DeepL usage limits",
 	aliases: ["DeepL"],
-	description: ["Checks the current usage limits of the DeepL translation engine in $translate."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check deepl</code>`,
+		`Checks the current usage limits of the DeepL translation engine in the <a href="/bot/command/detail/deepl/">${prefix}deepl</a> command.`
+	],
 	execute: async () => {
 		if (!process.env.API_DEEPL_KEY) {
 			throw new SupiError({

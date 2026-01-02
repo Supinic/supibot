@@ -4,7 +4,15 @@ export default {
 	name: "location",
 	title: "User location",
 	aliases: [],
-	description: ["Checks your or someone else's location, as set up within Supibot. Respects private locations."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check location</code>`,
+		`Checks your location, as set up within Supibot. Respects private locations.`,
+		"",
+
+		`<code>${prefix}check location (username)</code>`,
+		`Checks someone else's location, as above.`
+	],
 	execute: async (context, identifier) => {
 		const targetUser = (identifier)
 			? await sb.User.get(identifier, true)

@@ -7,7 +7,19 @@ export default {
 	name: "chatgpt",
 	title: "ChatGPT token usage",
 	aliases: ["chat-gpt", "gpt"],
-	description: ["Posts either: how many tokens you (or someone else) have used recently in the $gpt command; if used with \"total\", shows your total token amount overall."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check gpt</code>`,
+		`Checks how many tokens you've used for <a href="/bot/command/detail/gpt">${prefix}gpt</a> recently.`,
+		"",
+
+		`<code>${prefix}check gpt (username)</code>`,
+		`Checks how many tokens someone else has used recently.`,
+		"",
+
+		`<code>${prefix}check gpt total</code>`,
+		`Checks how many tokens you've used up overall (since April 2023).`
+	],
 	execute: async (context, target) => {
 		if (target === "total") {
 			const total = await core.Query.getRecordset<number | undefined>(rs => rs

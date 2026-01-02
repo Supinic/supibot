@@ -6,7 +6,11 @@ export default {
 	name: "logs",
 	title: "Supibot channel logging",
 	aliases: [],
-	description: ["Checks the Supibot chat line logging status of the current channel."],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}check logs</code>`,
+		`Checks the Supibot chat line logging status of the current channel.`
+	],
 	execute: async (context) => {
 		if (!context.channel) {
 			return {
