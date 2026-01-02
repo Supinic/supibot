@@ -1,13 +1,12 @@
+import { SupiError } from "supi-core";
 import { createRecentUseCacheKey } from "../../twitchlotto/definitions.js";
 import type { CheckSubcommandDefinition } from "../index.js";
 import type { User } from "../../../classes/user.js";
-import { SupiError } from "supi-core";
 
 export const TwitchLottoBlacklistSubcommand = {
 	name: "twitchlottoblacklist",
 	aliases: ["tlbl"],
 	title: "TwitchLotto blacklist info",
-	default: false,
 	description: ["If the current channel has a TwitchLotto blacklist setup, this will post it."],
 	execute: async (context) => {
 		if (!context.channel) {

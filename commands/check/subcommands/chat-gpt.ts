@@ -1,8 +1,7 @@
 import { SupiDate } from "supi-core";
-
-import type { CheckSubcommandDefinition } from "../index.js";
 import { postToHastebin } from "../../../utils/command-utils.js";
-import GptCache from "../../gpt/cache-control.js";
+import { getTokenUsage, determineUserLimits } from "../../gpt/cache-control.js";
+import type { CheckSubcommandDefinition } from "../index.js";
 
 export default {
 	name: "chatgpt",
@@ -40,8 +39,8 @@ export default {
 			};
 		}
 
-		const usage = await GptCache.getTokenUsage(targetUser);
-		const limits = await GptCache.determineUserLimits(targetUser);
+		const usage = await getTokenUsage(targetUser);
+		const limits = await determineUserLimits(targetUser);
 
 		const tokenUsage: Record<string, number> = {};
 		for (const [timestamp, tokens] of Object.entries(usage.summary)) {

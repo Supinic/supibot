@@ -1,6 +1,6 @@
-import type { CheckSubcommandDefinition } from "../index.js";
-import type { Reminder } from "../../../classes/reminder.js";
 import { SupiError } from "supi-core";
+import type { Reminder } from "../../../classes/reminder.js";
+import type { CheckSubcommandDefinition } from "../index.js";
 
 type ReminderRow = Pick<Reminder, "ID" | "User_From" | "User_To" | "Schedule" | "Text">;
 type HistoricReminderRow = ReminderRow & { Cancelled: boolean; };

@@ -1,6 +1,6 @@
-import type { CheckSubcommandDefinition } from "../index.js";
-import { isSupported } from "../../randomline/rustlog.js";
 import { SupiError } from "supi-core";
+import { isSupported } from "../../randomline/rustlog.js";
+import type { CheckSubcommandDefinition } from "../index.js";
 
 export default {
 	name: "logs",

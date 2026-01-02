@@ -1,7 +1,6 @@
 import { SupiDate } from "supi-core";
-
-import type { CheckSubcommandDefinition } from "../index.js";
 import CookieLogic from "../../cookie/cookie-logic.js";
+import type { CheckSubcommandDefinition } from "../index.js";
 
 export default {
 	name: "cookie",

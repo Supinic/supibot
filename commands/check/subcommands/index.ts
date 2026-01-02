@@ -1,4 +1,4 @@
-import { SubcommandCollection, SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
 
 import AfkSubcommand from "./afk.js";
 import AmbassadorSubcommand from "./ambassador.js";
