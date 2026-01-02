@@ -1,3 +1,6 @@
+import { declare } from "../../classes/command.js";
+import { asciiArtRegex, brailleRegex } from "../../utils/regexes.js";
+
 const MAXIMUM_REPEATS = 5;
 
 const fetchCopypasta = async () => {
@@ -9,25 +12,17 @@ const fetchCopypasta = async () => {
 	const $ = core.Utils.cheerio(response.body);
 	const text = $("span.-main-text").text();
 
-	if (typeof text === "string") {
-		return core.Utils.removeHTML(text).trim();
-	}
-	else {
-		return text;
-	}
+	return core.Utils.removeHTML(text).trim();
 };
 
-const asciiRegex = /([\u2591\u2588\u2500\u2580\u2593\u2584\u2592])/g;
-const brailleRegex = /[█▄▀░▒▓\u2802-\u28FF]/g;
-const hasAsciiArt = (string) => (asciiRegex.test(string) || brailleRegex.test(string));
+const hasAsciiArt = (string: string) => (asciiArtRegex.test(string) || brailleRegex.test(string));
 
-export default {
+export default declare({
 	Name: "copypasta",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches a random Twitch-related copypasta.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function copypasta () {
@@ -52,12 +47,12 @@ export default {
 			reply: `Your copypasta: ${copypasta}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		`Fetches a random Twitch copypasta from <a href="//twitchquotes.com">twitchquotes.com</a>.`,
+		"This command automatically excludes copypastas that contain some kind of ASCII or Braille characters art",
 		"",
 
 		`<code>${prefix}copypasta</code>`,
-		"(random copypasta)",
-		"This automatically excludes copypastas that contain some kind of ASCII or Braille characters art"
-	])
-};
+		"(random copypasta)"
+	]
+});

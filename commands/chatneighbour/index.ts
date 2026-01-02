@@ -1,12 +1,13 @@
+import { declare } from "../../classes/command.js";
 import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 
-export default {
+export default declare({
 	Name: "chatneighbour",
 	Aliases: ["cn"],
 	Author: "supinic",
 	Cooldown: 7500,
 	Description: "Finds your chat neighbour(s). When you take the chatter list in a channel and sort by the alphabet, your chat neighbours are users that come before and after you in the list. Use this to find new friends! 😃",
-	Flags: ["block","opt-out","pipe"],
+	Flags: ["block", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function (context, targetUser) {
@@ -73,4 +74,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+});

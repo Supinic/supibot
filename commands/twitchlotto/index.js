@@ -6,7 +6,7 @@ import {
 	flags,
 	scoreThreshold,
 	detections as detectionsDefinitions,
-	createRecentUseCacheKey,
+	createRecentUseCacheKey as getKey,
 	formatScore
 } from "./definitions.js";
 
@@ -352,7 +352,7 @@ export default {
 			}
 		}
 
-		await this.setCacheData(createRecentUseCacheKey(context), image.Link, {
+		await core.Cache.setByPrefix(getKey(context), image.Link, {
 			expiry: 600_000
 		});
 

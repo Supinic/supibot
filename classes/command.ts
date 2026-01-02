@@ -321,22 +321,16 @@ export interface SubcommandDefinition<T extends CommandDefinition = CommandDefin
 	aliases: string[];
 	description: string[];
 	getDescription?: (prefix: string) => string[] | Promise<string[]>;
-	default: boolean;
+	default?: boolean;
 	flags?: Record<string, boolean>;
 	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
 }
 
-export const createSubcommandBinding = <
-	T extends CommandDefinition
-> () => <
-	D extends SubcommandDefinition<T>
-> (def: D) => def;
-
 export class SubcommandCollection {
 	public readonly name: string;
 	public readonly names: readonly string[];
-	public readonly default: SubcommandDefinition;
 
+	private readonly defaultCommand: SubcommandDefinition | null;
 	private readonly subcommands: SubcommandDefinition[];
 
 	constructor (name: string, subcommands: SubcommandDefinition[]) {
@@ -345,14 +339,9 @@ export class SubcommandCollection {
 		this.names = this.subcommands.map(i => i.name);
 
 		const defaultSubcommands = subcommands.filter(i => i.default);
-		if (defaultSubcommands.length !== 1) {
-			throw new SupiError({
-			    message: "Assert error: Exactly one default subcommand must be present",
-				args: { name }
-			});
-		}
-
-		this.default = defaultSubcommands[0];
+		this.defaultCommand = (defaultSubcommands.length === 1)
+			? defaultSubcommands[0]
+			: null;
 	}
 
 	get (name: string | undefined) {
@@ -385,6 +374,17 @@ export class SubcommandCollection {
 		}
 
 		return result;
+	}
+
+	get default () {
+		if (!this.defaultCommand) {
+			throw new SupiError({
+			    message: "No default subcommand in collection",
+				args: { name: this.name }
+			});
+		}
+
+		return this.defaultCommand;
 	}
 }
 

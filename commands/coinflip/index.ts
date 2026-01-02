@@ -1,17 +1,18 @@
 import { randomInt } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "coinflip",
 	Aliases: ["cf"],
 	Author: "supinic",
 	Cooldown: 2500,
 	Description: "Flips a coin, and shows you the result of it.",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention", "pipe", "skip-banphrase"],
 	Params: [
 		{ name: "fail", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Code: (async function coinflip (context) {
+	Code: function coinflip (context) {
 		// According to Murray & Teare (1993), the probability of an American silver nickel landing on its edge is around 1 in 6000 tosses
 		const edgeRoll = randomInt(1, 6000);
 		if (edgeRoll === 1) {
@@ -33,8 +34,8 @@ export default {
 			success,
 			reply
 		};
-	}),
-	Dynamic_Description: (async (prefix) => [
+	},
+	Dynamic_Description: (prefix) => [
 		"Flips a virtual coin, telling you which side it landed on.",
 		"This is determined randomly.",
 		"",
@@ -42,5 +43,5 @@ export default {
 		`<code>${prefix}coinflip</code>`,
 		`<code>${prefix}cf</code>`,
 		"Shows which side the coin landed on."
-	])
-};
+	]
+});

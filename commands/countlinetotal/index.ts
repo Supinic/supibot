@@ -1,14 +1,24 @@
-export default {
+import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
+
+type HistoricLines = {
+	timestamp: number;
+	amount: number;
+};
+
+const cacheKey = "count-line-total-previous";
+const baseCooldown = 120_000;
+
+export default declare({
 	Name: "countlinetotal",
 	Aliases: ["clt"],
-	Author: "supinic",
-	Cooldown: 30000,
+	Cooldown: baseCooldown,
 	Description: "Fetches the number of data lines from ALL the log tables Supibot uses, including the total size and a prediction of when the storage will run out.",
 	Flags: ["mention"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function countLineTotal (context) {
-		const chatLineAmount = await core.Query.getRecordset(rs => rs
+	Code: (async function countLineTotal () {
+		const chatLineAmount = await core.Query.getRecordset<number | undefined>(rs => rs
 			.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
 			.from("INFORMATION_SCHEMA", "TABLES")
 			.where("TABLE_SCHEMA = %s", "chat_line")
@@ -16,18 +26,24 @@ export default {
 			.single()
 		);
 
+		if (!chatLineAmount) {
+			return {
+			    success: false,
+			    reply: "No chat lines are currently being logged!"
+			};
+		}
+
 		let historyText = "";
-		const cacheKey = "count-line-total-previous";
-		const history = await core.Cache.getByPrefix(cacheKey);
+		const history = await core.Cache.getByPrefix(cacheKey) as HistoricLines | undefined;
 		if (history) {
-			const days = (sb.Date.now() - history.timestamp) / 864e5;
+			const days = (SupiDate.now() - history.timestamp) / 864e5;
 			const linesPerHour = core.Utils.round((chatLineAmount - history.amount) / (days * 24), 0);
 
-			historyText = `Lines are added at a rate of ${core.Utils.groupDigits(linesPerHour)} lines/hr.`;
+			historyText = `Lines are being added at a rate of ${core.Utils.groupDigits(linesPerHour)} lines/hr.`;
 		}
 		else {
 			const value = {
-				timestamp: sb.Date.now(),
+				timestamp: SupiDate.now(),
 				amount: chatLineAmount
 			};
 
@@ -36,20 +52,7 @@ export default {
 			});
 		}
 
-		const cooldown = {};
-		if (context.channel) {
-			cooldown.user = null;
-			cooldown.channel = context.channel.ID;
-			cooldown.length = this.Cooldown;
-		}
-		else {
-			cooldown.user = context.user.ID;
-			cooldown.channel = null;
-			cooldown.length = this.Cooldown * 2;
-		}
-
 		return {
-			cooldown,
 			reply: core.Utils.tag.trim `
 				Currently logging ${core.Utils.groupDigits(chatLineAmount)} lines in total across all channels.
 				${historyText}
@@ -57,4 +60,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+});

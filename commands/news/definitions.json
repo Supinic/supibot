@@ -555,14 +555,14 @@
         "url": "https://feeds.feedburner.com",
         "path": "kathimerini",
         "endpoints": ["DJpy"],
-        "helpers": ["l7mon"]
+        "helpers": []
       },
       {
         "name": "ThePressProject",
         "url": "https://thepressproject.gr",
         "path": null,
         "endpoints": ["feed"],
-        "helpers": ["l7mon"]
+        "helpers": []
       }
     ]
   },
