@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `data`.`Bad_Apple` (
 	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`Link` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Device` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
-	`Status` ENUM('Approved','Denied','Pending approval') NOT NULL COLLATE 'utf8mb4_general_ci',
+	`Status` ENUM('Approved','Denied','Pending approval','Unavailable') NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Type` ENUM('Calculator','Computer','Console','IRL','Meme','Meta','Software','Technology') NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Published` DATE NULL DEFAULT NULL,
 	`Width` INT(10) UNSIGNED NULL DEFAULT NULL,
