@@ -5,7 +5,7 @@ import type Platform from "../platforms/template.js";
 import { getConfig } from "../config.js";
 const { responses, values } = getConfig();
 
-import regexes from "../utils/regexes.js";
+import { asciiArtRegex, emojiRegex, linkRegex, whitespaceRegex } from "../utils/regexes.js";
 import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
 import { transliterate as executeTransliteration } from "transliteration";
 import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
@@ -18,7 +18,10 @@ const banphraseConfigData = {
 	TWITCH_ANTIPING_CHARACTER,
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
 	transliterate: (input: string) => executeTransliteration(input),
-	...regexes
+	asciiArtRegex,
+	emojiRegex,
+	linkRegex,
+	whitespaceRegex
 } as const;
 
 export type Type = "Denial" | "API response" | "Custom response" | "Replacement" | "Inactive";
