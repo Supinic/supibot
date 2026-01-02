@@ -30,10 +30,8 @@ export default [
 			}
 
 			if (link.toLowerCase() === "last") {
-				const tl = sb.Command.get("tl");
 				const key = createRecentTwitchLottoCacheKey(context);
-
-				const cacheData = await tl.getCacheData(key);
+				const cacheData = await core.Cache.getByPrefix(key);
 				if (!cacheData) {
 					return {
 						success: false,
