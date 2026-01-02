@@ -1,18 +1,19 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "code",
 	Aliases: null,
 	Author: "supinic",
-	Cooldown: 5000,
+	Cooldown: 2500,
 	Description: "Posts a link to a specific command's code definition on GitHub.",
 	Flags: ["developer","mention","pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function code (context, commandString) {
+	Code: (function code (context, commandString) {
 		if (!commandString) {
 			return {
 				success: false,
-				reply: "No command provided!",
-				cooldown: 2500
+				reply: "No command provided!"
 			};
 		}
 
@@ -20,8 +21,7 @@ export default {
 		if (!command) {
 			return {
 				success: false,
-				reply: "Provided command does not exist!",
-				cooldown: 2500
+				reply: "Provided command does not exist!"
 			};
 		}
 
@@ -31,4 +31,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+});
