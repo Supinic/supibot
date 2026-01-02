@@ -1,9 +1,13 @@
+import { BadAppleRow, BadAppleSubcommandDefinition } from "../index.js";
+
 export default {
 	name: "random",
-	aliases: [],
-	description: "Rolls a random rendition from the list, and posts its details.",
+	aliases: ["roll"],
+	title: "Random link",
+	default: false,
+	description: ["Rolls a random Bad Apple!! rendition from the list, and posts its details."],
 	execute: async () => {
-		const random = await core.Query.getRecordset(rs => rs
+		const random = await core.Query.getRecordset<BadAppleRow | undefined>(rs => rs
 			.select("ID", "Device", "Link", "Timestamp")
 			.from("data", "Bad_Apple")
 			.where("Status = %s", "Approved")
@@ -11,6 +15,13 @@ export default {
 			.limit(1)
 			.single()
 		);
+
+		if (!random) {
+			return {
+			    success: false,
+			    reply: "There are no approved Bad Apple!! renditions available at the moment!"
+			};
+		}
 
 		const timestamp = (random.Timestamp) ? `?t=${random.Timestamp}` : "";
 		return {
@@ -21,4 +32,4 @@ export default {
 			`
 		};
 	}
-};
+} satisfies BadAppleSubcommandDefinition;
