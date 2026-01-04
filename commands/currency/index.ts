@@ -1,8 +1,27 @@
-const SPECIAL_CURRENCY_ALIASES = {
-	RMB: "CNY"
-};
+import * as z from "zod";
+import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
+import { typeRegexGroups } from "../../utils/ts-helpers.js";
 
-export default {
+const exchangeRatesKey = "currency-conversion-rates";
+const irrExchangeRateKey = "irr-usd-exchange-rate";
+const SPECIAL_CURRENCY_ALIASES: Record<string, string> = { RMB: "CNY" };
+
+const exchangeRatesSchema = z.object({
+	base: z.string(),
+	rates: z.record(z.string(), z.number().positive())
+});
+const iranianRealRatesSchema = z.object({
+	current: z.object({
+		price_dollar_rl: z.object({
+			p: z.string(),
+			h: z.string(),
+			l: z.string()
+		})
+	}).optional()
+});
+
+export default declare({
 	Name: "currency",
 	Aliases: ["money"],
 	Author: "supinic",
@@ -13,7 +32,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function currency (context, ...args) {
 		if (!process.env.API_OPEN_EXCHANGE_RATES) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No OpenExchangeRates key configured (API_OPEN_EXCHANGE_RATES)"
 			});
 		}
@@ -22,7 +41,7 @@ export default {
 		if (!query) {
 			return {
 				success: false,
-				reply: `No amount or currencies provided! Use this, for example: "$${context.invocation} 100 EUR to USD"`
+				reply: `No amount or currencies provided! Example: "$${context.invocation} 100 EUR to USD"`
 			};
 		}
 
@@ -31,33 +50,35 @@ export default {
 		if (!amountMatch) {
 			return {
 				success: false,
-				reply: `Invalid syntax provided! Use this, for example: "$${context.invocation} 100 EUR to USD"`,
+				reply: `Invalid syntax provided! Example: "$${context.invocation} 100 EUR to USD"`,
 				cooldown: 2500
 			};
 		}
 
 		let multiplier = 1;
+		const groups = typeRegexGroups<"first" | "second", "amount">(amountMatch);
 		let {
-			amount = "1",
+			amount: stringAmount = "1",
 			first,
 			second
-		} = amountMatch.groups;
+		} = groups;
 
-		if (/k/i.test(amount)) {
+		if (/k/i.test(stringAmount)) {
 			multiplier = 1e3;
 		}
-		else if (/m/i.test(amount)) {
+		else if (/m/i.test(stringAmount)) {
 			multiplier = 1e6;
 		}
-		else if (/b/i.test(amount)) {
+		else if (/b/i.test(stringAmount)) {
 			multiplier = 1e9;
 		}
-		else if (/t/i.test(amount)) {
+		else if (/t/i.test(stringAmount)) {
 			multiplier = 1e12;
 		}
 
-		amount = amount.replaceAll(/[kmbt]/gi, "").replaceAll(",", ".");
-		if (!Number(amount) || !Number.isFinite(Number(amount))) {
+		stringAmount = stringAmount.replaceAll(/[kmbt]/gi, "").replaceAll(",", ".");
+		let amount = Number(stringAmount);
+		if (!amount || !Number.isFinite(amount)) {
 			return {
 				success: false,
 				reply: "The amount of currency must be a proper finite number!",
@@ -86,7 +107,7 @@ export default {
 			};
 		}
 
-		let data = await this.getCacheData("currency-rates");
+		let data = await core.Cache.getByPrefix(exchangeRatesKey) as z.infer<typeof exchangeRatesSchema>["rates"] | null;
 		if (!data) {
 			const response = await core.Got.get("GenericAPI")({
 				method: "GET",
@@ -96,10 +117,12 @@ export default {
 				}
 			});
 
-			data = response.body.rates;
-			await this.setCacheData("currency-rates", data, {
+			const { rates } = exchangeRatesSchema.parse(response.body);
+			await this.setCacheData("currency-rates", rates, {
 				expiry: 3_600_000 // 1 hour
 			});
+
+			data = rates;
 		}
 
 		if (!data[first] || !data[second]) {
@@ -124,7 +147,7 @@ export default {
 			};
 		}
 
-		let ratio;
+		let ratio: number;
 		if (first === "USD" || second === "USD") {
 			ratio = (first === "USD")
 				? data[second]
@@ -135,7 +158,7 @@ export default {
 		}
 
 		// Override the default amount by a larger number in the case the ratio is too low to see
-		if (!amountMatch.groups.amount && ratio < 0.1) {
+		if (!groups.amount && ratio < 0.1) {
 			// If the ratio is lower than 0.1, the default amount automatically becomes:
 			// 0.1 → 100; 0.01 → 1000; 0.001 → 10_000; etc.
 			const power = -Math.trunc(Math.log10(ratio)) + 1;
@@ -149,7 +172,7 @@ export default {
 
 		// Special case for Iranian Rial - official exchange rates are frozen (as of 2021) and not relevant
 		if (first === "IRR" || second === "IRR") {
-			let dollarExchangeRate = await this.getCacheData("irr-usd-exchange-rate");
+			let dollarExchangeRate = await core.Cache.getByPrefix(irrExchangeRateKey) as number | undefined;
 			if (!dollarExchangeRate) {
 				const response = await core.Got.get("GenericAPI")({
 					url: "https://call4.tgju.org/ajax.json",
@@ -157,11 +180,10 @@ export default {
 				});
 
 				if (response.statusCode === 200) {
-					const data = response.body.current?.price_dollar_rl;
-					dollarExchangeRate = Number(data.p.replaceAll(",", ""));
-
-					if (!Number.isNaN(dollarExchangeRate)) {
-						await this.setCacheData("irr-usd-exchange-rate", dollarExchangeRate, {
+					const irrExchangeRate = iranianRealRatesSchema.parse(response.body).current?.price_dollar_rl.p ?? null;
+					if (irrExchangeRate) {
+						dollarExchangeRate = Number(irrExchangeRate.replaceAll(",", ""));
+						await core.Cache.setByPrefix(irrExchangeRateKey, dollarExchangeRate, {
 							expiry: 3_600_000 // 1 hour
 						});
 					}
@@ -198,7 +220,7 @@ export default {
 			reply: message
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		`Converts an amount of currency (or 1, if not specified) to another currency`,
 
 		`<code>${prefix}currency (amount) (source currency) (separator) (target currency)</code>`,
@@ -220,7 +242,7 @@ export default {
 		`<code>${prefix}currency 10k CZK to EUR</code>`,
 		`<code>${prefix}currency 10B IRR to CHF</code>`,
 		"Supports text multipliers:",
-		`<code>k</code> for thousand, <code>M</code> for million, <code>B</code> for billion and <code>T</code> for trillion.`,
+		`<code>k</code> for thousands, <code>M</code> for millions, <code>B</code> for billions and <code>T</code> for trillions.`,
 		""
-	])
-};
+	]
+});
