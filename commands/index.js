@@ -87,7 +87,6 @@ import LiveUamapCommand from "./liveuamap/index.js";
 import MarkovCommand from "./markov/index.js";
 import MastodonCommand from "./mastodon/index.js";
 import MathCommand from "./math/index.js";
-import MdnCommand from "./mdn/index.js";
 import MeCommand from "./me/index.js";
 import MetricsCommand from "./metrics/index.js";
 import MobaCommand from "./moba/index.js";
@@ -280,7 +279,6 @@ export default [
 	MarkovCommand,
 	MastodonCommand,
 	MathCommand,
-	MdnCommand,
 	MeCommand,
 	MetricsCommand,
 	MobaCommand,
