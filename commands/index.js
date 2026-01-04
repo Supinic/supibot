@@ -31,7 +31,6 @@ import CountLineChannelCommand from "./countlinechannel/index.js";
 import CountLineTotalCommand from "./countlinetotal/index.js";
 import CryptoCommand from "./crypto/index.js";
 import CryptoGameCommand from "./cryptogame/index.js";
-import CryptoWalletCommand from "./cryptowallet/index.js";
 import CurrencyCommand from "./currency/index.js";
 import CurrentCommand from "./current/index.js";
 import DalleCommand from "./dalle/index.js";
@@ -225,7 +224,6 @@ export default [
 	CountLineTotalCommand,
 	CryptoCommand,
 	CryptoGameCommand,
-	CryptoWalletCommand,
 	CurrencyCommand,
 	CurrentCommand,
 	DalleCommand,
