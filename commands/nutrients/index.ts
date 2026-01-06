@@ -99,7 +99,7 @@ export default declare({
 		const protein = getNutrient("protein", nutrients);
 
 		const text = core.Utils.tag.trim `
-			${servingSize}${unit} of ${description}
+			${servingSize}${unit} of ${description.toLowerCase()}
 			contains
 			${energy} kcal,
 			${fat}g of fat,
