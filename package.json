@@ -9,15 +9,15 @@
     "async-markov": "supinic/async-markov",
     "bing-chat": "^0.2.3",
     "chrono-node": "^2.9.0",
-    "cron": "^4.3.3",
+    "cron": "^4.3.4",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "^14.23.2",
+    "discord.js": "^14.24.2",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.3.5",
-    "vm2": "^3.9.19",
+    "vm2": "^3.10.0",
     "ws": "^8.18.3",
     "zod": "^4.1.12"
   },
@@ -48,17 +48,17 @@
   "license": "AGPL-3.0",
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
-    "@babel/core": "^7.28.4",
-    "@babel/eslint-parser": "^7.28.4",
+    "@babel/core": "^7.28.5",
+    "@babel/eslint-parser": "^7.28.5",
     "@types/xml2js": "^0.4.14",
-    "eslint": "^9.38.0",
+    "eslint": "^9.39.1",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-unicorn": "^61.0.2",
-    "globals": "^16.4.0",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "globals": "^16.5.0",
     "nyc": "^17.1.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.2"
+    "typescript-eslint": "^8.46.4"
   },
   "nyc": {
     "all": false,
@@ -67,5 +67,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.11.0"
 }

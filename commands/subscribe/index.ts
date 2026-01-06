@@ -158,12 +158,19 @@ export default declare({
 				}
 			}
 
-			await core.Query.getRecordUpdater(rs => rs
-				.update("data", "Event_Subscription")
-				.set("Active", !subData.Active)
-				.set("Flags", JSON.stringify(flags))
-				.where("ID = %n", subData.ID)
-			);
+			await core.Query.getRecordUpdater(ru => {
+				ru.update("data", "Event_Subscription")
+					.set("Active", !subData.Active)
+					.set("Flags", JSON.stringify(flags))
+					.where("ID = %n", subData.ID);
+
+				if (invocation === "subscribe") {
+					ru.set("Channel", context.channel?.ID ?? null);
+					ru.set("Platform", context.platform.ID);
+				}
+
+				return ru;
+			});
 
 			return {
 				reply: `Successfully ${invocationString}d${locationWithSpace}. ${response}`

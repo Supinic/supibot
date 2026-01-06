@@ -1,10 +1,13 @@
 import type { EventDefinition } from "../generic-event.js";
 
+import AppleSubDefinition from "./apple.js";
 import ArchLinuxSubDefinition from "./archlinux.js";
+import AsahiLinuxSubDefinition from "./asahilinux.js";
 import BrighterShoresSubDefinition from "./brighter-shores.js";
 import BunSubDefinition from "./bun.js";
 import ChangelogSubDefinition from "./changelog.js";
 import ChannelLiveSubDefinition from "./channel-live.js";
+import CloudflareDevSubDefinition from "./cloudflare-dev.js";
 import DenoSubDefinition from "./deno.js";
 import DotnetSubDefinition from "./dotnet.js";
 import FactorioSubDefinition from "./factorio.js";
@@ -20,11 +23,14 @@ import SuggestionSubDefinition from "./suggestion.js";
 import V8SubDefinition from "./v8.js";
 
 export default [
+	AppleSubDefinition,
 	ArchLinuxSubDefinition,
+	AsahiLinuxSubDefinition,
 	BrighterShoresSubDefinition,
 	BunSubDefinition,
 	ChangelogSubDefinition,
 	ChannelLiveSubDefinition,
+	CloudflareDevSubDefinition,
 	DenoSubDefinition,
 	DotnetSubDefinition,
 	FactorioSubDefinition,

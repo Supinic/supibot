@@ -38,6 +38,8 @@ To start off:
    - `TWITCH_CLIENT_ID`
    - `TWITCH_CLIENT_SECRET`
    - `TWITCH_REFRESH_TOKEN`
+   - `INITIAL_TWITCH_CHANNEL`
+8. Before running the bot, make sure to set it as the moderator in the channel set up by `INITIAL_TWITCH_CHANNEL`, otherwise it won't be able to join. 
 
 #### Discord
 

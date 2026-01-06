@@ -12,7 +12,9 @@ export default {
 	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}osrs playercount</code>`,
-		"Fetches the "
+		"Fetches the current amount of players online for OSRS",
+		"This command will not work when the website is down due to an update or otherwise",
+		`You can check the player count yourself on the <a href="//oldschool.runescape.com/slu">official Jagex website</a> (at the top)`
 	],
 	execute: async function () {
 		const playerCount = await fetchPlayerCount();

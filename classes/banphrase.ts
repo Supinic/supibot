@@ -5,7 +5,7 @@ import type Platform from "../platforms/template.js";
 import { getConfig } from "../config.js";
 const { responses, values } = getConfig();
 
-import regexes from "../utils/regexes.js";
+import { asciiArtRegex, emojiRegex, linkRegex, whitespaceRegex } from "../utils/regexes.js";
 import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
 import { transliterate as executeTransliteration } from "transliteration";
 import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
@@ -18,7 +18,10 @@ const banphraseConfigData = {
 	TWITCH_ANTIPING_CHARACTER,
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
 	transliterate: (input: string) => executeTransliteration(input),
-	...regexes
+	asciiArtRegex,
+	emojiRegex,
+	linkRegex,
+	whitespaceRegex
 } as const;
 
 export type Type = "Denial" | "API response" | "Custom response" | "Replacement" | "Inactive";
@@ -303,7 +306,7 @@ export class Banphrase extends TemplateWithId {
 		let isExternallyBanphrased: boolean | null = null;
 		try {
 			const responseData = await Banphrase.executeExternalAPI(
-				message.slice(0, 1000),
+				resultMessage.slice(0, 1000),
 				channelData.Banphrase_API_Type,
 				channelData.Banphrase_API_URL,
 				{ fullResponse: true }
@@ -317,7 +320,7 @@ export class Banphrase extends TemplateWithId {
 					API: channelData.Banphrase_API_URL,
 					Channel: channelData.ID,
 					Platform: channelData.Platform.ID,
-					Message: message,
+					Message: resultMessage,
 					Response: JSON.stringify(responseData[apiDataSymbol])
 				});
 
@@ -338,14 +341,14 @@ export class Banphrase extends TemplateWithId {
 			switch (channelData.Banphrase_API_Downtime) {
 				case "Ignore":
 					return {
-						string: message,
+						string: resultMessage,
 						passed: true,
 						warn: true
 					};
 
 				case "Notify":
 					return {
-						string: `⚠ ${message}`,
+						string: `⚠ ${resultMessage}`,
 						passed: true,
 						warn: true
 					};
@@ -382,7 +385,7 @@ export class Banphrase extends TemplateWithId {
 
 				case "Whisper": {
 					return {
-						string: `Banphrase failed, your command result: ${message}.`,
+						string: `Banphrase failed, your command result: ${resultMessage}.`,
 						passed: true,
 						privateMessage: true,
 						warn: true
@@ -402,7 +405,7 @@ export class Banphrase extends TemplateWithId {
 					continue;
 				}
 
-				const result = await banphrase.execute(message);
+				const result = await banphrase.execute(resultMessage);
 				if (typeof result === "string") {
 					return {
 						string: result,

@@ -31,7 +31,6 @@ import CountLineChannelCommand from "./countlinechannel/index.js";
 import CountLineTotalCommand from "./countlinetotal/index.js";
 import CryptoCommand from "./crypto/index.js";
 import CryptoGameCommand from "./cryptogame/index.js";
-import CryptoWalletCommand from "./cryptowallet/index.js";
 import CurrencyCommand from "./currency/index.js";
 import CurrentCommand from "./current/index.js";
 import DalleCommand from "./dalle/index.js";
@@ -88,7 +87,6 @@ import LiveUamapCommand from "./liveuamap/index.js";
 import MarkovCommand from "./markov/index.js";
 import MastodonCommand from "./mastodon/index.js";
 import MathCommand from "./math/index.js";
-import MdnCommand from "./mdn/index.js";
 import MeCommand from "./me/index.js";
 import MetricsCommand from "./metrics/index.js";
 import MobaCommand from "./moba/index.js";
@@ -149,7 +147,6 @@ import SongRequestCommand from "./songrequest/index.js";
 import SongRequestQueueCommand from "./songrequestqueue/index.js";
 import SortCommand from "./sort/index.js";
 import SpeedrunCommand from "./speedrun/index.js";
-import StackOverflowSearchCommand from "./stackoverflowsearch/index.js";
 import StalkCommand from "./stalk/index.js";
 import StatisticsCommand from "./statistics/index.js";
 import SteamGamePlayersCommand from "./steamgameplayers/index.js";
@@ -226,7 +223,6 @@ export default [
 	CountLineTotalCommand,
 	CryptoCommand,
 	CryptoGameCommand,
-	CryptoWalletCommand,
 	CurrencyCommand,
 	CurrentCommand,
 	DalleCommand,
@@ -283,7 +279,6 @@ export default [
 	MarkovCommand,
 	MastodonCommand,
 	MathCommand,
-	MdnCommand,
 	MeCommand,
 	MetricsCommand,
 	MobaCommand,
@@ -343,7 +338,6 @@ export default [
 	SongRequestQueueCommand,
 	SortCommand,
 	SpeedrunCommand,
-	StackOverflowSearchCommand,
 	StalkCommand,
 	StatisticsCommand,
 	SteamGamePlayersCommand,

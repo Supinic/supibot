@@ -9,89 +9,42 @@ export default declare({
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function wrongSong (context, target) {
-		if (!sb.VideoLANConnector) {
+		if (!sb.MpvClient) {
 			return {
 			    success: false,
-			    reply: "VLC connector is not available! Check configuration if this is required."
+			    reply: "mpv client is not available! Check configuration if this is required."
 			};
 		}
 
-		let targetID: number | undefined;
+		let result;
 		if (target) {
-			targetID = Number(target);
-			if (!core.Utils.isValidInteger(targetID)) {
+			const targetId = Number(target);
+			if (!core.Utils.isValidInteger(targetId)) {
 				return {
 					success: false,
 					reply: `Could not parse your provided song ID!`
 				};
 			}
+
+			result = await sb.MpvClient.removeById(targetId, context.user.ID);
+		}
+		else {
+			result = await sb.MpvClient.removeUserFirst(context.user.ID);
 		}
 
-		type UserRequest = {
-			ID: number;
-			Name: string;
-			VLC_ID: number;
-			Status: "Queued" | "Current" | "Inactive";
-			Prefix: string;
-		};
-		const userRequest = await core.Query.getRecordset<UserRequest | undefined>(rs => {
-			rs.select("Song_Request.ID", "Name", "VLC_ID", "Status")
-				.select("Video_Type.Link_Prefix AS Prefix")
-				.from("chat_data", "Song_Request")
-				.join({
-					toDatabase: "data",
-					toTable: "Video_Type",
-					on: "Video_Type.ID = Song_Request.Video_Type"
-				})
-				.where("User_Alias = %n", context.user.ID)
-				.where("Status IN %s+", ["Current", "Queued"])
-				.orderBy("Song_Request.ID DESC")
-				.limit(1)
-				.single();
-
-			if (targetID) {
-				rs.where("Song_Request.VLC_ID = %n", targetID);
-			}
-
-			return rs;
-		});
-
-		if (!userRequest) {
+		if (!result.success) {
 			return {
+				success: false,
 				reply: (target)
 					? "Target video ID was not found, or it wasn't requested by you!"
 					: "You don't currently have any videos in the playlist!"
 			};
 		}
 
-		let action = "";
-		if (userRequest.Status === "Current") {
-			const requestsAhead = await core.Query.getRecordset<number>(rs => rs
-				.select("COUNT(*) AS Amount")
-				.from("chat_data", "Song_Request")
-				.where("Status = %s", "Queued")
-				.where("ID > %n", userRequest.ID)
-				.limit(1)
-				.single()
-				.flat("Amount")
-			);
-
-			if (requestsAhead > 0) {
-				action = "skipped";
-				await sb.VideoLANConnector.playNext();
-			}
-			else {
-				action = "skipped, and the playlist stopped";
-				await sb.VideoLANConnector.stopPlaying();
-			}
-		}
-		else if (userRequest.Status === "Queued") {
-			action = "deleted from the playlist";
-			await sb.VideoLANConnector.removeFromPlaylist(userRequest.VLC_ID);
-		}
-
+		const action = (result.order === 0) ? "skipped" : "removed from the playlist";
 		return {
-			reply: `Your request "${userRequest.Name}" (ID ${userRequest.VLC_ID}) has been successfully ${action}.`
+			success: true,
+			reply: `Your request "${result.name ?? result.url}" (ID ${result.id}) has been successfully ${action}.`
 		};
 	}),
 	Dynamic_Description: (prefix) => [

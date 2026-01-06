@@ -58,19 +58,14 @@ export const ConfigSchema = z.strictObject({
 			});
 		}
 	}),
-	local: z.strictObject({
+	local: z.object({
 		epalAudioChannels: z.array(z.int().positive()).optional().nullable(),
 		listenerAddress: z.string().optional().nullable(),
 		listenerPort: port.optional().nullable(),
 		ttsVolume: z.int().min(0).max(8).optional().nullable(),
 		ttsLengthLimit: z.int().positive().optional().nullable(),
 		ttsListUrl: z.string().optional().nullable(),
-		playsoundListUrl: z.string().optional().nullable(),
-		vlcBaseUrl: z.string().optional().nullable(),
-		vlcUrl: z.string().optional().nullable(),
-		vlcUsername: z.string().optional().nullable(),
-		vlcPassword: z.string().optional().nullable(),
-		vlcPort: port.optional().nullable()
+		playsoundListUrl: z.string().optional().nullable()
 	}).optional(),
 	api: z.strictObject({
 		secure: z.boolean().nullable().optional(),

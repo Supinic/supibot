@@ -48,6 +48,7 @@ const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const MESSAGE_MODERATION_CODES = new Set(["channel_settings", "automod_held"]);
+const STREAM_SLICE_PAGE = 100;
 
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
 const PRIVATE_COMMAND_FILTERED_RESPONSE = "That command is not available via private messages.";
@@ -307,6 +308,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	public readonly supportsMeAction = true;
 	public readonly dynamicChannelAddition = true;
 	private readonly reconnectCheck: NodeJS.Timeout;
+	private readonly liveChannelsCheck: NodeJS.Timeout;
 	private readonly previousMessageMeta: Map<Channel["ID"], { time: number; length: number; }> = new Map();
 	private readonly userCommandSpamPrevention: Map<User["ID"], number> = new Map();
 
@@ -332,6 +334,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		super("twitch", TwitchConfigSchema.parse(resultConfig));
 
 		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000).unref();
+		this.liveChannelsCheck = setInterval(() => void this.#recheckLiveChannels(), 300_000).unref();
 	}
 
 	async connect (options: ConnectOptions = {}) {
@@ -361,6 +364,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
+			await TwitchUtils.ensureInitialChannelId(this);
 			const existingSubs = await TwitchUtils.getExistingSubscriptions(false);
 
 			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
@@ -420,11 +424,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			await this.handleReconnect(message);
 		}
 		else if (isRevocationMessage(message)) {
-			console.warn("Subscription revoked", { data });
-
+			console.warn("Subscription revoked", { message });
 			await sb.Logger.log(
 				"Twitch.Warning",
-				`Subscription revoked: ${JSON.stringify(data)}`,
+				`Subscription revoked: ${JSON.stringify(message)}`,
 				null,
 				null
 			);
@@ -807,10 +810,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification") as boolean | undefined;
 				if (!notified) {
 					const replyMessage = core.Utils.tag.trim `
-						@${userData.Name}, you have been flagged as suspicious.
-						This is because I have seen your Twitch username on a different account before.
-						This is usually caused by renaming into an account that existed before.
-						To remedy this, head into Supinic's channel chat twitch.tv/supinic and mention this.												
+						@${userData.Name}, I can't reply to your commands any more. 
+						This is because I have seen your username used on a different account.
+						To fix this: Go into my chat at twitch.tv/supibot then say the word "username" and I'll guide you through.
+						This takes just a minute at most :)
 					`;
 
 					if (channelData) {
@@ -1500,6 +1503,61 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		client.ping();
 	}
 
+	async #recheckLiveChannels () {
+		const client = this.client;
+		if (!client) {
+			return;
+		}
+
+		const cacheLiveChannelIds = await this.getLiveChannelIdList();
+		if (cacheLiveChannelIds.length === 0) {
+			return;
+		}
+
+		const simpleSchema = z.object({
+			data: z.array(z.object({ user_id: z.string() }))
+		});
+
+		const currentlyLiveChannelsSet = new Set<string>();
+		for (let slice = 0; slice < cacheLiveChannelIds.length; slice += STREAM_SLICE_PAGE) {
+			const channelIds = cacheLiveChannelIds.slice(slice * STREAM_SLICE_PAGE, (slice + 1) * STREAM_SLICE_PAGE);
+			const searchParams = new URLSearchParams({
+				type: "live",
+				first: String(STREAM_SLICE_PAGE)
+			});
+
+			for (const channelId of channelIds) {
+				searchParams.append("user_id", channelId);
+			}
+
+			const response = await core.Got.get("Helix")({
+				url: "streams",
+				searchParams
+			});
+
+			const { data } = simpleSchema.parse(response.body);
+			for (const stream of data) {
+				currentlyLiveChannelsSet.add(stream.user_id);
+			}
+		}
+
+		const cacheLiveChannelsSet = new Set(cacheLiveChannelIds);
+		const missedChannels = cacheLiveChannelsSet.difference(currentlyLiveChannelsSet);
+		for (const channelId of missedChannels) {
+			const channelData = sb.Channel.getBySpecificId(channelId, this);
+			if (!channelData) {
+				continue;
+			}
+
+			channelData.events.emit("offline", {
+				event: "offline",
+				channel: channelData
+			});
+
+			await this.removeLiveChannelIdList(channelId);
+		}
+	}
+
 	async fixChannelRename (channelData: Channel, twitchChanelName: string, channelId: string) {
 		const existingChannelName = await core.Query.getRecordset<string | undefined>(rs => rs
 			.select("Name")
@@ -1539,6 +1597,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		clearInterval(this.reconnectCheck);
+		clearInterval(this.liveChannelsCheck);
+
 		this.client = null;
 	}
 

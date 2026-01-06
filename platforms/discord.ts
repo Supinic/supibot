@@ -199,7 +199,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 				// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 				// All emotes on Discord are wrapped at least by colons
-				const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
+				const regex = new RegExp(String.raw `(?<!(:))\b${emote.name}\b(?!(:))`, "g");
 				message = message.replace(regex, formatEmoji(emote));
 			}
 		}

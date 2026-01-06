@@ -8,35 +8,27 @@ import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-ut
 import getLinkParser from "../../utils/link-parser.js";
 
 import { type User } from "../../classes/user.js";
-import { type DatabaseVideo } from "../../singletons/vlc-client.js";
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+import { type MpvPlaylistItem } from "../../singletons/mpv-client.js";
+
+const { SONG_REQUESTS_STATE } = cacheKeys;
 
 const REQUEST_TIME_LIMIT = 900;
 const REQUEST_AMOUNT_LIMIT = 10;
 
-const checkLimits = (userData: User, playlist: DatabaseVideo[]) => {
-	const userRequests = playlist.filter(i => i.User_Alias === userData.ID);
+const checkLimits = (userData: User, playlist: MpvPlaylistItem[]) => {
+	const userRequests = playlist.filter(i => i.user === userData.ID);
 	if (userRequests.length >= REQUEST_AMOUNT_LIMIT) {
 		return {
-			canRequest: false,
-			reason: `Maximum amount of videos queued! (${userRequests.length}/${REQUEST_AMOUNT_LIMIT})`
+			success: false,
+			reply: `Maximum amount of videos queued! Limit: ${REQUEST_AMOUNT_LIMIT}`
 		} as const;
 	}
 
-	let totalTime = 0;
-	for (const request of userRequests) {
-		totalTime += (request.End_Time ?? request.Length ?? 0) - (request.Start_Time ?? 0);
-	}
-
-	totalTime = Math.ceil(totalTime);
-
+	const totalTime = userRequests.reduce((acc, cur) => acc + (cur.duration ?? 0), 0);
 	return {
-		canRequest: true,
+		success: true,
 		totalTime,
-		requests: userRequests.length,
-		reason: null,
-		time: REQUEST_TIME_LIMIT,
-		amount: REQUEST_AMOUNT_LIMIT
+		requests: userRequests.length
 	} as const;
 };
 
@@ -74,10 +66,10 @@ export default declare({
 	] as const,
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequest (context, ...args) {
-		if (!sb.VideoLANConnector) {
+		if (!sb.MpvClient) {
 			return {
 				success: false,
-				reply: "VLC connector is not available! Check configuration if this is required."
+				reply: "mpv client is not available! Check configuration if this is required."
 			};
 		}
 
@@ -101,22 +93,14 @@ export default declare({
 				reply: "Song requests are currently turned off."
 			};
 		}
-		else if (state === "vlc-read") {
-			return {
-				reply: `Song requests are currently read-only. You can check what's playing with the "current" command, but not queue anything.`
-			};
-		}
-		else if (state === "vlc") {
-			// Simply make sure the VLC client is running if a song is being requested into it
-			sb.VideoLANConnector.startClient();
-		}
 
 		// Determine the user's and global limits - both duration and video amount
-		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
+		const queue = await sb.MpvClient.getPlaylist();
 		const limits = checkLimits(context.user, queue);
-		if (!limits.canRequest) {
+		if (!limits.success) {
 			return {
-				reply: limits.reason
+				success: false,
+				reply: limits.reply
 			};
 		}
 
@@ -371,63 +355,29 @@ export default declare({
 			};
 		}
 
-		const exists = queue.find(i => (
-			i.Link === data.ID
-			&& i.Start_Time === startTime
-			&& i.End_Time === endTime
-		));
-
-		const existsString = "";
-		if (exists) {
-			return {
-				success: false,
-				reply: `This video is already queued as ID ${exists.VLC_ID}!`
-			};
-		}
-
 		const authorString = (data.author) ? ` by ${data.author}` : "";
 		const segmentLength = (endTime ?? length ?? 0) - (startTime ?? 0);
 
-		let bonusString = "";
-		const bonusLimit = await context.user.getDataProperty("supinicStreamSongRequestExtension") ?? 0;
-		if ((limits.totalTime + segmentLength) > limits.time) {
-			const excess = core.Utils.round((limits.totalTime + segmentLength) - limits.time, 1);
-			if (excess > bonusLimit) {
-				return {
-					success: false,
-					reply: core.Utils.tag.trim `
-						Your video would exceed the total video limit by ${excess} seconds!.
-						You can change the start and end points of the video with these arguments, e.g.: start:0 end:${limits.totalTime - limits.time}
-					`
-				};
-			}
-			else {
-				const remainingBonus = core.Utils.round(bonusLimit - excess, 1);
-				await context.user.setDataProperty("supinicStreamSongRequestExtension", remainingBonus);
-				bonusString = `Used up ${excess} seconds from your extension, ${remainingBonus} remaining.`;
-			}
-		}
-
-		// Actually attempt to request the video into VLC
-		let id = null;
+		let addResult;
 		try {
-			let vlcLink = data.link;
-
-			// Extreme hard-coded exception! Apparently, some YouTube videos do not play properly in VLC if and only
-			// if they are queued with HTTPS. This is a temporary solution and should be removed as soon as a proper
-			// fix exists. Probably upgrading to VLC 4.x will work.
-			// Reference: https://forum.videolan.org/viewtopic.php?t=111579
-			if (data.type === "youtube") {
-				vlcLink = vlcLink.replace("https://", "http://");
-			}
-
-			id = await sb.VideoLANConnector.add(vlcLink, { startTime, endTime });
+			addResult = await sb.MpvClient.add(data.link, {
+				user: context.user.ID,
+				name: data.name,
+				duration: data.duration
+			});
 		}
 		catch (e) {
-			console.warn("sr error", e);
+			console.warn(e);
 			await core.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			return {
-				reply: `The desktop listener is currently turned off! Turning song requests off.`
+				reply: `The desktop listener is not currently running! Turning song requests off.`
+			};
+		}
+
+		if (!addResult.success) {
+			return {
+			    success: false,
+			    reply: `Could not request: ${addResult.reason}`
 			};
 		}
 
@@ -452,42 +402,10 @@ export default declare({
 			videoType = dbVideoType;
 		}
 
-		// Log the request into database
-		const row = await core.Query.getRow("chat_data", "Song_Request");
-		row.setValues({
-			VLC_ID: id,
-			Link: data.ID,
-			Name: core.Utils.wrapString(data.name, 100),
-			Video_Type: videoType,
-			Length: (data.duration) ? Math.ceil(data.duration) : null,
-			Status: (queue.length === 0) ? "Current" : "Queued",
-			Started: (queue.length === 0) ? new SupiDate() : null,
-			User_Alias: context.user.ID,
-			Start_Time: startTime ?? null,
-			End_Time: endTime ?? null
-		});
-		await row.save();
-
 		let when = "right now";
-		const status = await sb.VideoLANConnector.getUpdatedStatus();
-		if (queue.length > 0) {
-			const current = queue.find(i => i.Status === "Current");
-			const { time: currentVideoPosition, length } = status;
-			const endTime = current?.End_Time ?? length;
-
-			const playingDate = new SupiDate().addSeconds(endTime - currentVideoPosition);
-			const inQueue = queue.filter(i => i.Status === "Queued");
-
-			for (const item of inQueue) {
-				playingDate.addSeconds(item.Duration ?? 0);
-			}
-
-			if (playingDate.valueOf() <= SupiDate.now()) {
-				when = "right now";
-			}
-			else {
-				when = core.Utils.timeDelta(playingDate);
-			}
+		if (addResult.timeUntil !== 0) {
+			const deltaDate = new SupiDate().addSeconds(addResult.timeUntil);
+			when = core.Utils.timeDelta(deltaDate);
 		}
 
 		const seek = [];
@@ -498,9 +416,9 @@ export default declare({
 			seek.push(`ending at ${core.Utils.formatTime(endTime, true)}`);
 		}
 
-		const pauseState = await core.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
-		const pauseString = (pauseState === true)
-			? "Song requests are paused at the moment."
+		const status = await sb.MpvClient.getUpdatedStatus();
+		const pauseString = (status.paused)
+			? "The song request is paused at the moment."
 			: "";
 		const seekString = (seek.length > 0)
 			? `Your video is ${seek.join(" and ")}.`
@@ -508,13 +426,12 @@ export default declare({
 
 		return {
 			reply: core.Utils.tag.trim `
-				Video "${data.name}"${authorString} successfully added to queue with ID ${id}!
+				Video "${data.name}"${authorString} successfully added to queue with ID ${addResult.id}!
 				It is playing ${when}.
 				${seekString}
 				${pauseString}
-				${existsString}
-				(slots: ${limits.requests + 1}/${limits.amount}, length: ${Math.round(limits.totalTime + segmentLength)}/${limits.time})
-				${bonusString}
+				Your videos: ${limits.requests + 1}/${REQUEST_AMOUNT_LIMIT}
+				Length of your videos: ${Math.round(limits.totalTime + segmentLength)}/${REQUEST_TIME_LIMIT}
 			`
 		};
 	}),

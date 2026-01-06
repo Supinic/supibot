@@ -39,12 +39,7 @@
     "ttsVolume": null,
     "ttsLengthLimit": null,
     "ttsListUrl": null,
-    "playsoundListUrl": null,
-    "vlcPassword": null,
-    "vlcPort": null,
-    "vlcUrl": null,
-    "vlcUsername": null,
-    "vlcBaseUrl": null
+    "playsoundListUrl": null
   },
   "api": {
     "secure": false,

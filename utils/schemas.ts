@@ -1,16 +1,24 @@
 // @todo figure out where to place this file properly within the project
 import * as z from "zod";
 
+export const ivrErrorSchema = z.object({
+	statusCode: z.int().min(400).max(599),
+	error: z.object({
+		message: z.string()
+	})
+});
+
 const BaseIvrUserDataSchema = z.object({
 	login: z.string(),
+	displayName: z.string(),
 	id: z.string(),
 	bio: z.string().nullable(),
 	follows: z.null(),
 	followers: z.number(),
 	profileViewCount: z.null(),
-	chatColor: z.string(),
+	chatColor: z.string().nullable(),
 	logo: z.string(),
-	banner: z.string(),
+	banner: z.string().nullable(),
 	verifiedBot: z.null(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
@@ -18,11 +26,11 @@ const BaseIvrUserDataSchema = z.object({
 	roles: z.object({
 		isAffiliate: z.boolean(),
 		isPartner: z.boolean(),
-		isStaff: z.boolean()
+		isStaff: z.boolean().nullable()
 	}),
 	badges: z.array(
 		z.object({
-			setId: z.string(),
+			setID: z.string(),
 			title: z.string(),
 			description: z.string(),
 			version: z.string()
@@ -50,7 +58,7 @@ const BaseIvrUserDataSchema = z.object({
 		game: z.object({ displayName: z.string() }).nullable()
 	}).nullable(),
 	lastBroadcast: z.object({
-		startedAt: z.string(),
+		startedAt: z.string().nullable(),
 		title: z.string().nullable()
 	}).nullable(),
 	panels: z.array(z.object({ id: z.string() }))
@@ -71,7 +79,17 @@ const BannedIvrUserDataSchema = BaseIvrUserDataSchema.extend({
 });
 
 export const ivrUserDataSchema = z.array(
-	z.union([RegularIvrUserDataSchema, 	BannedIvrUserDataSchema])
+	z.union([RegularIvrUserDataSchema, BannedIvrUserDataSchema])
 );
 
 export type IvrUserData = z.infer<typeof ivrUserDataSchema>;
+
+export const ivrFoundersSchema = z.object({
+	founders: z.array(z.object({
+		isSubscribed: z.boolean(),
+		id: z.string(),
+		login: z.string(),
+		displayName: z.string(),
+		entitlementStart: z.iso.datetime()
+	}))
+});
