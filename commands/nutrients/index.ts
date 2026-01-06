@@ -116,7 +116,8 @@ export default declare({
 		"",
 
 		`<code>${prefix}nutrients (foodstuff)</code>`,
+		`<code>${prefix}nutrients cheddar cheese</code>`,
 		`<code>${prefix}nutrients chicken breasts</code>`,
-		"Shows the macro-nutrients for a given input: energy (kcal), fat, carbohydrates, protein.",
+		"Shows the macro-nutrients for a given input: energy (kcal), fat, carbohydrates, protein."
 	]
 });
