@@ -101,10 +101,10 @@ export default declare({
 		const text = core.Utils.tag.trim `
 			${servingSize}${unit} of ${description}
 			contains
-				${energy} kcal,
-				${fat}g of fat,
-				${carbohdyrates}g of carbohydrates,
-				${protein}g protein.
+			${energy} kcal,
+			${fat}g of fat,
+			${carbohdyrates}g of carbohydrates,
+			${protein}g protein.
 		`;
 
 		return {
