@@ -51,9 +51,11 @@ export default declare({
 
 		const nsfw = Boolean(context.channel?.NSFW);
 		const { data } = nineGagSchema.parse(rawData);
+
+		const noAdvertisingPosts = data.posts.filter(i => i.creationTs !== 0); // Advertising posts have timestamp = 0
 		const filteredPosts = (nsfw)
-			? data.posts
-			: data.posts.filter(i => i.nsfw !== 1);
+			? noAdvertisingPosts
+			: noAdvertisingPosts.filter(i => i.nsfw !== 1);
 
 		if (filteredPosts.length === 0) {
 			return {
