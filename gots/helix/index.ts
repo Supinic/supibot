@@ -22,6 +22,7 @@ export default {
 			},
 			hooks: {
 				afterResponse: [],
+				beforeCache: [],
 				beforeError: [],
 				beforeRedirect: [],
 				beforeRetry: [],

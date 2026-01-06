@@ -77,7 +77,7 @@ export default {
 			});
 
 			const saveResult = await row.save();
-			if (!saveResult) {
+			if (!saveResult || !("insertId" in saveResult)) {
 				throw new SupiError({
 				    message: "Assert error: No updated columns in Row"
 				});
