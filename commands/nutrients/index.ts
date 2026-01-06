@@ -6,16 +6,10 @@ const searchSchema = z.object({
 	totalHits: z.int().positive(),
 	currentPage: z.int().positive(),
 	foods: z.array(z.object({
-		fdcId: z.int(),
 		description: z.string(),
-		servingSize: z.number(),
-		servingSizeUnit: z.string(),
-		brandName: z.string(),
 		foodNutrients: z.array(z.object({
 			nutrientId: z.int(),
-			nutrientName: z.string(),
-			value: z.number(),
-			unitName: z.string()
+			value: z.number()
 		}))
 	}))
 });
@@ -88,8 +82,6 @@ export default declare({
 
 		const {
 			foodNutrients: nutrients,
-			servingSizeUnit: unit,
-			servingSize,
 			description
 		} = foods[0];
 
@@ -99,7 +91,7 @@ export default declare({
 		const protein = getNutrient("protein", nutrients);
 
 		const text = core.Utils.tag.trim `
-			${servingSize}${unit} of ${description.toLowerCase()}
+			100g of ${description.toLowerCase()}
 			contains
 			${energy} kcal,
 			${fat}g of fat,
