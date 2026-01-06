@@ -34,6 +34,7 @@ export default {
 		hooks: {
 			afterResponse: [],
 			beforeRedirect: [],
+			beforeCache: [],
 			beforeRetry: [],
 			beforeRequest: [],
 			init: [],
