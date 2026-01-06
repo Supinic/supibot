@@ -612,7 +612,7 @@ export class Command extends TemplateWithoutId {
 			user: userData,
 			platform: platformData,
 			options,
-			platformSpecificData = null
+			platformSpecificData
 		} = data;
 
 		if (!identifier) {
