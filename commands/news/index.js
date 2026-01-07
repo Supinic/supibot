@@ -47,17 +47,8 @@ export default {
 
 			return await rssNews.fetch(context, code, args.join(" "));
 		}
-		else if (!rssNews.isCountryCode(input)) {
-			return await googleNews.fetch(context, args.join(" "));
-		}
 		else {
-			return {
-				success: false,
-				reply: core.Utils.tag.trim `
-					Your provided country code is currently not supported!
-					If you know a good relevant news source with RSS support, you could $suggest it and it would be added.
-				`
-			};
+			return await googleNews.fetch(context, args.join(" "));
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
