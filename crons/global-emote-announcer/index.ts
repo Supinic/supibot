@@ -1,6 +1,8 @@
+import { setTimeout as wait } from "node:timers/promises";
+import { SupiDate } from "supi-core";
+
 import { postToHastebin } from "../../utils/command-utils.js";
 import type { CronDefinition } from "../temp-definitions.d.ts";
-import { SupiDate } from "supi-core";
 
 type HelixResponse = {
 	data: {
@@ -15,6 +17,9 @@ type EmoteJsonObject = {
 	deleted: HelixResponse["data"];
 };
 type EmoteDescriptor = { name: string; id: string; };
+
+const MAX_MESSAGES_SENT = 5;
+const MULTI_MESSAGE_DELAY = 250;
 
 const SANITY_EMOTE_AMOUNT = 25;
 const cacheKey = "twitch-global-emotes";
@@ -91,7 +96,6 @@ const definition: CronDefinition = {
 		}
 
 		const now = new SupiDate();
-		const result: string[] = [];
 		const json: EmoteJsonObject = {
 			timestamp: now.valueOf(),
 			added: [],
@@ -105,19 +109,12 @@ const definition: CronDefinition = {
 				continue;
 			}
 
+			const { id, name } = emote;
 			if (previousEmoteIds.has(emoteId)) {
-				result.push(`deleted: ${emote.name}`);
-				json.deleted.push({
-					id: emote.id,
-					name: emote.name
-				});
+				json.deleted.push({ id, name });
 			}
 			if (newEmoteIds.has(emoteId)) {
-				result.push(`added: ${emote.name}`);
-				json.added.push({
-					id: emote.id,
-					name: emote.name
-				});
+				json.added.push({ id, name });
 			}
 		}
 
@@ -141,7 +138,25 @@ const definition: CronDefinition = {
 
 		await suggestionRow.save({ skipLoad: true });
 
-		await channelData.send(`Global Twitch emotes changed: ${result.join(" ")} ${hastebinLink}`);
+		let message = `Global Twitch emotes changed! ${hastebinLink} `;
+		if (json.added.length !== 0) {
+			message += `Added: ${json.added.map(i => i.name).join(" ")}`;
+		}
+		if (json.deleted.length !== 0) {
+			if (json.added.length !== 0) {
+				message += " -- ";
+			}
+
+			message += `Deleted: ${json.deleted.map(i => i.name).join(" ")}`;
+		}
+
+		const limit = channelData.Message_Limit ?? channelData.Platform.messageLimit;
+		const chunks = core.Utils.partitionString(message, limit, MAX_MESSAGES_SENT);
+
+		for (const chunk of chunks) {
+			await channelData.send(chunk);
+			await wait(MULTI_MESSAGE_DELAY);
+		}
 	})
 };
 
