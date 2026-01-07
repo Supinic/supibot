@@ -3,6 +3,7 @@ import { SupiDate } from "supi-core";
 
 import { postToHastebin } from "../../utils/command-utils.js";
 import type { CronDefinition } from "../temp-definitions.d.ts";
+import subscriptionDefinition from "../../commands/subscribe/event-types/global-twitch-emotes.js";
 
 type HelixResponse = {
 	data: {
@@ -30,6 +31,8 @@ const fetchTwitchGlobalEmotes = () => core.Got.get("Helix")<HelixResponse>({
 });
 
 let previousEmotes: EmoteDescriptor[] | undefined;
+let suggestionTableExists: boolean | null = null;
+
 const definition: CronDefinition = {
 	name: "global-emote-announcer",
 	expression: "0 */5 * * * *",
@@ -128,17 +131,30 @@ const definition: CronDefinition = {
 		});
 
 		const hastebinLink = (hastebinResult.ok) ? hastebinResult.link : "(Hastebin link N/A)";
-		const suggestionRow = await core.Query.getRow("data", "Suggestion");
-		suggestionRow.setValues({
-			User_Alias: 1,
-			Text: `Global emote change, add to Origin: ${hastebinLink}`,
-			Priority: 255,
-			Category: "Data"
-		});
 
-		await suggestionRow.save({ skipLoad: true });
+		suggestionTableExists ??= await core.Query.isTablePresent("data", "Suggestion");
+		if (suggestionTableExists) {
+			const suggestionRow = await core.Query.getRow("data", "Suggestion");
+			suggestionRow.setValues({
+				User_Alias: 1,
+				Text: `Global emote change, add to Origin: ${hastebinLink}`,
+				Priority: 255,
+				Category: "Data"
+			});
 
-		let message = `Global Twitch emotes changed! ${hastebinLink} `;
+			await suggestionRow.save({ skipLoad: true });
+		}
+
+		const subscribedNames = await core.Query.getRecordset<string[]>(rs => rs
+			.select("User_Alias.Name AS Name")
+			.from("data", "Event_Subscription")
+			.join("chat_data", "User_Alias")
+			.where("Type = %s", subscriptionDefinition.name)
+			.flat("Name")
+		);
+
+		const names = subscribedNames.map(i => `@${i}`).join(" ");
+		let message = `${names} Global Twitch emotes changed! ${hastebinLink} `;
 		if (json.added.length !== 0) {
 			message += `Added: ${json.added.map(i => i.name).join(" ")}`;
 		}

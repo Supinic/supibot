@@ -12,6 +12,7 @@ import DenoSubDefinition from "./deno.js";
 import DotnetSubDefinition from "./dotnet.js";
 import FactorioSubDefinition from "./factorio.js";
 import GithubBlogDefinition from "./github-blog.js";
+import GlobalTwitchEmotesDefinition from "./global-twitch-emotes.js";
 import MicrosoftCppSubDefinition from "./msvcpp.js";
 import NodeSubDefinition from "./nodejs.js";
 import OsrsSubDefinition from "./osrs.js";
@@ -35,6 +36,7 @@ export default [
 	DotnetSubDefinition,
 	FactorioSubDefinition,
 	GithubBlogDefinition,
+	GlobalTwitchEmotesDefinition,
 	MicrosoftCppSubDefinition,
 	NodeSubDefinition,
 	OsrsSubDefinition,
