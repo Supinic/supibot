@@ -36,7 +36,7 @@ type AliasData = {
 describe("$alias", async () => {
 	let existingAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
 	let channelAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
-	let commandMap = new Map<string, Command>();
+	const commandMap = new Map<string, Command>();
 
 	const world = new TestWorld();
 

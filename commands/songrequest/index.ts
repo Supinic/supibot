@@ -251,7 +251,7 @@ export default declare({
 					};
 				}
 
-				const { clip, clipKey = "" } = response.body;
+				const { clip, clipKey } = response.body;
 				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
 
 				videoType = 19;
