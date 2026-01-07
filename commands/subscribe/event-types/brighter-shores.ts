@@ -1,4 +1,4 @@
-import { CustomEventDefinition } from "../generic-event.js";
+import type { CustomEventDefinition } from "../generic-event.js";
 
 const LATEST_STEAM_NEWS_DATE = "brighter-shores-latest-steam-update-date";
 const steamNewsUrl = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/";

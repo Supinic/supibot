@@ -8,9 +8,9 @@ import { fetchGeoLocationData, postToHastebin } from "../../utils/command-utils.
 import {
 	getSunPosition,
 	isWeatherFormatKey,
-	OwmPollutionResponse,
-	OwmWeatherResponse,
-	WeatherFormatObject,
+	type OwmPollutionResponse,
+	type OwmWeatherResponse,
+	type WeatherFormatObject,
 	WeatherItem
 } from "./helpers.js";
 

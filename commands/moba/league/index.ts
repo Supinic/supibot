@@ -1,5 +1,5 @@
 import { SubcommandCollection } from "../../../classes/command.js";
-import { type MobaGameDefinition, MobaSubcommandDefinition } from "../index.js";
+import type { MobaSubcommandDefinition, MobaGameDefinition } from "../index.js";
 
 import LastMatchCommand from "./last-match.js";
 import RankCommand from "./rank.js";

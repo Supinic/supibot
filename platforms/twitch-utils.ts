@@ -1,8 +1,8 @@
 import { SupiError } from "supi-core";
 
-import { TwitchPlatform } from "./twitch.js";
-import { User } from "../classes/user.js";
-import { Channel } from "../classes/channel.js";
+import type { TwitchPlatform } from "./twitch.js";
+import type { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
 
 const { env } = globalThis.process;
 

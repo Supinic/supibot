@@ -1,9 +1,9 @@
 import { SupiError } from "supi-core";
 
 import { TemplateWithoutId } from "./template.js";
-import { Channel, Like as ChannelLike } from "./channel.js";
-import { User } from "./user.js";
+import { Channel, type Like as ChannelLike } from "./channel.js";
 
+import type { User } from "./user.js";
 import { Platform } from "../platforms/template.js";
 import type { SimpleGenericData, XOR } from "../@types/globals.d.ts";
 import type { TwitchPlatform } from "../platforms/twitch.js";

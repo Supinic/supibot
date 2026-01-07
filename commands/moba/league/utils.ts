@@ -1,7 +1,7 @@
 import { SupiError } from "supi-core";
 import * as z from "zod";
 
-import { Context } from "../../../classes/command.js";
+import type { Context } from "../../../classes/command.js";
 import { typedEntries, typedKeys } from "../../../utils/ts-helpers.js";
 
 const PLATFORMS = {

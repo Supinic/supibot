@@ -1,4 +1,4 @@
-import { CheckSubcommandDefinition } from "../index.js";
+import type { CheckSubcommandDefinition } from "../index.js";
 
 export default {
 	name: "changelog",

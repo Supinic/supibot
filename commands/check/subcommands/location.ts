@@ -38,7 +38,7 @@ export default {
 			};
 		}
 
-		const { formatted, hidden = false } = locationData;
+		const { formatted, hidden } = locationData;
 		if (hidden) {
 			if (context.user === targetUser) {
 				await context.sendIntermediateMessage("As your location is set as private, I sent you a PM with it.");

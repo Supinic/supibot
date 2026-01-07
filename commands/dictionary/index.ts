@@ -1,4 +1,4 @@
-import { CommandDefinition, declare } from "../../classes/command.js";
+import { declare, type CommandDefinition } from "../../classes/command.js";
 
 type DictionaryApiFailure = {
 	title: string;

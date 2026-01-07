@@ -37,7 +37,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
-    "test": "yarn build && mocha ./build/tests --recursive --exit",
+    "test": "node --import ./tests/register-loader.mjs --test",
     "coverage": "nyc yarn test",
     "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core",
     "validate:config": "node ./build/utils/validate-config.js"
@@ -55,7 +55,6 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-unicorn": "^62.0.0",
     "globals": "^16.5.0",
-    "mocha": "^11.7.5",
     "nyc": "^17.1.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^5.9.3",

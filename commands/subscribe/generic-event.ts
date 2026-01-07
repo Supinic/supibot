@@ -4,7 +4,7 @@ import { parseRSS } from "../../utils/command-utils.js";
 import type { User } from "../../classes/user.js";
 import type { Channel } from "../../classes/channel.js";
 import type { Platform } from "../../platforms/template.js";
-import { SubscribeCommandContext } from "./index.js";
+import type { SubscribeCommandContext } from "./index.js";
 
 const DEFAULT_CHANNEL_ID = 38;
 

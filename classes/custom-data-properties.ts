@@ -3,7 +3,7 @@ import type { User } from "./user.js";
 import type { SimpleGenericData } from "../@types/globals.js";
 import type { Query } from "supi-core";
 
-import { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
+import type { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
 type TwitchLottoFlagName = typeof twitchLottoFlags[number]["name"];
 
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
