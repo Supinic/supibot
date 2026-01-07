@@ -1,8 +1,8 @@
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { SONG_REQUESTS_STATE } = sharedKeys;
+import { getConfig } from "../../config.js";
 
-const repeats: string[] = [];
-const repeatAmount = 100;
+const { listenerAddress, listenerPort } = getConfig().local ?? {};
+const { SONG_REQUESTS_STATE } = sharedKeys;
 
 export default {
 	name: "stream-silence-prevention",
@@ -37,29 +37,8 @@ export default {
 			return;
 		}
 
-		// @todo port the database table into some kind of a configuration, some kidn of json array or something
-		const videoData = await core.Query.getRecordset<{Link: string; Notes: string;}>(rs => rs
-			.select("Link", "Notes")
-			.from("personal", "Favourite_Track")
-			.where("Video_Type = %n", 15)
-			.where(
-				{ condition: (repeats.length !== 0) },
-				"Link NOT IN %s+",
-				repeats
-			)
-			.orderBy("RAND()")
-			.limit(1)
-			.single()
-		);
-
-		const name = videoData.Link.split("/").at(-1);
-		const eligibleLink = `/${videoData.Link}`;
-		const addResult = await sb.MpvClient.add(eligibleLink, { duration: null, name });
-		if (!addResult.success) {
-			return;
-		}
-
-		repeats.unshift(videoData.Link);
-		repeats.splice(repeatAmount); // Clamp array to first X elements
+		await core.Got.get("GenericAPI")({
+			url: `${listenerAddress}:${listenerPort}/?autoplay=queue`
+		});
 	})
 };
