@@ -150,6 +150,7 @@ const definition: CronDefinition = {
 			.from("data", "Event_Subscription")
 			.join("chat_data", "User_Alias")
 			.where("Type = %s", subscriptionDefinition.name)
+			.where("Active = %b", true)
 			.flat("Name")
 		);
 
