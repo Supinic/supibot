@@ -20,7 +20,26 @@ const tokenLimit = z
 		}
 	);
 
-export default z.object({
+const modelSchema = z.object({
+	url: z.string(),
+	type: z.enum(["openai", "deepinfra"]),
+	default: z.boolean(),
+	inputLimit: num,
+	outputLimit: tokenLimit.optional(),
+	flatCost: num.optional(),
+	pricePerMtoken: z.float32().positive(),
+	search: z.boolean().optional(),
+	usesCompletionTokens: z.boolean().optional(),
+	noSystemRole: z.boolean().optional(),
+	subscriberOnly: z.boolean().optional(),
+	flexProcessing: z.boolean().optional(),
+	noTemperature: z.boolean().optional(),
+	disabled: z.boolean().optional(),
+	disableReason: z.string().optional()
+});
+
+export type ModelData = z.infer<typeof modelSchema>;
+export const gptConfigSchema = z.object({
 	defaultTemperature: z.float32().min(0).max(2),
 	defaultHistoryMode: z.enum(["enabled", "disabled"]),
 	globalInputLimit: num,
@@ -33,22 +52,5 @@ export default z.object({
 		regular: userTokenLimit,
 		subscriber: userTokenLimit
 	}),
-	models: z.record(
-		z.string(),
-		z.object({
-			url: z.string(),
-			type: z.enum(["openai", "deepinfra"]),
-			default: z.boolean(),
-			inputLimit: num,
-			outputLimit: tokenLimit,
-			flatCost: num.optional(),
-			pricePerMtoken: z.float32().positive(),
-			search: z.boolean().optional(),
-			usesCompletionTokens: z.boolean().optional(),
-			subscriberOnly: z.boolean().optional(),
-			noTemperature: z.boolean().optional(),
-			disabled: z.boolean().optional(),
-			disableReason: z.string().optional()
-		})
-	)
+	models: z.record(z.string(), modelSchema)
 });

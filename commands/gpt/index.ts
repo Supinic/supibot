@@ -3,8 +3,8 @@ import { declare, type Context } from "../../classes/command.js";
 import { typedEntries } from "../../utils/ts-helpers.js";
 
 import rawGptConfig from "./config.json" with { type: "json" };
-import GptConfigSchema from "./config-schema.js";
-const GptConfig = GptConfigSchema.parse(rawGptConfig);
+import { gptConfigSchema } from "./config-schema.js";
+const GptConfig = gptConfigSchema.parse(rawGptConfig);
 
 import GptCache from "./cache-control.js";
 import { determineOutputLimit, GptTemplate, handleHistoryCommand } from "./gpt-template.js";
@@ -17,24 +17,6 @@ import { check as checkModeration } from "./moderation.js";
 import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
 
 export type ModelName = keyof typeof rawGptConfig.models;
-export type ModelData = {
-	url: string;
-	type: "openai" | "deepinfra" | "nexra" | "nexra-complements";
-	default: boolean;
-	disabled?: boolean;
-	disableReason?: string;
-	inputLimit: number;
-	outputLimit: {
-		default: number;
-		maximum: number;
-	};
-	pricePerMtoken: number;
-	flatCost?: number;
-	subscriberOnly?: boolean;
-	noSystemRole?: boolean;
-	usesCompletionTokens?: boolean;
-	search?: boolean;
-};
 
 const models = GptConfig.models;
 const defaultModelEntry = typedEntries(models).find(i => i[1].default);
@@ -231,8 +213,11 @@ export default declare({
 			const completionTokens = Handler.getCompletionTokens(response);
 
 			let emoji = "🤖";
-			if (outputLimitCheck.success && completionTokens !== null && completionTokens >= outputLimitCheck.outputLimit) {
-				emoji = "⏳";
+			if (outputLimitCheck.success) {
+				const { outputLimit } = outputLimitCheck;
+				if (completionTokens !== null && outputLimit !== null && completionTokens >= outputLimit) {
+					emoji = "⏳";
+				}
 			}
 
 			result = {
