@@ -596,6 +596,20 @@ export class Command extends TemplateWithoutId {
 		}
 	}
 
+	static getAsserted (identifier: Command | string): Command {
+		const command = Command.get(identifier);
+		if (!command) {
+			throw new SupiError({
+			    message: `Assert error: Fetched command does not exist`,
+				args: {
+					command: (typeof identifier === "string") ? identifier : identifier.Name
+				}
+			});
+		}
+
+		return command;
+	}
+
 	static async checkAndExecute (data: {
 		  command: string, // @todo consider renaming `command` to `invocation` here
 		  args: string[],
