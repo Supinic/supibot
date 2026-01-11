@@ -1,12 +1,13 @@
+import { declare } from "../../classes/command.js";
 import { getPathFromURL } from "../../utils/command-utils.js";
+import { ivrClipSchema } from "../../utils/schemas.js";
 
-export default {
+export default declare({
 	Name: "downloadclip",
 	Aliases: ["dlclip"],
-	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Takes a Twitch clip name or link, and sends a download link to it into private messages.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function downloadClip (context, input) {
@@ -37,7 +38,7 @@ export default {
 		}
 
 		const [slug] = match;
-		const response = await core.Got.get("IVR")(`v2/twitch/clip/${slug}`);
+		const response = await core.Got.get("IVR")({ url: `v2/twitch/clip/${slug}` });
 		if (response.statusCode === 400) {
 			return {
 				success: false,
@@ -51,10 +52,9 @@ export default {
 			};
 		}
 
-		const { clip, clipKey = "" } = response.body;
+		const { clip, clipKey = "" } = ivrClipSchema.parse(response.body);
 		if (clip.broadcaster) {
 			const [source] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
-
 			await context.platform.pm(
 				`${source.sourceURL}${clipKey}`,
 				context.user,
@@ -87,10 +87,9 @@ export default {
 
 			const baseUrl = "https://production.assets.clips.twitchcdn.net";
 			const experimentalUrl = `${baseUrl}/${match}.mp4${clipKey}`;
-
 			await context.platform.pm(
 				experimentalUrl,
-				context.user.Name,
+				context.user,
 				context.channel ?? null
 			);
 
@@ -100,4 +99,4 @@ export default {
 		}
 	}),
 	Dynamic_Description: null
-};
+});

@@ -93,3 +93,36 @@ export const ivrFoundersSchema = z.object({
 		entitlementStart: z.iso.datetime()
 	}))
 });
+
+export const ivrClipSchema = z.object({
+	clip: z.object({
+		durationSeconds: z.int(),
+		id: z.string(),
+		slug: z.string(),
+		url: z.string(),
+		title: z.string(),
+		viewCount: z.int(),
+		game: z.object({
+			id: z.string(),
+			name: z.string()
+		}).optional(),
+		broadcaster: z.object({
+			id: z.string(),
+			displayName: z.string()
+		}).optional(),
+		curator: z.object({
+			id: z.string(),
+			displayName: z.string()
+		}).optional(),
+		createdAt: z.iso.datetime(),
+		tiny: z.string().optional(),
+		small: z.string().optional(),
+		medium: z.string().optional(),
+		videoQualities: z.array(z.object({
+			frameRate: z.number().positive(),
+			quality: z.string(),
+			sourceURL: z.string()
+		}))
+	}),
+	clipKey: z.string().optional()
+});
