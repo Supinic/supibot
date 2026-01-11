@@ -1,14 +1,15 @@
+import { Script, createContext } from "node:vm";
 import crypto from "node:crypto";
-import vm from "node:vm";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "debug",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 0,
-	Description: "supiniHack ",
-	Flags: ["external-input","developer","pipe","skip-banphrase","system","whitelist"],
+	Description: "supiniHack",
+	Flags: ["external-input", "developer", "pipe", "skip-banphrase", "system", "whitelist"],
 	Params: [
+		{ name: "force", type: "boolean" },
 		{ name: "function", type: "string" },
 		{ name: "importGist", type: "string" }
 	],
@@ -35,26 +36,25 @@ export default {
 				};
 			}
 
-			const gistCommand = sb.Command.get("pastebin");
+			const gistCommand = sb.Command.getAsserted("pastebin");
 			const fakeCtx = sb.Command.createFakeContext(
 				gistCommand,
 				{
+					// eslint-disable-next-line @typescript-eslint/no-misused-spread
 					...context,
 					params: {
 						force: Boolean(context.params.force)
 					},
 					invocation: "gist"
-				},
-				{}
+				}
 			);
 
 			const gistResult = await gistCommand.execute(fakeCtx, context.params.importGist);
-			if (gistResult.success === false) {
+			if (gistResult.success === false || typeof gistResult.reply !== "string") {
 				return gistResult;
 			}
 
 			importedText = gistResult.reply;
-
 			if (!importedText.endsWith(";") && !importedText.endsWith(",")) {
 				importedText += ";";
 			}
@@ -77,16 +77,18 @@ export default {
 
 		let script;
 		try {
-			script = new vm.Script(scriptString);
+			script = new Script(scriptString);
 		}
 		catch (e) {
+			console.log(e);
 			return {
-				reply: `Parse: ${e.toString()}`
+				success: false,
+				reply: `Parse: ${String(e)}`
 			};
 		}
 
 		try {
-			const scriptContext = vm.createContext({
+			const scriptContext = createContext({
 				crypto,
 				version: process.version,
 				context,
@@ -94,19 +96,20 @@ export default {
 				args: scriptArgs ?? []
 			});
 
-			let result = await script.runInNewContext(scriptContext, { timeout: 2500 });
-
+			let result = await script.runInNewContext(scriptContext, { timeout: 2500 }) as unknown;
 			if (typeof result !== "undefined") {
-				if (result?.constructor?.name === "Object") {
+				if (result?.constructor.name === "Object") {
 					result = JSON.stringify(result, null, 4);
 				}
 
 				return {
+					success: true,
 					reply: String(result)
 				};
 			}
 			else {
 				return {
+					success: true,
 					reply: "Done"
 				};
 			}
@@ -114,9 +117,10 @@ export default {
 		catch (e) {
 			console.log(e);
 			return {
-				reply: `Execute: ${e.toString()}`
+				success: false,
+				reply: `Execute: ${String(e)}`
 			};
 		}
 	}),
 	Dynamic_Description: null
-};
+});
