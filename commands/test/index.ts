@@ -1,10 +1,11 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "test",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 5000,
-	Description: "?",
-	Flags: ["developer","pipe","skip-banphrase","system"],
+	Description: "Test.",
+	Flags: ["developer", "pipe", "skip-banphrase", "system"],
 	Params: [
 		{ name: "boolean", type: "boolean" },
 		{ name: "date", type: "date" },
@@ -14,10 +15,13 @@ export default {
 		{ name: "string", type: "string" }
 	],
 	Whitelist_Response: "For debugging purposes only :)",
-	Code: (async function test (context) {
+	Code: function test (context) {
 		return {
-			reply: `param: ${context.params.string ?? "(none)"}`
+			success: true,
+			reply: (context.params.string)
+				? `param: ${context.params.string}`
+				: "Test successful"
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+});

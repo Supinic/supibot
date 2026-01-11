@@ -1,22 +1,22 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "me",
 	Aliases: ["/me"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Turns the output into a \"/me\" message. E.g.: [Supibot] slaps someone around a bit with a large trout",
 	Flags: [],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function me (context, ...args) {
+	Code: function me (context, ...args) {
 		if (!context.channel) {
 			return {
 				success: false,
 				reply: "This command is not usable in PMs!",
-				cooldown: 5000
 			};
 		}
 
-		if (context.platform.supportsMeAction !== true) {
+		if (!context.platform.supportsMeAction) {
 			return {
 				success: false,
 				reply: `The /me action is not supported on this platform!`
@@ -24,9 +24,10 @@ export default {
 		}
 
 		return {
+			success: true,
 			reply: args.join(" "),
 			replyWithMeAction: true
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+});

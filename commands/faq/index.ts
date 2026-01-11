@@ -1,17 +1,18 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "faq",
 	Aliases: [],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts the link to Supibot's FAQ on the supinic.com website.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function faq (context, ...args) {
 		if (args.length > 0) {
 			const query = args.join(" ");
 			for (const column of ["Question", "Answer"]) {
-				const data = await core.Query.getRecordset(rs => rs
+				const data = await core.Query.getRecordset<{ Question: string; Answer: string; }[]>(rs => rs
 					.select("Question", "Answer")
 					.from("data", "FAQ")
 					.where(`${column} %*like*`, query)
@@ -37,4 +38,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+});

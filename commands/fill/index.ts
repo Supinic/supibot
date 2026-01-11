@@ -1,7 +1,8 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "fill",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 20000,
 	Description: "Takes the input and scrambles it around randomly, filling the message. In live streams, there is less text and the cooldown is increased to reduce spam.",
 	Flags: ["pipe"],
@@ -53,4 +54,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+});

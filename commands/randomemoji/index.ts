@@ -1,3 +1,4 @@
+import { declare } from "../../classes/command.js";
 import { randomInt } from "../../utils/command-utils.js";
 
 const MAXIMUM_EMOJI_LIMIT = 50;
@@ -6,7 +7,7 @@ const EMOJI_RANGES = [
 	[0x1F600, 0x1F64F],
 	[0x1F680, 0x1F6FF],
 	[0x1F910, 0x1F9FF]
-];
+] as const;
 
 const isEmojiRegex = /\p{Emoji}/u;
 const generateEmoji = () => {
@@ -27,16 +28,16 @@ const generateEmoji = () => {
 	return string;
 };
 
-export default {
+export default declare({
 	Name: "randomemoji",
 	Aliases: ["re"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches a random emoji. If a number is provided, rolls that many emojis.",
 	Flags: ["pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function randomEmoji (context, number = 1) {
+	// eslint-disable-next-line @typescript-eslint/no-useless-default-assignment
+	Code: function randomEmoji (context, number = "1") {
 		let repeats = Number(number);
 		if (!core.Utils.isValidInteger(repeats) || repeats > MAXIMUM_EMOJI_LIMIT) {
 			repeats = 1;
@@ -50,7 +51,7 @@ export default {
 		return {
 			reply: result.join(" ")
 		};
-	}),
+	},
 	Dynamic_Description: () => [
 		`Returns a random emoji from several pre-determined emoji ranges.`,
 		`Maximum amount of emojis per command: ${MAXIMUM_EMOJI_LIMIT}`,
@@ -64,4 +65,4 @@ export default {
 		"(ten random emojis)",
 		""
 	]
-};
+});
