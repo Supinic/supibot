@@ -23,7 +23,7 @@ const mobaCommandDefinition = declare({
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: [
 		{ name: "rawData", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function moba (context, command, ...args) {
 		if (context.invocation === "moba") {

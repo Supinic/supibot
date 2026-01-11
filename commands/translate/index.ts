@@ -30,7 +30,7 @@ export const translateCommandDefinition = declare({
 		{ name: "formality", type: "string" },
 		{ name: "to", type: "string" },
 		{ name: "textOnly", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	initialize: async () => {
 		logTableExists = await core.Query.isTablePresent("data", "Translate_Log");

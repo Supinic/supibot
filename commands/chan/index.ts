@@ -87,7 +87,7 @@ export default declare({
 		{ name: "regex", type: "regex" },
 		{ name: "search", type: "string" },
 		{ name: "textOnly", type: "string" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function chan (context, identifier, ...rest) {
 		if (!identifier) {

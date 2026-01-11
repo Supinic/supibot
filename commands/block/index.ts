@@ -41,7 +41,7 @@ export default declare({
 		{ name: "id", type: "number" },
 		{ name: "platform", type: "string" },
 		{ name: "user", type: "string" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function block (context, ...args) {
 		const parse = await parseGenericFilterOptions("Block", context.params, args, {

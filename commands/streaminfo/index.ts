@@ -35,7 +35,7 @@ export default declare({
 	Cooldown: 10000,
 	Description: "Posts information about a Twitch channel's stream, or the current channel if none is provided.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
-	Params: [{ name: "rawData", type: "boolean" }] as const,
+	Params: [{ name: "rawData", type: "boolean" }],
 	Whitelist_Response: null,
 	Code: (async function streamInfo (context, ...args) {
 		let targetChannel;

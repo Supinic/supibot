@@ -129,7 +129,7 @@ export default declare({
 	Params: [
 		{ name: "gameID", type: "number" },
 		{ name: "skipReviews", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	initialize: function () {
 		updateCronJob = new CronJob("0 0 * * * *", () => fetchGamesData());

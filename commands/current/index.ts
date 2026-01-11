@@ -8,7 +8,7 @@ export default declare({
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
 	Flags: ["developer", "mention", "pipe", "whitelist"],
-	Params: [{ name: "linkOnly", type: "boolean" }] as const,
+	Params: [{ name: "linkOnly", type: "boolean" }],
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
 	Code: async function current (context) {
 		if (!sb.MpvClient) {

@@ -12,7 +12,7 @@ export default declare({
 		{ name: "channel", type: "string" },
 		{ name: "channelsOnly", type: "boolean" },
 		{ name: "emotesOnly", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function botSubs (context) {
 		const twitch = sb.Platform.getAsserted("twitch");

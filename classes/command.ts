@@ -131,7 +131,8 @@ type PermissionOptions = {
 };
 type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & GetEmoteOptions>;
 
-export type Flag = "block" | "developer" | "external-input" | "mention" | "non-nullable" | "opt-out"
+export type Flag =
+	| "block" | "developer" | "external-input" | "mention" | "non-nullable" | "opt-out"
 	| "read-only" | "ping" | "pipe" | "rollback" | "skip-banphrase" | "system" | "whitelist";
 
 export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
@@ -1421,4 +1422,4 @@ export class Command extends TemplateWithoutId {
 	}
 }
 
-export const declare = <T extends ParameterDefinitions> (def: CommandDefinition<T>) => def;
+export const declare = <const T extends ParameterDefinitions> (def: CommandDefinition<T>) => def;
