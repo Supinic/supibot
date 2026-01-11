@@ -1,33 +1,22 @@
-import { CommandDefinition, declare } from "../../classes/command.js";
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
 
-type DictionaryApiFailure = {
-	title: string;
-	message: string;
-	resolution: string;
-};
-type DictionaryApiSuccess = [{
-		word: string;
-		phonetics: {
-			text?: string;
-			audio: string;
-			sourceUrl?: string;
-			license?: unknown;
-		}[];
-		license: unknown;
-		sourceUrls: string[];
-		meanings: {
-			partOfSpeech: string; // "noun" | "verb" | "interjection" | "adjective" | "adverb"
-			definitions: {
-				definition: string;
-				synonyms: string[];
-				antonyms: string[];
-				example?: string;
-			}[];
-			synonyms: string[];
-			antonyms: string[];
-		}[];
-}];
-type DictionaryApiResponse = DictionaryApiFailure | DictionaryApiSuccess;
+const dictSchema = z.union([
+	z.object({ title: z.string(), message: z.string(), resolution: z.string() }), // Failure
+	z.array(z.object({
+		word: z.string(),
+		phonetic: z.string(),
+		phonetics: z.array(z.object({
+			text: z.string()
+		})),
+		meanings: z.array(z.object({
+			partOfSpeech: z.string(),
+			definitions: z.array(z.object({
+				definition: z.string()
+			}))
+		}))
+	}))
+]);
 
 export default declare({
 	Name: "dictionary",
@@ -57,20 +46,21 @@ export default declare({
 		}
 
 		const phrase = encodeURIComponent(args.join(" "));
-		const response = await core.Got.get("GenericAPI")<DictionaryApiResponse>({
+		const response = await core.Got.get("GenericAPI")({
 			url: `https://api.dictionaryapi.dev/api/v2/entries/en/${phrase}`,
 			throwHttpErrors: false,
 			responseType: "json"
 		});
 
-		if ("message" in response.body) {
+		const rawData = dictSchema.parse(response.body);
+		if ("message" in rawData) {
 			return {
 				success: false,
-				reply: response.body.message
+				reply: rawData.message
 			};
 		}
 
-		const { phonetics, meanings, word } = response.body[0];
+		const { phonetics, meanings, word } = rawData[0];
 		const definitions = meanings.flatMap(meaning => {
 			const data = meaning.definitions.map(def => ({
 				...def,
@@ -113,4 +103,4 @@ export default declare({
 		"Will fetch the phrase's 4th (counting starts from zero) definition in the English language.",
 		""
 	])
-}) satisfies CommandDefinition;
+});
