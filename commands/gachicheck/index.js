@@ -172,7 +172,7 @@ export default {
 					Notes: videoData?.description ?? null
 				});
 
-				const { insertId: trackID } = await row.save();
+				const { insertId: trackID } = await row.save({ skipLoad: true });
 				const tagRow = await core.Query.getRow("music", "Track_Tag");
 				tagRow.setValues({
 					Track: trackID,

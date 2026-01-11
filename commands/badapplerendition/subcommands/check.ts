@@ -76,7 +76,7 @@ export default {
 				Notes: `Added to the list by ${context.user.Name}\n---\n${data.description ?? "No description"}`
 			});
 
-			const saveResult = await row.save();
+			const saveResult = await row.save({ skipLoad: true });
 			if (!saveResult || !("insertId" in saveResult)) {
 				throw new SupiError({
 				    message: "Assert error: No updated columns in Row"
