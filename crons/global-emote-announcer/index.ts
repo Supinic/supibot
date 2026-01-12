@@ -2,7 +2,7 @@ import { setTimeout as wait } from "node:timers/promises";
 import { SupiDate } from "supi-core";
 
 import { postToHastebin } from "../../utils/command-utils.js";
-import type { CronDefinition } from "../temp-definitions.d.ts";
+import type { CronDefinition } from "../index.js";
 import subscriptionDefinition from "../../commands/subscribe/event-types/global-twitch-emotes.js";
 
 type HelixResponse = {
