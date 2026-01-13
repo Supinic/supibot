@@ -1,12 +1,5 @@
 import type { CronDefinition } from "../index.js";
 
-const broadcastMessage = core.Utils.tag.trim `
-	Chatterino users supiniOkay 👉
-	To get binged 🔔 when Supi goes live, use !notifyme live
-	or use !events to get a list of things to get binged 🔔 about
-	(e.g. going live, changing title, ...)
-`;
-
 export default {
 	name: "supinic-advert",
 	expression: "0 30 * * * *",
@@ -23,6 +16,13 @@ export default {
 		}
 
 		const timeout = core.Utils.random(0, 600_000);
+		const broadcastMessage = core.Utils.tag.trim `
+			Chatterino users supiniOkay 👉
+			To get binged 🔔 when Supi goes live, use !notifyme live
+			or use !events to get a list of things to get binged 🔔 about
+			(e.g. going live, changing title, ...)
+		`;
+
 		setTimeout(() => void channelData.send(broadcastMessage), timeout);
 	})
 } satisfies CronDefinition;
