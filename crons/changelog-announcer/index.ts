@@ -1,19 +1,28 @@
-let isTableAvailable;
-let latestID;
+import * as z from "zod";
+import { SupiDate } from "supi-core";
+import type { CronDefinition } from "../index.js";
+
+let isTableAvailable: boolean | undefined;
+let latestID: number | undefined;
+const linkSchema = z.object({ data: z.object({ link: z.string() }) });
+const flagsSchema = z.object({ skipPrivateReminders: z.boolean().optional() });
+
+type ChangelogRow = { ID: number; Created: SupiDate; Title: string; Type: string; Description: string; };
+type SubData = { User_Alias: number; Platform: number | null; Flags: string | null; Channel: number | null; };
 
 export default {
 	name: "changelog-announcer",
 	expression: "0 */30 * * * *",
 	description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",
-	code: (async function changelogAnnouncer (cron) {
+	code: (async function changelogAnnouncer () {
 		isTableAvailable ??= await core.Query.isTablePresent("data", "Event_Subscription");
-		if (isTableAvailable === false) {
-			cron.job.stop();
+		if (!isTableAvailable) {
+			this.stop();
 			return;
 		}
 
 		if (typeof latestID !== "number") {
-			latestID = await core.Query.getRecordset(rs => rs
+			latestID = await core.Query.getRecordset<number>(rs => rs
 				.select("MAX(ID) AS Max")
 				.from("data", "Changelog")
 				.single()
@@ -23,10 +32,11 @@ export default {
 			return;
 		}
 
-		const data = await core.Query.getRecordset(rs => rs
+		const finalId = latestID;
+		const data = await core.Query.getRecordset<ChangelogRow[]>(rs => rs
 			.select("ID", "Created", "Title", "Type", "Description")
 			.from("data", "Changelog")
-			.where("ID > %n", latestID)
+			.where("ID > %n", finalId)
 		);
 
 		if (data.length === 0) {
@@ -35,8 +45,8 @@ export default {
 
 		latestID = Math.max(...data.map(i => i.ID));
 
-		const subscriptions = await core.Query.getRecordset(rs => rs
-			.select("User_Alias", "Platform", "Flags")
+		const subscriptions = await core.Query.getRecordset<SubData[]>(rs => rs
+			.select("User_Alias", "Platform", "Channel", "Flags")
 			.from("data", "Event_Subscription")
 			.where("Type = %s", "Changelog")
 			.where("Active = %b", true)
@@ -61,7 +71,7 @@ export default {
 
 				let link;
 				if (relay.statusCode === 200) {
-					link = relay.body.data.link;
+					link = linkSchema.parse(relay.body).data.link;
 				}
 				else {
 					link = `Multiple IDs: ${data.map(i => i.ID).join(", ")}`;
@@ -71,10 +81,13 @@ export default {
 			}
 
 			for (const sub of subscriptions) {
-				const flags = JSON.parse(sub.Flags ?? "{}");
-				if (flags.skipPrivateReminder === true) {
-					const platform = sb.Platform.get(sub.Platform ?? 1);
-					await platform.send(message, sub.User_Alias);
+				const flags = flagsSchema.parse(JSON.parse(sub.Flags ?? "{}"));
+				if ("skipPrivateReminder" in flags && flags.skipPrivateReminder === true) {
+					const platform = sb.Platform.getAsserted(sub.Platform ?? 1);
+					if (sub.Channel) {
+						const channelData = sb.Channel.getAsserted(sub.Channel, platform);
+						await platform.send(message, channelData);
+					}
 				}
 				else {
 					await sb.Reminder.create({
@@ -85,22 +98,22 @@ export default {
 						Schedule: null,
 						Private_Message: true,
 						Platform: sub.Platform ?? 1,
+						Created: new SupiDate(),
 						Type: "Reminder"
 					}, true);
 				}
 			}
 		}
 
-		const discord = sb.Platform.get("discord");
+		const discord = sb.Platform.getAsserted("discord");
 		const discordUpdatesRole = "748957148439904336";
-		const channelData = sb.Channel.get("748955843415900280");
-
+		const channelData = sb.Channel.getAsserted("748955843415900280", discord);
 		for (const item of data) {
 			const embed = {
 				title: item.Type,
 				url: `https://supinic.com/data/changelog/detail/${item.ID}`,
 				description: `<@&${discordUpdatesRole}>`,
-				timestamp: new sb.Date(item.Created).format("Y-m-d H:i:s"),
+				timestamp: new SupiDate(item.Created).format("Y-m-d H:i:s"),
 				fields: [
 					{
 						name: "Title",
@@ -121,4 +134,4 @@ export default {
 			});
 		}
 	})
-};
+} satisfies CronDefinition;

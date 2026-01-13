@@ -1,9 +1,17 @@
 import { setTimeout as wait } from "node:timers/promises";
+import * as z from "zod";
 import { SupiDate } from "supi-core";
 
+import type { CronDefinition } from "../index.js";
 import { postToHastebin } from "../../utils/command-utils.js";
-import type { CronDefinition } from "../temp-definitions.d.ts";
 import subscriptionDefinition from "../../commands/subscribe/event-types/global-twitch-emotes.js";
+
+const emoteSchema = z.object({
+	data: z.array(z.object({
+		id: z.string(),
+		name: z.string()
+	}))
+});
 
 type HelixResponse = {
 	data: {
@@ -24,48 +32,44 @@ const MULTI_MESSAGE_DELAY = 250;
 
 const SANITY_EMOTE_AMOUNT = 25;
 const cacheKey = "twitch-global-emotes";
-const fetchTwitchGlobalEmotes = () => core.Got.get("Helix")<HelixResponse>({
-	url: "chat/emotes/global",
-	method: "GET",
-	throwHttpErrors: false
-});
+const fetchTwitchGlobalEmotes = async () => {
+	const response = await core.Got.get("Helix")({
+		url: "chat/emotes/global",
+		method: "GET",
+		throwHttpErrors: false
+	});
+
+	return emoteSchema.parse(response.body).data;
+};
 
 let previousEmotes: EmoteDescriptor[] | undefined;
 let suggestionTableExists: boolean | null = null;
 
-const definition: CronDefinition = {
+export default {
 	name: "global-emote-announcer",
 	expression: "0 */5 * * * *",
 	description: "Periodically checks Twitch global emotes and announce",
-	code: (async function globalEmoteAnnouncer (cron) {
+	code: (async function globalEmoteAnnouncer () {
 		const twitchPlatform = sb.Platform.get("twitch");
 		if (!twitchPlatform) {
-			await cron.job.stop();
+			this.stop();
 			return;
 		}
 
 		const channelData = sb.Channel.get("supinic", twitchPlatform);
 		if (!channelData) {
-			await cron.job.stop();
+			this.stop();
 			return;
 		}
 
 		if (!previousEmotes || previousEmotes.length === 0) {
 			let data = await core.Cache.getByPrefix(cacheKey) as EmoteDescriptor[] | null;
 			if (!data) {
-				const response = await fetchTwitchGlobalEmotes();
-				if (!response.ok) {
+				data = await fetchTwitchGlobalEmotes();
+				if (data.length === 0) {
+					console.warn("No Helix emote data received!", { data });
 					return;
 				}
-				else if (response.body.data.length === 0) {
-					console.warn("No Helix emote data received!", { body: response.body });
-					return;
-				}
-
-				data = response.body.data.map(i => ({
-					id: i.id,
-					name: i.name
-				}));
 
 				await core.Cache.setByPrefix(cacheKey, data, {
 					expiry: 7 * 864e5 // 7 days
@@ -76,12 +80,11 @@ const definition: CronDefinition = {
 			return;
 		}
 
-		const response = await fetchTwitchGlobalEmotes();
-		if (!response.ok) {
+		const newEmotes = await fetchTwitchGlobalEmotes();
+		if (newEmotes.length === 0) { // Sanity fallback
 			return;
 		}
 
-		const newEmotes = response.body.data;
 		const previousEmoteIds = new Set(previousEmotes.map(i => i.id));
 		const newEmoteIds = new Set(newEmotes.map(i => i.id));
 		const differentEmoteIds = previousEmoteIds.symmetricDifference(newEmoteIds);
@@ -175,6 +178,4 @@ const definition: CronDefinition = {
 			await wait(MULTI_MESSAGE_DELAY);
 		}
 	})
-};
-
-export default definition;
+} satisfies CronDefinition;

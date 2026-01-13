@@ -1,30 +1,34 @@
 import getLinkParser from "../../utils/link-parser.js";
-
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+import type { CronDefinition } from "../index.js";
+
 const { SOUNDCLOUD_CLIENT_ID } = sharedKeys;
+const fetchStatusCode = async (clientId: string): Promise<number> => {
+	const response = await core.Got.get("GenericAPI")({
+		url: "https://api-v2.soundcloud.com/resolve",
+		throwHttpErrors: false,
+		searchParams: {
+			client_id: clientId,
+			url: "https://soundcloud.com/terribleterrio/mararinha"
+		}
+	});
+
+	return response.statusCode;
+};
 
 export default {
 	name: "yoink-soundcloud-client-id",
-	expression: "0 */10 * * * *",
+	expression: "0 */30 * * * *",
 	description: "\"Borrows\" the clientside Soundcloud API key to be used for TrackLinkParser module.",
-	code: (async function yoinkSoundcloudClientID (cron) {
-		const soundcloudClientId = await core.Cache.getByPrefix(SOUNDCLOUD_CLIENT_ID) ?? process.env.SOUNDCLOUD_CLIENT_ID;
+	code: (async function yoinkSoundcloudClientID () {
+		const cacheValue = await core.Cache.getByPrefix(SOUNDCLOUD_CLIENT_ID) as string | undefined;
+		const soundcloudClientId = cacheValue ?? process.env.SOUNDCLOUD_CLIENT_ID;
 		if (!soundcloudClientId) {
-			console.debug("No initial Soundcloud Client ID configured - stopping cron (SOUNDCLOUD_CLIENT_ID)");
-			cron.job.stop();
+			this.stop();
 			return;
 		}
 
-		const { statusCode } = await core.Got.get("GenericAPI")({
-			url: "https://api-v2.soundcloud.com/resolve",
-			throwHttpErrors: false,
-			searchParams: {
-				client_id: soundcloudClientId,
-				url: "https://soundcloud.com/terribleterrio/mararinha"
-			}
-		});
-
-		if (statusCode === 200) {
+		if (await fetchStatusCode(soundcloudClientId) === 200) {
 			return;
 		}
 
@@ -45,23 +49,13 @@ export default {
 			});
 
 			const scriptSource = scriptResponse.body;
-
 			const match = scriptSource.match(/client_id=(\w+?)\W/);
 			if (!match) {
 				continue;
 			}
 
 			const newClientId = match[1];
-			const { statusCode } = await core.Got.get("GenericAPI")({
-				url: "https://api-v2.soundcloud.com/resolve",
-				throwHttpErrors: false,
-				searchParams: {
-					client_id: newClientId,
-					url: "https://soundcloud.com/terribleterrio/mararinha"
-				}
-			});
-
-			if (statusCode === 200) {
+			if (await fetchStatusCode(newClientId) === 200) {
 				finalClientID = newClientId;
 				await core.Cache.setByPrefix(SOUNDCLOUD_CLIENT_ID, newClientId);
 				break;
@@ -69,13 +63,16 @@ export default {
 		}
 
 		if (finalClientID) {
-			console.log("Successfully updated soundcloud client-id", { finalClientID });
-
 			const linkParser = await getLinkParser();
 			linkParser.reloadParser("soundcloud", { key: finalClientID });
+
+			const channelData = sb.Channel.get("supinic", "twitch");
+			if (channelData) {
+				void channelData.send("Successfully updated soundcloud client");
+			}
 		}
 		else {
 			console.warn("Could not fetch Soundcloud client-id!");
 		}
 	})
-};
+} satisfies CronDefinition;

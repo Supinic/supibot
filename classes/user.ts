@@ -256,6 +256,20 @@ export class User extends TemplateWithIdString {
 		}
 	}
 
+	static async getAsserted (identifier: Like): Promise<User> {
+		const userData = await User.get(identifier);
+		if (!userData) {
+			throw new SupiError({
+				message: "Assert error: User not found",
+				args: {
+					identifier: (identifier instanceof User) ? identifier.Name : identifier
+				}
+			});
+		}
+
+		return userData;
+	}
+
 	static async getMultiple (identifiers: Like[]) {
 		const result: User[] = [];
 		const toFetch: (string | number)[] = [];

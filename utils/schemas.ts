@@ -1,6 +1,34 @@
 // @todo figure out where to place this file properly within the project
 import * as z from "zod";
 
+export const twitchIdentitySchema = z.object({
+	access_token: z.string(),
+	refresh_token: z.string()
+});
+
+export const twitchSubscriberSchema = z.object({
+	data: z.array(z.object({
+		broadcaster_id: z.string(),
+		broadcaster_login: z.string(),
+		broadcaster_name: z.string(),
+		gifter_id: z.string(),
+		gifter_login: z.string(),
+		gifter_name: z.string(),
+		is_gift: z.boolean(),
+		plan_name: z.string(),
+		user_id: z.string(),
+		user_name: z.string(),
+		user_login: z.string(),
+		tier: z.union([
+			z.literal("1000"),
+			z.literal("2000"),
+			z.literal("3000")
+		])
+	}))
+});
+
+export type TwitchSubscriberData = z.infer<typeof twitchSubscriberSchema>["data"];
+
 export const ivrErrorSchema = z.object({
 	statusCode: z.int().min(400).max(599),
 	error: z.object({

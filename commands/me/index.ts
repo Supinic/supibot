@@ -12,7 +12,7 @@ export default declare({
 		if (!context.channel) {
 			return {
 				success: false,
-				reply: "This command is not usable in PMs!",
+				reply: "This command is not usable in PMs!"
 			};
 		}
 
