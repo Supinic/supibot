@@ -51,10 +51,6 @@ export default {
 			};
 		}
 
-		const userArticle = (targetUser === context.user)
-			? "You have"
-			: "That user has";
-
 		let metaData = await core.Query.getRecordset(rs => rs
 			.select("First_Message_Posted", "First_Message_Text")
 			.from("chat_data", "Message_Meta_User_Alias")
@@ -67,12 +63,18 @@ export default {
 		if (!metaData) {
 			return {
 				success: false,
-				reply: `${userArticle} not said anything in ${channelArticle} channel!`
+				reply: (targetUser === context.user)
+					? "I haven't processed your messages yet! Try again in a couple of minutes."
+					: `That user has not said anything in ${channelArticle} channel!`
 			};
 		}
 		else if (!metaData.First_Message_Posted) {
 			const dbChannelName = targetChannel.getDatabaseName();
 			if (!await core.Query.isTablePresent("chat_line", dbChannelName)) {
+				const userArticle = (targetUser === context.user)
+					? "You have"
+					: "That user has";
+
 				return {
 					success: false,
 					reply: `${userArticle} no first line data available in ${channelArticle} channel!`
