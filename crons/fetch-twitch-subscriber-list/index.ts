@@ -1,23 +1,26 @@
+import { SupiError } from "supi-core";
+import type { CronDefinition } from "../index.js";
+import { twitchIdentitySchema, twitchSubscriberSchema } from "../../utils/schemas.js";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = sharedKeys;
 
 let tooManySubsWarningSent = false;
-
 export default {
 	name: "fetch-twitch-subscriber-list",
 	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to core.Cache",
 	code: (async function fetchTwitchSubscriberList () {
 		if (!process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No Twitch user ID configured for Twitch subscriptions"
 			});
 		}
 
-		const cacheRefreshToken = await core.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN");
+		const cacheRefreshToken = await core.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN") as string | undefined;
 		const envRefreshToken = process.env.TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN;
 		if (!cacheRefreshToken && !envRefreshToken) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No refresh token configured for Twitch subscriptions"
 			});
 		}
@@ -33,8 +36,11 @@ export default {
 			}
 		});
 
-		const accessToken = identityResponse.body.access_token;
-		const newRefreshToken = identityResponse.body.refresh_token;
+		const {
+			access_token: accessToken,
+			refresh_token: newRefreshToken
+		} = twitchIdentitySchema.parse(identityResponse.body);
+
 		await Promise.all([
 			core.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", accessToken),
 			core.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", newRefreshToken)
@@ -59,8 +65,7 @@ export default {
 			return;
 		}
 
-		/** @type {SubscriberData[]} */
-		const data = subsResponse.body.data;
+		const { data } = twitchSubscriberSchema.parse(subsResponse.body);
 		if (data.length >= 100 && !tooManySubsWarningSent) {
 			console.warn("Maximum subscribers reached for a single Helix call! Update this module to use pagination", { data });
 			tooManySubsWarningSent = true;
@@ -69,21 +74,5 @@ export default {
 		await core.Cache.setByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST, data, {
 			expiry: 864e5 // 1 day
 		});
-
-		/**
-		 * @typedef {Object} SubscriberData
-		 * @property {string} broadcaster_id
-		 * @property {string} broadcaster_login
-		 * @property {string} broadcaster_name
-		 * @property {string} gifter_id Empty string if not a gifted sub
-		 * @property {string} gifter_login Empty string if not a gifted sub
-		 * @property {string} gifter_name Empty string if not a gifted sub
-		 * @property {boolean} is_gift
-		 * @property {string} plan_name
-		 * @property {string} tier
-		 * @property {string} user_id
-		 * @property {string} user_login
-		 * @property {string} user_name
-		 */
 	})
-};
+} satisfies CronDefinition;

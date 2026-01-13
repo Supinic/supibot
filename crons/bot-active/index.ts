@@ -1,24 +1,25 @@
+import type { CronDefinition } from "../index.js";
+
 export default {
 	name: "bot-active",
 	expression: "0 */10 * * * *",
 	description: "Pings the bot active API to make sure supibot is being registered as online",
-	code: (async function verifyBotActivity (cron) {
-		if (!sb.Platform || !sb.User) {
+	code: async function verifyBotActivity () {
+		const platform = sb.Platform.get("twitch");
+		if (!platform) {
+			this.stop();
 			return;
 		}
 
-		const platform = sb.Platform.get(1);
-		const userData = await sb.User.get(platform.Self_Name);
+		const userData = await sb.User.get(platform.selfName);
 		if (!userData) {
-			console.warn("Bot-activity refresh cron is missing bot's user data");
-			cron.job.stop();
+			this.stop();
 			return;
 		}
 
 		const authKey = await userData.getDataProperty("authKey");
 		if (!authKey) {
-			console.warn("Bot-activity refresh cron is missing bot's auth key");
-			cron.job.stop();
+			this.stop();
 			return;
 		}
 
@@ -29,5 +30,5 @@ export default {
 				Authorization: `Basic ${userData.ID}:${authKey}`
 			}
 		});
-	})
-};
+	}
+} satisfies CronDefinition;

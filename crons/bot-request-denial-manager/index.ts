@@ -1,18 +1,26 @@
-let isTableAvailable;
-const trackedRequestIDs = new Set();
+import type { CronDefinition } from "../index.js";
+
+let isTableAvailable: boolean | undefined;
+const trackedRequestIDs = new Set<number>();
 
 export default {
 	name: "bot-request-denial-manager",
 	expression: "*/15 * * * *",
 	description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
-	code: (async function botRequestDenialManager (cron) {
+	code: async function botRequestDenialManager () {
 		isTableAvailable ??= await core.Query.isTablePresent("data", "Suggestion");
-		if (isTableAvailable === false) {
-			cron.job.stop();
+		if (!isTableAvailable) {
+			this.stop();
 			return;
 		}
 
-		const unresolvedRequestIDs = await core.Query.getRecordset(rs => rs
+		const twitchPlatform = sb.Platform.get("twitch");
+		if (!twitchPlatform) {
+			this.stop();
+			return;
+		}
+
+		const unresolvedRequestIDs = await core.Query.getRecordset<number[]>(rs => rs
 			.select("ID")
 			.from("data", "Suggestion")
 			.where("Category = %s", "Bot addition")
@@ -30,7 +38,7 @@ export default {
 			return;
 		}
 
-		const resolvedRequests = await core.Query.getRecordset(rs => rs
+		const resolvedRequests = await core.Query.getRecordset<{ ID: number; Status: string; Username: string; }[]>(rs => rs
 			.select("Suggestion.ID", "Suggestion.Status")
 			.select("User_Alias.Name AS Username")
 			.from("data", "Suggestion")
@@ -48,10 +56,12 @@ export default {
 			return;
 		}
 
-		const twitchPlatform = sb.Platform.get("twitch");
 		for (const request of resolvedRequests) {
 			const url = `https://supinic.com/data/suggestion/${request.ID}`;
 			const userData = await sb.User.get(request.Username);
+			if (!userData) {
+				continue;
+			}
 
 			await twitchPlatform.pm(
 				`Your Supibot request (ID ${request.ID}) has been ${request.Status.toLowerCase()}! Check the suggestion detail for more info: ${url}`,
@@ -60,5 +70,5 @@ export default {
 
 			trackedRequestIDs.delete(request.ID);
 		}
-	})
-};
+	}
+} satisfies CronDefinition;

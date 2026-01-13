@@ -59,6 +59,10 @@ class CronWrapper {
 			start: true
 		});
 	}
+
+	stop () {
+		void this.job.stop();
+	}
 }
 
 type InitOptions = {
