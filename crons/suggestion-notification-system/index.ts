@@ -1,11 +1,22 @@
-let isTableAvailable;
-let previousSuggestions;
+import { SupiDate } from "supi-core";
+import type { CronDefinition } from "../index.js";
+
+type SubsData = { User_Alias: number; Platform: number; };
+type SuggestionsData = {
+	ID: number;
+	User_Alias: number;
+	Status: string | null;
+	Notes: string | null;
+};
+
+let isTableAvailable: boolean | undefined;
+let previousSuggestions: SuggestionsData[] | undefined;
 
 export default {
 	name: "suggestion-notification-system",
 	expression: "0 * * * * *",
 	description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",
-	code: (async function notifyOnSuggestionChange (cron) {
+	code: (async function notifyOnSuggestionChange () {
 		if (typeof isTableAvailable === "undefined") {
 			const [subscription, suggestion] = await Promise.all([
 				core.Query.isTablePresent("data", "Event_Subscription"),
@@ -15,21 +26,21 @@ export default {
 			isTableAvailable = (subscription && suggestion);
 		}
 
-		if (isTableAvailable === false) {
-			cron.job.stop();
+		if (!isTableAvailable) {
+			this.stop();
 			return;
 		}
 
-		const subscriptions = await core.Query.getRecordset(rs => rs
+		const subscriptions = await core.Query.getRecordset<SubsData[]>(rs => rs
 			.select("User_Alias", "Platform")
 			.from("data", "Event_Subscription")
 			.where("Active = %b", true)
 			.where("Type = %s", "Suggestion")
 		);
-		const users = subscriptions.map(i => i.User_Alias);
 
-		const suggestions = await core.Query.getRecordset(rs => rs
-			.select("ID", "User_Alias", "Status")
+		const users = subscriptions.map(i => i.User_Alias);
+		const suggestions = await core.Query.getRecordset<SuggestionsData[]>(rs => rs
+			.select("ID", "User_Alias", "Status", "Notes")
 			.from("data", "Suggestion")
 			.where("Status IS NULL OR Status NOT IN %s+", ["Dismissed by author", "Quarantined"])
 			.where("User_Alias IN %n+", users)
@@ -67,7 +78,7 @@ export default {
 				User_To: oldRow.User_Alias,
 				Text: `Your suggestion ${oldRow.ID} changed: is now ${newRow.Status ?? "(pending)"}. ${extraInfoString}`,
 				Schedule: null,
-				Created: new sb.Date(),
+				Created: new SupiDate(),
 				Private_Message: true,
 				Type: "Reminder"
 			}, true);
@@ -75,4 +86,4 @@ export default {
 
 		previousSuggestions = suggestions;
 	})
-};
+} satisfies CronDefinition;

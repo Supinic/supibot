@@ -1,14 +1,20 @@
-const sanitize = (string) => string.replaceAll(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));
+import { SupiDate } from "supi-core";
+import type { CronDefinition } from "../index.js";
+
+// eslint-disable-next-line @typescript-eslint/no-deprecated
+const sanitize = (string: string) => string.replaceAll(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));
 
 export default {
 	name: "inactive-discord-server-detector",
 	expression: "0 0 12 * * 2",
-	description: "Logs the amount of currently active chatters.",
+	description: "Logs the amount of currently active chatters. Runs every Tuesday, at 12:00 (noon)",
 	code: (async function detectInactiveDiscordServers () {
-		// Runs every Tuesday, at 12:00 (noon)
-
-		/** @type {DiscordPlatform} */
 		const platform = sb.Platform.get("discord");
+		if (!platform) {
+			this.stop();
+			return;
+		}
+
 		const discord = platform.client;
 		const botChannels = sb.Channel.getJoinableForPlatform("discord");
 
@@ -18,7 +24,7 @@ export default {
 			return;
 		}
 
-		const messageThreshold = new sb.Date().addMonths(-3);
+		const messageThreshold = new SupiDate().addMonths(-3);
 		const result = [];
 		for (const guildData of guilds.values()) {
 			const guild = await discord.guilds.fetch(guildData.id);
@@ -32,7 +38,7 @@ export default {
 			}
 
 			const channelIDs = guildChannels.map(i => i.ID);
-			const lastCommandExecuted = await core.Query.getRecordset(rs => rs
+			const lastCommandExecuted = await core.Query.getRecordset<number>(rs => rs
 				.select("IFNULL(MAX(Last_Command_Posted), 0) AS Last")
 				.from("chat_data", "Meta_Channel_Command")
 				.where("Channel IN %n+", channelIDs)
@@ -40,13 +46,13 @@ export default {
 				.single()
 			);
 
-			// Re-do the sb.Date construction, as the IFNULL function turns inputs into string.
-			const checkDate = new sb.Date(lastCommandExecuted);
+			// Re-do the SupiDate construction, as the IFNULL function turns inputs into string.
+			const checkDate = new SupiDate(lastCommandExecuted);
 			if (checkDate >= messageThreshold) {
 				continue;
 			}
 
-			const lastMessagePosted = await core.Query.getRecordset(rs => rs
+			const lastMessagePosted = await core.Query.getRecordset<SupiDate>(rs => rs
 				.select("MAX(Last_Message_Posted) AS Last_Message_Executed")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("Channel IN %n+", channelIDs)
@@ -65,7 +71,7 @@ export default {
 					name: sanitize(guild.name),
 					id: guild.id
 				},
-				joined: new sb.Date(guild.joinedTimestamp),
+				joined: new SupiDate(guild.joinedTimestamp),
 				lastMessagePosted,
 				lastCommandExecuted,
 				members: nonBotMembers.size,
@@ -81,12 +87,12 @@ export default {
 		}
 		else {
 			let extra = "";
-			const skip = new sb.Date("2022-08-01");
-			if (skip > sb.Date.now()) {
+			const skip = new SupiDate("2022-08-01").valueOf();
+			if (skip > SupiDate.now()) {
 				extra = "(don't actually remove anything before 2022-08-01!)";
 			}
 
-			result.sort((a, b) => new sb.Date(a.lastCommandExecuted) - new sb.Date(b.lastCommandExecuted));
+			result.sort((a, b) => new SupiDate(a.lastCommandExecuted).valueOf() - new SupiDate(b.lastCommandExecuted).valueOf());
 
 			message = `${extra} Found ${result.length} potentially inactive Discord guilds:\n\n${JSON.stringify(result, null, 4)}`;
 		}
@@ -99,4 +105,4 @@ export default {
 
 		await suggestion.save({ skipLoad: true });
 	})
-};
+} satisfies CronDefinition;

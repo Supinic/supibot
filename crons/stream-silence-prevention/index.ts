@@ -1,7 +1,7 @@
 import * as z from "zod";
-
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 import { getConfig } from "../../config.js";
+import type { CronDefinition } from "../index.js";
 
 const { listenerAddress, listenerPort } = getConfig().local ?? {};
 const { SONG_REQUESTS_STATE } = sharedKeys;
@@ -14,6 +14,7 @@ export default {
 	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
 	code: (async function preventStreamSilence () {
 		if (!sb.MpvClient) {
+			this.stop();
 			return;
 		}
 
@@ -48,4 +49,4 @@ export default {
 		const { link } = autoplaySchema.parse(response.body);
 		await sb.MpvClient.add(link, { user: null, duration: null });
 	})
-};
+} satisfies CronDefinition;
