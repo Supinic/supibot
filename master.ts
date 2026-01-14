@@ -29,11 +29,6 @@ type PopulateOptions = {
 };
 
 interface GlobalSb {
-	/** @deprecated use `import { SupiDate } from "supi-core"` instead */
-	Date: typeof supiCore.SupiDate;
-	/** @deprecated use `import { SupiError } from "supi-core"` instead */
-	Error: typeof supiCore.SupiError;
-
 	API: ReturnType<typeof initializeInternalApi>;
 	AwayFromKeyboard: typeof AwayFromKeyboard;
 	Banphrase: typeof Banphrase;
@@ -167,17 +162,7 @@ else {
 }
 
 globalThis.sb = {
-	get Date () {
-		console.warn("Deprecated sb.Date access");
-		return supiCore.Date;
-	},
-	get Error () {
-		console.warn("Deprecated sb.Error access");
-		return supiCore.Error;
-	},
-
 	Platform,
-
 	Filter,
 	Command,
 	User,
