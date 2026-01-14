@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 import { getConfig } from "../../config.js";
 
@@ -77,7 +78,7 @@ export default {
 
 		const cacheKey = getPlaysoundCacheKey(playsound);
 		const existingCooldown = await core.Cache.getByPrefix(cacheKey) ?? 0;
-		const now = sb.Date.now();
+		const now = SupiDate.now();
 
 		if (existingCooldown >= now) {
 			const delta = core.Utils.timeDelta(existingCooldown);

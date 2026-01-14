@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "schedule",
 	Aliases: null,
@@ -71,16 +73,16 @@ export default {
 
 		const scheduleUrl = `https://twitch.tv/${channelName}/schedule`;
 		if (vacation !== null) {
-			const start = new sb.Date(vacation.start_time);
-			const end = new sb.Date(vacation.end_time);
+			const start = new SupiDate(vacation.start_time);
+			const end = new SupiDate(vacation.end_time);
 
 			const [firstSeg] = segments;
-			const firstSegStart = new sb.Date(firstSeg.start_time);
-			const firstSegEnd = new sb.Date(firstSeg.end_time);
+			const firstSegStart = new SupiDate(firstSeg.start_time);
+			const firstSegEnd = new SupiDate(firstSeg.end_time);
 
 			// Only mention the vacation if it affects the first segment in the list, and only if it hasn't ended yet.
-			if (firstSegStart > start && firstSegEnd < end && end > sb.Date.now()) {
-				const verb = (start < sb.Date.now()) ? "started" : "starts";
+			if (firstSegStart > start && firstSegEnd < end && end > SupiDate.now()) {
+				const verb = (start < SupiDate.now()) ? "started" : "starts";
 				return {
 					reply: core.Utils.tag.trim `
 						Streaming schedule is interrupted.
@@ -98,8 +100,8 @@ export default {
 			segment = segments[0];
 		}
 		else {
-			const firstSegmentStart = new sb.Date(segments[0].start_time);
-			if (firstSegmentStart < sb.Date.now()) { // First stream segment should already be underway
+			const firstSegmentStart = new SupiDate(segments[0].start_time);
+			if (firstSegmentStart < SupiDate.now()) { // First stream segment should already be underway
 				const response = await core.Got.get("Helix")({
 					url: "streams",
 					searchParams: {
@@ -112,8 +114,8 @@ export default {
 				if (!isLive) { // Stream is not live - use the first segment (when it should have started), and mention that stream is late
 					segment = segments[0];
 
-					const preparationTime = new sb.Date(segment.start_time).addMinutes(5);
-					const now = new sb.Date();
+					const preparationTime = new SupiDate(segment.start_time).addMinutes(5);
+					const now = new SupiDate();
 					if (now < preparationTime) {
 						const emote = await context.getBestAvailableEmote(["pajaPause", "PauseMan", "PauseManSit", "PauseChamp"], "😐");
 						lateString = `The stream is about to start ${emote}`;
@@ -138,7 +140,7 @@ export default {
 			? "Your"
 			: `${channelName}'s`;
 
-		const time = core.Utils.timeDelta(new sb.Date(segment.start_time));
+		const time = core.Utils.timeDelta(new SupiDate(segment.start_time));
 		return {
 			reply: core.Utils.tag.trim `
 				${target} next stream:

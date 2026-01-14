@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const ERROR_REASONS = {
 	"public-incoming": "That person has too many public reminders pending!",
 	"public-outgoing": "You have too many public reminders pending!",
@@ -50,7 +52,7 @@ export default {
 			User_To: targetUser.ID,
 			Text: args.filter(Boolean).join(" ") ?? null,
 			Schedule: null,
-			Created: new sb.Date(),
+			Created: new SupiDate(),
 			Private_Message: Boolean(context.privateMessage),
 			Platform: context.platform.ID,
 			Type: "Pingme"

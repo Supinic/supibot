@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SONG_REQUESTS_STATE } = cacheKeys;
 
@@ -21,7 +22,7 @@ export default {
 
 		const [stream] = response.body.data;
 		if (stream) {
-			const start = new sb.Date(stream.created_at);
+			const start = new SupiDate(stream.created_at);
 			const date = start.clone().discardTimeUnits("h", "m", "s", "ms");
 			const exists = await core.Query.getRecordset(rs => rs
 				.select("Video_ID")
@@ -63,7 +64,7 @@ export default {
 
 			// No stream data - stream is already offline
 			// Try and find an unfinished stream - look up by date and look for unfinished ones (End IS NULL)
-			const yesterday = new sb.Date().discardTimeUnits("h", "m", "s", "ms").addDays(-1);
+			const yesterday = new SupiDate().discardTimeUnits("h", "m", "s", "ms").addDays(-1);
 			const activeVideoID = await core.Query.getRecordset(rs => rs
 				.select("Video_ID")
 				.from("stream", "Stream")
@@ -78,7 +79,7 @@ export default {
 				const row = await core.Query.getRow("stream", "Stream");
 				await row.load(activeVideoID);
 
-				row.values.End = new sb.Date().discardTimeUnits("s", "ms");
+				row.values.End = new SupiDate().discardTimeUnits("s", "ms");
 				await row.save();
 			}
 

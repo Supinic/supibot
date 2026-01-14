@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "npm",
 	Aliases: null,
@@ -31,7 +33,7 @@ export default {
 		if (data.package) {
 			const lastPublish = data.upsell?.createdAt ?? data.capsule?.lastPublish?.time;
 			const delta = (lastPublish)
-				? core.Utils.timeDelta(new sb.Date(lastPublish))
+				? core.Utils.timeDelta(new SupiDate(lastPublish))
 				: "N/A";
 
 			const { version, description, repository } = data.packument;

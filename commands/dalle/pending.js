@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const channelsPendingAmount = {};
 const usersPending = new Set();
 const channelThreshold = 3;
@@ -6,11 +8,11 @@ let overloadedTimestamp = 0;
 const overloadTimeout = 30_000;
 
 const setOverloaded = () => {
-	overloadedTimestamp = sb.Date.now() + overloadTimeout;
+	overloadedTimestamp = SupiDate.now() + overloadTimeout;
 };
 
 const check = (user, channel) => {
-	if (overloadedTimestamp > sb.Date.now()) {
+	if (overloadedTimestamp > SupiDate.now()) {
 		const skippedTimePeriod = core.Utils.timeDelta(overloadedTimestamp, true);
 		return {
 			success: false,

@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import pastebinLanguages from "./pastebin-languages.json" with { type: "json" };
 
 export default {
@@ -34,8 +35,8 @@ export default {
 			data = response.body.map(i => ({
 				key: i.key,
 				title: (i.title === "") ? null : i.title,
-				posted: new sb.Date(i.date * 1000),
-				expires: (i.expire === "0") ? null : new sb.Date(i.expire * 1000),
+				posted: new SupiDate(i.date * 1000),
+				expires: (i.expire === "0") ? null : new SupiDate(i.expire * 1000),
 				user: (i.user === "") ? null : i.user,
 				syntax: i.syntax,
 				size: Number(i.size)
@@ -79,8 +80,8 @@ export default {
 			};
 		}
 
-		const delta = core.Utils.timeDelta(new sb.Date(paste.posted));
-		const expiryString = (paste.expires) ? `Expires ${core.Utils.timeDelta(new sb.Date(paste.expires))}.` : "";
+		const delta = core.Utils.timeDelta(new SupiDate(paste.posted));
+		const expiryString = (paste.expires) ? `Expires ${core.Utils.timeDelta(new SupiDate(paste.expires))}.` : "";
 		return {
 			reply: core.Utils.tag.trim `
 				Random ${paste.syntax} paste

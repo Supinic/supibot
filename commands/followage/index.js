@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "followage",
 	Aliases: ["fa"],
@@ -64,7 +66,7 @@ export default {
 		}
 
 		const verb = (user.toLowerCase() === context.user.Name) ? "have" : "has";
-		const delta = core.Utils.timeDelta(new sb.Date(followedAt), true, true);
+		const delta = core.Utils.timeDelta(new SupiDate(followedAt), true, true);
 		return {
 			reply: `${prefix} ${verb} been following ${suffix} for ${delta}.`
 		};

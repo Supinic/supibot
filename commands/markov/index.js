@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import { CronJob } from "cron";
+import { SupiDate } from "supi-core";
 
 import { getConfig } from "../../config.js";
 const BASE_PATH = getConfig().basePath;
@@ -65,7 +66,7 @@ export default {
 				continue;
 			}
 
-			const fileName = `markov-dump-${new sb.Date().format("Y-m-d H:i")}-channel-${channelID}.json`;
+			const fileName = `markov-dump-${new SupiDate().format("Y-m-d H:i")}-channel-${channelID}.json`;
 			fs.writeFile(`${BASE_PATH}/markovs/${fileName}`, JSON.stringify(markov));
 		}
 	},

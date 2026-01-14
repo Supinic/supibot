@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import getLinkParser from "../../../utils/link-parser.js";
 
 export default {
@@ -71,7 +72,7 @@ export default {
 			const link = videoType.values.Link_Prefix.replace("$", mostRequested.Link);
 
 			const uniques = Object.keys(counter).length;
-			const total = core.Utils.timeDelta(sb.Date.now() + totalLength * 1000, true);
+			const total = core.Utils.timeDelta(SupiDate.now() + totalLength * 1000, true);
 			return {
 				reply: core.Utils.tag.trim `
 					Videos requested: ${requests.length} (${uniques} unique), for a total runtime of ${total}.

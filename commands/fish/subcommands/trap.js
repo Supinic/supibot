@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { randomInt } from "../../../utils/command-utils.js";
 import { addFish, addJunk, getInitialStats, rollCatch, saveData } from "./fishing-utils.js";
 
@@ -19,7 +20,7 @@ const execute = async (context, operation) => {
 		fishData.lifetime.trap ??= lifetime.trap;
 	}
 
-	const now = sb.Date.now();
+	const now = SupiDate.now();
 	const { lifetime, trap } = fishData;
 	if (fishData.readyTimestamp !== 0 && now < fishData.readyTimestamp) {
 		return {

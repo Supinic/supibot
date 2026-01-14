@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import unsetSuggestionSubcommand from "../set/subcommands/suggestion.js";
 
 export default {
@@ -39,7 +40,7 @@ export default {
 				};
 			}
 
-			const date = new sb.Date().format("Y-m-d H:i:s");
+			const date = new SupiDate().format("Y-m-d H:i:s");
 			row.setValues({
 				Text: `${row.values.Text}\n\n--- Amended on ${date} ---\n${text}`
 			});

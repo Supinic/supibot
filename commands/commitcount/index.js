@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 import GiteaHandler from "./gitea.js";
 import GithubHandler from "./github.js";
 import GitlabHandler from "./gitlab.js";
@@ -35,8 +37,8 @@ export default {
 			};
 		}
 
-		const threshold = context.params.since ?? new sb.Date().addHours(-24);
-		if (threshold >= sb.Date.now()) {
+		const threshold = context.params.since ?? new SupiDate().addHours(-24);
+		if (threshold >= SupiDate.now()) {
 			return {
 				success: false,
 				reply: "Provided date is in the future!"
@@ -56,7 +58,7 @@ export default {
 
 		let since;
 		if (context.params.since) {
-			since = (result.intervalEnd && result.intervalEnd >= new sb.Date())
+			since = (result.intervalEnd && result.intervalEnd >= new SupiDate())
 				? `between ${context.params.since.format("Y-m-d")} and ${result.intervalEnd.format("Y-m-d")}`
 				: `since ${core.Utils.timeDelta(context.params.since)}`;
 		}

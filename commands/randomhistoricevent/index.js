@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const formatter = new Intl.DateTimeFormat("en-GB", {
 	month: "long"
 });
@@ -13,8 +15,8 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function randomHistoricEvent (context, ...args) {
 		const date = (args.length > 0)
-			? new sb.Date(args.join(" "))
-			: new sb.Date();
+			? new SupiDate(args.join(" "))
+			: new SupiDate();
 
 		if (!date.valueOf()) {
 			return {
