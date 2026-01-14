@@ -168,7 +168,7 @@ else {
 
 globalThis.sb = {
 	get Date () {
-		// console.warn("Deprecated sb.Date access");
+		console.warn("Deprecated sb.Date access");
 		return supiCore.Date;
 	},
 	get Error () {
