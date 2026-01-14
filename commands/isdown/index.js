@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { domainToASCII } from "node:url";
 
 export default {
@@ -48,7 +49,7 @@ export default {
 			};
 		}
 
-		const lastScan = new sb.Date(scan.last_scan);
+		const lastScan = new SupiDate(scan.last_scan);
 		const delta = core.Utils.timeDelta(lastScan);
 
 		if (Array.isArray(warnings?.scan_failed)) {

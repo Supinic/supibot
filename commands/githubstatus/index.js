@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "githubstatus",
 	Aliases: ["ghs"],
@@ -19,7 +21,7 @@ export default {
 		});
 
 		const { components, page_status: pageStatus } = response.body;
-		const lastUpdate = core.Utils.timeDelta(new sb.Date(pageStatus.page.updated_at));
+		const lastUpdate = core.Utils.timeDelta(new SupiDate(pageStatus.page.updated_at));
 
 		const degraded = components.filter(i => i.status !== "operational");
 		if (degraded.length === 0) {

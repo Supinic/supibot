@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
 
 export default {
@@ -162,7 +163,7 @@ export default {
 			};
 		}
 
-		const delta = core.Utils.timeDelta(new sb.Date(post.date));
+		const delta = core.Utils.timeDelta(new SupiDate(post.date));
 		return {
 			reply: `${post.content} ${post.link} (posted ${delta})`
 		};

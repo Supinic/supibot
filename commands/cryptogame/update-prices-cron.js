@@ -1,21 +1,22 @@
+import { SupiDate, SupiError } from "supi-core";
 const IGNORED_ASSETS = new Set(["VEF"]);
 
 export default async (cron) => {
 	if (!process.env.API_CRYPTO_COMPARE) {
 		cron.job.stop();
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
 		});
 	}
 	if (!process.env.API_FIXER_IO) {
 		cron.job.stop();
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No FixerIO key configured (API_FIXER_IO)"
 		});
 	}
 
 	const conditionalFixerIo = (async () => {
-		if (new sb.Date().hours % 12 !== 0) {
+		if (new SupiDate().hours % 12 !== 0) {
 			return { rates: {} };
 		}
 
@@ -65,7 +66,7 @@ export default async (cron) => {
 		totalData.XAG = silverData.value[0].spreadProfilePrices[0].bid;
 	}
 
-	const now = new sb.Date();
+	const now = new SupiDate();
 	const uppercaseOnly = /^[A-Z]+$/;
 	const promises = Object.entries(totalData).map(async ([code, value]) => {
 		if (!uppercaseOnly.test(code)) {

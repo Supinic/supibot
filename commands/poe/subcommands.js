@@ -1,8 +1,10 @@
+import { SupiDate } from "supi-core";
 import { fetchYoutubePlaylist } from "../../utils/command-utils.js";
 
 import ascendancies from "./ascendancies.json" with { type: "json" };
 import leagues from "./leagues.json" with { type: "json" };
 import gems from "./gems.json" with { type: "json" };
+
 const additionalGems = gems.filter(i => i.type === "additional");
 const skillGems = gems.filter(i => i.type === "main");
 
@@ -64,10 +66,10 @@ export default [
 				};
 			}
 
-			lab.date ??= new sb.Date();
+			lab.date ??= new SupiDate();
 
 			// reset all image links if new day is reached
-			if (lab.date.day !== new sb.Date().day) {
+			if (lab.date.day !== new SupiDate().day) {
 				for (const key of Object.keys(lab.images)) {
 					lab.images[key] = null;
 				}
@@ -191,8 +193,8 @@ export default [
 		description: "Posts data about the upcoming or current league. Also, supports (preliminary only!) info about Path of Exile 2 - use <code>$poe2</code>",
 		execute: async (context) => {
 			if (context.invocation === "poe2") {
-				const releaseDate = new sb.Date(POE2_RELEASE_DATE);
-				const now = new sb.Date();
+				const releaseDate = new SupiDate(POE2_RELEASE_DATE);
+				const now = new SupiDate();
 				const delta = core.Utils.timeDelta(releaseDate);
 				const verb = (now >= releaseDate) ? "released" : "releases";
 
@@ -203,22 +205,22 @@ export default [
 			}
 
 			const result = [];
-			const now = sb.Date.now();
+			const now = SupiDate.now();
 
-			const currentLeague = leagues.find(i => i.end && new sb.Date(i.end) > now);
+			const currentLeague = leagues.find(i => i.end && new SupiDate(i.end) > now);
 			if (currentLeague) {
-				const endDate = new sb.Date(currentLeague.end);
+				const endDate = new SupiDate(currentLeague.end);
 				result.push(`The ${currentLeague.patch} ${currentLeague.name} league will end ${core.Utils.timeDelta(endDate)}.`);
 			}
 
 			const nextLeague = (currentLeague)
-				? leagues.find(i => !i.end && new sb.Date(i.launch) > now)
-				: leagues.find(i => !i.end || new sb.Date(i.end) > now);
+				? leagues.find(i => !i.end && new SupiDate(i.launch) > now)
+				: leagues.find(i => !i.end || new SupiDate(i.end) > now);
 
 			if (nextLeague) {
 				const { name, patch, reveal, launch } = nextLeague;
-				const revealDate = new sb.Date(reveal);
-				const launchDate = new sb.Date(launch);
+				const revealDate = new SupiDate(reveal);
+				const launchDate = new SupiDate(launch);
 
 				if (revealDate > now) {
 					result.push(`The ${patch} ${name ?? ""} league will be revealed ${core.Utils.timeDelta(revealDate)}.`);

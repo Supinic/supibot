@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import config from "./config.json" with { type: "json" };
 import Subreddit from "./subreddit.js";
 
@@ -119,7 +120,7 @@ export default {
 			};
 		}
 
-		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
+		if (forum.posts.length === 0 || SupiDate.now() > forum.expiration) {
 			const response = await redditGot(`${subreddit}/hot.json`);
 			const { statusCode, body } = response;
 

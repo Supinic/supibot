@@ -1,3 +1,4 @@
+import { SupiDate, SupiError } from "supi-core";
 import { getConfig } from "../../config.js";
 const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
 
@@ -93,7 +94,7 @@ export default {
 					Command: commandCheck.Name,
 					Invocation: command,
 					Arguments: (rest.length > 0) ? JSON.stringify(rest) : null,
-					Created: new sb.Date(),
+					Created: new SupiDate(),
 					Edited: null
 				});
 
@@ -489,7 +490,7 @@ export default {
 					Arguments: targetAlias.Arguments,
 					Description: null,
 					Parent: targetAlias.ID,
-					Created: new sb.Date(),
+					Created: new SupiDate(),
 					Edited: null
 				});
 
@@ -613,7 +614,7 @@ export default {
 					Arguments: oldAlias.Arguments,
 					Description: null,
 					Parent: oldAlias.ID,
-					Created: new sb.Date(),
+					Created: new SupiDate(),
 					Edited: null
 				});
 
@@ -820,7 +821,7 @@ export default {
 				const row = await core.Query.getRow("data", "Custom_Command_Alias");
 				if (existingID) {
 					if (type !== "linkplace") {
-						throw new sb.Error({
+						throw new SupiError({
 							message: "Sanity check - reached linkplace without $alias linkplace"
 						});
 					}
@@ -835,7 +836,7 @@ export default {
 					Command: null,
 					Invocation: null,
 					Arguments: null,
-					Created: new sb.Date(),
+					Created: new SupiDate(),
 					Edited: null,
 					Description: targetAlias.Description,
 					Parent: targetAlias.ID

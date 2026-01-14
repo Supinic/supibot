@@ -1,6 +1,7 @@
-import { randomInt } from "../../utils/command-utils.js";
-import { promisify } from "node:util";
 import { exec } from "node:child_process";
+import { promisify } from "node:util";
+import { SupiDate } from "supi-core";
+import { randomInt } from "../../utils/command-utils.js";
 
 const shell = promisify(exec);
 const checkLatency = async (callback, ...args) => {
@@ -37,7 +38,7 @@ export default {
 			? `${temperatureResult.value.stdout.match(/([\d.]+)/)[1]}°C`
 			: "N/A";
 
-		const uptime = new sb.Date().addSeconds(-process.uptime());
+		const uptime = new SupiDate().addSeconds(-process.uptime());
 		const data = {
 			Uptime: core.Utils.timeDelta(uptime, true),
 			Temperature: temperature,

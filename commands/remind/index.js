@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { fetchTimeData, parseChrono } from "../../utils/command-utils.js";
 
 const MESSAGE_LIMIT = 2000;
@@ -106,7 +107,7 @@ export default {
 		let targetReminderDelta = "when they next type in chat";
 		let delta = 0;
 
-		const now = new sb.Date();
+		const now = new SupiDate();
 		if (chronoParam) {
 			let chronoValue = (chronoType === "after" && !chronoParam.includes(":")) ? `in ${chronoParam}` : chronoParam;
 			chronoValue = chronoValue
@@ -150,7 +151,7 @@ export default {
 
 				chronoValue += ` UTC${prettyOffset}`;
 
-				referenceDate = new sb.Date();
+				referenceDate = new SupiDate();
 				referenceDate.setTimezoneOffset((timeData.rawOffset + timeData.dstOffset) / 60);
 			}
 
@@ -162,7 +163,7 @@ export default {
 				};
 			}
 
-			targetReminderDate = new sb.Date(chronoData.component.date());
+			targetReminderDate = new SupiDate(chronoData.component.date());
 
 			// S#12177
 			// If there is no user-provided day value (e.g. "2 am") and that timestamp has already been passed today,
@@ -194,7 +195,7 @@ export default {
 					const next = timeData.ranges[i + 1];
 
 					delta += current.time;
-					targetReminderDate = targetReminderDate ?? sb.Date.now();
+					targetReminderDate = targetReminderDate ?? SupiDate.now();
 					targetReminderDate += current.time;
 
 					// Parse out the text between ranges, ...
@@ -226,14 +227,14 @@ export default {
 
 		if (targetReminderDate) {
 			if (typeof targetReminderDate === "number") {
-				targetReminderDate = new sb.Date(targetReminderDate);
+				targetReminderDate = new SupiDate(targetReminderDate);
 				targetReminderDelta = core.Utils.timeDelta(targetReminderDate, true);
 			}
 			else {
 				targetReminderDelta = core.Utils.timeDelta(targetReminderDate, true);
 			}
 
-			const comparison = new sb.Date(now.valueOf() + delta);
+			const comparison = new SupiDate(now.valueOf() + delta);
 			if (delta < 0) {
 				return {
 					success: false,
@@ -253,7 +254,7 @@ export default {
 					cooldown: this.Cooldown / 2
 				};
 			}
-			else if ((sb.Date.now() + delta) > MAXIMUM_SQL_TIMESTAMP) {
+			else if ((SupiDate.now() + delta) > MAXIMUM_SQL_TIMESTAMP) {
 				const description = (Number.isFinite(comparison.valueOf()))
 					? `the date ${comparison.format("Y-m-d")}`
 					: `approximately ${core.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;

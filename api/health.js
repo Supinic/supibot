@@ -1,9 +1,10 @@
 import { freemem, totalmem } from "node:os";
+import { SupiDate } from "supi-core";
 
 export default {
 	summary: async () => {
 		const uptime = Math.trunc(process.uptime() * 1000);
-		const started = new sb.Date().addMilliseconds(-uptime);
+		const started = new SupiDate().addMilliseconds(-uptime);
 		const processMemory = process.memoryUsage();
 
 		return {

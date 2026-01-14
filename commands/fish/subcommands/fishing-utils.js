@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import { randomInt } from "../../../utils/command-utils.js";
 
 const defaultFishingData = Object.freeze({
@@ -369,7 +370,7 @@ export const rollCatch = (bait = null) => {
 	if (bait) {
 		const baitData = baitTypes.find(i => i.emoji === bait || i.name === bait);
 		if (!baitData) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid bait type provided",
 				args: { bait }
 			});

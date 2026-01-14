@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import { randomInt } from "../../utils/command-utils.js";
 import definitions from "./definitions.json" with { type: "json" };
 const { cannotTimeoutBadges, outcomes } = definitions;
@@ -44,7 +45,7 @@ export default {
 
 		const messageData = context.platformSpecificData;
 		if (!messageData || !Array.isArray(messageData.badges)) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Assert error: No badges available on Twitch platform"
 			});
 		}

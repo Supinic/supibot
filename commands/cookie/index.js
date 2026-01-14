@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import subcommands from "./subcommands/index.js";
 import CookieLogic from "./cookie-logic.js";
 
@@ -42,8 +43,8 @@ export default {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const utcMidnightToday = sb.Date.getTodayUTC();
-		const nextUtcMidnightDate = new sb.Date(utcMidnightToday).addHours(24);
+		const utcMidnightToday = SupiDate.getTodayUTC();
+		const nextUtcMidnightDate = new SupiDate(utcMidnightToday).addHours(24);
 		const delta = core.Utils.timeDelta(nextUtcMidnightDate);
 
 		return [

@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { searchYoutube } from "../../utils/command-utils.js";
 import gameData from "./game-data.json" with { type: "json" };
 const { zones } = gameData;
@@ -48,7 +49,7 @@ export default {
 			};
 		}
 
-		const now = sb.Date.now();
+		const now = SupiDate.now();
 		const { invocation } = context;
 		if (invocation === "ndr" || invocation === "necrodancerreset") {
 			const permissions = await context.getUserPermissions();

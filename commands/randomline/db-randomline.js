@@ -1,10 +1,11 @@
+import { SupiError } from "supi-core";
 import { randomInt } from "../../utils/command-utils.js";
 
 const tableHistoricColumns = new Map();
 
 const throwOrReturn = (throwFlag, message) => {
 	if (throwFlag) {
-		throw new sb.Error({ message });
+		throw new SupiError({ message });
 	}
 	else {
 		return {

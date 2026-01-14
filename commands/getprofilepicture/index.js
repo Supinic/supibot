@@ -1,3 +1,5 @@
+import { SupiError } from "supi-core";
+
 export default {
 	Name: "getprofilepicture",
 	Aliases: ["avatar", "pfp"],
@@ -34,7 +36,7 @@ export default {
 				context.user
 			);
 
-			throw new sb.Error({
+			throw new SupiError({
 				message: `Invalid IVR API response - more data: Log #${logId}`
 			});
 		}

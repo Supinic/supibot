@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 
 const ALLOWED_PARAMETER_TYPES = new Set(["string", "number", "boolean", "date", "object", "regex"]);
@@ -239,19 +240,19 @@ export default async function createDebugSandbox (context, scriptArgs) {
 						const row = data[i];
 						if (row && typeof row === "object") {
 							for (const [key, value] of Object.entries(row)) {
-								if (value instanceof sb.Date) {
+								if (value instanceof SupiDate) {
 									row[key] = new Date(Number(value));
 								}
 							}
 						}
-						else if (row instanceof sb.Date) {
+						else if (row instanceof SupiDate) {
 							data[i] = new Date(Number(data[i]));
 						}
 					}
 				}
 				else if (data && typeof data === "object") {
 					for (const [key, value] of Object.entries(data)) {
-						if (value instanceof sb.Date) {
+						if (value instanceof SupiDate) {
 							data[key] = new Date(Number(value));
 						}
 					}

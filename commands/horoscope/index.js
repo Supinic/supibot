@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import zodiacData from "./zodiac.json" with { type: "json" };
 
 export default {
@@ -5,7 +6,7 @@ export default {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Checks your horoscope, if you have set your birthday within Supibot.",
+	Description: "Checks a specific zodiac sign's horoscope. Can also check your horoscope, if you have set your birthday (day/month, not year) within Supibot.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [],
 	Whitelist_Response: null,
@@ -96,8 +97,8 @@ export default {
 	Dynamic_Description: (async (prefix) => {
 		const zodiacSignList = zodiacData.map(i => {
 			const { start, end, name } = i;
-			const startString = new sb.Date(2022, ...start).format("F jS");
-			const endString = new sb.Date(2022, ...end).format("F jS");
+			const startString = new SupiDate(2022, ...start).format("F jS");
+			const endString = new SupiDate(2022, ...end).format("F jS");
 
 			return `<li><code>${name}</code> (${startString} - ${endString})</li>`;
 		}).join("");

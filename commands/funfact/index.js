@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { randomInt } from "../../utils/command-utils.js";
 
 export default {
@@ -10,8 +11,8 @@ export default {
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function funFact () {
-		const { year } = new sb.Date();
-		const randomDate = new sb.Date(
+		const { year } = new SupiDate();
+		const randomDate = new SupiDate(
 			randomInt(2017, year),
 			randomInt(1, 12)
 		);

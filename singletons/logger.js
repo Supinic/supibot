@@ -1,3 +1,4 @@
+import { SupiDate, SupiError } from "supi-core";
 import { CronJob } from "cron";
 import { getConfig } from "../config.js";
 const { logging } = getConfig();
@@ -226,7 +227,7 @@ export default class LoggerSingleton {
 	/**
 	 * Logs a new error, and returns its ID.
 	 * @param {string} type
-	 * @param {sb.Error|Error} error
+	 * @param {SupiError|Error} error
 	 * @param {Object} [data]
 	 * @param {"Internal"|"External"} [data.origin] Whether the error is first- or third-party
 	 * @param {Object} [data.context] Object with any additional info
@@ -315,7 +316,7 @@ export default class LoggerSingleton {
 
 			const lineObject = {
 				Text: message,
-				Posted: new sb.Date()
+				Posted: new SupiDate()
 			};
 
 			const batch = this.batches[chan];
@@ -370,7 +371,7 @@ export default class LoggerSingleton {
 
 			const lineObject = {
 				Text: message,
-				Posted: new sb.Date()
+				Posted: new SupiDate()
 			};
 
 			try {
@@ -417,17 +418,17 @@ export default class LoggerSingleton {
 
 		const { channelData, message, userData } = options;
 		if (!userData) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Missing userData for lastSeen data"
 			});
 		}
 		else if (!channelData) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Missing channelData for lastSeen data"
 			});
 		}
 		else if (!message) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Missing message for lastSeen data",
 				arg: {
 					channel: channelData?.ID ?? null,
@@ -443,7 +444,7 @@ export default class LoggerSingleton {
 		}
 
 		const count = this.lastSeen.get(channelData.ID).get(userData.ID)?.count ?? 0;
-		const now = new sb.Date();
+		const now = new SupiDate();
 
 		this.#lastSeenUserMap.set(userData.ID, now.valueOf());
 		this.lastSeen.get(channelData.ID).set(userData.ID, {
@@ -455,7 +456,7 @@ export default class LoggerSingleton {
 
 	getUserLastSeen (userID) {
 		const result = this.#lastSeenUserMap.get(userID);
-		return (result) ? new sb.Date(result) : result;
+		return (result) ? new SupiDate(result) : result;
 	}
 
 	/**

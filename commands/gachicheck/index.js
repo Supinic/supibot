@@ -1,5 +1,7 @@
+import { SupiDate } from "supi-core";
 import { fetchYoutubePlaylist, postToHastebin } from "../../utils/command-utils.js";
 import getLinkParser from "../../utils/link-parser.js";
+
 const limit = 100;
 
 export default {
@@ -166,7 +168,7 @@ export default {
 					Added_By: context.user.ID,
 					Video_Type: this.data.typeMap[type],
 					Available: Boolean(videoData),
-					Published: (videoData?.created) ? new sb.Date(videoData.created) : null,
+					Published: (videoData?.created) ? new SupiDate(videoData.created) : null,
 					Duration: (videoData && videoData.duration) || null,
 					Track_Type: null,
 					Notes: videoData?.description ?? null

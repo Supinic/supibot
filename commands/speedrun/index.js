@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 let speedrunGotInstance;
 const speedrunGot = (...args) => {
 	speedrunGotInstance ??= core.Got.get("GenericAPI").extend({
@@ -198,7 +200,7 @@ export default {
 		}
 
 		const link = run.videos?.links?.[0]?.uri ?? run.weblink;
-		const date = new sb.Date(run.date).format("Y-m-d");
+		const date = new SupiDate(run.date).format("Y-m-d");
 		const time = core.Utils.formatTime(run.times.primary_t);
 		return {
 			reply: core.Utils.tag.trim `

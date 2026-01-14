@@ -189,6 +189,8 @@ Since all command code functions are `await`ed, it doesn't really make a differe
 
 ##### Advanced command using an external API
 ```js
+import { SupiDate } from "supi-core";
+
 (async function gag (context, ...args) {
     const options = { responseType: "json" };
     if (args.length === 0) {
@@ -216,7 +218,7 @@ Since all command code functions are `await`ed, it doesn't really make a differe
         };
     }
 
-    const delta = core.Utils.timeDelta(new sb.Date(post.creationTs * 1000));
+    const delta = core.Utils.timeDelta(new SupiDate(post.creationTs * 1000));
     return {
         reply: `${core.Utils.fixHTML(post.title)} - ${post.url} - Score: ${post.upVoteCount}, posted ${delta}.`
     };

@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "offline-only-mode",
 	Events: ["online", "offline"],
@@ -8,7 +10,7 @@ export default {
 
 		if (event === "online" && channel.Mode !== "Read" && !offlineConfiguration) {
 			await context.channel.setDataProperty("offlineOnlyBot", {
-				started: new sb.Date().sqlDateTime(),
+				started: new SupiDate().sqlDateTime(),
 				mode: channel.Mode ?? "Write"
 			});
 
