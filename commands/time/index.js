@@ -1,3 +1,4 @@
+import { SupiDate, SupiError } from "supi-core";
 import { fetchTimeData } from "../../utils/command-utils.js";
 import timezones from "./timezones.json" with { type: "json" };
 
@@ -28,7 +29,7 @@ const detectTimezone = async (...args) => {
 		}
 
 		return {
-			date: new sb.Date().setTimezoneOffset(offset).format("H:i (Y-m-d)"),
+			date: new SupiDate().setTimezoneOffset(offset).format("H:i (Y-m-d)"),
 			offset: `${sign}${hours}${minutes ?? ""}`,
 			abbr: null,
 			name: null
@@ -46,7 +47,7 @@ const detectTimezone = async (...args) => {
 		offset = `+${offset}`;
 	}
 
-	const date = new sb.Date().setTimezoneOffset(timezoneData.offset * 60).format("H:i (Y-m-d)");
+	const date = new SupiDate().setTimezoneOffset(timezoneData.offset * 60).format("H:i (Y-m-d)");
 	return {
 		date,
 		offset,
@@ -66,12 +67,12 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function time (context, ...args) {
 		if (!process.env.API_GOOGLE_GEOCODING) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No Google geocoding API key configured (API_GOOGLE_GEOCODING)"
 			});
 		}
 		if (!process.env.API_GOOGLE_TIMEZONE) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
 			});
 		}
@@ -118,7 +119,7 @@ export default {
 			else if (targetUser.Name === context.platform.Self_Name) {
 				const robotEmote = await context.getBestAvailableEmote(["MrDestructoid"], "🤖");
 				return {
-					reply: `My current time is ${sb.Date.now()} ${robotEmote}`
+					reply: `My current time is ${SupiDate.now()} ${robotEmote}`
 				};
 			}
 
@@ -202,7 +203,7 @@ export default {
 		const minutes = core.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
 
 		const offset = `${symbol}${hours}:${minutes}`;
-		const time = new sb.Date();
+		const time = new SupiDate();
 		time.setTimezoneOffset(totalOffset / 60);
 
 		if (user) {

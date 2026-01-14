@@ -34,17 +34,6 @@ interface GlobalSb {
 	/** @deprecated use `import { SupiError } from "supi-core"` instead */
 	Error: typeof supiCore.SupiError;
 
-	/** @deprecated use `core.Got` instead */
-	Got: typeof supiCore.Got;
-	/** @deprecated use `core.Metrics` instead */
-	Metrics: supiCore.Metrics;
-	/** @deprecated use `core.Cache` instead */
-	Cache: supiCore.Cache;
-	/** @deprecated use `core.Query` instead */
-	Query: supiCore.Query;
-	/** @deprecated use `core.Utils` instead */
-	Utils: supiCore.Utils;
-
 	API: ReturnType<typeof initializeInternalApi>;
 	AwayFromKeyboard: typeof AwayFromKeyboard;
 	Banphrase: typeof Banphrase;
@@ -139,35 +128,15 @@ globalThis.core = {
 	Utils: new supiCore.Utils()
 };
 
-// @ts-expect-error Assignment is partial due to legacy globals split */
+// @ts-expect-error Backwards compatibility - removable after all traces of sb.Date/sb.Error are removed
 globalThis.sb = {
 	get Date () {
-		// console.warn("Deprecated sb.Date access");
+		console.warn("Deprecated sb.Date access");
 		return supiCore.Date;
 	},
 	get Error () {
-		// console.warn("Deprecated sb.Error access");
+		console.warn("Deprecated sb.Error access");
 		return supiCore.Error;
-	},
-	get Got () {
-		console.warn("Deprecated sb.Got access");
-		return supiCore.Got;
-	},
-	get Query () {
-		console.warn("Deprecated sb.Query access");
-		return core.Query;
-	},
-	get Cache () {
-		console.warn("Deprecated sb.Cache access");
-		return core.Cache;
-	},
-	get Metrics () {
-		console.warn("Deprecated sb.Metrics access");
-		return core.Metrics;
-	},
-	get Utils () {
-		console.warn("Deprecated sb.Utils access");
-		return core.Utils;
 	}
 };
 

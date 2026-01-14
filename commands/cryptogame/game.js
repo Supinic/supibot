@@ -1,3 +1,5 @@
+import { SupiError } from "supi-core";
+
 export const baseAsset = {
 	Code: "EUR",
 	Price: 1
@@ -49,7 +51,7 @@ export const getPortfolioData = async (identifier) => {
 			rs.where("ID = %s", identifier);
 		}
 		else {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid portfolio identifier provided",
 				args: { identifier }
 			});
@@ -167,7 +169,7 @@ export const updatePortfolioAsset = async (portfolioData, assetData, amount) => 
 	const targetAsset = portfolioData.assets.find(i => i.Code === assetData.Code);
 	if (!targetAsset) {
 		if (amount <= 0) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid operation - no asset, negative amount"
 			});
 		}
@@ -182,7 +184,7 @@ export const updatePortfolioAsset = async (portfolioData, assetData, amount) => 
 	}
 	else {
 		if ((targetAsset.Amount + amount) < 0) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid operation - asset exists, negative net amount"
 			});
 		}
