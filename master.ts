@@ -128,18 +128,6 @@ globalThis.core = {
 	Utils: new supiCore.Utils()
 };
 
-// @ts-expect-error Backwards compatibility - removable after all traces of sb.Date/sb.Error are removed
-globalThis.sb = {
-	get Date () {
-		console.warn("Deprecated sb.Date access");
-		return supiCore.Date;
-	},
-	get Error () {
-		console.warn("Deprecated sb.Error access");
-		return supiCore.Error;
-	}
-};
-
 console.timeEnd("supi-core");
 
 const platforms: Set<Platform> = new Set();
@@ -179,7 +167,14 @@ else {
 }
 
 globalThis.sb = {
-	...sb,
+	get Date () {
+		console.warn("Deprecated sb.Date access");
+		return supiCore.Date;
+	},
+	get Error () {
+		console.warn("Deprecated sb.Error access");
+		return supiCore.Error;
+	},
 
 	Platform,
 
