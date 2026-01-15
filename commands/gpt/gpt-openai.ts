@@ -1,5 +1,5 @@
 import { type GotResponse, SupiError } from "supi-core";
-import { checkInputLimits, getHistoryMode, getUserHash, GptTemplate } from "./gpt-template.js";
+import { checkInputLimits, getHistoryMode, getUserHash, type GptTemplate } from "./gpt-template.js";
 import GptHistory from "./history-control.js";
 import type { GptContext } from "./index.js";
 import type { ModelData } from "./config-schema.js";
