@@ -310,11 +310,114 @@ describe("$alias", async () => {
 			expectCommandResultFailure(result, "They don't have", ALIAS_NAME, "alias");
 		});
 
-		// alias definition + message = too long -> link
-		// different result for $alias code -> should post definition and no fluff
-		// checking user - user doesn't exist
-		// checking linked alias -> exists
-		// checking linked alias -> original is deleted
+		it("2 args: should fail when provided user does not exist", async () => {
+			const result = await run("check", "ghost_user", "foo");
+			expectCommandResultFailure(result, "Provided user does not exist");
+		});
+
+		it("1 arg: should return link when definition is too long (non-code invocation)", async () => {
+			const ALIAS_NAME = "LongOne";
+
+			// current user's alias list contains the name
+			world.queueRsData([ALIAS_NAME]);
+
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: 9001,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "ping",
+					Invocation: "ping",
+					Arguments: JSON.stringify(["x".repeat(50)]),
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const tinyPlatform = createTestPlatform({ messageLimit: 1 });
+			const ctx = cloneContext(baseContext, { platform: tinyPlatform });
+			const result = await baseCommand.execute(ctx, "check", ALIAS_NAME);
+
+			expectCommandResultSuccess(result, "details:", "alias/detail");
+			assert.ok(typeof result.reply === "string" && result.reply.includes(ALIAS_NAME));
+		});
+
+		it("1 arg: should return bare link when definition is too long (code invocation)", async () => {
+			const ALIAS_NAME = "LongCode";
+
+			world.queueRsData([ALIAS_NAME]);
+
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: 9002,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "ping",
+					Invocation: "ping",
+					Arguments: JSON.stringify(["x".repeat(50)]),
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const tinyPlatform = createTestPlatform({ messageLimit: 1 });
+			const context = cloneContext(baseContext, { platform: tinyPlatform });
+			const result = await baseCommand.execute(context, "code", ALIAS_NAME);
+
+			assert.strictEqual(result.success, undefined);
+			assert.ok(typeof result.reply === "string");
+			assert.ok(result.reply.startsWith("https://"), "Expected a direct link");
+			assert.ok(result.reply.includes("/alias/detail/"));
+			assert.ok(!result.reply.includes("details:"), "Should not include prefix text in code mode");
+		});
+
+		it("1 arg: should print definition only for `code` (no surrounding text)", async () => {
+			const ALIAS_NAME = "JustCode";
+
+			world.queueRsData([ALIAS_NAME]);
+
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: 9003,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "ping",
+					Invocation: "ping",
+					Arguments: JSON.stringify(["a", "b"]),
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await run("code", ALIAS_NAME);
+			expectCommandResultSuccess(result, "ping");
+
+			assert.ok(typeof result.reply === "string");
+			assert.ok(!result.reply.includes("has this definition"), "No fluff expected");
+			assert.ok(!result.reply.includes("Your alias"), "No fluff expected");
+		});
+
+		it("1 arg: linked alias but original deleted -> prints deleted-original message", async () => {
+			const ALIAS_NAME = "DeadLink";
+
+			world.queueRsData([ALIAS_NAME]); // current user's alias list contains this name
+
+			existingAliasMap[BASE_USER_ID] = {
+				[ALIAS_NAME]: {
+					ID: 9005,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: null,
+					Invocation: null,
+					Arguments: null,
+					Parent: null,
+					Channel: null
+				}
+			};
+
+			const result = await run("check", ALIAS_NAME);
+			expectCommandResultSuccess(result, "original has been deleted");
+		});
 	});
 
 	describe("copy", () => {
@@ -2269,6 +2372,14 @@ describe("$alias", async () => {
 				expectCommandResultFailure(result, "cannot continue", "causes more than", "alias calls", "reduce the complexity");
 			});
 
+			it(" invalid alias name (regex fail) -> success:false, reply:null", async () => {
+				world.queueRsData([]); // eligibleAliases empty
+				const result = await run("run", "$$$");
+
+				assert.strictEqual(result.success, false);
+				assert.strictEqual(result.reply, null);
+			});
+
 			describe("actually running mocked commands", () => {
 				beforeEach(() => {
 					sb.Command = Command;
@@ -2423,7 +2534,30 @@ describe("$alias", async () => {
 				expectCommandResultFailure(result, "don't have", ALIAS_NAME);
 			});
 
-			// try a nested alias - dependencies must work
+			it(" should fail if only a channel alias exists (single eligible alias not owned by target user)", async () => {
+				const REMOTE_USER = "bob";
+				const REMOTE_ID = 5001;
+				world.allowUser(REMOTE_USER);
+				world.setUserId(REMOTE_USER, REMOTE_ID);
+
+				const ch = createTestChannel(31337, basePlatform);
+
+				const ctx = cloneContext(baseContext, { channel: ch });
+
+				world.queueRsData([{
+					ID: 7001,
+					Name: "foo",
+					User_Alias: null, // channel alias (not the remote user's user alias)
+					Channel: ch.ID,
+					Command: "anything",
+					Invocation: "anything",
+					Arguments: null,
+					Parent: null
+				}]);
+
+				const result = await baseCommand.execute(ctx, "try", REMOTE_USER, "foo");
+				expectCommandResultFailure(result, "They don't have", "foo", "alias");
+			});
 		});
 	});
 

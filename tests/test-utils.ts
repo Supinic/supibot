@@ -2,7 +2,7 @@ import { Utils } from "supi-core";
 import { Channel } from "../classes/channel.js";
 import { Command, type CommandDefinition } from "../classes/command.js";
 import { User } from "../classes/user.js";
-import { type Platform } from "../platforms/template.js";
+import { type BaseConfig, type Platform } from "../platforms/template.js";
 import { TwitchPlatform } from "../platforms/twitch.js";
 
 import assert from "node:assert/strict";
@@ -16,12 +16,12 @@ export const createTestUser = (opts: { Name?: string, ID?: number, Twitch_ID?: s
 	Started_Using: null
 });
 
-export const createTestPlatform = () => new TwitchPlatform({
+export const createTestPlatform = (opts: Partial<BaseConfig> = {}) => new TwitchPlatform({
 	ID: 1,
 	selfId: "123",
 	logging: {},
 	platform: {},
-	messageLimit: 500,
+	messageLimit: opts.messageLimit ?? 500,
 	selfName: "Foo",
 	active: true
 });
