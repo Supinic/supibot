@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const LEAGUES = {
 	nfl: "football",
 	nba: "basketball",
@@ -46,8 +48,8 @@ export default {
 
 		const league = context.invocation;
 		const targetDate = (context.params.date)
-			? new sb.Date(context.params.date)
-			: new sb.Date(sb.Date.getTodayUTC());
+			? new SupiDate(context.params.date)
+			: new SupiDate(SupiDate.getTodayUTC());
 
 		if (mode === "scores") {
 			// Adjust for games that already took place in NA timezones, the previous day
@@ -66,7 +68,7 @@ export default {
 		const leagueAbbr = league.toUpperCase();
 		if (mode === "next") {
 			const event = response.body.events
-				.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
+				.sort((a, b) => new SupiDate(a.date) - new SupiDate(b.date))
 				.find(i => i.status.type.completed !== true);
 
 			if (!event) {
@@ -91,14 +93,14 @@ export default {
 			}
 
 			const link = createGamecastLink(league, event.id);
-			const delta = core.Utils.timeDelta(new sb.Date(event.date));
+			const delta = core.Utils.timeDelta(new SupiDate(event.date));
 			return {
 				reply: `Next ${leagueAbbr} match: ${event.name} ${delta}${playedAtString}.${statusString} ${link}`
 			};
 		}
 		else if (mode === "today") {
 			const events = response.body.events
-				.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
+				.sort((a, b) => new SupiDate(a.date) - new SupiDate(b.date))
 				.filter(i => i.status.type.completed !== true);
 
 			if (events.length === 0) {
@@ -111,14 +113,14 @@ export default {
 				};
 			}
 
-			const list = events.map(i => `${i.shortName} ${core.Utils.timeDelta(new sb.Date(i.date))}`);
+			const list = events.map(i => `${i.shortName} ${core.Utils.timeDelta(new SupiDate(i.date))}`);
 			return {
 				reply: `Upcoming ${leagueAbbr} matches: ${list.join("; ")}`
 			};
 		}
 		else if (mode === "scores") {
 			const events = response.body.events
-				.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
+				.sort((a, b) => new SupiDate(a.date) - new SupiDate(b.date))
 				.filter(i => i.status.type.completed === true);
 
 			if (events.length === 0) {

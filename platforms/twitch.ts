@@ -28,14 +28,14 @@ import TwitchUtils, {
 	type SubscribeMessageNotification,
 	type RaidNotification,
 	type StreamOnlineNotification,
-	type StreamOfflineNotification,
-	type BroadcasterSubscription
+	type StreamOfflineNotification
 } from "./twitch-utils.js";
 
 import type { Channel } from "../classes/channel.js";
 import type { User } from "../classes/user.js";
 import { SupiDate, SupiError } from "supi-core";
 import type { Emote, ThirdPartyEmote } from "../@types/globals.d.ts";
+import type { TwitchSubscriberData } from "../utils/schemas.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -1208,7 +1208,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	 * Determines whether a user is subscribed to a given Twitch channel.
 	 */
 	async fetchUserAdminSubscription (userData: User) {
-		const subscriberList = await core.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST) as BroadcasterSubscription[] | null;
+		const subscriberList = await core.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST) as TwitchSubscriberData | null;
 		if (!subscriberList || !Array.isArray(subscriberList)) {
 			return false;
 		}

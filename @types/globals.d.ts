@@ -55,7 +55,7 @@ export type TypeExtract<T, U> = {
 };
 
 export type IvrClipData = {
-    clipKey: string | null;
+    clipKey: string;
     clip: {
       durationSeconds: number;
       id: string;

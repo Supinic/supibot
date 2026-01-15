@@ -26,7 +26,7 @@ export default declare({
 	Params: [
 		{ name: "index", type: "number" },
 		{ name: "linkOnly", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function youtubeSearch (context, ...args) {
 		const query = args.join(" ");

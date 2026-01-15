@@ -156,7 +156,6 @@ import StreamInfoCommand from "./streaminfo/index.js";
 import SubAgeCommand from "./subage/index.js";
 import SubscribeCommand from "./subscribe/index.js";
 import SuggestCommand from "./suggest/index.js";
-import SupiBotUpdatesCommand from "./supibotupdates/index.js";
 import TestCommand from "./test/index.js";
 import TextToSpeechCommand from "./texttospeech/index.js";
 import TextTransformCommand from "./texttransform/index.js";
@@ -347,7 +346,6 @@ export default [
 	SubAgeCommand,
 	SubscribeCommand,
 	SuggestCommand,
-	SupiBotUpdatesCommand,
 	TestCommand,
 	TextToSpeechCommand,
 	TextTransformCommand,

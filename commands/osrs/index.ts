@@ -20,7 +20,7 @@ const osrsCommandDefinition = declare({
 		{ name: "seasonal", type: "boolean" },
 		{ name: "skill", type: "string" },
 		{ name: "virtual", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function osrs (context, first, ...args) {
 		const input = (first) ? first.toLowerCase() : "";

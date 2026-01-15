@@ -132,7 +132,8 @@ type PermissionOptions = {
 };
 type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & GetEmoteOptions>;
 
-export type Flag = "block" | "developer" | "external-input" | "mention" | "non-nullable" | "opt-out"
+export type Flag =
+	| "block" | "developer" | "external-input" | "mention" | "non-nullable" | "opt-out"
 	| "read-only" | "ping" | "pipe" | "rollback" | "skip-banphrase" | "system" | "whitelist";
 
 export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
@@ -594,6 +595,20 @@ export class Command extends TemplateWithoutId {
 
 			return null;
 		}
+	}
+
+	static getAsserted (identifier: Command | string): Command {
+		const command = Command.get(identifier);
+		if (!command) {
+			throw new SupiError({
+			    message: `Assert error: Fetched command does not exist`,
+				args: {
+					command: (typeof identifier === "string") ? identifier : identifier.Name
+				}
+			});
+		}
+
+		return command;
 	}
 
 	static async checkAndExecute (data: {
@@ -1422,4 +1437,4 @@ export class Command extends TemplateWithoutId {
 	}
 }
 
-export const declare = <T extends ParameterDefinitions> (def: CommandDefinition<T>) => def;
+export const declare = <const T extends ParameterDefinitions> (def: CommandDefinition<T>) => def;

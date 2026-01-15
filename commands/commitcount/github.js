@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const execute = async (data) => {
 	if (!process.env.API_GITHUB_PUBLIC_REPO_GQL_TOKEN) {
 		return {
@@ -49,7 +51,7 @@ const execute = async (data) => {
 		};
 	}
 	const collection = response.data.user.contributionsCollection;
-	const intervalEnd = new sb.Date(collection.endedAt);
+	const intervalEnd = new SupiDate(collection.endedAt);
 	const commitCount = collection.totalCommitContributions + collection.restrictedContributionsCount;
 
 	return {

@@ -96,7 +96,7 @@ export default {
 			if (!this.data.channels.includes(channel)) {
 				return {
 					success: false,
-					reply: "This channel is not currently supported!"
+					reply: `This channel is not currently supported! Check the list of supported channels here: ${this.getDetailURL()}`
 				};
 			}
 		}

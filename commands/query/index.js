@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import { uploadToImgur } from "../../utils/command-utils.js";
 
 export default {
@@ -13,7 +14,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function query (context, ...args) {
 		if (!process.env.API_WOLFRAM_ALPHA_APPID) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No Wolfram Alpha AppID configured (API_WOLFRAM_ALPHA_APPID)"
 			});
 		}

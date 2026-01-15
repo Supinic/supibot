@@ -7,7 +7,7 @@ export default declare({
 	Cooldown: 30000,
 	Description: "Fills the message provided with the word (usually an emote) provided as the first argument.",
 	Flags: ["external-input","mention","pipe"],
-	Params: [{ name: "sentences", type: "boolean" }] as const,
+	Params: [{ name: "sentences", type: "boolean" }],
 	Whitelist_Response: null,
 	Code: function addBetween (context, word, ...args) {
 		if (!word || args.length === 0) {

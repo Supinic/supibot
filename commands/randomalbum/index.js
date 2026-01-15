@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { randomInt } from "../../utils/command-utils.js";
 
 // Borrowed from https://codepen.io/bobhami/pen/gwAJNp
@@ -44,7 +45,7 @@ export default {
 		const { album } = data.response;
 		const { artist, url } = album;
 		const releaseYear = (album.release_date)
-			? new sb.Date(album.release_date).year
+			? new SupiDate(album.release_date).year
 			: "(unknown)";
 
 		return {

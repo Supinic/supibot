@@ -1,15 +1,8 @@
 import { type GotResponse, SupiError } from "supi-core";
-
+import { checkInputLimits, getHistoryMode, getUserHash, GptTemplate } from "./gpt-template.js";
 import GptHistory from "./history-control.js";
-import type { GptContext, ModelData } from "./index.js";
-import {
-	checkInputLimits,
-	determineOutputLimit,
-	getHistoryMode,
-	getTemperature,
-	getUserHash,
-	type GptTemplate
-} from "./gpt-template.js";
+import type { GptContext } from "./index.js";
+import type { ModelData } from "./config-schema.js";
 
 const DEFAULT_SYSTEM_MESSAGE = "Be extremely concise. Do not add URLs to the response.";
 
@@ -40,6 +33,7 @@ type OpenAiPayload = {
 	messages: unknown[];
 	user: string;
 	temperature?: number;
+	service_tier?: "flex" | "auto";
 	top_p?: number;
 	frequency_penalty?: number;
 	presence_penalty?: number;
@@ -74,19 +68,9 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 		];
 	}
 	else {
-		const { platform, channel } = context;
-		const channelString = (channel)
-			? `, in channel ${channel.Description ?? channel.Name}`
-			: "";
-
-		const contextSystemMessage = core.Utils.tag.trim `
-			You are being queried on behalf of ${platform.selfName},
-			a chat bot running on ${platform.name}${channelString}.
-		`;
-
 		return [
 			...promptHistory,
-			{ role: "user", content: `${DEFAULT_SYSTEM_MESSAGE} ${contextSystemMessage} ${query}` }
+			{ role: "user", content: `${DEFAULT_SYSTEM_MESSAGE} ${query}` }
 		];
 	}
 };
@@ -122,18 +106,6 @@ export const GptOpenAI = {
 			}
 		}
 
-		const outputLimitCheck = determineOutputLimit(context, modelData);
-		if (!outputLimitCheck.success) {
-			return outputLimitCheck;
-		}
-		const { outputLimit } = outputLimitCheck;
-
-		const temperatureCheck = getTemperature(context);
-		if (!temperatureCheck.success) {
-			return temperatureCheck;
-		}
-		const { temperature } = temperatureCheck;
-
 		const json: OpenAiPayload = {
 			model: modelData.url,
 			messages,
@@ -141,18 +113,17 @@ export const GptOpenAI = {
 		};
 
 		if (modelData.search !== true) {
-			json.temperature = temperature;
 			json.top_p = 1;
 			json.frequency_penalty = 0;
 			json.presence_penalty = 0;
 		}
+		if (modelData.flexProcessing === true) {
+			json.service_tier = "flex";
+		}
 
 		if (modelData.usesCompletionTokens === true) {
-			json.reasoning_effort = "low";
-			json.max_completion_tokens = 1000;
-		}
-		else {
-			json.max_tokens = outputLimit;
+			json.reasoning_effort = "medium";
+			json.max_completion_tokens = 5000;
 		}
 
 		const response = await core.Got.get("GenericAPI")<OpenAiResponse>({

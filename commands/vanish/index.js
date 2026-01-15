@@ -1,3 +1,5 @@
+import { SupiError } from "supi-core";
+
 export default {
 	Name: "vanish",
 	Aliases: null,
@@ -29,7 +31,7 @@ export default {
 
 		const messageData = context.platformSpecificData;
 		if (!messageData || !Array.isArray(messageData.badges)) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Assert error: No badges available on Twitch platform"
 			});
 		}

@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const VIEWER_THRESHOLD = 100;
 const BATCH_SIZE = 100;
 
@@ -41,7 +43,7 @@ export default {
 				viewers: i.viewer_count,
 				game: i.game_name,
 				title: i.title,
-				liveFor: core.Utils.timeDelta(new sb.Date(i.started_at), true)
+				liveFor: core.Utils.timeDelta(new SupiDate(i.started_at), true)
 			}));
 
 			raidData.push(...formatted);
@@ -56,7 +58,7 @@ export default {
 			method: "POST",
 			url: `https://haste.zneix.eu/documents`,
 			throwHttpErrors: false,
-			body: `Raid targets ${new sb.Date().format("Y-m-d H:i:s")}\n\n${data}`
+			body: `Raid targets ${new SupiDate().format("Y-m-d H:i:s")}\n\n${data}`
 		});
 
 		if (response.statusCode !== 200) {

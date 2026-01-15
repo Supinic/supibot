@@ -5,7 +5,8 @@ import { GptDeepInfra } from "../gpt/gpt-deepinfra.js";
 import gptConfig from "../gpt/config.json" with { type: "json" };
 
 import { check as checkModeration } from "../gpt/moderation.js";
-import type { GptContext, ModelData } from "../gpt/index.js";
+import type { GptContext } from "../gpt/index.js";
+import type { ModelData } from "../gpt/config-schema.js";
 
 const { models } = gptConfig;
 const summaryModel = models.maverick as ModelData;
@@ -147,7 +148,7 @@ export default declare({
 	Cooldown: 5000,
 	Description: "Summarizes the last couple of messages in the current (or provided) channel via GPT. This command applies a 30s cooldown to all users in the channel it is used in.",
 	Flags: ["mention","pipe"],
-	Params: [{ name: "type", type: "string" }] as const,
+	Params: [{ name: "type", type: "string" }],
 	Whitelist_Response: null,
 	Code: async function chatSummary (context, channelInput) {
 		if (!context.channel) {

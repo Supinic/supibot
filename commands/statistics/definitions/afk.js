@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	name: "afk",
 	aliases: ["total-afk", "gn", "brb", "food", "shower", "lurk", "poop", "work", "study", "pppoof"],
@@ -67,8 +69,8 @@ export default {
 			};
 		}
 		else {
-			const delta = core.Utils.timeDelta(sb.Date.now() + data.Delta * 1000, true);
-			const average = core.Utils.timeDelta(sb.Date.now() + (data.Delta * 1000 / Number(data.Amount)), true);
+			const delta = core.Utils.timeDelta(SupiDate.now() + data.Delta * 1000, true);
+			const average = core.Utils.timeDelta(SupiDate.now() + (data.Delta * 1000 / Number(data.Amount)), true);
 
 			return {
 				reply: core.Utils.tag.trim `

@@ -15,7 +15,7 @@ export default declare({
 		{ name: "id", type: "number" },
 		{ name: "invocation", type: "string" },
 		{ name: "platform", type: "string" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function optOut (context, ...args) {
 		const parse = await parseGenericFilterOptions("Opt-out", context.params, args, {

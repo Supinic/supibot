@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const execute = async (data) => {
 	const {
 		username,
@@ -40,7 +42,7 @@ const execute = async (data) => {
 	}
 
 	let commitCount = 0;
-	const standardTimestamp = new sb.Date(threshold).valueOf() / 1000;
+	const standardTimestamp = new SupiDate(threshold).valueOf() / 1000;
 
 	for (const item of response.body) {
 		if (item.timestamp >= standardTimestamp) {

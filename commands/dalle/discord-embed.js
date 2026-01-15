@@ -2,7 +2,7 @@
  * @param {string} id
  * @param {Object} options
  * @param {string} options.prompt
- * @param {sb.Date} options.created
+ * @param {SupiDate} options.created
  * @param {number} options.creationTime
  * @returns {Object[]}
  */

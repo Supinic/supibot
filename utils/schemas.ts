@@ -1,6 +1,34 @@
 // @todo figure out where to place this file properly within the project
 import * as z from "zod";
 
+export const twitchIdentitySchema = z.object({
+	access_token: z.string(),
+	refresh_token: z.string()
+});
+
+export const twitchSubscriberSchema = z.object({
+	data: z.array(z.object({
+		broadcaster_id: z.string(),
+		broadcaster_login: z.string(),
+		broadcaster_name: z.string(),
+		gifter_id: z.string(),
+		gifter_login: z.string(),
+		gifter_name: z.string(),
+		is_gift: z.boolean(),
+		plan_name: z.string(),
+		user_id: z.string(),
+		user_name: z.string(),
+		user_login: z.string(),
+		tier: z.union([
+			z.literal("1000"),
+			z.literal("2000"),
+			z.literal("3000")
+		])
+	}))
+});
+
+export type TwitchSubscriberData = z.infer<typeof twitchSubscriberSchema>["data"];
+
 export const ivrErrorSchema = z.object({
 	statusCode: z.int().min(400).max(599),
 	error: z.object({
@@ -92,4 +120,37 @@ export const ivrFoundersSchema = z.object({
 		displayName: z.string(),
 		entitlementStart: z.iso.datetime()
 	}))
+});
+
+export const ivrClipSchema = z.object({
+	clip: z.object({
+		durationSeconds: z.int(),
+		id: z.string(),
+		slug: z.string(),
+		url: z.string(),
+		title: z.string(),
+		viewCount: z.int(),
+		game: z.object({
+			id: z.string(),
+			name: z.string()
+		}).optional(),
+		broadcaster: z.object({
+			id: z.string(),
+			displayName: z.string()
+		}).optional(),
+		curator: z.object({
+			id: z.string(),
+			displayName: z.string()
+		}).optional(),
+		createdAt: z.iso.datetime(),
+		tiny: z.string().optional(),
+		small: z.string().optional(),
+		medium: z.string().optional(),
+		videoQualities: z.array(z.object({
+			frameRate: z.number().positive(),
+			quality: z.string(),
+			sourceURL: z.string()
+		}))
+	}),
+	clipKey: z.string().optional()
 });

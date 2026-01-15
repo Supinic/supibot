@@ -50,7 +50,7 @@ export default declare({
 		{ name: "pollution", type: "boolean" },
 		{ name: "status", type: "string" },
 		{ name: "radar", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function weather (context, ...args) {
 		if (!process.env.API_GOOGLE_GEOCODING) {

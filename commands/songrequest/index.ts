@@ -63,7 +63,7 @@ export default declare({
 		{ name: "start", type: "string" },
 		{ name: "end", type: "string" },
 		{ name: "type", type: "string" }
-	] as const,
+	],
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequest (context, ...args) {
 		if (!sb.MpvClient) {

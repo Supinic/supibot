@@ -1,4 +1,6 @@
+import { SupiDate } from "supi-core";
 import RedditPost from "./post.js";
+
 const defaultSubredditCacheExpiration = 2 * 3_600_000;
 
 export default class Subreddit {
@@ -33,7 +35,7 @@ export default class Subreddit {
 	}
 
 	setExpiration () {
-		this.#expiration = new sb.Date().addMilliseconds(Subreddit.defaultSubredditCacheExpiration);
+		this.#expiration = new SupiDate().addMilliseconds(Subreddit.defaultSubredditCacheExpiration);
 	}
 
 	addPosts (data) {

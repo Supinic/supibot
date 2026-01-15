@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 // This number represents Supibot's User_Alias ID.
 // With some assumptions, every user with a lower ID is then not considered "first seen" by Supibot,
 // since they predate Supibot - and are therefore extrapolated from logs.
@@ -40,8 +42,8 @@ export default {
 		}
 
 		const delta = core.Utils.timeDelta(targetUser.Started_Using);
-		const now = new sb.Date();
-		const { year, month, day } = new sb.Date(targetUser.Started_Using);
+		const now = new SupiDate();
+		const { year, month, day } = new SupiDate(targetUser.Started_Using);
 
 		let birthdayString = "";
 		if (now.year > year && now.month === month && now.day === day) {

@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import findPopularSymbol from "./stocks.js";
 
 export default {
@@ -11,7 +12,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function stock (context, ...args) {
 		if (!process.env.API_ALPHA_VANTAGE) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No AlphaVantage key configured (API_ALPHA_VANTAGE)"
 			});
 		}

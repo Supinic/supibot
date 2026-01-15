@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 /**
  * @param {Object[]} mediaEntities
  * @returns {string[]}
@@ -133,7 +135,7 @@ export default {
 		}
 
 		const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${input}/status/${tweet.id_str}` : "";
-		const delta = core.Utils.timeDelta(new sb.Date(tweet.created_at));
+		const delta = core.Utils.timeDelta(new SupiDate(tweet.created_at));
 		const fullText = core.Utils.fixHTML(tweet.full_text ?? "");
 		const fixedText = `${fullText} ${replyUrl}`;
 

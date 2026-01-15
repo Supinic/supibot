@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const execute = async (data) => {
 	const {
 		username,
@@ -40,9 +42,9 @@ const execute = async (data) => {
 	}
 
 	let commitCount = 0;
-	const thresholdDate = new sb.Date(threshold.format("Y-m-d"));
+	const thresholdDate = new SupiDate(threshold.format("Y-m-d"));
 	for (const [date, contributions] of Object.entries(response.body)) {
-		const dateStamp = new sb.Date(date);
+		const dateStamp = new SupiDate(date);
 		if (dateStamp >= thresholdDate) {
 			commitCount += contributions;
 		}

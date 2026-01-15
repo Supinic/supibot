@@ -1,8 +1,12 @@
+import * as z from "zod";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+import { getConfig } from "../../config.js";
+import type { CronDefinition } from "../index.js";
+
+const { listenerAddress, listenerPort } = getConfig().local ?? {};
 const { SONG_REQUESTS_STATE } = sharedKeys;
 
-const repeats: string[] = [];
-const repeatAmount = 100;
+const autoplaySchema = z.object({ link: z.string() });
 
 export default {
 	name: "stream-silence-prevention",
@@ -10,6 +14,7 @@ export default {
 	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
 	code: (async function preventStreamSilence () {
 		if (!sb.MpvClient) {
+			this.stop();
 			return;
 		}
 
@@ -37,29 +42,11 @@ export default {
 			return;
 		}
 
-		// @todo port the database table into some kind of a configuration, some kidn of json array or something
-		const videoData = await core.Query.getRecordset<{Link: string; Notes: string;}>(rs => rs
-			.select("Link", "Notes")
-			.from("personal", "Favourite_Track")
-			.where("Video_Type = %n", 15)
-			.where(
-				{ condition: (repeats.length !== 0) },
-				"Link NOT IN %s+",
-				repeats
-			)
-			.orderBy("RAND()")
-			.limit(1)
-			.single()
-		);
+		const response = await core.Got.get("GenericAPI")({
+			url: `${listenerAddress}:${listenerPort}/?autoplay=random`
+		});
 
-		const name = videoData.Link.split("/").at(-1);
-		const eligibleLink = `/${videoData.Link}`;
-		const addResult = await sb.MpvClient.add(eligibleLink, { duration: null, name });
-		if (!addResult.success) {
-			return;
-		}
-
-		repeats.unshift(videoData.Link);
-		repeats.splice(repeatAmount); // Clamp array to first X elements
+		const { link } = autoplaySchema.parse(response.body);
+		await sb.MpvClient.add(link, { user: null, duration: null });
 	})
-};
+} satisfies CronDefinition;

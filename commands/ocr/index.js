@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import { getCode, getName } from "../../utils/languages.js";
 import OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
 const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => getName(i));
@@ -17,7 +18,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function ocr (context, ...args) {
 		if (!process.env.API_OCR_SPACE) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No OCR Space key configured (API_OCR_SPACE)"
 			});
 		}

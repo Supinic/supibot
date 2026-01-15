@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { randomInt } from "../../utils/command-utils.js";
 import fortuneCookieData from "./fortune-cookies.json" with { type: "json" };
 
@@ -42,7 +43,7 @@ const getInitialStats = () => structuredClone(basicStats);
  * @returns {boolean}
  */
 const hasOutdatedDailyStats = (data) => {
-	const today = sb.Date.getTodayUTC();
+	const today = SupiDate.getTodayUTC();
 	return (data.lastTimestamp.daily < today);
 };
 
@@ -80,7 +81,7 @@ const hasExtraCookieAvailable = (data, options) => {
  * @returns {string}
  */
 const determineAvailableDailyCookieType = (data, options) => {
-	const today = sb.Date.getTodayUTC();
+	const today = SupiDate.getTodayUTC();
 	if (options?.hasDoubleCookieAccess === true) {
 		const used = data.today.eaten.daily + data.today.donated;
 		if (used === 0) {
@@ -109,7 +110,7 @@ const determineAvailableDailyCookieType = (data, options) => {
  * @returns {boolean}
  */
 const canEatDailyCookie = (data, options) => {
-	const today = sb.Date.getTodayUTC();
+	const today = SupiDate.getTodayUTC();
 	if (options?.hasDoubleCookieAccess === true) {
 		const used = data.today.eaten.daily + data.today.donated;
 		return (used < 2);
@@ -124,7 +125,7 @@ const canEatDailyCookie = (data, options) => {
  * @returns {boolean}
  */
 const canEatReceivedCookie = (data) => {
-	const today = sb.Date.getTodayUTC();
+	const today = SupiDate.getTodayUTC();
 	return (data.lastTimestamp.received === today);
 };
 
@@ -134,7 +135,7 @@ const canEatReceivedCookie = (data) => {
  * @returns {boolean}
  */
 const hasDonatedDailyCookie = (data) => {
-	const today = sb.Date.getTodayUTC();
+	const today = SupiDate.getTodayUTC();
 	return (data.lastTimestamp.daily === today && data.today.donated !== 0);
 };
 
@@ -144,7 +145,7 @@ const hasDonatedDailyCookie = (data) => {
  * @returns {boolean} `false` if unable to eat, `true` if the process succeeded.
  */
 const eatDailyCookie = (data, options) => {
-	const today = sb.Date.getTodayUTC();
+	const today = SupiDate.getTodayUTC();
 	if (!canEatDailyCookie(data, options)) {
 		return false;
 	}
@@ -203,7 +204,7 @@ const eatCookie = (data, options = {}) => {
 		};
 	}
 	else {
-		const nextUTCMidnight = new sb.Date(sb.Date.getTodayUTC()).addHours(24);
+		const nextUTCMidnight = new SupiDate(SupiDate.getTodayUTC()).addHours(24);
 		const delta = core.Utils.timeDelta(nextUTCMidnight);
 		const rudeRoll = randomInt(1, 100);
 
@@ -264,7 +265,7 @@ const donateCookie = (donator, receiver, donatorOptions = {}, receiverOptions = 
 		};
 	}
 
-	const today = sb.Date.getTodayUTC();
+	const today = SupiDate.getTodayUTC();
 	donator.lastTimestamp.daily = today;
 	donator.today.donated++;
 	donator.total.donated++;

@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import { fetchYoutubePlaylist } from "../../utils/command-utils.js";
 import getLinkParser from "../../utils/link-parser.js";
 
@@ -14,7 +15,7 @@ export default {
 	Whitelist_Response: "Only usable in Supinic's channel.",
 	Code: (async function randomUploaderVideo (context, ...args) {
 		if (!process.env.API_GOOGLE_YOUTUBE) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
 			});
 		}

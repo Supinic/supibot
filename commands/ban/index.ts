@@ -47,7 +47,7 @@ export default declare({
 		{ name: "type", type: "string" },
 		{ name: "string", type: "string" },
 		{ name: "user", type: "string" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function ban (context) {
 		const { invocation } = context;

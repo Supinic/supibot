@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "chat-suggestion-linker",
 	Events: ["message"],
@@ -21,7 +23,7 @@ export default {
 			.single()
 		);
 
-		const now = sb.Date.now();
+		const now = SupiDate.now();
 		if (!data) {
 			return;
 		}

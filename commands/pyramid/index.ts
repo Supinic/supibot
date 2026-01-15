@@ -15,7 +15,7 @@ export default declare({
 	Params: [
 		{ name: "delay", type: "number" },
 		{ name: "wait", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function pyramid (context, ...args) {
 		if (!context.channel) {

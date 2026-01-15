@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "firstfollowedchannel",
 	Aliases: ["ffc"],
@@ -91,7 +93,7 @@ export default {
 			? "you!"
 			: `@${followUsername}`;
 
-		const delta = core.Utils.timeDelta(new sb.Date(date), false, true);
+		const delta = core.Utils.timeDelta(new SupiDate(date), false, true);
 		return {
 			reply: `The channel ${who} have followed the longest is ${followUser}, since ${delta}.`
 		};

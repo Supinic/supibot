@@ -13,7 +13,7 @@ const doesNotExistCommandDefinition = declare({
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "summary", type: "boolean" },
 		{ name: "wordOnly", type: "boolean" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function doesnotexist (context, type) {
 		const subcommand = DoesNotExistSubcommands.get(type) ?? DoesNotExistSubcommands.default;

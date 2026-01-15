@@ -16,7 +16,7 @@ export default declare({
 		{ name: "invocation", type: "string" },
 		{ name: "platform", type: "string" },
 		{ name: "user", type: "string" }
-	] as const,
+	],
 	Whitelist_Response: null,
 	Code: (async function unping (context, ...args: string[]) {
 		const parse = await parseGenericFilterOptions("Unping", context.params, args, {

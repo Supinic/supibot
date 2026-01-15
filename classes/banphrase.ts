@@ -1,15 +1,14 @@
+import { isGotRequestError, SupiDate, SupiError, type RecordUpdater } from "supi-core";
 import { TemplateWithId } from "./template.js";
-import type { Channel } from "./channel.js";
-import type Platform from "../platforms/template.js";
-
-import { getConfig } from "../config.js";
-const { responses, values } = getConfig();
-
 import { asciiArtRegex, emojiRegex, linkRegex, whitespaceRegex } from "../utils/regexes.js";
-import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
 import { transliterate as executeTransliteration } from "transliteration";
 import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
+import { getConfig } from "../config.js";
 
+import type { Channel } from "./channel.js";
+import type { Platform } from "../platforms/template.js";
+
+const { responses, values } = getConfig();
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
 const apiResultSymbol: unique symbol = Symbol("banphrase-api-result");
 const inactiveSymbol: unique symbol = Symbol("banphrase-inactive");
@@ -21,7 +20,8 @@ const banphraseConfigData = {
 	asciiArtRegex,
 	emojiRegex,
 	linkRegex,
-	whitespaceRegex
+	whitespaceRegex,
+	Date: SupiDate
 } as const;
 
 export type Type = "Denial" | "API response" | "Custom response" | "Replacement" | "Inactive";

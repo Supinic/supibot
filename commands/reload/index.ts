@@ -14,7 +14,7 @@ export default declare({
 	Cooldown: 0,
 	Description: "Reloads a database definition or hotloads an updated script",
 	Flags: ["pipe", "skip-banphrase", "system", "whitelist"],
-	Params: [{ name: "skipUpgrade", type: "boolean" }] as const,
+	Params: [{ name: "skipUpgrade", type: "boolean" }],
 	Whitelist_Response: null,
 	Code: (async function reload (context, command, ...rest) {
 		switch (command) {
