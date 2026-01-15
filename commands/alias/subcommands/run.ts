@@ -1,8 +1,8 @@
 import { SupiError } from "supi-core";
 import type { User } from "../../../classes/user.js";
 import type { ContextAppendData } from "../../../classes/command.js";
+import { getConfig } from "../../../config.js";
 
-import config from "../../../config.json" with { type: "json" };
 import { type AliasSubcommandDefinition } from "../index.js";
 import { prefix } from "../../../utils/command-utils.js";
 
@@ -18,8 +18,7 @@ import {
 	isClassicAlias
 } from "../alias-utils.js";
 
-const bannedCommandCombinations = config.modules.commands.bannedCombinations;
-
+const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations;
 export default {
 	name: "run",
 	title: "Run an alias",

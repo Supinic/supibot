@@ -1,5 +1,5 @@
 import config from "../config.json" with { type: "json" };
-export const { prefix } = config.modules.commands;
+export const { prefix } = config.modules.commands; // @todo check if this shouldn't be getConfig()?
 
 import { randomInt as cryptoRandomInt } from "node:crypto";
 
