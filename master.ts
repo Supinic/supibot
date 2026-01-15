@@ -1,7 +1,6 @@
 import * as supiCore from "supi-core";
-import { getConfig } from "./config.js";
 import type { GotInstanceDefinition } from "supi-core";
-
+import { getConfig } from "./config.js";
 import initializeInternalApi from "./api/index.js";
 
 import commandDefinitions from "./commands/index.js";
@@ -9,15 +8,15 @@ import chatModuleDefinitions from "./chat-modules/index.js";
 import { definitions as gotDefinitions } from "./gots/index.js";
 import initializeCrons from "./crons/index.js";
 
-import Filter from "./classes/filter.js";
-import { Command, CommandDefinition } from "./classes/command.js";
-import User from "./classes/user.js";
-import AwayFromKeyboard from "./classes/afk.js";
-import Banphrase from "./classes/banphrase.js";
-import Channel from "./classes/channel.js";
-import Reminder from "./classes/reminder.js";
-import { ChatModule, ChatModuleDefinition } from "./classes/chat-module.js";
+import { AwayFromKeyboard } from "./classes/afk.js";
+import { Banphrase } from "./classes/banphrase.js";
+import { Channel } from "./classes/channel.js";
+import { ChatModule, type ChatModuleDefinition } from "./classes/chat-module.js";
+import { Command, type CommandDefinition } from "./classes/command.js";
+import { Filter } from "./classes/filter.js";
 import { MpvClient as MpvClientConstructor } from "./singletons/mpv-client.js";
+import { Reminder } from "./classes/reminder.js";
+import { User } from "./classes/user.js";
 
 import Logger from "./singletons/logger.js";
 import { Platform } from "./platforms/template.js";
