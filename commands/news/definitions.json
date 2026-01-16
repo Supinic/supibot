@@ -452,11 +452,26 @@
     "language": "french",
     "sources": [
       {
-        "name": "Europe 1",
-        "url": "https://www.europe1.fr",
+        "name": "AFP",
+        "specificMainPageUrl": "https://www.afp.com/",
+        "url": "https://flipboard.com",
+        "path": "topic",
+        "endpoints": ["fr-afp.rss"],
+        "helpers": []
+      },
+      {
+        "name": "France24",
+        "url": "https://www.france24.com",
+        "path": "fr",
+        "endpoints": ["france/rss", "europe/rss"],
+        "helpers": []
+      },
+      {
+        "name": "FranceInfo",
+        "url": "https://www.franceinfo.fr",
         "path": null,
-        "endpoints": ["rss.xml"],
-        "helpers": ["supinic"]
+        "endpoints": ["titres.rss", "france.rss"],
+        "helpers": []
       }
     ]
   },
