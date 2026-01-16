@@ -208,6 +208,7 @@ export default tseslint.config(
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
 
+			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
 				allowNumber: true
 			}],
@@ -217,6 +218,7 @@ export default tseslint.config(
 			"@typescript-eslint/no-unused-vars": "warn", // Only warn for unused vars instead of resulting in an error
 			"@typescript-eslint/no-unnecessary-condition": "warn", // Only warn for unnecessary conditions  instead of resulting in an error
 			"@typescript-eslint/no-unnecessary-type-conversion": "off", // Maybe re-enable later to force proper types
+			"@typescript-eslint/no-useless-default-assignment": "off", // Does not work for rest arguments
 
 			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
 			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
@@ -242,6 +244,25 @@ export default tseslint.config(
 
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error"
+		}
+	},
+	{
+		files: ["tests/**/*.{test,spec}.ts", "**/*.test.ts"],
+		languageOptions: {
+		},
+		rules: {
+			"max-nested-callbacks": "off",
+			"max-statements-per-line": ["warn", {
+				max: 2
+			}],
+			"unicorn/prefer-module": "off",
+			"import/extensions": "off",
+			"unicorn/consistent-function-scoping": "off",
+			"unicorn/no-useless-undefined": "off",
+			"unicorn/no-await-expression-member": "off",
+			"@typescript-eslint/no-floating-promises": "off",
+			"@typescript-eslint/no-unused-vars": "off",
+			"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }]
 		}
 	}
 );

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { CustomEventDefinition } from "../generic-event.js";
+import type { CustomEventDefinition } from "../generic-event.js";
 import { SupiError } from "supi-core";
 
 const jagexRssSchema = z.object({

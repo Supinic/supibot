@@ -1,6 +1,6 @@
 import { setTimeout as wait } from "node:timers/promises";
 
-import { GptTemplate, getHistoryMode } from "./gpt-template.js";
+import { type GptTemplate, getHistoryMode } from "./gpt-template.js";
 import { get as getHistoryEntry, add as addHistoryEntry } from "./history-control.js";
 import type { GptContext } from "./index.js";
 import type { ModelData } from "./config-schema.js";

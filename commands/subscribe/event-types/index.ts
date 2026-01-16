@@ -1,4 +1,4 @@
-import { EventDefinition } from "../generic-event.js";
+import type { EventDefinition } from "../generic-event.js";
 
 import AppleSubDefinition from "./apple.js";
 import ArchLinuxSubDefinition from "./archlinux.js";

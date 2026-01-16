@@ -1,7 +1,7 @@
 /* eslint-disable array-element-newline */
 import { getCode, getName } from "../../../utils/languages.js";
 import { SupiError } from "supi-core";
-import { TranslateSubcommandDefinition } from "../index.js";
+import type { TranslateSubcommandDefinition } from "../index.js";
 
 const supportedLanguages: readonly string[] = [
 	"bg", "cs", "da", "de", "el",

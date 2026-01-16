@@ -256,14 +256,12 @@ export class User extends TemplateWithIdString {
 		}
 	}
 
-	static async getAsserted (identifier: Like): Promise<User> {
-		const userData = await User.get(identifier);
+	static async getAsserted (identifier: string | number): Promise<User> {
+		const userData = await User.get(identifier, true);
 		if (!userData) {
 			throw new SupiError({
-				message: "Assert error: User not found",
-				args: {
-					identifier: (identifier instanceof User) ? identifier.Name : identifier
-				}
+			    message: "Assert error: User.getAsserted did not find User",
+				args: { identifier }
 			});
 		}
 

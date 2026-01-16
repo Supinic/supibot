@@ -2,7 +2,7 @@ import { CronJob } from "cron";
 import { type Context, declare } from "../../classes/command.js";
 
 import subscriptions from "./event-types/index.js";
-import { EventSubscription, handleGenericSubscription, isGenericSubscriptionDefinition } from "./generic-event.js";
+import { type EventSubscription, handleGenericSubscription, isGenericSubscriptionDefinition } from "./generic-event.js";
 
 const crons: Set<CronJob> = new Set();
 

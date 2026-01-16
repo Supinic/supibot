@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { MapEntries } from "../utils/ts-helpers.js";
+import type { MapEntries } from "../utils/ts-helpers.js";
 
 type ConstructorOptions = {
 	host: string;

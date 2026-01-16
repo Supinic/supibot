@@ -10,32 +10,32 @@ import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
 import TwitchUtils, {
-	MessageNotification,
+	type MessageNotification,
 	isMessageNotification,
-	TwitchWebsocketMessage,
+	type TwitchWebsocketMessage,
 	isWelcomeMessage,
 	isReconnectMessage,
 	isRevocationMessage,
 	isNotificationMessage,
 	isKeepaliveMessage,
-	NotificationMessage,
-	SessionReconnectMessage,
+	type NotificationMessage,
+	type SessionReconnectMessage,
 	isWhisperNotification,
 	isRaidNotification,
 	isSubscribeNotification,
 	isStreamChangeNotification,
-	WhisperNotification,
-	SubscribeMessageNotification,
-	RaidNotification,
-	StreamOnlineNotification,
-	StreamOfflineNotification
+	type WhisperNotification,
+	type SubscribeMessageNotification,
+	type RaidNotification,
+	type StreamOnlineNotification,
+	type StreamOfflineNotification
 } from "./twitch-utils.js";
 
-import { Channel } from "../classes/channel.js";
-import { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
+import type { User } from "../classes/user.js";
 import { SupiDate, SupiError } from "supi-core";
 import type { Emote, ThirdPartyEmote } from "../@types/globals.d.ts";
-import { TwitchSubscriberData } from "../utils/schemas.js";
+import type { TwitchSubscriberData } from "../utils/schemas.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -333,8 +333,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		super("twitch", TwitchConfigSchema.parse(resultConfig));
 
-		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
-		this.liveChannelsCheck = setInterval(() => void this.#recheckLiveChannels(), 300_000);
+		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000).unref();
+		this.liveChannelsCheck = setInterval(() => void this.#recheckLiveChannels(), 300_000).unref();
 	}
 
 	async connect (options: ConnectOptions = {}) {
@@ -1490,7 +1490,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
 			client.close();
 			void this.connect({ skipSubscriptions: true });
-		}, NO_EVENT_RECONNECT_TIMEOUT);
+		}, NO_EVENT_RECONNECT_TIMEOUT).unref();
 
 		const start = SupiDate.now();
 		client.once("pong", () => {
