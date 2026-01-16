@@ -247,11 +247,14 @@ export default tseslint.config(
 		}
 	},
 	{
-		files: ["tests/**/*.{test,spec}.ts"],
+		files: ["tests/**/*.{test,spec}.ts", "**/*.test.ts"],
 		languageOptions: {
 		},
 		rules: {
 			"max-nested-callbacks": "off",
+			"max-statements-per-line": ["warn", {
+				max: 2
+			}],
 			"unicorn/prefer-module": "off",
 			"import/extensions": "off",
 			"unicorn/consistent-function-scoping": "off",

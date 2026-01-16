@@ -1,28 +1,24 @@
-/* eslint-disable max-nested-callbacks, prefer-arrow-callback */
+import { it, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert";
+
 import Logic from "./cookie-logic.js";
-import { Date } from "supi-core";
+import { TestWorld } from "../../tests/test-utils.js";
 
 // Allow proper object cloning when `structuredClone` is not available
 // E.g. in workers
+// eslint-disable-next-line
 globalThis.structuredClone ??= (input) => JSON.parse(JSON.stringify(input));
 
 const notPrivileged = Object.freeze({ hasDoubleCookieAccess: false });
 const privileged = Object.freeze({ hasDoubleCookieAccess: true });
 
-describe("cookie logic", function () {
-	beforeEach(async () => {
-		globalThis.sb = {
-			Date,
-			Utils: {
-				timeDelta: (date) => date.toString(),
-				random: () => 0
-			}
-		};
-	});
+describe("cookie logic", () => {
+	const world = new TestWorld();
+	beforeEach(() => { world.install(); });
+	afterEach(() => { world.reset(); });
 
-	describe("initial logic", function () {
-		it("can eat daily cookie", function () {
+	describe("initial logic", () => {
+		it("can eat daily cookie", () => {
 			const data = Logic.getInitialStats();
 			const canEat = Logic.canEatDailyCookie(data);
 			assert.strictEqual(canEat, true);
@@ -43,14 +39,14 @@ describe("cookie logic", function () {
 			assert.strictEqual(data.lastTimestamp.received, 0, dump);
 		});
 
-		it("can not eat received cookie", function () {
+		it("can not eat received cookie", () => {
 			const data = Logic.getInitialStats();
 			const canEat = Logic.canEatReceivedCookie(data);
 
 			assert.strictEqual(canEat, false);
 		});
 
-		it("can not donate a cookie if the daily one is not eaten", function () {
+		it("can not donate a cookie if the daily one is not eaten", () => {
 			const donator = Logic.getInitialStats();
 			const receiver = Logic.getInitialStats();
 
@@ -60,8 +56,8 @@ describe("cookie logic", function () {
 		});
 	});
 
-	describe("multi-step logic", function () {
-		it("can eat golden cookie if privileged", function () {
+	describe("multi-step logic", () => {
+		it("can eat golden cookie if privileged", () => {
 			const data = Logic.getInitialStats();
 			assert.strictEqual(data.today.eaten.daily, 0);
 			assert.strictEqual(data.total.eaten.daily, 0);
@@ -77,7 +73,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(data.total.eaten.daily, 1); // Total stats do not increase after eating the second cookie
 		});
 
-		it("can donate, then eat golden cookie if privileged", function () {
+		it("can donate, then eat golden cookie if privileged", () => {
 			const receiver = Logic.getInitialStats();
 			Logic.eatCookie(receiver);
 
@@ -90,7 +86,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(donator.total.eaten.daily, 0); // Total stats do not increase after eating the second cookie
 		});
 
-		it("can not donate golden cookie if privileged", function () {
+		it("can not donate golden cookie if privileged", () => {
 			const donator = Logic.getInitialStats();
 			const options = { hasDoubleCookieAccess: true };
 			assert.strictEqual(donator.today.eaten.daily, 0);
@@ -109,7 +105,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(receiver.today.received, 0);
 		});
 
-		it("can donate cookie and eat it", function () {
+		it("can donate cookie and eat it", () => {
 			const donator = Logic.getInitialStats();
 			const receiver = Logic.getInitialStats();
 			Logic.eatCookie(receiver);
@@ -149,7 +145,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(Logic.hasDonatedDailyCookie(donator), true);
 		});
 
-		it("can gift a cookie, eat one, but not two - if privileged", function () {
+		it("can gift a cookie, eat one, but not two - if privileged", () => {
 			const donator = Logic.getInitialStats();
 			const receiver = Logic.getInitialStats();
 
@@ -165,7 +161,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(secondResult.success, false);
 		});
 
-		it("cannot donate an already donated cookie", function () {
+		it("cannot donate an already donated cookie", () => {
 			const userOne = Logic.getInitialStats();
 			const userTwo = Logic.getInitialStats();
 
@@ -176,7 +172,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(result.success, false);
 		});
 
-		it("cannot donate cookie to someone who already has a donated cookie pending", function () {
+		it("cannot donate cookie to someone who already has a donated cookie pending", () => {
 			const userOne = Logic.getInitialStats();
 			const userTwo = Logic.getInitialStats();
 			const userThree = Logic.getInitialStats();
@@ -188,7 +184,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(result.success, false);
 		});
 
-		it("cannot donate cookie to privileged user who didn't eat their golden cookie", function () {
+		it("cannot donate cookie to privileged user who didn't eat their golden cookie", () => {
 			const userOne = Logic.getInitialStats();
 			const userTwo = Logic.getInitialStats();
 
@@ -198,7 +194,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(result.success, false);
 		});
 
-		it("cannot donate if already eaten", function () {
+		it("cannot donate if already eaten", () => {
 			const userOne = Logic.getInitialStats();
 			const userTwo = Logic.getInitialStats();
 
@@ -208,7 +204,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(result.success, false);
 		});
 
-		it("cannot donate if already donated", function () {
+		it("cannot donate if already donated", () => {
 			const userOne = Logic.getInitialStats();
 			const userTwo = Logic.getInitialStats();
 
@@ -221,8 +217,8 @@ describe("cookie logic", function () {
 		// explicitly test Logic.eatDailyCookie and Logic.eatReceivedCookie if not possible
 	});
 
-	describe("meta operations", function () {
-		it("properly resets daily stats after usage", function () {
+	describe("meta operations", () => {
+		it("properly resets daily stats after usage", () => {
 			const data = Logic.getInitialStats();
 
 			Logic.eatCookie(data);
@@ -244,7 +240,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(data.today.eaten.received, 0);
 		});
 
-		it("allows eating a cookie after stats are reset", function () {
+		it("allows eating a cookie after stats are reset", () => {
 			const data = Logic.getInitialStats();
 			Logic.eatCookie(data, notPrivileged);
 
@@ -257,7 +253,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(result.success, true);
 		});
 
-		it("allows donating a cookie after stats are reset", function () {
+		it("allows donating a cookie after stats are reset", () => {
 			const userOne = Logic.getInitialStats();
 			const userTwo = Logic.getInitialStats();
 			Logic.eatCookie(userOne, notPrivileged);
@@ -272,7 +268,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(result.success, true, JSON.stringify(result));
 		});
 
-		it("cannot execute `Logic.eatDailyCookie` if already eaten", function () {
+		it("cannot execute `Logic.eatDailyCookie` if already eaten", () => {
 			const userOne = Logic.getInitialStats();
 
 			Logic.eatCookie(userOne, notPrivileged);
@@ -281,7 +277,7 @@ describe("cookie logic", function () {
 			assert.strictEqual(result, false);
 		});
 
-		it("cannot execute `Logic.eatReceivedCookie` if none is available", function () {
+		it("cannot execute `Logic.eatReceivedCookie` if none is available", () => {
 			const userOne = Logic.getInitialStats();
 			const result = Logic.eatReceivedCookie(userOne);
 			assert.strictEqual(result, false);

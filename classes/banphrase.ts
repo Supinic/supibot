@@ -13,7 +13,7 @@ const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
 const apiResultSymbol: unique symbol = Symbol("banphrase-api-result");
 const inactiveSymbol: unique symbol = Symbol("banphrase-inactive");
 
-const banphraseConfigData = {
+const getBanphraseConfigData = () => ({
 	TWITCH_ANTIPING_CHARACTER,
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
 	transliterate: (input: string) => executeTransliteration(input),
@@ -22,7 +22,7 @@ const banphraseConfigData = {
 	linkRegex,
 	whitespaceRegex,
 	Date: SupiDate
-} as const;
+} as const);
 
 export type Type = "Denial" | "API response" | "Custom response" | "Replacement" | "Inactive";
 type ConstructorData = {
@@ -87,8 +87,9 @@ type ExternalExecuteOptions = {
 };
 type ExternalApiType = "Pajbot";
 
-type ReplacementFunction = (message: string, configData?: typeof banphraseConfigData) => string | Promise<string>;
-type CustomResponseFunction = (message: string, configData?: typeof banphraseConfigData) => string | null | Promise<string | null>;
+type BanphraseConfigData = ReturnType<typeof getBanphraseConfigData>;
+type ReplacementFunction = (message: string, configData?: BanphraseConfigData) => string | Promise<string>;
+type CustomResponseFunction = (message: string, configData?: BanphraseConfigData) => string | null | Promise<string | null>;
 type BanphraseCodeFunction = ReplacementFunction | CustomResponseFunction;
 
 const isBanphraseFunction = (input: unknown): input is Banphrase["Code"] => (typeof input === "function");
@@ -168,7 +169,7 @@ export class Banphrase extends TemplateWithId {
 		}
 
 		try {
-			return await this.Code(message, banphraseConfigData);
+			return await this.Code(message, getBanphraseConfigData());
 		}
 		catch (e) {
 			console.warn("banphrase failed", message, this, e);
