@@ -36,7 +36,6 @@ export default declare({
 	Flags: ["pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	// eslint-disable-next-line @typescript-eslint/no-useless-default-assignment
 	Code: function randomEmoji (context, number = "1") {
 		let repeats = Number(number);
 		if (!core.Utils.isValidInteger(repeats) || repeats > MAXIMUM_EMOJI_LIMIT) {

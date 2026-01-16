@@ -19,7 +19,6 @@ export default declare({
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	// eslint-disable-next-line @typescript-eslint/no-useless-default-assignment
 	Code: (async function crypto (context, symbol = "BTC") {
 		if (!process.env.API_CRYPTO_COMPARE) {
 			throw new SupiError({
