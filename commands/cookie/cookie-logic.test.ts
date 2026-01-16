@@ -5,7 +5,7 @@ import Logic from "./cookie-logic.js";
 import { TestWorld } from "../../tests/test-utils.js";
 
 // Allow proper object cloning when `structuredClone` is not available
-// E.g. in workers
+// E.g. in workers or in GitHub CI
 // eslint-disable-next-line
 globalThis.structuredClone ??= (input) => JSON.parse(JSON.stringify(input));
 
