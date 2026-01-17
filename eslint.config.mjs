@@ -10,7 +10,7 @@ export default tseslint.config(
 	unicornPlugin.configs["flat/recommended"],
 	tseslint.configs.strictTypeChecked,
 	{
-		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs"]
+		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
 	},
 	{
 		languageOptions: {
