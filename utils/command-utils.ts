@@ -1,8 +1,4 @@
-import config from "../config.json" with { type: "json" };
-export const { prefix } = config.modules.commands; // @todo check if this shouldn't be getConfig()?
-
 import { randomInt as cryptoRandomInt } from "node:crypto";
-
 import RSSParser from "rss-parser";
 import { parse as chronoParse, type ParsingOption } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
@@ -13,6 +9,9 @@ import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import type { Platform } from "../platforms/template.js";
 import type { Coordinates } from "../@types/globals.js";
+
+import { getConfig } from "../config.js";
+export const { prefix } = getConfig().modules.commands;
 
 type CommandContextParams = CommandContext["params"];
 

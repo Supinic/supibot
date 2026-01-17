@@ -1,8 +1,8 @@
 import { it, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert";
 
-import Logic from "./cookie-logic.js";
-import { TestWorld } from "../../tests/test-utils.js";
+import Logic from "../../../commands/cookie/cookie-logic.js";
+import { TestWorld } from "../../test-utils.js";
 
 // Allow proper object cloning when `structuredClone` is not available
 // E.g. in workers or in GitHub CI

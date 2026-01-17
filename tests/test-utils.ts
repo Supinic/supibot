@@ -308,7 +308,9 @@ export class TestWorld {
 			}
 		};
 
+		// @ts-ignore
 		globalThis.core = (baseCore as unknown as typeof globalThis.core);
+		// @ts-ignore
 		globalThis.sb = (baseSb as unknown as typeof globalThis.sb);
 	}
 

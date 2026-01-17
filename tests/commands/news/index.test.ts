@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { it, describe } from "node:test";
-import rawDefinitions from "./definitions.json" with { type: "json" };
+import rawDefinitions from "../../../commands/news/definitions.json" with { type: "json" };
 import RssParser from "rss-parser";
 
 const rssFetch = async (url: string) => await fetch(url, {

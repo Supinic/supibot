@@ -2,8 +2,8 @@ import { it, describe } from "node:test";
 import assert from "node:assert";
 import * as z from "zod";
 
-import rawCopypastas from "./subcommands/copypasta.json" with { type: "json" };
-import rawKimiQuotes from "./subcommands/kimi.json" with { type: "json" };
+import rawCopypastas from "../../../commands/formula1/subcommands/copypasta.json" with { type: "json" };
+import rawKimiQuotes from "../../../commands/formula1/subcommands/kimi.json" with { type: "json" };
 
 const jsonSchema = z.array(z.string());
 
