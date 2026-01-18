@@ -1,4 +1,46 @@
+import * as z from "zod";
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
+
+const espnSchema = z.object({
+	events: z.array(z.object({
+		id: z.string(),
+		uid: z.string(),
+		name: z.string(),
+		date: z.iso.datetime(),
+		shortName: z.string(),
+		competitions: z.array(z.object({
+			competitors: z.array(z.object({
+				id: z.string(),
+				homeAway: z.enum(["home", "away"]),
+				score: z.string()
+			})),
+			venue: z.object({
+				id: z.string(),
+				fullName: z.string(),
+				address: z.object({
+					city: z.string(),
+					state: z.string(),
+					country: z.string()
+				})
+			}).optional()
+		})),
+		season: z.object({
+			year: z.int(),
+			type: z.int(),
+			slug: z.string()
+		}),
+		status: z.object({
+			clock: z.number(),
+			displayClock: z.string(),
+			period: z.int(),
+			type: z.object({
+				completed: z.boolean(),
+				description: z.string()
+			})
+		})
+	}))
+});
 
 const LEAGUES = {
 	nfl: "football",
@@ -10,15 +52,19 @@ const LEAGUES = {
 	// wnba → basketball
 	// mens-college-basketball → basketball
 	// womens-college-basketball → basketball
-};
+} as const;
 const LEAGUES_LIST = Object.keys(LEAGUES);
-const ALLOWED_COMMAND_MODES = ["next", "scores", "today"];
+const ALLOWED_COMMAND_MODES = ["next", "scores", "today"] as const;
 const GAME_RANGE_DAYS = 90;
 
-const makeUrl = (league) => `https://site.api.espn.com/apis/site/v2/sports/${LEAGUES[league]}/${league}/scoreboard`;
-const createGamecastLink = (league, gameId) => `https://www.espn.com/${league}/game/_/gameId/${gameId}`;
+const isCommand = (input: string): input is typeof ALLOWED_COMMAND_MODES[number] => (
+	(ALLOWED_COMMAND_MODES as readonly string[]).includes(input)
+);
 
-export default {
+const makeUrl = (league: keyof typeof LEAGUES) => `https://site.api.espn.com/apis/site/v2/sports/${LEAGUES[league]}/${league}/scoreboard`;
+const createGamecastLink = (league: string, gameId: string | number) => `https://www.espn.com/${league}/game/_/gameId/${gameId}`;
+
+export default declare({
 	Name: "espn",
 	Aliases: ["nba", "nfl", "nhl", "mlb"],
 	Author: "supinic",
@@ -31,7 +77,9 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: async function espn (context) {
-		if (context.invocation === this.Name) {
+		// @todo remove this type cast when context.invocation is a specific union in the future
+		const league = context.invocation as "espn" | "nba" | "nfl" | "nhl" | "mlb";
+		if (league === "espn") {
 			return {
 				success: false,
 				reply: `Use one of the specific sports league aliases instead of the full command name! List: ${LEAGUES_LIST.join(", ")}`
@@ -39,14 +87,13 @@ export default {
 		}
 
 		const mode = context.params.mode ?? "next";
-		if (!ALLOWED_COMMAND_MODES.includes(mode)) {
+		if (!isCommand(mode)) {
 			return {
 				success: false,
 				reply: `Invalid mode provided! Use one of: ${ALLOWED_COMMAND_MODES.join(", ")}`
 			};
 		}
 
-		const league = context.invocation;
 		const targetDate = (context.params.date)
 			? new SupiDate(context.params.date)
 			: new SupiDate(SupiDate.getTodayUTC());
@@ -65,11 +112,12 @@ export default {
 			}
 		});
 
+		const data = espnSchema.parse(response.body);
 		const leagueAbbr = league.toUpperCase();
 		if (mode === "next") {
-			const event = response.body.events
-				.sort((a, b) => new SupiDate(a.date) - new SupiDate(b.date))
-				.find(i => i.status.type.completed !== true);
+			const event = data.events
+				.sort((a, b) => new SupiDate(a.date).valueOf() - new SupiDate(b.date).valueOf())
+				.find(i => i.status.type.completed);
 
 			if (!event) {
 				return {
@@ -88,20 +136,21 @@ export default {
 			}
 
 			let statusString = "";
-			if (event.status && event.status.clock !== 0) {
+			if (event.status.clock !== 0) {
 				statusString = ` Period ${event.status.period}, ${event.status.displayClock}`;
 			}
 
 			const link = createGamecastLink(league, event.id);
 			const delta = core.Utils.timeDelta(new SupiDate(event.date));
 			return {
+				success: true,
 				reply: `Next ${leagueAbbr} match: ${event.name} ${delta}${playedAtString}.${statusString} ${link}`
 			};
 		}
 		else if (mode === "today") {
-			const events = response.body.events
-				.sort((a, b) => new SupiDate(a.date) - new SupiDate(b.date))
-				.filter(i => i.status.type.completed !== true);
+			const events = data.events
+				.sort((a, b) => new SupiDate(a.date).valueOf() - new SupiDate(b.date).valueOf())
+				.filter(i => !i.status.type.completed);
 
 			if (events.length === 0) {
 				return {
@@ -115,13 +164,14 @@ export default {
 
 			const list = events.map(i => `${i.shortName} ${core.Utils.timeDelta(new SupiDate(i.date))}`);
 			return {
+				success: true,
 				reply: `Upcoming ${leagueAbbr} matches: ${list.join("; ")}`
 			};
 		}
-		else if (mode === "scores") {
-			const events = response.body.events
-				.sort((a, b) => new SupiDate(a.date) - new SupiDate(b.date))
-				.filter(i => i.status.type.completed === true);
+		else {
+			const events = data.events
+				.sort((a, b) => new SupiDate(a.date).valueOf() - new SupiDate(b.date).valueOf())
+				.filter(i => i.status.type.completed);
 
 			if (events.length === 0) {
 				return {
@@ -145,28 +195,28 @@ export default {
 			};
 		}
 	},
-	Dynamic_Description: () => ([
+	Dynamic_Description: (prefix) => [
 		"Collection of commands related to North American leagues, as covered by the ESPN.",
 
-		`<code>$nba</code>`,
-		`<code>$nfl</code>`,
-		`<code>$nhl</code>`,
-		`<code>$mlb</code>`,
-		`<code>$nba mode:next</code>`,
+		`<code>${prefix}nba</code>`,
+		`<code>${prefix}nfl</code>`,
+		`<code>${prefix}nhl</code>`,
+		`<code>${prefix}mlb</code>`,
+		`<code>${prefix}nba mode:next</code>`,
 		"Shows the next upcoming match, depending on the league you selected.",
 		"",
 
-		`<code>$nba mode:today</code>`,
-		`<code>$nfl mode:today</code>`,
-		`<code>$nhl mode:today</code>`,
-		`<code>$mlb mode:today</code>`,
+		`<code>${prefix}nba mode:today</code>`,
+		`<code>${prefix}nfl mode:today</code>`,
+		`<code>${prefix}nhl mode:today</code>`,
+		`<code>${prefix}mlb mode:today</code>`,
 		"Shows a summary of all upcoming matches for today.",
 		"",
 
-		`<code>$nba mode:scores</code>`,
-		`<code>$nfl mode:scores</code>`,
-		`<code>$nhl mode:scores</code>`,
-		`<code>$mlb mode:scores</code>`,
+		`<code>${prefix}nba mode:scores</code>`,
+		`<code>${prefix}nfl mode:scores</code>`,
+		`<code>${prefix}nhl mode:scores</code>`,
+		`<code>${prefix}mlb mode:scores</code>`,
 		"Shows a summary of all today's finished matches along with their scores."
-	])
-};
+	]
+});
