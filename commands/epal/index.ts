@@ -1,12 +1,48 @@
+import * as z from "zod";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { TTS_ENABLED } = cacheKeys;
-
 import { getConfig } from "../../config.js";
-const { epalAudioChannels, listenerAddress, listenerPort } = getConfig().local ?? {};
+import { declare } from "../../classes/command.js";
 
+const profilesSchema = z.object({
+	content: z.object({
+		list: z.array(z.object({
+			userId: z.int(),
+			userName: z.string(),
+			introduction: z.string(),
+			introductionText: z.string(),
+			introductionSpeech: z.string(),
+			cover: z.string(),
+			productName: z.string(),
+			styleDesc: z.array(z.string()),
+			serveNum: z.int().nullable(),
+			price: z.int(),
+			priceUnitDesc: z.string().nullable()
+		}))
+	})
+});
+type ItemData = {
+	ID: number;
+	name: string;
+	intro: string;
+	description: string;
+	audioFile: string;
+	product: string;
+	profilePicture: string;
+	tags: string[];
+	revenue: number | null;
+	price: {
+		regular: number;
+		unit: string;
+	}
+}
+
+const { TTS_ENABLED } = cacheKeys;
+const { listenerAddress, listenerPort } = getConfig().local ?? {};
+const epalAudioChannels = getConfig().local?.epalAudioChannels ?? [];
 const PROFILES_CACHE_KEY = "epal-profiles";
+const listenerEnabled = (epalAudioChannels.length === 0 || !listenerAddress || !listenerPort);
 
-export default {
+export default declare({
 	Name: "epal",
 	Aliases: ["ForeverAlone"],
 	Author: "supinic",
@@ -15,17 +51,8 @@ export default {
 	Flags: ["mention"],
 	Params: [],
 	Whitelist_Response: null,
-	initialize: function () {
-		if (!epalAudioChannels || !listenerAddress || !listenerPort) {
-			console.warn("$epal: TTS not configured - will be unavailable");
-			this.data.listenerEnabled = false;
-		}
-		else {
-			this.data.listenerEnabled = true;
-		}
-	},
 	Code: async function epal (context) {
-		let profilesData = await this.getCacheData(PROFILES_CACHE_KEY);
+		let profilesData = await this.getCacheData(PROFILES_CACHE_KEY) as ItemData[] | undefined;
 		if (!profilesData) {
 			const response = await core.Got.get("GenericAPI")({
 				method: "POST",
@@ -35,14 +62,15 @@ export default {
 				json: {}
 			});
 
-			if (!response.ok || !response.body.content) {
+			if (!response.ok) {
 				return {
 					success: false,
 					reply: `No profile data is currently available! Try again later.`
 				};
 			}
 
-			profilesData = response.body.content.list.map(i => ({
+			const { list } = profilesSchema.parse(response.body).content;
+			profilesData = list.map(i => ({
 				ID: i.userId,
 				name: i.userName,
 				intro: i.introduction,
@@ -50,7 +78,7 @@ export default {
 				audioFile: i.introductionSpeech,
 				product: i.productName,
 				profilePicture: i.cover,
-				tags: i.styleDesc ?? [],
+				tags: i.styleDesc,
 				revenue: (i.serveNum)
 					? core.Utils.round(i.serveNum * i.price / 100, 2)
 					: null,
@@ -81,15 +109,15 @@ export default {
 			tags
 		} = core.Utils.randArray(profilesData);
 
-		const ttsStatus = await core.Cache.getByPrefix(TTS_ENABLED);
-		if (epalAudioChannels.includes(context.channel?.ID) && ttsStatus && this.data.listenerEnabled) {
+		const ttsStatus = await core.Cache.getByPrefix(TTS_ENABLED) as boolean | undefined;
+		if (context.channel && epalAudioChannels.includes(context.channel.ID) && ttsStatus && listenerEnabled) {
 			await core.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",
 				searchParams: new URLSearchParams({
 					specialAudio: "1",
 					url: audioFile,
-					limit: 20_000
+					limit: "20_000"
 				})
 			});
 		}
@@ -112,15 +140,13 @@ export default {
 			`
 		};
 	},
-	Dynamic_Description: async function (prefix) {
-		return [
-			`Fetches a random description of a user profile from <a target="_blank" href="//epal.gg">epal.gg</a>.`,
-			`If this command is executed in Supinic's channel and TTS is on, the user introduction audio will be played.`,
-			"",
+	Dynamic_Description: (prefix) => [
+		`Fetches a random description of a user profile from <a target="_blank" href="//epal.gg">epal.gg</a>.`,
+		`If this command is executed in Supinic's channel and TTS is on, the user introduction audio will be played.`,
+		"",
 
-			`<code>${prefix}epal</code>`,
-			`<code>${prefix}ForeverAlone</code>`,
-			"Random user from the current featured/top list"
-		];
-	}
-};
+		`<code>${prefix}epal</code>`,
+		`<code>${prefix}ForeverAlone</code>`,
+		"Random user from the current featured/top list"
+	]
+});
