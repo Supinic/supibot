@@ -1,13 +1,16 @@
-const RESPONSE_TIMEOUT = 10_000;
-let prefixes;
+import { declare } from "../../classes/command.js";
 
-export default {
+type BotData = { ID: number; prefix: string; };
+
+const RESPONSE_TIMEOUT = 10_000;
+let prefixes: BotData[];
+
+export default declare({
 	Name: "externalbot",
 	Aliases: ["ebot"],
-	Author: "supinic",
-	Cooldown: 15000,
+	Cooldown: 15_000,
 	Description: "Makes Supibot execute a command of a different bot, and then the result will be that bot's command response. As such, this command can only be used in a pipe.",
-	Flags: ["external-input","mention","pipe"],
+	Flags: ["external-input", "mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	initialize: async () => {
@@ -15,7 +18,7 @@ export default {
 			prefixes = [];
 		}
 		else {
-			prefixes = await core.Query.getRecordset(rs => rs
+			prefixes = await core.Query.getRecordset<BotData[]>(rs => rs
 				.select("Bot_Alias AS ID", "Prefix as prefix")
 				.from("bot_data", "Bot")
 				.where("Prefix IS NOT NULL")
@@ -26,11 +29,13 @@ export default {
 	Code: (async function externalBot (context, ...rest) {
 		if (!context.channel) {
 			return {
+				success: false,
 				reply: "Can't use this command in PMs!"
 			};
 		}
 		else if (!context.append.pipe) {
 			return {
+				success: false,
 				reply: "Can't use this command outside of pipe!"
 			};
 		}
@@ -74,6 +79,13 @@ export default {
 
 		// Sends the actual external bot's command, and wait to see if it responds
 		const safeMessage = await context.platform.prepareMessage(message, context.channel);
+		if (!safeMessage) {
+			return {
+				success: false,
+				reply: "This invocation is banphrased in this channel!"
+			};
+		}
+
 		const messagePromise = context.channel.waitForUserMessage(botData, {
 			timeout: RESPONSE_TIMEOUT
 		});
@@ -90,8 +102,9 @@ export default {
 
 		const selfRegex = new RegExp(`^@?${context.platform.Self_Name},?`, "i");
 		return {
+			success: true,
 			reply: result.message.replace(selfRegex, "")
 		};
 	}),
 	Dynamic_Description: null
-};
+});
