@@ -4295,7 +4295,7 @@ duration-parser@supinic/duration-parser:
 
 supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=a79f4b8ca9cb92e563823b9c36f488cb8e090e45"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=c06f6c0371a4b7f311f980d54928820e41ebb5a2"
   dependencies:
     "@types/geojson": "npm:^7946.0.16"
     cheerio: "npm:^1.1.0"
@@ -4305,7 +4305,7 @@ supi-core@supinic/supi-core:
     mariadb: "npm:^3.4.4"
     prom-client: "npm:^15.1.3"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/ac26d32d70108887f35f3f1762ac8dd8973d138cc713f096e38499b5ee40ad21dbeaf1298017cb84d48566d7a55b04b0562ccb483374cb51924f97b7b8d0c01a
+  checksum: 10c0/83ba7a5c6f737e96490c121278869af2f5fc4a2874fed2ccd4fbb827e1512bac920c6adaa215bb54573eb8b2a747e82949863c2f678162059eed97f19aee68c7
   languageName: node
   linkType: hard
 

@@ -1,34 +1,48 @@
+import * as z from "zod";
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
 
-export default {
+const querySchema = z.object({
+	data: z.object({
+		user: z.object({
+			followers: z.object({
+				edges: z.array(z.object({
+					followedAt: z.iso.datetime(),
+					node: z.object({ login: z.string() }).optional()
+				})).optional()
+			})
+		}).optional()
+	})
+});
+
+const headers = new Map([
+	["Accept", "*/*"],
+	["Accept-Language", "en-US"],
+	["Content-Type", "text/plain;charset=UTF-8"],
+	["Referer", "https://dashboard.twitch.tv/"]
+]);
+
+export default declare({
 	Name: "firstchannelfollower",
 	Aliases: ["fcf"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the first user that follows you or someone else on Twitch.",
-	Flags: ["mention","non-nullable","opt-out","pipe"],
+	Flags: ["mention", "non-nullable", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	initialize: function () {
-		this.data.requestHeaders = {
-			Accept: "*/*",
-			"Accept-Language": "en-US",
-			"Content-Type": "text/plain;charset=UTF-8",
-			Referer: `https://dashboard.twitch.tv/`
-		};
-
 		if (process.env.TWITCH_GQL_CLIENT_ID) {
-			this.data.requestHeaders["Client-ID"] = process.env.TWITCH_GQL_CLIENT_ID;
+			headers.set("Client-ID", process.env.TWITCH_GQL_CLIENT_ID);
 		}
 		if (process.env.TWITCH_GQL_CLIENT_VERSION) {
-			this.data.requestHeaders["Client-Version"] = process.env.TWITCH_GQL_CLIENT_VERSION;
+			headers.set("Client-Version", process.env.TWITCH_GQL_CLIENT_VERSION);
 		}
 		if (process.env.TWITCH_GQL_DEVICE_ID) {
-			this.data.requestHeaders["X-Device-ID"] = process.env.TWITCH_GQL_DEVICE_ID;
+			headers.set("X-Device-ID", process.env.TWITCH_GQL_DEVICE_ID);
 		}
 	},
-	Code: (async function firstChannelFollower (context, target) {
-		const platform = sb.Platform.get("twitch");
+	Code: (async function firstChannelFollower (context, target?: string) {
+		const platform = sb.Platform.getAsserted("twitch");
 		const name = sb.User.normalizeUsername(target ?? context.user.Name);
 
 		const channelID = await platform.getUserID(name);
@@ -41,8 +55,7 @@ export default {
 
 		const response = await core.Got.gql({
 			url: "https://gql.twitch.tv/gql",
-			responseType: "json",
-			headers: this.data.requestHeaders,
+			headers: Object.fromEntries(headers.entries()),
 			query: `{user(login:"${name}"){followers(first:1){edges{node{login}followedAt}}}}`
 		});
 
@@ -50,7 +63,8 @@ export default {
 			? "you"
 			: "they";
 
-		if (!response.body.data.user) {
+		const { user } = querySchema.parse(response.body).data;
+		if (!user) {
 			const target = (context.user.Name === name.toLowerCase()) ? "you" : "that user";
 			return {
 				success: false,
@@ -58,7 +72,7 @@ export default {
 			};
 		}
 
-		const { edges } = response.body.data.user.followers;
+		const { edges } = user.followers;
 		if (!edges || edges.length === 0) {
 			return {
 				reply: `${core.Utils.capitalize(who)} don't have any followers.`
@@ -66,7 +80,7 @@ export default {
 		}
 
 		const edge = edges.find(i => i.node);
-		if (!edge) {
+		if (!edge || !edge.node) {
 			return {
 				success: false,
 				reply: `You seem to have hit a very rare case where all 10 first followers are banned! Congratulations?`
@@ -81,10 +95,11 @@ export default {
 
 		const delta = core.Utils.timeDelta(new SupiDate(date), false, true);
 		return {
+			success: true,
 			reply: `The longest still following user ${who} have is ${followUser}, since ${delta}.`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Fetches the first still active follower of a provided channel on Twitch.",
 		`To fetch the reverse - the first followed channel of a given user - check out the <a href="/bot/command/detail/firstfollowedchannel">first followed channel</a> command`,
 		"",
@@ -98,5 +113,5 @@ export default {
 		`<code>${prefix}firstchannelfollower (username)</code>`,
 		"Posts the provided channel's first still active follower.",
 		""
-	])
-};
+	]
+});
