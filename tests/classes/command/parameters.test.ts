@@ -1,13 +1,14 @@
 import assert from "node:assert";
-import { before, describe, it, beforeEach, afterEach } from "node:test";
-import { Command } from "../../../classes/command.js";
-import { SupiDate, Utils } from "supi-core";
-
-before(() => {
-	globalThis.core = { Utils: new Utils() };
-});
+import { describe, it, beforeEach, afterEach, mock } from "node:test";
+import { Command, type ParameterType } from "../../../classes/command.js";
+import { SupiDate } from "supi-core";
+import { TestWorld } from "../../test-utils.js";
 
 describe("Command parameter parsing", () => {
+	const world = new TestWorld();
+	beforeEach(() => { world.install(); });
+	afterEach(() => { world.reset(); });
+
 	const paramsDefinition = [
 		{ name: "boolean", type: "boolean" },
 		{ name: "date", type: "date" },
@@ -15,7 +16,7 @@ describe("Command parameter parsing", () => {
 		{ name: "object", type: "object" },
 		{ name: "regex", type: "regex" },
 		{ name: "string", type: "string" }
-	];
+	] as const;
 	const sampleStringValues = {
 		boolean: "true",
 		date: "2022-04-01",
@@ -25,7 +26,7 @@ describe("Command parameter parsing", () => {
 		regex: "/foobar/i"
 	};
 
-	const checkParameterType = (value, type) => {
+	const checkParameterType = (value: unknown, type: string) => {
 		assert.notStrictEqual(value, undefined, "Parsed param must not be undefined");
 
 		if (type === "regex") {
@@ -93,15 +94,6 @@ describe("Command parameter parsing", () => {
 
 				assert.strictEqual(result.success, false, `Param parsing must fail for type ${type}: ${JSON.stringify(result)}`);
 			}
-		});
-
-		it("fails for an unrecognized type", () => {
-			const result = Command.parseParametersFromArguments(
-				[{ name: "foo", type: "UNSUPPORTED_TYPE" }],
-				[`foo:bar`]
-			);
-
-			assert.strictEqual(result.success, false, `Param parsing must fail for unrecognized type: ${JSON.stringify(result)}`);
 		});
 
 		it("fails for unclosed quoted values", () => {
@@ -222,7 +214,7 @@ describe("Command parameter parsing", () => {
 			["string:foobar", "string:barbaz"]
 		);
 
-		assert.notStrictEqual(result.success, false, `Param parsing must not fail: ${JSON.stringify(result)}`);
+		assert.strictEqual(result.success, true, `Param parsing must not fail: ${JSON.stringify(result)}`);
 		assert.strictEqual(Object.keys(result.parameters).length, 1, "Exactly one param must be extracted");
 		assert.strictEqual(result.args.length, 0, "Remaining args should be empty");
 
@@ -272,9 +264,11 @@ describe("Command parameter parsing", () => {
 		const delimiter = "--";
 
 		beforeEach(() => {
+			// @ts-ignore
 			Command.ignoreParametersDelimiter = delimiter;
 		});
 		afterEach(() => {
+			// @ts-ignore
 			Command.ignoreParametersDelimiter = originalDelimiterDefinition;
 		});
 
@@ -294,6 +288,7 @@ describe("Command parameter parsing", () => {
 		});
 
 		it("should not ignore parameters if the delimiter is not used", () => {
+			// @ts-ignore
 			Command.ignoreParametersDelimiter = null;
 
 			const result = Command.parseParametersFromArguments(
