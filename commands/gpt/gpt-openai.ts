@@ -122,8 +122,8 @@ export const GptOpenAI = {
 		}
 
 		if (modelData.usesCompletionTokens === true) {
-			json.reasoning_effort = "medium";
-			json.max_completion_tokens = 5000;
+			json.reasoning_effort = "low";
+			json.max_completion_tokens = 2500;
 		}
 
 		const response = await core.Got.get("GenericAPI")<OpenAiResponse>({
