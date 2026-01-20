@@ -233,7 +233,7 @@ export default declare({
 			row.setValues({
 				User_Alias: context.user.ID,
 				Channel: context.channel?.ID ?? null,
-				Model: modelName,
+				Model: modelData.url,
 				Query: query,
 				Reply: reply,
 				Parameters: (Object.keys(context.params).length > 0)
