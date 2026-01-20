@@ -18,6 +18,13 @@ import {
 
 const EXISTING_COMMANDS = ["EXISTING_COMMAND"];
 
+// @todo I don't like this but it shuts up the local `sb.Command` reassignments
+declare global {
+	var sb: {
+		Command: typeof Command;
+	};
+}
+
 type AliasData = {
 	ID: number;
 	User_Alias: User["ID"] | null;
@@ -2593,7 +2600,6 @@ describe("$alias", async () => {
 			expectCommandResultFailure(result, "Your", "Twitch ID", "not the same");
 		});
 
-		it.skip("transfer");
 		// $alias transfer (old username) [conflicting new/old aliases] -> error
 		// $alias transfer (old username) -> OK, check aliases changing user
 	});
