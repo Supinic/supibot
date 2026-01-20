@@ -249,6 +249,9 @@ export default {
 				user: context.user,
 				channel: context.channel,
 				platform: context.platform,
+				params: {
+					model: "mistral"
+				}
 			});
 
 			try {
