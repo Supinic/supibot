@@ -1,13 +1,14 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "whisper",
 	Aliases: ["/w", "pm"],
-	Author: "supinic",
 	Cooldown: 1000,
-	Description: "Usable in pipe only - turns the response into a private message.",
+	Description: "Instead of replying in the given channel, this command will make the bot whisper you the response. Only usable in pipes.",
 	Flags: [],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function whisper (context, ...args) {
+	Code: function whisper (context, ...args) {
 		if (!context.append.pipe) {
 			return {
 				success: false,
@@ -17,9 +18,9 @@ export default {
 		}
 
 		return {
-			reply: `Result of your pipe: ${args.join(" ")}`,
+			reply: `Result of your command: ${args.join(" ")}`,
 			replyWithPrivateMessage: true
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+});
