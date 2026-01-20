@@ -84,7 +84,6 @@ import LastSeenCommand from "./lastseen/index.js";
 import LinkCommand from "./link/index.js";
 import LiveUamapCommand from "./liveuamap/index.js";
 import MarkovCommand from "./markov/index.js";
-import MastodonCommand from "./mastodon/index.js";
 import MathCommand from "./math/index.js";
 import MeCommand from "./me/index.js";
 import MetricsCommand from "./metrics/index.js";
@@ -275,7 +274,6 @@ export default [
 	LinkCommand,
 	LiveUamapCommand,
 	MarkovCommand,
-	MastodonCommand,
 	MathCommand,
 	MeCommand,
 	MetricsCommand,
