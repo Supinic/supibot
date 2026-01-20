@@ -49,7 +49,7 @@ export default {
 			});
 
 			const scriptSource = scriptResponse.body;
-			const match = scriptSource.match(/client_id=(\w+?)\W/);
+			const match = scriptSource.match(/client_id\s*:\s*['"](\w+?)['"]/);
 			if (!match) {
 				continue;
 			}
