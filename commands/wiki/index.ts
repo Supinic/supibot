@@ -1,10 +1,35 @@
+import * as z from "zod";
+import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
 import { getLanguage } from "../../utils/languages.js";
 
-export default {
+const searchSchema = z.tuple([ // For given search term:
+	z.string(), // searched term in lowercase
+	z.array(z.string()), // related topics
+	z.array(z.string()), // empty strings?
+	z.array(z.string()) // related topics as links
+]);
+const articleSchema = z.object({
+	query: z.object({
+		pages: z.record(z.string(), z.object({
+			extract: z.string(),
+			ns: z.int(),
+			pageid: z.int(),
+			title: z.string()
+		}))
+	})
+});
+const shortenSchema = z.object({
+	shortenurl: z.object({
+		shorturl: z.string(),
+		shorturlalt: z.string()
+	})
+});
+
+export default declare({
 	Name: "wiki",
 	Aliases: null,
-	Author: "supinic",
-	Cooldown: 15000,
+	Cooldown: 10000,
 	Description: "Fetches the headline of the first article found according to the user query. Watch out, articles might be case-sensitive.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
@@ -21,10 +46,9 @@ export default {
 			};
 		}
 
-		const language = context.params.lang ?? getLanguage("english");
-		const languageCode = language.getIsoCode(1);
-
+		const languageCode = context.params.lang?.getIsoCode(1) ?? "en";
 		let query = args.join(" ");
+
 		if (query.toLowerCase() === "random") {
 			const response = await core.Got.get("FakeAgent")({
 				url: `https://${languageCode}.wikipedia.org/wiki/Special:Random`,
@@ -42,7 +66,7 @@ export default {
 			query = blobs[1];
 		}
 
-		const searchData = await core.Got.get("GenericAPI")({
+		const searchResponse = await core.Got.get("GenericAPI")({
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: {
 				format: "json",
@@ -53,7 +77,8 @@ export default {
 			}
 		});
 
-		if (searchData.body[1].length === 0) {
+		const searchData = searchSchema.parse(searchResponse);
+		if (searchData[1].length === 0) {
 			return {
 				success: false,
 				reply: "No Wiki articles found for your query!"
@@ -69,63 +94,56 @@ export default {
 				redirects: "1",
 				exintro: "0",
 				explaintext: "0",
-				titles: searchData.body[1][0]
+				titles: searchData[1][0]
 			}
 		});
 
-		const data = response.body.query.pages;
+		const data = articleSchema.parse(response.body).query.pages;
 		const key = Object.keys(data)[0];
 		if (key === "-1") {
-			return {
-				success: false,
-				reply: "No results found?!"
-			};
-		}
-		else {
-			const idLink = `https://${languageCode}.wikipedia.org/?curid=${key}`;
-			const params = new URLSearchParams();
-			params.append("action", "shortenurl");
-			params.append("format", "json");
-			params.append("url", idLink);
-
-			const shortenResponse = await core.Got.get("GenericAPI")({
-				method: "POST",
-				responseType: "json",
-				url: "https://meta.wikimedia.org/w/api.php",
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded"
-				},
-				body: params.toString()
+			throw new SupiError({
+				message: "Assert error: Wiki provides no result despite providing a search title",
+				args: { data, searchData }
 			});
+		}
 
-			let link = idLink;
-			if (shortenResponse.statusCode === 200) {
-				if (shortenResponse.body.shortenurl?.shorturl) {
-					link = shortenResponse.body.shortenurl.shorturl;
-				}
-				else {
-					await sb.Logger.log(
-						"Command.Warning",
-						`Unexpected Wiki shorturl response: ${JSON.stringify(shortenResponse.body)}`,
-						context.channelData ?? null,
-						context.user
-					);
-				}
-			}
+		const idLink = `https://${languageCode}.wikipedia.org/?curid=${key}`;
+		const params = new URLSearchParams([
+			["action", "shortenurl"],
+			["format", "json"],
+			["url", idLink]
+		]);
 
-			if (context.params.linkOnly) {
-				return {
-					reply: link
-				};
-			}
+		const shortenResponse = await core.Got.get("GenericAPI")({
+			method: "POST",
+			responseType: "json",
+			url: "https://meta.wikimedia.org/w/api.php",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded"
+			},
+			body: params.toString()
+		});
 
-			const { extract, title } = data[key];
+		let link = idLink;
+		if (shortenResponse.statusCode === 200) {
+			const shortenData = shortenSchema.parse(shortenResponse.body);
+			link = shortenData.shortenurl.shorturl;
+		}
+
+		if (context.params.linkOnly) {
 			return {
-				reply: `${link} ${title}: ${core.Utils.wrapString(extract, 500)}`
+				success: true,
+				reply: link
 			};
 		}
+
+		const { extract, title } = data[key];
+		return {
+			success: true,
+			reply: `${link} ${title}: ${core.Utils.wrapString(extract, 500)}`
+		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Finds the summary of a given Wikipedia article.",
 		"Watch out - the topic is case sensitive, unfortunately, that's how Wikipedia works, apparently.",
 		"",
@@ -146,5 +164,5 @@ export default {
 		`<code>${prefix}wiki lang:pl random (topic)</code>`,
 		"Posts a completely random article, using the Wikipedia <code>Special:Random</code> article.",
 		"Also supports specifiying languages."
-	])
-};
+	]
+});
