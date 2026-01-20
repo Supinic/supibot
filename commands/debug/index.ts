@@ -93,6 +93,7 @@ export default declare({
 				version: process.version,
 				context,
 				sb,
+				core,
 				args: scriptArgs ?? []
 			});
 
