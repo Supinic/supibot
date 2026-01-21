@@ -1,11 +1,11 @@
 import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "vanish",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 60000,
-	Description: "Times out the user for 1 second. Only works if Supibot is a Twitch moderator.",
+	Description: "Twitch only: times the user out for 1 second. Only works if Supibot is a Twitch moderator.",
 	Flags: ["skip-banphrase"],
 	Params: [],
 	Whitelist_Response: null,
@@ -29,8 +29,11 @@ export default {
 			};
 		}
 
+		const twitch = sb.Platform.getAsserted("twitch");
 		const messageData = context.platformSpecificData;
-		if (!messageData || !Array.isArray(messageData.badges)) {
+
+		// @todo: Proper type security for messageData appearing as TwitchAppendData in TwitchPlatform
+		if (!messageData || !("badges" in messageData) || !Array.isArray(messageData.badges)) {
 			throw new SupiError({
 				message: "Assert error: No badges available on Twitch platform"
 			});
@@ -57,13 +60,11 @@ export default {
 			};
 		}
 
-		/** @type {TwitchPlatform} */
-		const platform = context.platform;
 		try {
-			await platform.timeout(context.channel, context.user, 1, "Vanished");
+			await twitch.timeout(context.channel, context.user, 1, "Vanished");
 		}
 		catch {
-			const emote = await context.getBestAvailableEmote(["LULW", "LuL", "LUL"], "😄");
+			const emote = await context.getBestAvailableEmote(["LULE", "LULW", "LuL", "LUL"], "😄");
 			return {
 				success: false,
 				reply: `Could not time you out, because Twitch said nothing and left! ${emote}`
@@ -71,8 +72,9 @@ export default {
 		}
 
 		return {
+			success: true,
 			reply: null
 		};
 	}),
 	Dynamic_Description: null
-};
+});
