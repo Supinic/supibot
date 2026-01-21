@@ -1,8 +1,9 @@
 import { randomBytes } from "node:crypto";
 import { roll as diceRoll } from "@jprochazk/roll-dice";
 import { randomInt } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "roll",
 	Aliases: ["dice"],
 	Author: "supinic",
@@ -13,7 +14,7 @@ export default {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Code: (async function roll (context, ...args) {
+	Code: function roll (context, ...args) {
 		if (args.length === 0) {
 			const result = randomInt(1, 100);
 			if (context.params.textOnly) {
@@ -69,7 +70,7 @@ export default {
 			result = diceRoll(fixedInput, { seed, limit: 1_000_000n, strict: true });
 		}
 		catch (e) {
-			const message = e?.message ?? String(e);
+			const message = (e instanceof Error) ? e.message : String(e);
 			return {
 				success: false,
 				reply: `Cannot make this roll work! Error: ${message}`
@@ -86,8 +87,8 @@ export default {
 				reply: `Your roll is ${result}.`
 			};
 		}
-	}),
-	Dynamic_Description: (async (prefix) => [
+	},
+	Dynamic_Description: (prefix) => [
 		"Rolls a random number.",
 		"You can use multiple ways to determine the limits of your rolls.",
 		"If you add the <code>textOnly:true</code> parameter, only the roll will be the output, without the surrounding text.",
@@ -106,5 +107,5 @@ export default {
 		`<code>${prefix}roll 5d25</code>`,
 		`<code>${prefix}roll (1d5)d(25d100)</code>`,
 		"Rolls using DnD dice format."
-	])
-};
+	]
+});
