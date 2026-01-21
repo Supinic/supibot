@@ -125,7 +125,6 @@ import RandomMemeCommand from "./randommeme/index.js";
 import RandomPastebinCommand from "./randompastebin/index.js";
 import RandomSadCatCommand from "./randomsadcat/index.js";
 import RandomScpCommand from "./randomscp/index.js";
-import RandomUploaderVideoCommand from "./randomuploadervideo/index.js";
 import RandomWordCommand from "./randomword/index.js";
 import RecordCommand from "./record/index.js";
 import ReloadCommand from "./reload/index.js";
@@ -313,7 +312,6 @@ export default [
 	RandomPastebinCommand,
 	RandomSadCatCommand,
 	RandomScpCommand,
-	RandomUploaderVideoCommand,
 	RandomWordCommand,
 	RecordCommand,
 	ReloadCommand,
