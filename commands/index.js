@@ -175,7 +175,6 @@ import UnmentionCommand from "./unmention/index.js";
 import UnpingCommand from "./unping/index.js";
 import UrbanCommand from "./urban/index.js";
 import VanishCommand from "./vanish/index.js";
-import VideoStatsCommand from "./videostats/index.js";
 import WeatherCommand from "./weather/index.js";
 import WhatAnimeIsItCommand from "./whatanimeisit/index.js";
 import WhatEmoteIsItCommand from "./whatemoteisit/index.js";
@@ -364,7 +363,6 @@ export default [
 	UnpingCommand,
 	UrbanCommand,
 	VanishCommand,
-	VideoStatsCommand,
 	WeatherCommand,
 	WhatAnimeIsItCommand,
 	WhatEmoteIsItCommand,
