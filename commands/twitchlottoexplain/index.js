@@ -3,7 +3,7 @@ import { exec } from "node:child_process";
 import stream from "node:stream";
 import fs from "node:fs";
 
-import { getPathFromURL, uploadToImgur } from "../../utils/command-utils.js";
+import { getPathFromURL, uploadFile } from "../../utils/command-utils.js";
 import { detections } from "../twitchlotto/definitions.js";
 
 import Explain from "./explainer.js";
@@ -136,7 +136,7 @@ export default {
 			};
 		}
 
-		const { statusCode, link: outputLink } = await uploadToImgur(outputFile);
+		const { statusCode, link: outputLink } = await uploadFile(outputFile);
 
 		await fs.promises.unlink(`/tmp/out_${link}`);
 
