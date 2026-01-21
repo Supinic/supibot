@@ -1,7 +1,6 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
-import { getLanguage } from "../../utils/languages.js";
 
 const searchSchema = z.tuple([ // For given search term:
 	z.string(), // searched term in lowercase
