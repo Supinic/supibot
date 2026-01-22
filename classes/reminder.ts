@@ -705,6 +705,7 @@ export class Reminder extends TemplateWithId {
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
+				.where("User_From IS NOT NULL") // Do not count system reminders
 				.where("User_To = %n", userTo)
 			),
 			core.Query.getRecordset<Item[]>(rs => rs
