@@ -27,7 +27,7 @@ export default {
 		if (!userID) {
 			return {
 				success: false,
-				reply: `Provided user does not exist on Twitch!`
+				reply: `Channel ${userName} does not exist on Twitch, or is banned!`
 			};
 		}
 
@@ -51,7 +51,7 @@ export default {
 		if (!channelID) {
 			return {
 				success: false,
-				reply: `Provided channel does not exist on Twitch!`
+				reply: `Channel ${userName} does not exist on Twitch, or is banned!`
 			};
 		}
 
