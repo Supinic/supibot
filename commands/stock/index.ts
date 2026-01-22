@@ -1,16 +1,71 @@
+import * as z from "zod";
 import { SupiError } from "supi-core";
-import findPopularSymbol from "./stocks.js";
+import { declare } from "../../classes/command.js";
+import rawSymbolData from "./popular-stock-symbols.json" with { type: "json" };
 
-export default {
+const symbolSchema = z.array(z.tuple([z.string(), z.string()]));
+const symbolData = symbolSchema.parse(rawSymbolData);
+
+const stockSchema = z.object({
+	"Global Quote": z.union([
+		z.object({
+			"01. symbol": z.string(),
+			"02. open": z.string(),
+			"05. price": z.string(),
+			"08. previous close": z.string(),
+			"10. change percent": z.string()
+		}),
+		z.object({}) // API returns an empty object when no stock symbol matches (response code 200, of course)
+	])
+}).transform(({ "Global Quote": g }) => {
+	if (Object.keys(g).length === 0) {
+		return null;
+	}
+
+	return {
+		symbol: g["01. symbol"],
+		open: Number(g["02. open"]),
+		price: Number(g["05. price"]),
+		previousClose: Number(g["08. previous close"]),
+		changePercent: g["10. change percent"]
+	};
+});
+
+const findPopularSymbol = (from: string) => {
+	from = from.toLowerCase();
+
+	let bestScore = -Infinity;
+	let index = -1;
+	for (let i = 0; i < symbolData.length; i++) {
+		const currentName = symbolData[i][1];
+		if (!currentName.includes(from)) {
+			continue;
+		}
+
+		const score = core.Utils.jaroWinklerSimilarity(from, currentName);
+		if (score > 0 && score > bestScore) {
+			bestScore = score;
+			index = i;
+		}
+	}
+
+	if (bestScore === -Infinity) {
+		return null;
+	}
+	else {
+		return symbolData[index][0];
+	}
+};
+
+export default declare({
 	Name: "stock",
 	Aliases: ["stocks", "stonks"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the latest price and daily change for a stock.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function stock (context, ...args) {
+	Code: async function stock (context, ...args) {
 		if (!process.env.API_ALPHA_VANTAGE) {
 			throw new SupiError({
 				message: "No AlphaVantage key configured (API_ALPHA_VANTAGE)"
@@ -44,20 +99,12 @@ export default {
 			}
 		});
 
-		const rawData = response.body["Global Quote"];
-		if (!rawData || Object.keys(rawData).length === 0) {
+		const data = stockSchema.parse(response.body);
+		if (!data) {
 			return {
 				success: false,
 				reply: "Stock symbol could not be found!"
 			};
-		}
-
-		// Fix the API's crazy key naming syntax (e.g. data["01. symbol"])
-		const data = {};
-		for (const rawKey of Object.keys(rawData)) {
-			const fixedKey = rawKey.replace(/^\d+\.\s+/, "");
-			const key = core.Utils.convertCase(fixedKey, "text", "camel");
-			data[key] = rawData[rawKey];
 		}
 
 		const changeSymbol = (Number(data.changePercent.replace("%", "")) >= 0) ? "+" : "";
@@ -68,6 +115,6 @@ export default {
 				Open price: $${data.open}.
 			`
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+});
