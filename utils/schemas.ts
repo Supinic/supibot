@@ -29,6 +29,26 @@ export const twitchSubscriberSchema = z.object({
 
 export type TwitchSubscriberData = z.infer<typeof twitchSubscriberSchema>["data"];
 
+export const twitchStreamsSchema = z.object({
+	data: z.array(z.object({
+		id: z.string(),
+		user_id: z.string(),
+		user_login: z.string(),
+		user_name: z.string(),
+		game_id: z.string(),
+		game_name: z.string(),
+		type: z.enum(["live", ""]),
+		title: z.string(),
+		tags: z.array(z.string()),
+		viewer_count: z.int().min(0),
+		started_at: z.iso.datetime(),
+		language: z.string(),
+		thumbnail_url: z.string(),
+		/** @deprecated This field is deprecated and always return `false` */
+		is_mature: z.literal(false)
+	}))
+});
+
 export const ivrErrorSchema = z.object({
 	statusCode: z.int().min(400).max(599),
 	error: z.object({

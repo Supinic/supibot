@@ -1,26 +1,28 @@
+import { declare } from "../../classes/command.js";
 import { getTwitchGameID } from "../../utils/command-utils.js";
+import { twitchStreamsSchema } from "../../utils/schemas.js";
 
-export default {
+export default declare({
 	Name: "topstreams",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Checks the top 10 streams on Twitch - if you add a game, will look for the top 10 streams playing that game. The game must be provided verbatim.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function topStreams (context, ...args) {
-		const searchParams = { limit: "10" };
+		const searchParams: Record<string, string> = { limit: "10" };
 		if (args.length > 0) {
 			const games = await getTwitchGameID(args.join(" "));
-			if (games.length === 0) {
+			const game = games.at(0);
+			if (!game) {
 				return {
 					success: false,
 					reply: `Provided game is not available on Twitch! You must use an exact match.`
 				};
 			}
 
-			searchParams.game_id = games[0].id;
+			searchParams.game_id = game.id;
 		}
 
 		const response = await core.Got.get("Helix")({
@@ -28,15 +30,14 @@ export default {
 			searchParams
 		});
 
-		if (response.statusCode !== 200 || response.body.data.length === 0) {
+		const { data } = twitchStreamsSchema.parse(response.body);
+		if (!response.ok || data.length === 0) {
 			return {
-				reply: (searchParams.game)
+				reply: ("game_id" in searchParams)
 					? "Nobody is playing that game right now."
 					: "Nobody is playing anything on Twitch right now. (?!)"
 			};
 		}
-
-		const { data } = response.body;
 
 		let gameString;
 		if (searchParams.game) {
@@ -58,7 +59,7 @@ export default {
 			reply: `These streamers ${gameString}: ${streamers.join("; ")}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Fetches the top 10 streamers currently live on Twitch, sorted by viewers descending.",
 		"If you provide a game, only that game's streams will be shown.",
 		"",
@@ -67,9 +68,8 @@ export default {
 		"Shows the top streamers currently live",
 		"",
 
-
 		`<code>${prefix}topstreams (game)</code>`,
 		`<code>${prefix}topstreams Old School Runescape</code>`,
 		"Shows the top streamers currently live in that game or category."
-	])
-};
+	]
+});
