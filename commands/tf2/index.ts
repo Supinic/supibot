@@ -1,20 +1,28 @@
-import weapons from "./weapons.json" with { type: "json" };
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
+import rawWeapons from "./weapons.json" with { type: "json" };
+
+const weaponsSchema = z.array(z.object({
+	name: z.string(),
+	classes: z.array(z.string()),
+	slot: z.enum(["primary", "secondary", "melee", "watch"])
+}));
 
 // This definitely has to be turned into a standard subcommand structure once it gets expanded
 // I'm only leaving the definition like this because $tf2 only has one subcommand (for now).
 const SUBCOMMAND_NAMES = ["roll"].join(", ");
-const TEAM_FORTRESS_CLASSES = ["Scout", "Pyro", "Soldier", "Heavy", "Demoman", "Medic", "Spy", "Engineer", "Sniper"];
+const TEAM_FORTRESS_CLASSES = ["Scout", "Pyro", "Soldier", "Heavy", "Demoman", "Medic", "Spy", "Engineer", "Sniper"] as const;
+const weaponsData = weaponsSchema.parse(rawWeapons);
 
-export default {
+export default declare({
 	Name: "tf2",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Aggregate command for everything related to Team Fortress 2.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function teamFortress2 (context, subcommand, ...args) {
+	Code: function teamFortress2 (context, subcommand, ...args) {
 		if (!subcommand) {
 			return {
 				success: false,
@@ -29,7 +37,7 @@ export default {
 					? core.Utils.capitalize(args[0])
 					: core.Utils.randArray(TEAM_FORTRESS_CLASSES);
 
-				const classWeapons = weapons.filter(i => i.classes.includes(playerClass));
+				const classWeapons = weaponsData.filter(i => i.classes.includes(playerClass));
 
 				const primary = core.Utils.randArray(classWeapons.filter(i => i.slot === "primary"));
 				const secondary = core.Utils.randArray(classWeapons.filter(i => i.slot === "secondary"));
@@ -42,6 +50,7 @@ export default {
 				}
 
 				return {
+					success: true,
 					reply: core.Utils.tag.trim `
 						Your random ${playerClass} loadout is:
 						${loadout.join(", ")}
@@ -56,13 +65,13 @@ export default {
 				};
 			}
 		}
-	}),
-	Dynamic_Description: (async (prefix) => [
+	},
+	Dynamic_Description: (prefix) => [
 		"Aggregate command for Team Fortress 2.",
 		"",
 
 		`<code>${prefix}tf2 roll</code>`,
 		`<code>${prefix}tf2 roll pyro</code>`,
 		"Rolls a random loadout, either for a random class or for the one you provide."
-	])
-};
+	]
+});
