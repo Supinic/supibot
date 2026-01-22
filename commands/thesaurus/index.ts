@@ -1,12 +1,15 @@
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
 import { randomInt } from "../../utils/command-utils.js";
 
-export default {
+const stringArraySchema = z.array(z.string());
+
+export default declare({
 	Name: "thesaurus",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Attempts to re-creates your sentence using random synonyms for each word.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "singleWord", type: "boolean" }
 	],
@@ -14,25 +17,27 @@ export default {
 	Code: (async function thesaurus (context, ...words) {
 		if (words.length === 0) {
 			return {
+				success: false,
 				reply: "No message provided!"
 			};
 		}
 
-		const wordsData = await core.Query.getRecordset(rs => rs
+		const wordsData = await core.Query.getRecordset<{ Word: string; Result: string; }[]>(rs => rs
 			.select("Word", "Result")
 			.from("data", "Thesaurus")
 			.where("Word IN %s+", words)
 		);
 
-		const thesaurus = {};
+		const thesaurus = new Map<string, string[]>();
 		for (const record of wordsData) {
-			thesaurus[record.Word] = JSON.parse(record.Result);
+			thesaurus.set(record.Word, stringArraySchema.parse(JSON.parse(record.Result)));
 		}
 
 		if (context.params.singleWord) {
-			const synonyms = thesaurus[words[0]];
+			const synonyms = thesaurus.get(words[0]);
 			if (synonyms && synonyms.length !== 0) {
 				return {
+					success: true,
 					reply: synonyms.sort().join(", ")
 				};
 			}
@@ -48,21 +53,23 @@ export default {
 		for (const rawWord of words) {
 			const word = rawWord.toLowerCase();
 			const roll = randomInt(1, 3);
+			const synonyms = thesaurus.get(word);
 
-			// With a chance of 2 in 3, transmute the word into a synonym
-			if (thesaurus[word] && roll > 1) {
-				result.push(core.Utils.randArray(thesaurus[word]));
-			}
-			else {
+			if (roll === 1 || !synonyms) {
 				result.push(rawWord);
+				continue;
 			}
+
+			const synonym = core.Utils.randArray(synonyms);
+			result.push(synonym);
 		}
 
 		return {
+			success: true,
 			reply: result.join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Re-creates your sentence using random synonyms for each word, if available.",
 		"By default, has a 66% chance to replace a word with a random synonym - if that exists.",
 		"",
@@ -76,5 +83,5 @@ export default {
 
 		`<code>${prefix}thesaurus population singleWord:true</code>`,
 		"accumulation, aggregation, assemblage, collection, colonisation, colonization, group, grouping, integer, people, settlement, universe, whole number"
-	])
-};
+	]
+});
