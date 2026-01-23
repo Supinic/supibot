@@ -5,6 +5,7 @@ import { SupiDate } from "supi-core";
 import type { CronDefinition } from "../index.js";
 import { postToHastebin } from "../../utils/command-utils.js";
 import subscriptionDefinition from "../../commands/subscribe/event-types/global-twitch-emotes.js";
+import type { Channel } from "../../classes/channel.js";
 
 const emoteSchema = z.object({
 	data: z.array(z.object({
@@ -148,17 +149,30 @@ export default {
 			await suggestionRow.save({ skipLoad: true });
 		}
 
-		const subscribedNames = await core.Query.getRecordset<string[]>(rs => rs
-			.select("User_Alias.Name AS Name")
+		const subscriptionData = await core.Query.getRecordset<{ name: string; channel: Channel["ID"] }[]>(rs => rs
+			.select("User_Alias.Name AS name", "Channel AS channel")
 			.from("data", "Event_Subscription")
 			.join("chat_data", "User_Alias")
 			.where("Type = %s", subscriptionDefinition.name)
 			.where("Active = %b", true)
-			.flat("Name")
 		);
 
-		const names = subscribedNames.map(i => `@${i}`).join(" ");
-		let message = `${names} Global Twitch emotes changed! ${hastebinLink} `;
+		if (subscriptionData.length === 0) {
+			return;
+		}
+
+		const channelUserMap = new Map<Channel["ID"], string[]>();
+		for (const { name, channel } of subscriptionData) {
+			let arr = channelUserMap.get(channel);
+			if (!arr) {
+				arr = [];
+				channelUserMap.set(channel, arr);
+			}
+
+			arr.push(name);
+		}
+
+		let message = `Global Twitch emotes changed! ${hastebinLink} `;
 		if (json.added.length !== 0) {
 			message += `Added: ${json.added.map(i => i.name).join(" ")}`;
 		}
@@ -170,12 +184,20 @@ export default {
 			message += `Deleted: ${json.deleted.map(i => i.name).join(" ")}`;
 		}
 
-		const limit = channelData.Message_Limit ?? channelData.Platform.messageLimit;
-		const chunks = core.Utils.partitionString(message, limit, MAX_MESSAGES_SENT);
+		for (const [channelId, usernames] of channelUserMap.entries()) {
+			const channelData = sb.Channel.getAsserted(channelId);
+			const names = usernames.map(i => `@${i}`).join(" ");
+			const finalMessage = `${names} ${message}`;
 
-		for (const chunk of chunks) {
-			await channelData.send(chunk);
-			await wait(MULTI_MESSAGE_DELAY);
+			const limit = channelData.Message_Limit ?? channelData.Platform.messageLimit;
+			const chunks = core.Utils.partitionString(finalMessage, limit, MAX_MESSAGES_SENT);
+
+			void (async (strings) => {
+				for (const string of strings) {
+					await channelData.send(string);
+					await wait(MULTI_MESSAGE_DELAY);
+				}
+			})(chunks);
 		}
 	})
 } satisfies CronDefinition;
