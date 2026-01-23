@@ -1,4 +1,5 @@
 {
+  "upperLimit": 600,
   "cannotTimeoutBadges": ["moderator", "broadcaster", "staff"],
   "outcomes": {
     "blank": [
