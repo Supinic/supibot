@@ -49,6 +49,20 @@ export const twitchStreamsSchema = z.object({
 	}))
 });
 
+export const twitchChannelSchema = z.array(z.object({
+	broadcaster_id: z.string(),
+	broadcaster_language: z.string(),
+	broadcaster_login: z.string(),
+	broadcaster_name: z.string(),
+	content_classification_labels: z.array(z.unknown()),
+	delay: z.int(),
+	game_id: z.string(),
+	game_name: z.string(),
+	is_branded_content: z.boolean(),
+	tags: z.array(z.string()),
+	title: z.string()
+}));
+
 export const ivrErrorSchema = z.object({
 	statusCode: z.int().min(400).max(599),
 	error: z.object({
