@@ -61,6 +61,6 @@ export default declare({
 
 		`<code>${prefix}shuffle fancy:true (message)</code>`,
 		"Shuffles the message word by word, splitting off non-letter characters.",
-		`<code>(this) isn't random!</code> → <code>) isn a ' ! random this ( message</code>`,
+		`<code>(this) isn't random!</code> → <code>) isn a ' ! random this ( message</code>`
 	]
 });
