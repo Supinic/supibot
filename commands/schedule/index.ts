@@ -1,16 +1,18 @@
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
+import type { TwitchPlatform } from "../../platforms/twitch.js";
+import { twitchScheduleSchema, twitchStreamSchema } from "../../utils/schemas.js";
 
-export default {
+export default declare({
 	Name: "schedule",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts the channel's stream schedule.",
-	Flags: ["external-input","mention","non-nullable","opt-out","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function schedule (context, channel) {
-		let channelName = null;
+		let channelName;
 		if (channel) {
 			channelName = channel;
 		}
@@ -25,13 +27,13 @@ export default {
 			};
 		}
 
-		/** @type {TwitchPlatform} */
-		const platform = sb.Platform.get("twitch");
+		// @todo remove typecast when platform is discriminated by name
+		const platform = context.platform as TwitchPlatform;
 		const channelID = await platform.getUserID(channelName);
 		if (!channelID) {
 			return {
 				success: false,
-				reply: `Provided user does not exist on Twitch!`
+				reply: `Provided user does not exist on Twitch, or is currently banned!`
 			};
 		}
 
@@ -55,7 +57,7 @@ export default {
 			};
 		}
 
-		const { segments: rawSegments, vacation } = response.body.data;
+		const { segments: rawSegments, vacation } = twitchScheduleSchema.parse(response.body).data;
 		if (!rawSegments) {
 			return {
 				success: false,
@@ -71,6 +73,7 @@ export default {
 			};
 		}
 
+		const now = new SupiDate();
 		const scheduleUrl = `https://twitch.tv/${channelName}/schedule`;
 		if (vacation !== null) {
 			const start = new SupiDate(vacation.start_time);
@@ -81,8 +84,8 @@ export default {
 			const firstSegEnd = new SupiDate(firstSeg.end_time);
 
 			// Only mention the vacation if it affects the first segment in the list, and only if it hasn't ended yet.
-			if (firstSegStart > start && firstSegEnd < end && end > SupiDate.now()) {
-				const verb = (start < SupiDate.now()) ? "started" : "starts";
+			if (firstSegStart > start && firstSegEnd < end && end > now) {
+				const verb = (start < now) ? "started" : "starts";
 				return {
 					reply: core.Utils.tag.trim `
 						Streaming schedule is interrupted.
@@ -101,7 +104,7 @@ export default {
 		}
 		else {
 			const firstSegmentStart = new SupiDate(segments[0].start_time);
-			if (firstSegmentStart < SupiDate.now()) { // First stream segment should already be underway
+			if (firstSegmentStart < now) { // First stream segment should already be underway
 				const response = await core.Got.get("Helix")({
 					url: "streams",
 					searchParams: {
@@ -109,7 +112,8 @@ export default {
 					}
 				});
 
-				const isLive = Boolean(response.statusCode === 200 && response.body.data.length !== 0);
+				const { data } = twitchStreamSchema.parse(response.body);
+				const isLive = Boolean(response.statusCode === 200 && data.length !== 0);
 
 				if (!isLive) { // Stream is not live - use the first segment (when it should have started), and mention that stream is late
 					segment = segments[0];
@@ -136,11 +140,9 @@ export default {
 
 		const game = segment.category?.name ?? "(no category)";
 		const title = (segment.title !== "") ? segment.title : "(no title)";
-		const target = (channelName.toLowerCase() === context.user.Name)
-			? "Your"
-			: `${channelName}'s`;
-
+		const target = (channelName.toLowerCase() === context.user.Name) ? "Your" : `${channelName}'s`;
 		const time = core.Utils.timeDelta(new SupiDate(segment.start_time));
+
 		return {
 			reply: core.Utils.tag.trim `
 				${target} next stream:
@@ -152,4 +154,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-};
+});

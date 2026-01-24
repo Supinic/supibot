@@ -29,7 +29,7 @@ export const twitchSubscriberSchema = z.object({
 
 export type TwitchSubscriberData = z.infer<typeof twitchSubscriberSchema>["data"];
 
-export const twitchStreamsSchema = z.object({
+export const twitchStreamSchema = z.object({
 	data: z.array(z.object({
 		id: z.string(),
 		user_id: z.string(),
@@ -62,6 +62,30 @@ export const twitchChannelSchema = z.array(z.object({
 	tags: z.array(z.string()),
 	title: z.string()
 }));
+
+export const twitchScheduleSchema = z.object({
+	data: z.object({
+		broadcaster_id: z.string(),
+		broadcaster_language: z.string(),
+		broadcaster_name: z.string(),
+		segments: z.array(z.object({
+			id: z.string(),
+			start_time: z.iso.datetime(),
+			end_time: z.iso.datetime(),
+			title: z.string(),
+			canceled_until: z.iso.datetime().nullable(),
+			is_recurring: z.boolean(),
+			category: z.object({
+				id: z.string(),
+				name: z.string()
+			}).nullable()
+		})).optional(),
+		vacation: z.object({
+			start_time: z.iso.datetime(),
+			end_time: z.iso.datetime()
+		}).nullable()
+	})
+});
 
 export const ivrErrorSchema = z.object({
 	statusCode: z.int().min(400).max(599),

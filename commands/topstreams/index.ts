@@ -1,6 +1,6 @@
 import { declare } from "../../classes/command.js";
 import { getTwitchGameID } from "../../utils/command-utils.js";
-import { twitchStreamsSchema } from "../../utils/schemas.js";
+import { twitchStreamSchema } from "../../utils/schemas.js";
 
 export default declare({
 	Name: "topstreams",
@@ -30,7 +30,7 @@ export default declare({
 			searchParams
 		});
 
-		const { data } = twitchStreamsSchema.parse(response.body);
+		const { data } = twitchStreamSchema.parse(response.body);
 		if (!response.ok || data.length === 0) {
 			return {
 				reply: ("game_id" in searchParams)
