@@ -1,17 +1,15 @@
+import { declare } from "../../classes/command.js";
 import { randomInt } from "../../utils/command-utils.js";
 
-export default {
+export default declare({
 	Name: "shuffle",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Shuffles the provided message, word by word.",
 	Flags: ["non-nullable","pipe"],
-	Params: [
-		{ name: "fancy", type: "boolean" }
-	],
+	Params: [{ name: "fancy", type: "boolean" }],
 	Whitelist_Response: null,
-	Code: (async function shuffle (context, ...args) {
+	Code: function shuffle (context, ...args) {
 		if (args.length === 0) {
 			return {
 				success: false,
@@ -45,20 +43,24 @@ export default {
 
 		return {
 			reply,
+			success: true,
 			cooldown: {
 				length: (context.append.pipe) ? null : this.Cooldown
 			}
 		};
-	}),
-	Dynamic_Description: (async (prefix) => [
+	},
+	Dynamic_Description: (prefix) => [
 		"For a given message, shuffles the words around.",
 		"",
 
-		`<code>${prefix}shuffle this is a random message</code>`,
-		`a random is message this`,
+		`<code>${prefix}shuffle (message)</code>`,
+		"Shuffles the message word by word, split by spaces.",
+		`<code>this is a random message</code> → <code>random is message this</code>`,
+		`<code>(this is a random) message</code> → <code>random) is message (this</code>`,
 		"",
 
-		`<code>${prefix}shuffle fancy:true (this) isn't a random! message</code>`,
-		`) isn a ' ! random this ( message`
-	])
-};
+		`<code>${prefix}shuffle fancy:true (message)</code>`,
+		"Shuffles the message word by word, splitting off non-letter characters.",
+		`<code>(this) isn't random!</code> → <code>) isn a ' ! random this ( message</code>`,
+	]
+});
