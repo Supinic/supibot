@@ -1,8 +1,14 @@
-const getTargetName = (userName, context) => {
-	if (userName === context.user.Name) {
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
+import { ivrUserDataSchema } from "../../utils/schemas.js";
+import type { Platform } from "../../platforms/template.js";
+import type { User } from "../../classes/user.js";
+
+const getTargetName = (userName: string, user: User, platform: Platform) => {
+	if (userName === user.Name) {
 		return "You are";
 	}
-	else if (userName === context.platform.selfName) {
+	else if (userName === platform.selfName) {
 		return "I am";
 	}
 	else {
@@ -10,7 +16,25 @@ const getTargetName = (userName, context) => {
 	}
 };
 
-export default {
+const querySchema = z.array(z.object({
+	data: z.object({
+		targetUser: z.object({
+			relationship: z.object({
+				cumulativeTenure: z.object({
+					daysRemaining: z.int(),
+					months: z.int()
+				}).nullable(),
+				subscriptionBenefit: z.object({
+					gift: z.object({ isGift: z.boolean() }),
+					purchasedWithPrime: z.boolean(),
+					tier: z.string()
+				}).nullable()
+			})
+		}).nullable()
+	})
+}));
+
+export default declare({
 	Name: "subage",
 	Aliases: ["sa"],
 	Author: "supinic",
@@ -19,35 +43,37 @@ export default {
 	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: async function subAge (context, user, channel) {
-		const platform = sb.Platform.get("twitch");
+	Code: async function subAge (context, user?: string, channel?: string) {
+		const platform = sb.Platform.getAsserted("twitch");
 		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
 
 		const userID = await platform.getUserID(userName);
 		if (!userID) {
 			return {
 				success: false,
-				reply: `Channel ${userName} does not exist on Twitch, or is banned!`
+				reply: `User ${userName} does not exist on Twitch, or is banned!`
 			};
 		}
 
-		if (!channel) {
-			if (context.platform.Name !== "twitch") {
+		let channelName = channel;
+		if (!channelName) {
+			if (context.platform.name !== "twitch") {
 				return {
 					success: false,
 					reply: `When not in a Twitch channel, a specific channel name must be provided!`
 				};
 			}
-			else if (context.privateMessage) {
+			else if (!context.channel) {
 				return {
 					success: false,
 					reply: `When in private messages, a specific channel name must be provided!`
 				};
 			}
+
+			channelName = context.channel.Name;
 		}
 
-		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
-		const channelID = await platform.getUserID(channelName);
+		const channelID = await platform.getUserID(sb.User.normalizeUsername(channelName));
 		if (!channelID) {
 			return {
 				success: false,
@@ -81,7 +107,7 @@ export default {
 			}])
 		});
 
-		const [sub] = response.body;
+		const sub = querySchema.parse(response.body).at(0);
 		if (!sub) {
 			return {
 				success: false,
@@ -97,26 +123,26 @@ export default {
 
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
+			// No tenure -> either the target channel isn't affiliated, is banned, or is hiding subscription status
 			const response = await core.Got.get("IVR")({
 				url: "v2/twitch/user",
-				searchParams: {
-					login: channelName
-				}
+				searchParams: { login: channelName }
 			});
 
-			const channelNameString = getTargetName(channelName, context);
+			const channelNameString = getTargetName(channelName, context.user, context.platform);
 			if (response.statusCode === 200 && response.body.length !== 0) {
-				const [channelInfo] = response.body;
-				const { banned, banReason } = channelInfo;
-				const { isAffiliate, isPartner } = channelInfo.roles ?? {};
+				const [channelInfo] = ivrUserDataSchema.parse(response.body);
+				const { banned } = channelInfo;
+				const { isAffiliate, isPartner } = channelInfo.roles;
 
-				if (isAffiliate === false && isPartner === false) {
+				if (!isAffiliate && !isPartner) {
 					return {
 						success: false,
 						reply: `${channelNameString} not affiliated nor partnered!`
 					};
 				}
-				else if (banned === true) {
+				else if (banned) {
+					const { banReason } = channelInfo;
 					return {
 						success: false,
 						reply: `${channelNameString} currently banned (${banReason})!`
@@ -147,57 +173,58 @@ export default {
 			channelString = channelName;
 		}
 
-		const userString = getTargetName(userName, context);
+		const userString = getTargetName(userName, context.user, context.platform);
 		const { daysRemaining, months } = relationship.cumulativeTenure;
 		if (!relationship.subscriptionBenefit) {
 			if (daysRemaining === 0 && months === 0) {
 				const verb = (userString.startsWith("User")) ? "has" : "have";
 				return {
+					success: true,
 					reply: `${userString} not subscribed to ${channelString}, and never ${verb} been.`
 				};
 			}
 			else {
 				return {
+					success: true,
 					reply: `${userString} not subscribed to ${channelString}, but used to be subscribed for ${months} months.`
 				};
 			}
 		}
-		else {
-			const benefit = relationship.subscriptionBenefit;
-			const giftString = (benefit.gift.isGift) ? "gifted" : "";
-			const primeString = (benefit.purchasedWithPrime) ? "Prime" : "";
-			const tier = benefit.tier.replace("000", "");
-			const remainingString = (daysRemaining === 0)
-				? "less than 24 hours"
-				: `${daysRemaining} days`;
 
-			return {
-				reply: core.Utils.tag.trim `
-					${userString} subscribed to ${channelString}
-					for ${months} months in total
-					with a Tier ${tier} ${giftString} ${primeString} subscription.
-					Next Sub anniversary: in ${remainingString}.
-				`
-			};
-		}
+		const benefit = relationship.subscriptionBenefit;
+		const giftString = (benefit.gift.isGift) ? "gifted" : "";
+		const primeString = (benefit.purchasedWithPrime) ? "Prime" : "";
+		const tier = benefit.tier.replace("000", "");
+		const remainingString = (daysRemaining === 0)
+			? "less than 24 hours"
+			: `${daysRemaining} days`;
+
+		return {
+			reply: core.Utils.tag.trim `
+				${userString} subscribed to ${channelString}
+				for ${months} months in total
+				with a Tier ${tier} ${giftString} ${primeString} subscription.
+				Next Sub anniversary: in ${remainingString}.
+			`
+		};
 	},
-	Dynamic_Description: () => ([
+	Dynamic_Description: (prefix) => [
 		"Shows the current subscription status for you or someone else to the current channel or any other provided.",
 		"",
 
-		`<code>$subage</code>`,
-		`<code>$sa</code>`,
+		`<code>${prefix}subage</code>`,
+		`<code>${prefix}sa</code>`,
 		"Shows your current subscription status to the channel you're using this command in.",
-		"Obviously, if used like this, will not work in whispers.",
+		"Won't work in whispers if used like this - there's no channel to default to.",
 		"",
 
-		`<code>$subage (user)</code>`,
+		`<code>${prefix}subage (user)</code>`,
 		"Shows that user's current subscription status to the channel you're using this command in.",
 		"Again, won't work in whispers",
 		"",
 
-		`<code>$subage (user) (channel)</code>`,
+		`<code>${prefix}subage (user) (channel)</code>`,
 		"Shows that user's current subscription status to the channel you provided.",
 		"Will work in whispers as well, since you provided the channel specifically."
-	])
-};
+	]
+});
