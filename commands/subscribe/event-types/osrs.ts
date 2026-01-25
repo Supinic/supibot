@@ -19,7 +19,7 @@ const jagexRssSchema = z.object({
 
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
 const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id-list";
-const SLIDING_CACHE_SIZE = 20;
+const SLIDING_CACHE_SIZE = 20000;
 
 type OsrsResponse = {
 	newsItems: {
