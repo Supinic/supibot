@@ -20,6 +20,7 @@ const jagexRssSchema = z.object({
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
 const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id-list";
 const SLIDING_CACHE_SIZE = 20000;
+let repeatedMessageCheck: string | undefined;
 
 type OsrsResponse = {
 	newsItems: {
@@ -99,8 +100,13 @@ export default {
 		}
 
 		const articleString = newArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
-		const noun = (newArticles.length === 1) ? "article" : "articles";
+		if (repeatedMessageCheck === articleString) { // Fallback spam protection
+			return null;
+		}
 
+		repeatedMessageCheck = articleString;
+
+		const noun = (newArticles.length === 1) ? "article" : "articles";
 		await sb.Logger.log("System.Request", JSON.stringify({
 			previousArticleIds: [...previousArticleIds],
 			newArticleIds: [...newArticleIds],
