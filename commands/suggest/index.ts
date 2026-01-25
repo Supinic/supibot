@@ -1,20 +1,33 @@
 import { SupiDate } from "supi-core";
 import unsetSuggestionSubcommand from "../set/subcommands/suggestion.js";
+import { declare } from "../../classes/command.js";
+import type User from "../../classes/user.js";
 
-export default {
+type Suggestion = {
+	ID: number;
+	User_Alias: User["ID"];
+	Text: string;
+	Date: SupiDate;
+	Category: string | null;
+	Status: string | null;
+	Priority: number | null;
+	Notes: string | null;
+	Last_Update: SupiDate | null;
+	Github_Link: string | null;
+};
+
+export default declare({
 	Name: "suggest",
 	Aliases: ["suggestions"],
-	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Suggest something for Supinic. When you post your first suggestion, you will automatically receive reminders when your suggestions get updated. Posts links to a suggestion list if you don't provide any text. To remove, check the $unset command.",
-	Flags: ["mention","skip-banphrase"],
-	Params: [
-		{ name: "amend", type: "number" }
-	],
+	Flags: ["mention", "skip-banphrase"],
+	Params: [{ name: "amend", type: "number" }],
 	Whitelist_Response: null,
 	Code: (async function suggest (context, ...args) {
 		if (args.length === 0 || context.invocation === "suggestions") {
 			return {
+				success: false,
 				reply: core.Utils.tag.trim `
 					No suggestion text provided!
 					Your suggestions here: https://supinic.com/data/suggestion/list?columnAuthor=${context.user.Name}
@@ -24,7 +37,7 @@ export default {
 		}
 
 		const text = args.join(" ");
-		const row = await core.Query.getRow("data", "Suggestion");
+		const row = await core.Query.getRow<Suggestion>("data", "Suggestion");
 		if (context.params.amend) {
 			await row.load(context.params.amend, true);
 			if (!row.loaded) {
@@ -48,6 +61,7 @@ export default {
 			await row.save({ skipLoad: true });
 
 			return {
+				success: true,
 				reply: `Your suggestion ID ${row.values.ID} was succesfully amended.`
 			};
 		}
@@ -61,7 +75,7 @@ export default {
 			await row.save({ skipLoad: true });
 		}
 
-		const isSubscribed = await core.Query.getRecordset(rs => rs
+		const isSubscribed = await core.Query.getRecordset<Suggestion["ID"] | undefined>(rs => rs
 			.select("ID")
 			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
@@ -81,15 +95,13 @@ export default {
 			});
 
 			await row.save();
-			subscribed = "You will now receive reminders when your suggestions get updated - you can use the $unsubscribe command to remove this. ";
+			subscribed = "You will now receive reminders when your suggestions get updated - you can use the $unsubscribe command to remove this.";
 		}
 
 		const link = `https://supinic.com/data/suggestion/${row.values.ID}`;
-		const emote = (context.platform.Name === "twitch")
-			? "BroBalt"
-			: "👍";
-
+		const emote = (context.platform.Name === "twitch") ? "BroBalt" : "👍";
 		return {
+			success: true,
 			reply: `Suggestion saved, and will eventually be processed (ID ${row.values.ID}) ${link} ${emote} ${subscribed}`
 		};
 	}),
@@ -115,4 +127,4 @@ export default {
 		`<code>$unset ${unsetSuggestionSubcommand.name} (${unsetSuggestionSubcommand.parameter})</code>`,
 		unsetSuggestionSubcommand.description
 	]
-};
+});
