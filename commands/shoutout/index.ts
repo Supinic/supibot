@@ -61,7 +61,7 @@ export default declare({
 			broadcaster_name: name,
 			game_name: game,
 			title
-		} = twitchChannelSchema.parse(response.body)[0];
+		} = twitchChannelSchema.parse(response.body).data[0];
 
 		const url = `https://twitch.tv/${login}`;
 		const nameString = (login.toLowerCase() === name.toLowerCase()) ? name : `${name} (${login})`;
