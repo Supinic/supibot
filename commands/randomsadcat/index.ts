@@ -1,18 +1,21 @@
-import sadCats from "./sad-cat.json" with { type: "json" };
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
+import rawSadCats from "./sad-cat.json" with { type: "json" };
+
+const sadCats = z.array(z.string()).parse(rawSadCats);
 
 const MAXIMUM_REPEATS = 5;
-const previousPosts = [];
+const previousPosts: string[] = [];
 
-export default {
+export default declare({
 	Name: "randomsadcat",
 	Aliases: ["rsc"],
-	Author: "supinic",
-	Cooldown: 15000,
+	Cooldown: 10000,
 	Description: "Posts a random sad cat image SadCat",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function randomSadCat (context) {
+	Code: async function randomSadCat (context) {
 		const eligibleLinks = sadCats.filter(i => !previousPosts.includes(i));
 		const link = core.Utils.randArray(eligibleLinks);
 
@@ -21,8 +24,9 @@ export default {
 
 		const emote = await context.getBestAvailableEmote(["SadCat", "sadCat", "mericCat"], "😿");
 		return {
+			success: true,
 			reply: `${emote} ${link}`
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+});
