@@ -32,7 +32,7 @@ export default {
 		else {
 			let rateLimited = false;
 			let response;
-			const key = getFacebookAppID();
+			const key = await getFacebookAppID();
 			if (!key) {
 				return {
 					success: false,
@@ -48,8 +48,7 @@ export default {
 					},
 					headers: {
 						"X-IG-App-ID": key,
-						Referer: "https://www.instagram.com/",
-						"Referrer-Policy": "strict-origin-when-cross-origin"
+						"Alt-Used": "i.instagram.com"
 					},
 					throwHttpErrors: false,
 					responseType: "json"
