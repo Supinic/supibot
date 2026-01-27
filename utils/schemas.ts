@@ -44,8 +44,11 @@ export const twitchStreamSchema = z.object({
 		started_at: z.iso.datetime(),
 		language: z.string(),
 		thumbnail_url: z.string(),
-		/** @deprecated This field is deprecated and always return `false` */
-		is_mature: z.literal(false)
+		/**
+		 * Despite what Twitch's Helix API documentation says, this field can be `true`.
+		 * Disregard this (Helix API docs): `IMPORTANT This field is deprecated and returns only false.`
+		 */
+		is_mature: z.boolean()
 	}))
 });
 
