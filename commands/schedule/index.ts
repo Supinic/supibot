@@ -81,10 +81,10 @@ export default declare({
 
 			const [firstSeg] = segments;
 			const firstSegStart = new SupiDate(firstSeg.start_time);
-			const firstSegEnd = new SupiDate(firstSeg.end_time);
+			const firstSegEnd = (firstSeg.end_time) ? new SupiDate(firstSeg.end_time) : null;
 
 			// Only mention the vacation if it affects the first segment in the list, and only if it hasn't ended yet.
-			if (firstSegStart > start && firstSegEnd < end && end > now) {
+			if (firstSegStart > start && firstSegEnd && firstSegEnd < end && end > now) {
 				const verb = (start < now) ? "started" : "starts";
 				return {
 					reply: core.Utils.tag.trim `
