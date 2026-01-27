@@ -34,6 +34,7 @@
     "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core && tsc",
     "prod-update": "git pull origin master && yarn workspaces focus --production -A && tsc",
     "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
+    "check": "tsc --incremental false --composite false && yarn lint && yarn test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
