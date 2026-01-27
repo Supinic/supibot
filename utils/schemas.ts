@@ -52,19 +52,21 @@ export const twitchStreamSchema = z.object({
 	}))
 });
 
-export const twitchChannelSchema = z.array(z.object({
-	broadcaster_id: z.string(),
-	broadcaster_language: z.string(),
-	broadcaster_login: z.string(),
-	broadcaster_name: z.string(),
-	content_classification_labels: z.array(z.unknown()),
-	delay: z.int(),
-	game_id: z.string(),
-	game_name: z.string(),
-	is_branded_content: z.boolean(),
-	tags: z.array(z.string()),
-	title: z.string()
-}));
+export const twitchChannelSchema = z.object({
+	data: z.array(z.object({
+		broadcaster_id: z.string(),
+		broadcaster_language: z.string(),
+		broadcaster_login: z.string(),
+		broadcaster_name: z.string(),
+		content_classification_labels: z.array(z.unknown()),
+		delay: z.int(),
+		game_id: z.string(),
+		game_name: z.string(),
+		is_branded_content: z.boolean(),
+		tags: z.array(z.string()),
+		title: z.string()
+	}))
+});
 
 export const twitchScheduleSchema = z.object({
 	data: z.object({
