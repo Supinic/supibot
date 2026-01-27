@@ -69,12 +69,12 @@ export const twitchChannelSchema = z.array(z.object({
 export const twitchScheduleSchema = z.object({
 	data: z.object({
 		broadcaster_id: z.string(),
-		broadcaster_language: z.string(),
+		broadcaster_language: z.string().optional(),
 		broadcaster_name: z.string(),
 		segments: z.array(z.object({
 			id: z.string(),
 			start_time: z.iso.datetime(),
-			end_time: z.iso.datetime(),
+			end_time: z.iso.datetime().nullable(),
 			title: z.string(),
 			canceled_until: z.iso.datetime().nullable(),
 			is_recurring: z.boolean(),
