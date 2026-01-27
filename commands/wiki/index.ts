@@ -76,7 +76,7 @@ export default declare({
 			}
 		});
 
-		const searchData = searchSchema.parse(searchResponse);
+		const searchData = searchSchema.parse(searchResponse.body);
 		if (searchData[1].length === 0) {
 			return {
 				success: false,
