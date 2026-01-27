@@ -220,7 +220,7 @@ export default class LoggerSingleton {
 			User_Alias: (user) ? user.ID : null
 		});
 
-		const { insertId } = await row.save();
+		const { insertId } = await row.save({ skipLoad: true });
 		return insertId;
 	}
 
@@ -254,7 +254,7 @@ export default class LoggerSingleton {
 			Arguments: (data.arguments) ? JSON.stringify(data.arguments) : null
 		});
 
-		const { insertId } = await row.save();
+		const { insertId } = await row.save({ skipLoad: true });
 		return insertId;
 	}
 
