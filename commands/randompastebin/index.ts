@@ -1,12 +1,71 @@
+/* eslint-disable array-element-newline */
+import * as z from "zod";
 import { SupiDate } from "supi-core";
-import pastebinLanguages from "./pastebin-languages.json" with { type: "json" };
+import { declare } from "../../classes/command.js";
 
-export default {
+const pastebinLanguages = [
+	"apache", "arduino", "bash", "c", "cpp",
+	"csharp", "css", "dart", "html4strict", "html5",
+	"java", "javascript", "json", "kotlin", "lua",
+	"make", "mysql", "nginx", "pascal", "php",
+	"postgresql", "powershell", "python", "ruby", "sql",
+	"stonescript", "swift", "typescript", "verilog", "xml",
+	"yaml"
+] as const;
+const querySchema = z.array(z.object({
+	date: z.string(),
+	expire: z.string(),
+	full_url: z.string(),
+	key: z.string(),
+	size: z.string(),
+	syntax: z.string(),
+	title: z.string(),
+	user: z.string()
+}));
+type CachedPastebinItem = {
+	key: string;
+	title: string | null;
+	user: string | null;
+	posted: string;
+	expires: string | null;
+	syntax: string;
+	size: number;
+};
+
+const fetchData = async () => {
+	let data = await core.Cache.getByPrefix("random-pastebin-paste-list") as CachedPastebinItem[] | undefined;
+	if (!data) {
+		const response = await core.Got.get("GenericAPI")({
+			url: "https://scrape.pastebin.com/api_scraping.php",
+			responseType: "json",
+			searchParams: {
+				limit: "100"
+			}
+		});
+
+		data = querySchema.parse(response.body).map(i => ({
+			key: i.key,
+			title: (i.title === "") ? null : i.title,
+			posted: new SupiDate(Number(i.date) * 1000).toJSON(), // @todo if Cache supports SupiDate, remove the toJSON here
+			expires: (i.expire === "0") ? null : new SupiDate(Number(i.expire) * 1000).toJSON(),
+			user: (i.user === "") ? null : i.user,
+			syntax: i.syntax,
+			size: Number(i.size)
+		}));
+
+		await core.Cache.setByPrefix("random-pastebin-paste-list", data, {
+			expiry: 300_000
+		});
+	}
+
+	return data;
+};
+
+export default declare({
 	Name: "randompastebin",
 	Aliases: ["rpb"],
-	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches a random recently posted programming-related Pastebin paste.",
+	Description: "Fetches a random recently posted Pastebin paste.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" },
@@ -14,39 +73,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function randomPastebin (context, syntax) {
-		let data = await core.Cache.getByPrefix("random-pastebin-paste-list");
-		if (!data) {
-			const response = await core.Got.get("GenericAPI")({
-				url: "https://scrape.pastebin.com/api_scraping.php",
-				responseType: "json",
-				throwHttpErrors: false,
-				searchParams: {
-					limit: "100"
-				}
-			});
-
-			if (!response.ok) {
-				return {
-					success: false,
-					reply: `Pastebin API encountered an error (code ${response.statusCode})! Try again later.`
-				};
-			}
-
-			data = response.body.map(i => ({
-				key: i.key,
-				title: (i.title === "") ? null : i.title,
-				posted: new SupiDate(i.date * 1000),
-				expires: (i.expire === "0") ? null : new SupiDate(i.expire * 1000),
-				user: (i.user === "") ? null : i.user,
-				syntax: i.syntax,
-				size: Number(i.size)
-			}));
-
-			await core.Cache.setByPrefix("random-pastebin-paste-list", data, {
-				expiry: 300_000
-			});
-		}
-
+		const data = await fetchData();
 		if (syntax === "list") {
 			const list = [...new Set(data.map(i => i.syntax))].sort();
 			return {
@@ -64,8 +91,7 @@ export default {
 			filteredData = data.filter(i => i.syntax.toLowerCase() === syntax.toLowerCase());
 		}
 
-		const paste = core.Utils.randArray(filteredData);
-		if (!paste) {
+		if (filteredData.length === 0) {
 			const list = [...new Set(data.map(i => i.syntax))].sort();
 			return {
 				success: false,
@@ -74,8 +100,10 @@ export default {
 			};
 		}
 
+		const paste = core.Utils.randArray(filteredData);
 		if (context.params.linkOnly) {
 			return {
+				success: true,
 				reply: `https://pastebin.com/${paste.key}`
 			};
 		}
@@ -94,24 +122,14 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const data = await core.Cache.getByPrefix("random-pastebin-paste-list");
+		const data = await fetchData();
+		const uniques = new Set(data.map(i => i.syntax));
 
-		let list;
-		let listDescription;
-		if (data && data.length !== 0) {
-			const uniques = new Set(data.map(i => i.syntax));
-			list = [...uniques]
-				.filter(Boolean)
-				.sort()
-				.map(i => `<li>${i}</li>`)
-				.join("");
-
-			listDescription = "Currently available languages:";
-		}
-		else {
-			list = pastebinLanguages.map(i => `<li>${i}</li>`).join("");
-			listDescription = "Common language list (<a href=\"//pastebin.com/languages\">full list</a>):";
-		}
+		const list = pastebinLanguages.map(lang => (
+			(uniques.has(lang))
+				? `<li><b>${lang}</b>`
+				: `<li>${lang}</li>`
+		));
 
 		return [
 			"Fetches a random programming related paste, posted recently (up to ~1 hour old).",
@@ -139,8 +157,8 @@ export default {
 			"Shows a list of currently available languages.",
 			"",
 
-			listDescription,
-			`<ul>${list}</ul>`
+			"Currently available languages:",
+			`<ul>${list.join("")}</ul>`
 		];
 	})
-};
+});
