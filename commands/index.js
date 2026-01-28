@@ -86,7 +86,6 @@ import MetricsCommand from "./metrics/index.js";
 import MobaCommand from "./moba/index.js";
 import NecroDancerCommand from "./necrodancer/index.js";
 import NewsCommand from "./news/index.js";
-import NpmCommand from "./npm/index.js";
 import NutrientsCommand from "./nutrients/index.js";
 import OcrCommand from "./ocr/index.js";
 import OptOutCommand from "./optout/index.js";
@@ -270,7 +269,6 @@ export default [
 	MobaCommand,
 	NecroDancerCommand,
 	NewsCommand,
-	NpmCommand,
 	NutrientsCommand,
 	OcrCommand,
 	OptOutCommand,
