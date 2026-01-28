@@ -65,7 +65,6 @@ import GachiSearchCommand from "./gachisearch/index.js";
 import GetProfilePictureCommand from "./getprofilepicture/index.js";
 import GiftCommand from "./gift/index.js";
 import GitHubCommand from "./github/index.js";
-import GitHubStatusCommand from "./githubstatus/index.js";
 import GptCommand from "./gpt/index.js";
 import HaHAACommand from "./haHAA/index.js";
 import HelpCommand from "./help/index.js";
@@ -251,7 +250,6 @@ export default [
 	GetProfilePictureCommand,
 	GiftCommand,
 	GitHubCommand,
-	GitHubStatusCommand,
 	GptCommand,
 	HaHAACommand,
 	HelpCommand,
