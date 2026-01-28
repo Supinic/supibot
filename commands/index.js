@@ -60,7 +60,6 @@ import Formula1Command from "./formula1/index.js";
 import ForsenCDCommand from "./forsenCD/index.js";
 import ForsenECommand from "./forsenE/index.js";
 import FunFactCommand from "./funfact/index.js";
-import GachiCommand from "./gachi/index.js";
 import GachiCheckCommand from "./gachicheck/index.js";
 import GachiSearchCommand from "./gachisearch/index.js";
 import GetProfilePictureCommand from "./getprofilepicture/index.js";
@@ -248,7 +247,6 @@ export default [
 	ForsenCDCommand,
 	ForsenECommand,
 	FunFactCommand,
-	GachiCommand,
 	GachiCheckCommand,
 	GachiSearchCommand,
 	GetProfilePictureCommand,
