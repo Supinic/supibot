@@ -80,7 +80,7 @@ export default declare({
 		// @todo remove typecast when platform is discriminated by name
 		const platform = context.platform as TwitchPlatform;
 		const result = randomInt(1, 6);
-		if (result !== -1) {
+		if (result !== 1) {
 			return {
 				success: true,
 				reply: "Click! You are safe."
