@@ -1,7 +1,14 @@
-export default {
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
+
+const querySchema = z.union([
+	z.object({ result: z.string(), error: z.null() }),
+	z.object({ result: z.null(), error: z.string() })
+]);
+
+export default declare({
 	Name: "math",
 	Aliases: ["calculate", "calc"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Does math. For more info, check the documentation for math.js.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
@@ -18,7 +25,7 @@ export default {
 			};
 		}
 
-		const parameters = {
+		const parameters: Record<string, string | number> = {
 			expr: args.join(" ")
 		};
 
@@ -45,38 +52,39 @@ export default {
 			json: parameters
 		});
 
-
-		if (response.statusCode === 400 && response.body.error) {
-			return {
-				success: false,
-				reply: `${response.body.error}`
-			};
-		}
-		else if (response.statusCode !== 200) {
+		if (!response.ok) {
 			return {
 				success: false,
 				reply: `The math API is currently unavailable! Try again later (status code ${response.statusCode})`
 			};
 		}
-		else {
-			let reply = response.body.result;
-			if (context.params.fixed !== false) {
-				reply = reply.replaceAll(/(^")|("$)/g, "");
-			}
 
+		const { error, result } = querySchema.parse(response.body);
+		if (error !== null) {
 			return {
-				reply
+				success: false,
+				reply: error
 			};
 		}
+
+		let reply = result;
+		if (context.params.fixed !== false) {
+			reply = reply.replaceAll(/(^")|("$)/g, "");
+		}
+
+		return {
+			success: true,
+			reply
+		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Calculates advanced maths. You can use functions, derivatives, integrals, methods, ...",
 		`Look here for more info: <a href="https://mathjs.org/">mathjs documentation</a>`,
 		"",
 
 		"Simple math:",
-		`<code>${prefix}math 1+1</code>`,
-		"2",
+		`<code>${prefix}math 9+10</code>`,
+		"19",
 		"",
 
 		"Conversions between units:",
@@ -96,5 +104,5 @@ export default {
 		`<code>${prefix}math (expression) <u>fixed:false</u></code>`,
 		`<code>${prefix}math 1000 * 1000 fixed:true</code> => 1000000`,
 		`<code>${prefix}math 1000 * 1000 fixed:false</code> => 1e+6`
-	])
-};
+	]
+});
