@@ -63,7 +63,6 @@ import FunFactCommand from "./funfact/index.js";
 import GachiCheckCommand from "./gachicheck/index.js";
 import GachiSearchCommand from "./gachisearch/index.js";
 import GetProfilePictureCommand from "./getprofilepicture/index.js";
-import GetVideoDataCommand from "./getvideodata/index.js";
 import GiftCommand from "./gift/index.js";
 import GitHubCommand from "./github/index.js";
 import GitHubStatusCommand from "./githubstatus/index.js";
@@ -250,7 +249,6 @@ export default [
 	GachiCheckCommand,
 	GachiSearchCommand,
 	GetProfilePictureCommand,
-	GetVideoDataCommand,
 	GiftCommand,
 	GitHubCommand,
 	GitHubStatusCommand,
