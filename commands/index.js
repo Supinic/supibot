@@ -73,7 +73,6 @@ import HowLongToBeatCommand from "./howlongtobeat/index.js";
 import IdCommand from "./id/index.js";
 import InspireMeCommand from "./inspireme/index.js";
 import IsDownCommand from "./isdown/index.js";
-import KanjiCommand from "./kanji/index.js";
 import KissCommand from "./kiss/index.js";
 import KnowYourMemeCommand from "./knowyourmeme/index.js";
 import LastLineCommand from "./lastline/index.js";
@@ -258,7 +257,6 @@ export default [
 	IdCommand,
 	InspireMeCommand,
 	IsDownCommand,
-	KanjiCommand,
 	KissCommand,
 	KnowYourMemeCommand,
 	LastLineCommand,
