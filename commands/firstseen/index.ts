@@ -1,13 +1,24 @@
-export default {
+import { declare } from "../../classes/command.js";
+import type { Channel } from "../../classes/channel.js";
+import type { SupiDate } from "supi-core";
+import type { User } from "../../classes/user.js";
+
+type MetaRow = {
+	User_Alias: User["ID"];
+	Channel: Channel["ID"];
+	First_Message_Posted: SupiDate;
+	First_Message_Text: string;
+};
+
+export default declare({
 	Name: "firstseen",
 	Aliases: ["fs"],
-	Author: "supinic",
 	Cooldown: 10000,
-	Description: "For a given user, this command tells you when they were first seen, based on Supibot's chat logs.",
-	Flags: ["block","mention","opt-out","pipe"],
+	Description: "For a given user, this command tells you when they were first seen in chat - based on chat logs, so it might not be 100% accurate.",
+	Flags: ["block", "mention", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function firstSeen (context, user) {
+	Code: async function firstSeen (context, user) {
 		const userData = (user) ? await sb.User.get(user) : context.user;
 		if (!userData) {
 			return {
@@ -16,7 +27,7 @@ export default {
 			};
 		}
 
-		const missingFirstLineChannels = await core.Query.getRecordset(rs => rs
+		const missingFirstLineChannels = await core.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
@@ -33,7 +44,7 @@ export default {
 				}
 
 				const promise = (async () => {
-					const message = await core.Query.getRecordset(rs => rs
+					const message = await core.Query.getRecordset<{ Text: string; Posted: SupiDate; } | undefined>(rs => rs
 						.select("Text", "Posted")
 						.from("chat_line", channelData.getDatabaseName())
 						.where("User_Alias = %n", userData.ID)
@@ -46,7 +57,7 @@ export default {
 						return;
 					}
 
-					const row = await core.Query.getRow("chat_data", "Message_Meta_User_Alias");
+					const row = await core.Query.getRow<MetaRow>("chat_data", "Message_Meta_User_Alias");
 					await row.load({
 						User_Alias: userData.ID,
 						Channel: channelData.ID
@@ -70,7 +81,8 @@ export default {
 			await Promise.all(promises);
 		}
 
-		const data = await core.Query.getRecordset(rs => rs
+		type DataRow = { Channel: Channel["ID"]; Date: SupiDate; Message: string; };
+		const data = await core.Query.getRecordset<DataRow | undefined>(rs => rs
 			.select("Channel", "First_Message_Posted AS Date", "First_Message_Text AS Message")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
@@ -82,6 +94,7 @@ export default {
 
 		if (!data) {
 			return {
+				success: true,
 				reply: core.Utils.tag.trim `
 					That user is in the database, but never showed up in chat.
 					They were first spotted ${core.Utils.timeDelta(userData.Started_Using)}.
@@ -89,11 +102,11 @@ export default {
 			};
 		}
 
-		const channelData = sb.Channel.get(data.Channel);
+		const channelData = sb.Channel.getAsserted(data.Channel);
 		const who = (userData === context.user) ? "You were" : "That user was";
 		const belongsTo = (userData === context.user) ? "your" : "their";
-
 		return {
+			success: true,
 			reply: core.Utils.tag.trim `
 				${who}
 				first seen in chat ${core.Utils.timeDelta(data.Date)},
@@ -101,6 +114,6 @@ export default {
 				${belongsTo} message: ${data.Message}
 			`
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+});
