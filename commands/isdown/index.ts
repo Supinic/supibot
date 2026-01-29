@@ -1,13 +1,27 @@
+import * as z from "zod";
 import { SupiDate } from "supi-core";
 import { domainToASCII } from "node:url";
+import { declare } from "../../classes/command.js";
 
-export default {
+const querySchema = z.object({
+	scan: z.object({
+		last_scan: z.iso.datetime(),
+		error: z.string().optional()
+	}).optional(),
+	warnings: z.object({
+		scan_failed: z.array(z.object({
+			type: z.string(),
+			msg: z.string().optional()
+		})).optional()
+	}).optional()
+});
+
+export default declare({
 	Name: "isdown",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks if a website is currently down or if it's just you.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function isDown (context, input) {
@@ -24,8 +38,9 @@ export default {
 				`Website is currently down: ${emote}`
 			]);
 
-			context.sendIntermediateMessage(first);
+			void context.sendIntermediateMessage(first);
 			return {
+				success: true,
 				reply: second
 			};
 		}
@@ -34,18 +49,18 @@ export default {
 			url: `https://sitecheck.sucuri.net/api/v3/?scan=${fixedInput}`
 		});
 
-		if (response.statusCode !== 200) {
+		if (!response.ok) {
 			return {
 				success: false,
 				reply: `Could not check if the website is down right now!`
 			};
 		}
 
-		const { scan, warnings } = response.body;
-		if (scan?.error) {
+		const { scan, warnings } = querySchema.parse(response.body);
+		if (!scan || scan.error) {
 			return {
 				success: false,
-				reply: `Cannot check website status! ${scan.error}`
+				reply: `Cannot check website status! ${scan?.error ?? "(no error available)"}`
 			};
 		}
 
@@ -62,15 +77,17 @@ export default {
 			}
 			else {
 				return {
+					success: true,
 					reply: `Website is currently down: ${error ?? "(N/A)"}. Last scanned ${delta}.`
 				};
 			}
 		}
 		else {
 			return {
+				success: true,
 				reply: `That website is currently up and available. Last scanned ${delta}.`
 			};
 		}
 	}),
 	Dynamic_Description: null
-};
+});
