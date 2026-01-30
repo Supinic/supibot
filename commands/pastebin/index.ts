@@ -1,11 +1,24 @@
+import * as z from "zod";
 import { getPathFromURL, postToPastebin } from "../../utils/command-utils.js";
 import validateHastebinServer from "./validate-hastebin.js";
+import { declare } from "../../classes/command.js";
 
 const BASE_HASTEBIN_SERVER = "https://haste.zneix.eu";
 const ALLOWED_GIST_TYPES = ["text/plain", "text/javascript", "application/javascript"];
 const TEXT_LENGTH_LIMIT = 50_000;
 
-const getHastebinServer = (param) => {
+const simpleHastebinSchema = z.object({ key: z.string() });
+const gistErrorSchema = z.object({ message: z.string() });
+const gistSchema = z.object({
+	files: z.record(z.string(), z.object({
+		content: z.string(),
+		filename: z.string(),
+		language: z.string(),
+		type: z.string()
+	}))
+});
+
+const getHastebinServer = (param?: string) => {
 	let path = param ?? BASE_HASTEBIN_SERVER;
 	if (!path.startsWith("http://") && !path.startsWith("https://")) {
 		path = `https://${path}`;
@@ -22,7 +35,7 @@ const getHastebinServer = (param) => {
 	return url.hostname;
 };
 
-export default {
+export default declare({
 	Name: "pastebin",
 	Aliases: ["pbg", "pbp", "gist", "hbg", "hbp"],
 	Author: "supinic",
@@ -32,7 +45,6 @@ export default {
 	Params: [
 		{ name: "hasteServer", type: "string" },
 		{ name: "force", type: "boolean" },
-		{ name: "gistUser", type: "string" },
 		{ name: "raw", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -141,8 +153,9 @@ export default {
 					};
 				}
 
+				const { key } = simpleHastebinSchema.parse(response.body);
 				return {
-					reply: `https://${server}/${rawString}${response.body.key}`
+					reply: `https://${server}/${rawString}${key}`
 				};
 			}
 			else {
@@ -153,49 +166,7 @@ export default {
 			}
 		}
 		else if (type === "get") {
-			let userInput = args[0];
-			if (provider === "gist" && context.params.gistUser) {
-				const escapedUser = encodeURI(context.params.gistUser);
-				const response = await core.Got.get("GitHub")({
-					url: `users/${escapedUser}/gists`,
-					throwHttpErrors: false
-				});
-
-				if (response.statusCode === 404) {
-					return {
-						success: false,
-						reply: `Provided user does not exist on GitHub!`
-					};
-				}
-				else if (response.statusCode !== 200) {
-					return {
-						success: false,
-						reply: `GitHub error: ${response.body.message}`
-					};
-				}
-
-				/** @type {Array} */
-				const gists = response.body;
-				const eligibleGists = gists.filter(gist => {
-					const eligibleFiles = Object.values(gist.files).filter(i => ALLOWED_GIST_TYPES.includes(i.type));
-					return (eligibleFiles.length === 1);
-				});
-
-				if (eligibleGists.length === 0) {
-					return {
-						success: false,
-						reply: core.Utils.tag.trim `
-							That user does not have any Gists I can use!							
-							A Gist valid for this command must use exactly one file of one of these types:
-							${ALLOWED_GIST_TYPES.join(", ")}
-						`
-					};
-				}
-
-				const randomUserGist = core.Utils.randArray(eligibleGists);
-				userInput = randomUserGist.id;
-			}
-
+			const userInput = args[0];
 			const id = getPathFromURL(userInput) || userInput;
 			if (!id) {
 				return {
@@ -205,7 +176,7 @@ export default {
 			}
 
 			const cacheKey = `${context.params.hasteServer ?? provider}-${id}`;
-			const cacheData = (context.params.force) ? null : await this.getCacheData(cacheKey);
+			const cacheData = ((context.params.force) ? null : await this.getCacheData(cacheKey)) as string | null;
 			if (cacheData) {
 				return {
 					reply: cacheData,
@@ -279,23 +250,24 @@ export default {
 					url: `gists/${id}`
 				});
 
-				if (response.statusCode === 403) {
+				// GitHub docs: `If you exceed your primary rate limit, you will receive a 403 or 429 response`
+				if (response.statusCode === 403 || response.statusCode === 429) {
 					const reset = response.headers["x-ratelimit-reset"];
 					const resetDate = new Date(Number(reset) * 1000);
-
 					return {
 						success: false,
 						reply: `Too many requests have been used recently! Try again ${core.Utils.timeDelta(resetDate)}.`
 					};
 				}
-				else if (response.statusCode !== 200) {
+				else if (!response.ok) {
+					const { data } = gistErrorSchema.safeParse(response.body);
 					return {
 						success: false,
-						reply: response.body.message
+						reply: `Could not load gist! ${data?.message ?? "(no error message))"}`
 					};
 				}
 
-				const { files } = response.body;
+				const { files } = gistSchema.parse(response.body);
 				if (Object.keys(files).length === 0) {
 					return {
 						success: false,
@@ -365,68 +337,65 @@ export default {
 			};
 		}
 	},
-	Dynamic_Description: async function () {
-		const threshold = core.Utils.groupDigits(TEXT_LENGTH_LIMIT);
-		return [
-			"Gets or creates a new text paste on Pastebin or Hastebin; or fetches one from Gist.",
-			`When fetching existing text, the output must not be longer than ${threshold} characters, for performance reasons.`,
-			"If it is, the file/paste won't be fetched, and an error is returned instead.",
-			"",
+	Dynamic_Description: () => [
+		"Gets or creates a new text paste on Pastebin or Hastebin; or fetches one from Gist.",
+		`When fetching existing text, the output must not be longer than ${core.Utils.groupDigits(TEXT_LENGTH_LIMIT)} characters, for performance reasons.`,
+		"If it is, the file/paste won't be fetched, and an error is returned instead.",
+		"",
 
-			"<h5> Pastebin </h5>",
+		"<h5> Pastebin </h5>",
 
-			`<code>$pastebin get (link)</code>`,
-			`<code>$pbg (link)</code>`,
-			"Fetches the contents of a specified Pastebin paste via ID or link.",
-			"",
+		`<code>$pastebin get (link)</code>`,
+		`<code>$pbg (link)</code>`,
+		"Fetches the contents of a specified Pastebin paste via ID or link.",
+		"",
 
-			`<code>$pastebin post (...text)</code>`,
-			`<code>$pbp (...text)</code>`,
-			"Creates a new temporary paste for you to use.",
-			"The paste is set to only be available for 10 minutes from posting, then it is deleted.",
-			"",
+		`<code>$pastebin post (...text)</code>`,
+		`<code>$pbp (...text)</code>`,
+		"Creates a new temporary paste for you to use.",
+		"The paste is set to only be available for 10 minutes from posting, then it is deleted.",
+		"",
 
-			"<h5> Hastebin </h5>",
+		"<h5> Hastebin </h5>",
 
-			`<code>$hbg (link)</code>`,
-			`<code>$hbg (link) hasteServer:(custom Hastebin URL)</code>`,
-			"Fetches the contents of a specified Hastebin haste via ID or link.",
-			"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
-			"",
+		`<code>$hbg (link)</code>`,
+		`<code>$hbg (link) hasteServer:(custom Hastebin URL)</code>`,
+		"Fetches the contents of a specified Hastebin haste via ID or link.",
+		"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
+		"",
 
-			`<code>$hbp (...text)</code>`,
-			`<code>$hbp (...text) hasteServer:(custom Hastebin URL)</code>`,
-			"Creates a new temporary haste for you to see.",
-			"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
-			"",
+		`<code>$hbp (...text)</code>`,
+		`<code>$hbp (...text) hasteServer:(custom Hastebin URL)</code>`,
+		"Creates a new temporary haste for you to see.",
+		"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
+		"",
 
-			"<h5> GitHub Gist </h5>",
+		"<h5> GitHub Gist </h5>",
 
-			`<code>$gist (gist ID)</code>`,
-			"Fetches the contents of a specified GitHub Gist paste via its ID.",
-			"The Gist must only contain a single text/plain or Javascript file.",
-			"",
+		`<code>$gist (gist ID)</code>`,
+		"Fetches the contents of a specified GitHub Gist paste via its ID.",
+		"The Gist must only contain a single text/plain or Javascript file.",
+		"",
 
-			`<code>$gist gistUser:(username)</code>`,
-			"Fetches the contents of a randomg GitHub Gist owned by the provided user.",
-			"This will automatically filter out all Gists that don't contain a single text/plain or Javascript file.",
-			"",
+		`<code>$gist gistUser:(username)</code>`,
+		"Fetches the contents of a randomg GitHub Gist owned by the provided user.",
+		"This will automatically filter out all Gists that don't contain a single text/plain or Javascript file.",
+		"",
 
-			"<h5> Other arguments </h5>",
+		"<h5> Other arguments </h5>",
 
-			`<code>$pbp (text) raw:false</code>`,
-			`<code>$hbp (text) raw:false</code>`,
-			`<code>$hbp (text) raw:false hasteServer:(custom Hastebin URL)</code>`,
-			"This command will post \"raw\" paste links, which only contain the text, rather than the website's layout.",
-			"If you would like to receive a proper link, use <code>raw:false</code> as this parameter is <code>true</code> by default!",
-			"",
+		`<code>$pbp (text) raw:false</code>`,
+		`<code>$hbp (text) raw:false</code>`,
+		`<code>$hbp (text) raw:false hasteServer:(custom Hastebin URL)</code>`,
+		"This command will post \"raw\" paste links, which only contain the text, rather than the website's layout.",
+		"If you would like to receive a proper link, use <code>raw:false</code> as this parameter is <code>true</code> by default!",
+		"",
 
-			`<code>$pastebin get (link) force:true</code>`,
-			`<code>$pbg (link) force:true</code>`,
-			`<code>$hbg (link)</code>`,
-			`<code>$hbg (link) hasteServer:(custom Hastebin URL)</code>`,
-			`<code>$gist (gist ID) force:true</code>`,
-			"Since the results of all fetching (pastebin, hastebin, gist) are cached, use <code>force:true</code> to forcibly fetch the current status of the paste."
-		];
-	}
-};
+		`<code>$pastebin get (link) force:true</code>`,
+		`<code>$pbg (link) force:true</code>`,
+		`<code>$hbg (link)</code>`,
+		`<code>$hbg (link) hasteServer:(custom Hastebin URL)</code>`,
+		`<code>$gist (gist ID) force:true</code>`,
+		"Since the results of all fetching (pastebin, hastebin, gist) are cached, use <code>force:true</code> to forcibly fetch the current status of the paste."
+	]
+});

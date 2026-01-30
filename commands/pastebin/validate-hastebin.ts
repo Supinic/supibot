@@ -1,4 +1,9 @@
-const validate = async function (server) {
+import * as z from "zod";
+import type { Command } from "../../classes/command.js";
+
+const validateSchema = z.object({ key: z.string() });
+
+const validate = async function (server: string) {
 	const slug = core.Utils.randomString(64);
 	const postResponse = await core.Got.get("GenericAPI")({
 		method: "POST",
@@ -14,11 +19,12 @@ const validate = async function (server) {
 		return false;
 	}
 
-	const { key } = postResponse.body;
-	if (typeof key !== "string") {
+	const validation = validateSchema.safeParse(postResponse.body);
+	if (!validation.success) {
 		return false;
 	}
 
+	const { key } = validation.data;
 	const getResponse = await core.Got.get("GenericAPI")({
 		url: `https://${server}/raw/${key}`,
 		throwHttpErrors: false,
@@ -35,7 +41,7 @@ const validate = async function (server) {
 	return (getResponse.body === slug);
 };
 
-export default async function validateHastebinServer (command, server) {
+export default async function validateHastebinServer (command: Command, server: string) {
 	const cacheKey = `valid-hastebin-${server}`;
 	let isValid = await command.getCacheData(cacheKey);
 	if (typeof isValid === "boolean") {
@@ -53,10 +59,7 @@ export default async function validateHastebinServer (command, server) {
 		await command.setCacheData(cacheKey, isValid, {
 			expiry: 7 * 864e5 // 7 days
 		});
+	}
 
-		return isValid;
-	}
-	else { // do not cache when `isValid === null` - this means the server is inaccessible
-		return false;
-	}
+	return isValid;
 };
