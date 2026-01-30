@@ -14,8 +14,8 @@ export default {
 	subName: "GitHub blogpost",
 	type: "rss",
 	cacheKey: "github-blogpost-last-publish-date",
-	url: "https://archlinux.org/feeds/news/",
+	url: "https://github.blog/changelog/rss",
 	options: {
-		ignoredCategories: ["github copilot"]
+		ignoredCategories: ["copilot"]
 	}
 } satisfies RssEventDefinition;
