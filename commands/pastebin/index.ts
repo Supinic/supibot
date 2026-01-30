@@ -34,6 +34,7 @@ const getHastebinServer = (param?: string) => {
 
 	return url.hostname;
 };
+const getGistKey = (id: string) => `gist-last-modified-${id}`;
 
 export default declare({
 	Name: "pastebin",
@@ -49,7 +50,7 @@ export default declare({
 	],
 	Whitelist_Response: null,
 	Code: async function pastebin (context, command, ...rest) {
-		let type;
+		let type: "get" | "post";
 		let provider;
 		const rawArgs = [...rest];
 
@@ -165,7 +166,7 @@ export default declare({
 				};
 			}
 		}
-		else if (type === "get") {
+		else {
 			const userInput = args[0];
 			const id = getPathFromURL(userInput) || userInput;
 			if (!id) {
@@ -246,8 +247,16 @@ export default declare({
 				textData = response.body;
 			}
 			else if (provider === "gist") {
+				const cacheKey = getGistKey(id);
+				const modifiedSince = await core.Cache.getByPrefix(cacheKey) as string | null;
+				const headers: Record<string, string> = {};
+				if (modifiedSince) {
+					headers["if-modified-since"] = modifiedSince;
+				}
+
 				const response = await core.Got.get("GitHub")({
-					url: `gists/${id}`
+					url: `gists/${id}`,
+					headers
 				});
 
 				// GitHub docs: `If you exceed your primary rate limit, you will receive a 403 or 429 response`
@@ -265,6 +274,11 @@ export default declare({
 						success: false,
 						reply: `Could not load gist! ${data?.message ?? "(no error message))"}`
 					};
+				}
+
+				const lastModified = response.headers["last-modified"];
+				if (lastModified) {
+					await core.Cache.setByPrefix(cacheKey, lastModified);
 				}
 
 				const { files } = gistSchema.parse(response.body);
@@ -328,12 +342,6 @@ export default declare({
 
 			return {
 				reply: textData
-			};
-		}
-		else {
-			return {
-				success: false,
-				reply: `Invalid operation provided!`
 			};
 		}
 	},
