@@ -1,13 +1,14 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "randomfilm",
 	Aliases: ["rf"],
-	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches a random movie.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function randomFilm () {
+	Code: async function randomFilm () {
 		const html = await core.Got.get("FakeAgent")({
 			url: "https://www.bestrandoms.com/random-movie-generator",
 			responseType: "text"
@@ -21,9 +22,11 @@ export default {
 				.replace(/(\(\d+\))/, " $1");
 		});
 
+		const movie = core.Utils.randArray([...movies]);
 		return {
-			reply: `Your random movie is: ${core.Utils.randArray(movies)}.`
+			success: true,
+			reply: `Your random movie: ${movie}.`
 		};
-	}),
+	},
 	Dynamic_Description: null
-};
+});
