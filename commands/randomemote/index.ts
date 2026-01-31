@@ -1,7 +1,7 @@
 import { randomInt } from "../../utils/command-utils.js";
 import { declare } from "../../classes/command.js";
+import { RESULT_CHARACTER_LIMIT } from "../pipe/index.js";
 
-const RESULT_CHARACTER_LIMIT = 50000; // @todo import from $pipe: // import { RESULT_CHARACTER_LIMIT } from "../pipe/index.js";
 const MAXIMUM_EMOTE_LIMIT = 200;
 const match = (flag: boolean | undefined, condition: boolean) => (flag === undefined || condition === flag);
 

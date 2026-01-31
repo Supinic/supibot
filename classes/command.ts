@@ -82,7 +82,7 @@ export type StrictResult = {
 		skipWhitespaceCheck?: boolean;
 	}
 };
-type Result = StrictResult & {
+export type Result = StrictResult & {
 	reason?: string;
 	replyWithMeAction?: boolean;
 	discord?: {
@@ -118,6 +118,7 @@ export type ContextAppendData = {
 	id?: string;
 	messageID?: string;
 	pipe?: boolean;
+	pipeCount?: number;
 	platform?: never; // @todo this is a temporary check for refactor purposes
 	privateMessage?: boolean;
 	skipPending?: boolean;

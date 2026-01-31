@@ -18,7 +18,7 @@ import {
 	isClassicAlias
 } from "../alias-utils.js";
 
-const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations;
+const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
 export default {
 	name: "run",
 	title: "Run an alias",

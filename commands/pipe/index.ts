@@ -1,10 +1,11 @@
 import { getConfig } from "../../config.js";
+import { declare, type Result as CommandResult } from "../../classes/command.js";
 const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
 
 // matches | and > characters if and only if they're not preceded, nor followed by another | or >.
 const PIPE_REGEX = /(?<![|>])[|>](?![|>])/;
 const NESTED_PIPE_LIMIT = 10;
-const RESULT_CHARACTER_LIMIT = 50_000;
+export const RESULT_CHARACTER_LIMIT = 50_000;
 const ERROR_REASONS = {
 	block: "That user has blocked you from this command!",
 	cooldown: "Still on cooldown!",
@@ -13,9 +14,25 @@ const ERROR_REASONS = {
 	"opt-out": "That user has opted out from this command!",
 	pending: "Another command still being executed!",
 	"pipe-nsfw": "You cannot pipe NSFW results!"
+} as const;
+
+const isErrorReason = (input?: string): input is keyof typeof ERROR_REASONS => Boolean(input && Object.keys(ERROR_REASONS).includes(input));
+const getErrorReply = (execution: CommandResult): string => {
+	const { reply, reason } = execution;
+	if (isErrorReason(reason)) {
+		return ERROR_REASONS[reason];
+	}
+	else if (reply) {
+		return reply;
+	}
+	else if (reason) {
+		return reason;
+	}
+
+	return "(no error available)";
 };
 
-export default {
+export default declare({
 	Name: "pipe",
 	Aliases: null,
 	Author: "supinic",
@@ -51,7 +68,7 @@ export default {
 		}
 
 		const invocations = args.join(" ").split(splitter).map(i => i.trim());
-		if (!context.externalPipe && invocations.length < 2) {
+		if (invocations.length < 2) {
 			return {
 				success: false,
 				reply: "At least two commands must be piped together!"
@@ -81,7 +98,7 @@ export default {
 					reply: `Output of command "${commandString}" cannot be piped!`
 				};
 			}
-			else if (nullCommand && commandData.Flags.includes("nonNullable") && invocations[i + 1]) {
+			else if (nullCommand && commandData.Flags.includes("non-nullable") && invocations[i + 1]) {
 				const [nextCommandString] = invocations[i + 1].split(" ");
 				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
 				if (nextCommand && nextCommand.Name === nullCommand.Name) {
@@ -140,7 +157,7 @@ export default {
 		}
 
 		// let finalResult = null;
-		let currentArgs = [];
+		let currentArgs: string[] = [];
 		let privateMessageReply = false;
 		let meActionReply = false;
 
@@ -150,7 +167,7 @@ export default {
 
 			let argumentStartPosition = null;
 			if (typeof context.params._apos?.[i] !== "undefined") {
-				argumentStartPosition = Number(context.params._apos?.[i]);
+				argumentStartPosition = Number(context.params._apos[i]);
 			}
 			else if (typeof context.params._pos !== "undefined") {
 				argumentStartPosition = Number(context.params._pos);
@@ -198,11 +215,8 @@ export default {
 					...context.append,
 					pipeCount,
 					tee: context.tee,
-					platform: context.platform,
-					platformSpecificData: context.platformSpecificData,
 					commandList: totalUsedCommandNames,
 					pipe: true,
-					pipeIndex: i,
 					skipBanphrases: true,
 					skipPending: true,
 					skipMention: true,
@@ -210,19 +224,14 @@ export default {
 				}
 			});
 
-			if (execution) {
-				if (typeof execution.replyWithPrivateMessage === "boolean") {
-					privateMessageReply = execution.replyWithPrivateMessage;
-				}
-				else if (typeof execution.replyWithMeAction === "boolean") {
-					meActionReply = execution.replyWithMeAction;
-				}
+			if (typeof execution.replyWithPrivateMessage === "boolean") {
+				privateMessageReply = execution.replyWithPrivateMessage;
+			}
+			else if (typeof execution.replyWithMeAction === "boolean") {
+				meActionReply = execution.replyWithMeAction;
 			}
 
-			if (!execution) { // Banphrase result: Do not reply
-				currentArgs = [];
-			}
-			else if (execution.success === false) {
+			if (execution.success === false) {
 				if (context.params._force) {
 					let reply = execution.reply;
 					if (!reply) {
@@ -251,7 +260,7 @@ export default {
 					}
 				}
 				else {
-					const reply = ERROR_REASONS[execution.reason] ?? execution.reply ?? execution.reason;
+					const reply = getErrorReply(execution);
 					return {
 						success: false,
 						replyWithPrivateMessage: privateMessageReply,
@@ -263,7 +272,7 @@ export default {
 			else if (!execution.reply && i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
 				currentArgs = [];
 			}
-			else if (execution.reply === null && execution.success !== false) { // "Special" case for successful `null` results - pretend as if nothing happened
+			else if (!execution.reply) { // "Special" case for successful `null` results - pretend as if nothing happened
 				return execution;
 			}
 			else if (typeof execution !== "object") { // Banphrase result: Reply with message
@@ -304,7 +313,7 @@ export default {
 			reply: currentArgs.join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Pipes multiple commands together, where each command's result will become the input of another.",
 		"Separate the commands with <code>|</code> or <code>&gt;</code> characters.",
 		"",
@@ -344,5 +353,5 @@ export default {
 		`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
 		"If used with <code>_force:true</code>, this invocation will actually pipe the failure response of the <code>translate</code> command into <code>remind</code>.",
 		""
-	])
-};
+	]
+});

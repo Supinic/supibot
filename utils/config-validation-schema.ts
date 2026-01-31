@@ -102,7 +102,7 @@ export const ConfigSchema = z.strictObject({
 			prefix: z.string(),
 			bannedCombinations: z.array(
 				z.array(z.string())
-			)
+			).optional()
 		}),
 		crons: moduleBase("crons"),
 		gots: moduleBase("gots").safeExtend({
