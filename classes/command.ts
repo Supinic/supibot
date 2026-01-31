@@ -675,6 +675,19 @@ export class Command extends TemplateWithoutId {
 			if (!options.skipPending) {
 				const pending = Command.#cooldownManager.fetchPending(userData.ID);
 				if (pending) {
+					sb.Logger.logCommandExecution({
+						User_Alias: userData.ID,
+						Command: command.Name,
+						Platform: platformData.ID,
+						Executed: new SupiDate(),
+						Channel: channelData?.ID ?? null,
+						Success: false,
+						Invocation: identifier,
+						Arguments: null,
+						Result: `Pending failure: ${JSON.stringify(pending)}`,
+						Execution_Time: null
+					});
+
 					return {
 						reply: (options.privateMessage) ? pending.description : null,
 						reason: "pending"
@@ -788,6 +801,19 @@ export class Command extends TemplateWithoutId {
 				name: command.Name,
 				result: "filtered",
 				reason: filterData.reason
+			});
+
+			sb.Logger.logCommandExecution({
+				User_Alias: userData.ID,
+				Command: command.Name,
+				Platform: platformData.ID,
+				Executed: new SupiDate(),
+				Channel: channelData?.ID ?? null,
+				Success: false,
+				Invocation: identifier,
+				Arguments: JSON.stringify(args.filter(Boolean)),
+				Result: `Filter failure: ${JSON.stringify(filterData)}`,
+				Execution_Time: null
 			});
 
 			return filterData;
