@@ -395,7 +395,7 @@ export class Command extends TemplateWithoutId {
 	readonly Name: string;
 	readonly Aliases: string[];
 	readonly Description: string | null;
-	readonly Cooldown: number | null;
+	readonly Cooldown: number;
 	readonly Flags: readonly Flag[];
 	readonly Params: ParameterDefinitions = [];
 	readonly Whitelist_Response: string | null;
@@ -423,7 +423,7 @@ export class Command extends TemplateWithoutId {
 		this.Name = data.Name;
 		this.Aliases = data.Aliases ?? [];
 		this.Description = data.Description ?? null;
-		this.Cooldown = data.Cooldown ?? null;
+		this.Cooldown = data.Cooldown;
 		this.Whitelist_Response = data.Whitelist_Response ?? null;
 
 		this.Flags = Object.freeze(data.Flags);
@@ -774,7 +774,7 @@ export class Command extends TemplateWithoutId {
 		if (!filterData.success && (!options.skipGlobalBan || !isFilterGlobalBan)) {
 			Command.#cooldownManager.unsetPending(userData.ID);
 
-			let length = command.Cooldown;
+			let length: number | null = command.Cooldown;
 			const cooldownFilter = Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
@@ -1134,7 +1134,7 @@ export class Command extends TemplateWithoutId {
 			}
 		}
 		else {
-			let length = commandData.Cooldown ?? 0;
+			let length = commandData.Cooldown;
 			const cooldownFilter = Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,

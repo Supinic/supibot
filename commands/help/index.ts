@@ -75,10 +75,7 @@ export default declare({
 		}
 
 		const aliases = (command.Aliases.length === 0) ? "" : (` (${command.Aliases.map(i => prefix + i).join(", ")})`);
-		const cooldownString = (command.Cooldown === null)
-			? `no cooldown`
-			: `${core.Utils.round(command.Cooldown / 1000, 1)} seconds cooldown.`;
-
+		const cooldownString = `${core.Utils.round(command.Cooldown / 1000, 1)} seconds cooldown.`;
 		const cooldownModifier = sb.Filter.getCooldownModifiers({
 			command,
 			invocation: identifier,
