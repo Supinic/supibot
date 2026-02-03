@@ -77,7 +77,7 @@ export default declare({
 	],
 	Whitelist_Response: null,
 	Code: async function espn (context) {
-		// @todo remove this type cast when context.invocation is a specific union in the future
+		// @todo remove this typecast when context.invocation is a specific union in the future
 		const league = context.invocation as "espn" | "nba" | "nfl" | "nhl" | "mlb";
 		if (league === "espn") {
 			return {
