@@ -1,17 +1,17 @@
-export default {
+import { declare } from "../../classes/command.js";
+
+export default declare({
 	Name: "pick",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Picks a single word from the provided list of words in a message.",
-	Flags: ["mention","pipe"],
-	Params: [
-		{ name: "delimiter", type: "regex" }
-	],
+	Flags: ["mention", "pipe"],
+	Params: [{ name: "delimiter", type: "regex" }],
 	Whitelist_Response: null,
-	Code: (async function pick (context, ...words) {
+	Code: function pick (context, ...words) {
 		if (words.length === 0) {
 			return {
+				success: false,
 				reply: "No input provided!"
 			};
 		}
@@ -23,13 +23,12 @@ export default {
 		const word = core.Utils.randArray(prepared);
 
 		return {
+			success: true,
 			reply: word,
-			cooldown: (context.append.pipe)
-				? 0
-				: this.Cooldown
+			cooldown: (context.append.pipe) ? 0 : this.Cooldown
 		};
-	}),
-	Dynamic_Description: (async (prefix) => [
+	},
+	Dynamic_Description: (prefix) => [
 		"Picks a single word from a list in your message.",
 		`This command has no cooldown if used within a <a href="/bot/command/detail/pipe">${prefix}pipe</a> command.`,
 		"",
@@ -46,5 +45,5 @@ export default {
 		"Another example of delimiters:",
 		`<code>${prefix}pick <u>delimiter:;</u> one word; two words; three words</code>`,
 		"<code>two words</code>"
-	])
-};
+	]
+});
