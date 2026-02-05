@@ -106,8 +106,11 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
 	}
 };
 
+type WeirdRssCategory = { _: string; $: Record<string, string> };
+type Category = string | WeirdRssCategory;
+
 /**
- * Parses RSS xml into an object definition, caching and uncaching it as required.
+ * Parses RSS XML into an object definition, caching and uncaching it as required.
  */
 const parseRssNews = async function (xml: string, cacheKey: string, options: RssEventDefinition["options"] = {}): Promise<string[] | null> {
 	const feed = await parseRSS(xml);
@@ -121,8 +124,11 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 				return true;
 			}
 
-			const itemCat = (article.categories ?? []).map(i => i.toLowerCase());
-			return itemCat.some(category => skippedCategories.includes(category));
+			const categories = (article.categories ?? []) as Category[];
+			return categories.some(cat => {
+				const category = (typeof cat === "string") ? cat : cat._;
+				return skippedCategories.includes(category);
+			});
 		})
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
 
