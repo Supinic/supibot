@@ -1,19 +1,21 @@
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
+import { twitchStreamSchema } from "../../utils/schemas.js";
+import { postToHastebin } from "../../utils/command-utils.js";
 
 const VIEWER_THRESHOLD = 100;
 const BATCH_SIZE = 100;
 
-export default {
+export default declare({
 	Name: "findraidstreams",
 	Aliases: ["frs"],
-	Author: "supinic",
-	Cooldown: 0,
-	Description: "Iterates over eligible Twitch channels, finds online streams and posts a summary to Pastebin. Used to find a good raid after a stream is finished.",
-	Flags: ["developer","pipe","whitelist"],
+	Cooldown: 120000,
+	Description: "Iterates over eligible Twitch channels, finds online streams and posts a summary to Hastebin. Used to find a good raid after a stream is finished.",
+	Flags: ["developer", "pipe", "whitelist"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function findRaidStreams () {
-		const twitch = sb.Platform.get("twitch");
+		const twitch = sb.Platform.getAsserted("twitch");
 		const channelIds = await twitch.getLiveChannelIdList();
 
 		let counter = 0;
@@ -37,7 +39,7 @@ export default {
 		const raidData = [];
 		const results = await Promise.all(promises);
 		for (const partialResult of results) {
-			const block = partialResult.body?.data ?? [];
+			const block = twitchStreamSchema.parse(partialResult.body).data;
 			const formatted = block.map(i => ({
 				name: i.user_login,
 				viewers: i.viewer_count,
@@ -54,23 +56,21 @@ export default {
 			.sort((a, b) => b.viewers - a.viewers);
 
 		const data = JSON.stringify(filteredRaidData, null, 4);
-		const response = await core.Got.get("GenericAPI")({
-			method: "POST",
-			url: `https://haste.zneix.eu/documents`,
-			throwHttpErrors: false,
-			body: `Raid targets ${new SupiDate().format("Y-m-d H:i:s")}\n\n${data}`
+		const hasteResult = await postToHastebin(data, {
+			title: `Raid targets ${new SupiDate().format("Y-m-d H:i:s")}`
 		});
 
-		if (response.statusCode !== 200) {
+		if (!hasteResult.ok) {
 			return {
 				success: false,
-				reply: `Error ${response.statusCode} while posting paste!`
+				reply: `Could not post paste! ${hasteResult.statusCode}`
 			};
 		}
 
 		return {
-			reply: `https://haste.zneix.eu/raw/${response.body.key}`
+			success: true,
+			reply: `https://haste.zneix.eu/raw/${hasteResult.link}`
 		};
 	}),
 	Dynamic_Description: null
-};
+});
