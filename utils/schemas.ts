@@ -217,3 +217,32 @@ export const ivrClipSchema = z.object({
 	}),
 	clipKey: z.string().optional()
 });
+
+const simpleUserShape = z.object({
+	id: z.string(),
+	login: z.string(),
+	displayName: z.string()
+});
+const subDurationShape = z.object({
+	elapsedDays: z.int(),
+	daysRemaining: z.int(),
+	months: z.int(),
+	start: z.iso.datetime(),
+	end: z.iso.datetime()
+});
+
+export const ivrSubAgeSchema = z.object({
+	user: simpleUserShape,
+	channel: simpleUserShape,
+	statusHidden: z.boolean().nullable(),
+	followedAt: z.iso.datetime().nullable(),
+	streak: subDurationShape.nullable(),
+	cumulative: subDurationShape.nullable(),
+	meta: z.object({
+		type: z.string(),
+		tier: z.string(),
+		renewsAt: z.iso.datetime().nullable(),
+		endsAt: z.iso.datetime().nullable(),
+		gitMeta: z.unknown().nullable()
+	}).nullable()
+});

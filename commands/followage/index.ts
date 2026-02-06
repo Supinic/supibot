@@ -1,37 +1,43 @@
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
+import { ivrSubAgeSchema } from "../../utils/schemas.js";
 
-export default {
+export default declare({
 	Name: "followage",
 	Aliases: ["fa"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the followage for a given user and a channel. If no channel is provided, checks the current one. If no user is provided either, checks yourself.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function followAge (context, user, channel) {
-		if (!channel && user) {
-			channel = user;
-			user = context.user.Name;
-		}
-
-		if (!channel) {
+	Code: (async function followAge (context, ...args) {
+		let channel;
+		let user;
+		if (args.length === 0) {
 			if (!context.channel) {
 				return {
 					success: false,
-					reply: "You must provide a specific channel in PMs!"
+					reply: "When in PMs, you must provide full context! Use $followage (user) (channel)."
 				};
 			}
-			else if (context.platform.Name !== "twitch") {
+			else if (context.platform.name !== "twitch") {
 				return {
 					success: false,
-					reply: "You must provide a specific channel in non-Twitch channels!"
+					reply: `When in ${context.platform.capital}, you must provide full context! Use $followage (user) (channel).`
 				};
 			}
-		}
 
-		channel ??= context.channel.Name;
-		user ??= context.user.Name;
+			channel = context.channel.Name;
+			user = context.user.Name;
+		}
+		else if (args.length === 1) {
+			channel = args[0];
+			user = context.user.Name;
+		}
+		else {
+			user = args[0];
+			channel = args[1];
+		}
 
 		if (user === channel.toLowerCase()) {
 			if (user === context.user.Name) {
@@ -57,10 +63,11 @@ export default {
 		const prefix = (user.toLowerCase() === context.user.Name) ? "You" : user;
 		const suffix = (channel.toLowerCase() === context.user.Name) ? "you" : channel;
 
-		const { followedAt } = response.body;
+		const { followedAt } = ivrSubAgeSchema.parse(response.body);
 		if (!followedAt) {
 			const verb = (user.toLowerCase() === context.user.Name) ? "are" : "is";
 			return {
+				success: true,
 				reply: `${prefix} ${verb} not following ${suffix}.`
 			};
 		}
@@ -68,8 +75,9 @@ export default {
 		const verb = (user.toLowerCase() === context.user.Name) ? "have" : "has";
 		const delta = core.Utils.timeDelta(new SupiDate(followedAt), true, true);
 		return {
+			success: true,
 			reply: `${prefix} ${verb} been following ${suffix} for ${delta}.`
 		};
 	}),
 	Dynamic_Description: null
-};
+});
