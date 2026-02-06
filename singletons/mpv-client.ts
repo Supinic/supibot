@@ -324,6 +324,24 @@ export class MpvClient {
 		return await this.removeById(targetId, targetUser);
 	}
 
+	public async removeUserLast (targetUser: number): Promise<Failure | RemoveSuccess> {
+		let targetId;
+		for (const { user, id } of this.itemData.values()) {
+			if (user === targetUser) {
+				targetId = id;
+			}
+		}
+
+		if (typeof targetId !== "number") {
+			return {
+				success: false,
+				reason: "No media queued by user"
+			};
+		}
+
+		return await this.removeById(targetId, targetUser);
+	}
+
 	public async playNext (): Promise<Success> {
 		await this.send(["playlist-next", "force"]);
 		await this.saveCache();

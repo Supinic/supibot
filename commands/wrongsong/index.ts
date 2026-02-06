@@ -11,8 +11,8 @@ export default declare({
 	Code: (async function wrongSong (context, target) {
 		if (!sb.MpvClient) {
 			return {
-			    success: false,
-			    reply: "mpv client is not available! Check configuration if this is required."
+				success: false,
+				reply: "mpv client is not available! Check configuration if this is required."
 			};
 		}
 
@@ -29,7 +29,7 @@ export default declare({
 			result = await sb.MpvClient.removeById(targetId, context.user.ID);
 		}
 		else {
-			result = await sb.MpvClient.removeUserFirst(context.user.ID);
+			result = await sb.MpvClient.removeUserLast(context.user.ID);
 		}
 
 		if (!result.success) {
