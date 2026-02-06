@@ -3,6 +3,7 @@ import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
 
 const HLTB_TOKEN_CACHE_KEY = "hltb-token-cache";
+const HLTB_ENDPOINT_CACHE_KEY = "hltb-api-endpoint";
 
 const initSchema = z.object({ token: z.string() });
 const hltbGameSchema = z.object({
@@ -62,9 +63,59 @@ const hltbDataSchema = z.object({
  */
 
 /**
+ * Minor heuristic to fetch the API's current endpoint as it is known to change fairly dynamically.
+ */
+const fetchEndpoint = async (force?: boolean) => {
+	if (!force) {
+		const cached = await core.Cache.getByPrefix(HLTB_ENDPOINT_CACHE_KEY) as string | null;
+		if (cached) {
+			return cached;
+		}
+	}
+
+	const mainResponse = await core.Got.get("FakeAgent")({
+		url: "https://howlongtobeat.com",
+		responseType: "text"
+	});
+
+	const $ = core.Utils.cheerio(mainResponse.body);
+	const scripts = $("script[src*='chunks']");
+
+	const scriptUrls = new Set<string>();
+	for (const script of scripts) {
+		const src = $(script).attr("src");
+		if (!src) {
+			continue;
+		}
+
+		scriptUrls.add(src.replace(/^\//, ""));
+	}
+
+	const regex = /\/api\/(\w+)\/init\?t=/i;
+	for (const url of scriptUrls) {
+		const response = await core.Got.get("FakeAgent")({
+			prefixUrl: "https://howlongtobeat.com",
+			url,
+			responseType: "text"
+		});
+
+		const match = response.body.match(regex);
+		if (match) {
+			await core.Cache.setByPrefix(HLTB_ENDPOINT_CACHE_KEY, match[1], {
+				expiry: 864e5 // 24 hours
+			});
+
+			return match[1];
+		}
+	}
+
+	return null;
+};
+
+/**
  * Fetches the "authentication token" - either from cache, or refreshes it.
  */
-const fetchToken = async () => {
+const fetchToken = async (endpoint: string) => {
 	const existing = await core.Cache.getByPrefix(HLTB_TOKEN_CACHE_KEY) as string | undefined;
 	if (existing) {
 		return existing;
@@ -72,7 +123,7 @@ const fetchToken = async () => {
 
 	const now = SupiDate.now();
 	const response = await core.Got.get("FakeAgent")({
-		url: `https://howlongtobeat.com/api/search/init?t=${now}`,
+		url: `https://howlongtobeat.com/api/${endpoint}/init?t=${now}`,
 		responseType: "json",
 		headers: {
 			Referer: "https://howlongtobeat.com/"
@@ -91,8 +142,11 @@ const fetchToken = async () => {
 	return token;
 };
 
-const fetchData = async (query: string[]) => {
-	const token = await fetchToken();
+/**
+ * Fetches the search data for a provided game query.
+ */
+const fetchData = async (endpoint: string, query: string[]) => {
+	const token = await fetchToken(endpoint);
 	if (!token) {
 		return {
 			success: false,
@@ -101,7 +155,7 @@ const fetchData = async (query: string[]) => {
 	}
 
 	const response = await core.Got.get("FakeAgent")({
-		url: `https://howlongtobeat.com/api/search`,
+		url: `https://howlongtobeat.com/api/${endpoint}`,
 		method: "POST",
 		throwHttpErrors: false,
 		headers: {
@@ -157,23 +211,44 @@ export default declare({
 			};
 		}
 
-		let response = await fetchData(args);
+		const endpoint = await fetchEndpoint(false);
+		if (!endpoint) {
+			return {
+				success: false,
+				reply: "Could not fetch the HLTB endpoint! The API likely changed!"
+			};
+		}
+
+		let response = await fetchData(endpoint, args);
 		if ("success" in response) {
 			return response;
 		}
 
 		if (!response.ok) {
 			await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, null);
-			response = await fetchData(args);
+			response = await fetchData(endpoint, args);
 
 			if ("success" in response) {
 				return response;
 			}
 			else if (!response.ok) {
-				return {
-				    success: false,
-				    reply: "Could not fetch data after resetting the token! The API has likely changed (again?!)"
-				};
+				const newEndpoint = await fetchEndpoint(true);
+				if (!newEndpoint) {
+					return {
+						success: false,
+						reply: "Could not re-fetch API endpoint!"
+					};
+				}
+
+				response = await fetchData(newEndpoint, args);
+				if ("success" in response) {
+					return response;
+				}
+
+				const channelData = sb.Channel.get("supinic", "twitch");
+				if (channelData) {
+					void channelData.send(`Seems like the HLTB endpoint has changed, it is now "${newEndpoint}" Clueless @Supinic`);
+				}
 			}
 		}
 
