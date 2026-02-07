@@ -46,6 +46,7 @@ export default {
 		if (!firstName && !secondName) {
 			const username = encodeURIComponent(context.user.Name);
 			return {
+				success: true,
 				reply: `List of your aliases: https://supinic.com/bot/user/${username}/alias/list`
 			};
 		}
@@ -76,10 +77,42 @@ export default {
 
 			// Not a username nor current user's alias name - error out
 			if (targetAliases.length === 0 && !aliases.includes(firstName)) {
-				return {
-					success: false,
-					reply: `Could not match your input to username or any of your aliases!`
-				};
+				const { channel } = context;
+				if (!channel) {
+					return {
+						success: false,
+						reply: `Could not match your input to username or any of your aliases!`
+					};
+				}
+
+				const authorId = await core.Query.getRecordset<number | undefined>(rs => rs
+					.select("ParentAlias.User_Alias AS Author")
+					.from("data", "Custom_Command_Alias")
+					.join({
+						alias: "ParentAlias",
+						fromTable: "Custom_Command_Alias",
+						toTable: "Custom_Command_Alias",
+						on: "ParentAlias.ID = Custom_Command_Alias.Parent"
+					})
+					.where("Custom_Command_Alias.Name = %s", firstName)
+					.where("Custom_Command_Alias.Channel = %n", channel.ID)
+					.where("Custom_Command_Alias.User_Alias IS NULL")
+					.flat("Author")
+					.single()
+				);
+
+				if (authorId) {
+					const authorData = await sb.User.getAsserted(authorId);
+					user = authorData;
+					aliasName = firstName;
+					prefix = `${authorData.Name}'s published`;
+				}
+				else {
+					return {
+						success: false,
+						reply: `Could not match your input to username or any of your aliases!`
+					};
+				}
 			}
 			// Not a username, but current user has an alias with the provided name
 			else if (targetAliases.length === 0 && aliases.includes(firstName)) {
