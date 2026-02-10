@@ -3,7 +3,7 @@ import { SupiDate, SupiError } from "supi-core";
 import type { default as LinkParser } from "track-link-parser";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 
-import type { IvrClipData } from "../../@types/globals.js";
+import type { IvrClipData } from "../../utils/globals.js";
 import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
 import getLinkParser from "../../utils/link-parser.js";
 

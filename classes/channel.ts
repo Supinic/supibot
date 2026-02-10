@@ -20,7 +20,7 @@ import {
 import type { User } from "./user.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
 import { TemplateWithId } from "./template.js";
-import type { Emote } from "../@types/globals.js";
+import type { Emote } from "../utils/globals.js";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 

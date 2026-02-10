@@ -22,7 +22,7 @@ import {
 
 import { BasePlatformConfigSchema } from "./schema.js";
 import { Platform, type PlatformVerificationStatus, type PrepareMessageOptions } from "./template.js";
-import type { DiscordEmote, Emote } from "../@types/globals.d.ts";
+import type { DiscordEmote, Emote } from "../utils/globals.js";
 
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";

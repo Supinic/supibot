@@ -1,6 +1,6 @@
 import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
-import type { SimpleGenericData } from "../@types/globals.js";
+import type { SimpleGenericData } from "../utils/globals.js";
 import type { Query } from "supi-core";
 
 import type { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";

@@ -31,7 +31,7 @@ import CooldownManager from "../utils/cooldown-manager.js";
 import { type Language, getLanguage } from "../utils/languages.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
-import type { Emote } from "../@types/globals.js";
+import type { Emote } from "../utils/globals.js";
 
 const { values: configValues, modules: modulesConfig, responses: configResponses } = getConfig();
 const COMMAND_PREFIX = modulesConfig.commands.prefix;

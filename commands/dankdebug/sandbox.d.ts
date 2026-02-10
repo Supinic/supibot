@@ -1,4 +1,4 @@
-import type { JSONifiable, Emote } from "../../@types/globals.d.ts"
+import type { JSONifiable, Emote } from "../../utils/globals.js"
 import type { Command, ParameterType } from "../../classes/command.js"
 import type { Channel } from "../../classes/channel.js"
 import type { User, permissions as Permissions } from "../../classes/user.js"

@@ -6,7 +6,7 @@ import { Platform, type MirrorOptions } from "./template.js";
 import { BasePlatformConfigSchema } from "./schema.js";
 import type { Channel } from "../classes/channel.js";
 import type { User } from "../classes/user.js";
-import type { Emote } from "../@types/globals.js";
+import type { Emote } from "../utils/globals.js";
 
 type PlaylistObject = VideoObject | {
 	media: VideoObject["media"];

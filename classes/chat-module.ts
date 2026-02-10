@@ -5,7 +5,7 @@ import { Channel, type Like as ChannelLike } from "./channel.js";
 
 import type { User } from "./user.js";
 import { Platform } from "../platforms/template.js";
-import type { SimpleGenericData, XOR } from "../@types/globals.d.ts";
+import type { SimpleGenericData, XOR } from "../utils/globals.js";
 import type { TwitchPlatform } from "../platforms/twitch.js";
 import type { MessageNotification as TwitchMessageNotification } from "../platforms/twitch-utils.js";
 

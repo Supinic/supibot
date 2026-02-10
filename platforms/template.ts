@@ -13,7 +13,7 @@ import type { CytubeConfig, CytubePlatform } from "./cytube.js";
 import type { IrcConfig, IrcPlatform } from "./irc.js";
 
 import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
-import type { Emote } from "../@types/globals.d.ts";
+import type { Emote } from "../utils/globals.js";
 
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 

@@ -34,7 +34,7 @@ import TwitchUtils, {
 import type { Channel } from "../classes/channel.js";
 import type { User } from "../classes/user.js";
 import { SupiDate, SupiError } from "supi-core";
-import type { Emote, ThirdPartyEmote } from "../@types/globals.d.ts";
+import type { Emote, ThirdPartyEmote } from "../utils/globals.js";
 import type { TwitchSubscriberData } from "../utils/schemas.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68

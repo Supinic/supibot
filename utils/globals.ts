@@ -9,8 +9,6 @@ declare global {
     }
 }
 
-export type Message = string;
-
 type BaseEmote = {
     ID: string | number;
     name: string;
@@ -110,4 +108,3 @@ type IvrEmoteFailure = {
     };
 };
 export type IvrEmoteData = IvrEmoteSuccess | IvrEmoteFailure;
-
