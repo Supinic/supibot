@@ -1,4 +1,7 @@
-export default {
+import { declare } from "../../classes/command.js";
+import type { SupiDate } from "supi-core";
+
+export default declare({
 	Name: "firstline",
 	Aliases: ["fl"],
 	Author: "supinic",
@@ -36,10 +39,7 @@ export default {
 			};
 		}
 
-		const channelArticle = (targetChannel === context.channel)
-			? "this"
-			: "that";
-
+		const channelArticle = (targetChannel === context.channel) ? "this" : "that";
 		const targetUser = (user)
 			? await sb.User.get(user)
 			: context.user;
@@ -51,7 +51,8 @@ export default {
 			};
 		}
 
-		let metaData = await core.Query.getRecordset(rs => rs
+		type Meta = { First_Message_Posted: SupiDate | null; First_Message_Text: string | null; };
+		const metaData = await core.Query.getRecordset<Meta | undefined>(rs => rs
 			.select("First_Message_Posted", "First_Message_Text")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", targetUser.ID)
@@ -68,20 +69,23 @@ export default {
 					: `That user has not said anything in ${channelArticle} channel!`
 			};
 		}
-		else if (!metaData.First_Message_Posted) {
+
+		let {
+			First_Message_Posted: posted,
+			First_Message_Text: text
+		} = metaData;
+
+		if (!posted || !text) {
 			const dbChannelName = targetChannel.getDatabaseName();
 			if (!await core.Query.isTablePresent("chat_line", dbChannelName)) {
-				const userArticle = (targetUser === context.user)
-					? "You have"
-					: "That user has";
-
+				const userArticle = (targetUser === context.user) ? "You have" : "That user has";
 				return {
 					success: false,
 					reply: `${userArticle} no first line data available in ${channelArticle} channel!`
 				};
 			}
 
-			const lineData = await core.Query.getRecordset(rs => rs
+			const lineData = await core.Query.getRecordset<{ Text: string; Posted: SupiDate; }>(rs => rs
 				.select("Text", "Posted")
 				.from("chat_line", dbChannelName)
 				.where("User_Alias = %n", targetUser.ID)
@@ -103,15 +107,13 @@ export default {
 
 			await row.save({ skipLoad: true });
 
-			metaData = {
-				First_Message_Posted: lineData.Posted,
-				First_Message_Text: lineData.Text
-			};
+			posted = lineData.Posted;
+			text = lineData.Text;
 		}
 
 		if (context.params.textOnly) {
 			return {
-				reply: metaData.First_Message_Text
+				reply: text
 			};
 		}
 
@@ -120,22 +122,22 @@ export default {
 			partialReplies: [
 				{
 					bancheck: false,
-					message: `${prefix} first message in ${channelArticle} channel was (${core.Utils.timeDelta(metaData.First_Message_Posted)}):`
+					message: `${prefix} first message in ${channelArticle} channel was (${core.Utils.timeDelta(posted)}):`
 				},
 				{
 					bancheck: true,
-					message: metaData.First_Message_Text
+					message: text
 				}
 			]
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Posts the target user's first chat line.",
 		"",
 
 		"You can specify a channel as context with the channel parameter (see examples below).",
 		"If you don't specify a channel, the current channel will be used as context.",
-		"The command can only be used in whispers, if you specify a valid channel.",
+		"When used in whispers, you must provide a channel.",
 		"",
 
 		`<code>${prefix}firstline</code>`,
@@ -156,5 +158,5 @@ export default {
 
 		`<code>${prefix}fl textOnly:true</code>`,
 		"(first message text here)"
-	])
-};
+	]
+});
