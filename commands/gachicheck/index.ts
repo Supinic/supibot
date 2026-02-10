@@ -1,4 +1,5 @@
 import { SupiDate, SupiError } from "supi-core";
+import type { ParserName } from "track-link-parser";
 import { postToHastebin } from "../../utils/command-utils.js";
 import getLinkParser from "../../utils/link-parser.js";
 import { declare } from "../../classes/command.js";
@@ -38,8 +39,6 @@ const trackToLink = (channel: Channel | null, id: number) => (!channel || channe
 	? `https://supinic.com/track/detail/${id}`
 	: `track list ID ${id}`;
 
-// @todo export this type from the LinkParser module and import it here
-type ParserName = "bilibili" | "dailymotion" | "nicovideo" | "soundcloud" | "vimeo" | "vk" | "youtube";
 let typeMap: Record<ParserName, number> | null = null;
 const getVideoTypes = async () => {
 	if (!typeMap) {
