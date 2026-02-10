@@ -214,7 +214,7 @@ export default declare({
 							Added_By: context.user.ID
 						});
 
-						const result = await authorRow.save();
+						const result = await authorRow.save({ skipLoad: true });
 						if (!result || !("insertId" in result)) {
 							throw new SupiError({
 								message: "Assert error: No updated columns in Row"
