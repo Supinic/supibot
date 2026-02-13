@@ -17,8 +17,8 @@ const querySchema = z.object({
 								node: z.object({ text: z.string() })
 							}))
 						}),
-						edge_media_to_comment: z.object({ count: z.int().nullable().optional() }),
-						edge_liked_by: z.object({ count: z.int().nullable().optional() }),
+						edge_media_to_comment: z.object({ count: z.int().nullish() }),
+						edge_liked_by: z.object({ count: z.int().nullish() }),
 						taken_at_timestamp: z.int(),
 						shortcode: z.string()
 					})

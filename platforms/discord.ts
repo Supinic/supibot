@@ -82,7 +82,7 @@ export const DiscordConfigSchema = BasePlatformConfigSchema.extend({
 	selfId: z.string(),
 	platform: z.object({
 		sendVerificationChallenge: z.boolean().optional(),
-		guildCreateAnnounceChannel: z.union([z.string(), z.array(z.string())]).nullable().optional()
+		guildCreateAnnounceChannel: z.union([z.string(), z.array(z.string())]).nullish()
 	}),
 	logging: z.object({
 		messages: z.boolean().optional(),

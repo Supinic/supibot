@@ -68,7 +68,7 @@ export const ConfigSchema = z.strictObject({
 		playsoundListUrl: z.string().optional().nullable()
 	}).optional(),
 	api: z.strictObject({
-		secure: z.boolean().nullable().optional(),
+		secure: z.boolean().nullish(),
 		port: port.optional().nullable()
 	}).optional(),
 	rustlog: z.strictObject({
@@ -94,7 +94,8 @@ export const ConfigSchema = z.strictObject({
 		messages: loggingObject,
 		commands: loggingObject,
 		lastSeen: loggingObject,
-		errors: z.object({ enabled: z.boolean() })
+		errors: z.object({ enabled: z.boolean() }),
+		warnLimit: z.int().min(1).max(100_000).nullish()
 	}),
 	modules: z.strictObject({
 		"chat-modules": moduleBase("chat-modules"),
