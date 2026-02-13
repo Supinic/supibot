@@ -75,7 +75,7 @@ export default declare({
 				locale = randomItem.locale;
 			}
 			else {
-				const languageCode = getCode(locale);
+				const languageCode = getCode(context.params.lang);
 				if (!languageCode) {
 					return {
 						success: false,
