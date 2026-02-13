@@ -1,6 +1,13 @@
-import { SupiDate, SupiError } from "supi-core";
+import { SupiDate, SupiError, type Batch } from "supi-core";
 import { CronJob } from "cron";
 import { getConfig } from "../config.js";
+import { typedEntries } from "../utils/ts-helpers.js";
+
+import type { Command } from "../classes/command.js";
+import type { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
+import type { Platform } from "../platforms/template.js";
+
 const { logging } = getConfig();
 
 const notified = {
@@ -9,134 +16,52 @@ const notified = {
 };
 
 const FALLBACK_WARN_LIMIT = 2500;
+const loggingWarnLimit = logging.messages.warnLimit ?? FALLBACK_WARN_LIMIT;
+
+type PrimaryTag = "Command" | "Message" | "Twitch" | "Discord" | "Cytube" | "Module" | "System";
+type SecondaryTag = "Request" | "Fail" | "Warning" | "Success" | "Shadowban" | "Ban" | "Clearchat" | "Sub" | "Giftsub" | "Host" | "Error" | "Timeout" | "Restart" | "Other" | "Ritual" | "Join";
+type Tag = `${PrimaryTag}.${SecondaryTag}`;
+
+type ChannelCommandMeta = { date: SupiDate; command: string; result: string | null; };
+const setMetaChannelCommand = async (channelId: number, meta: ChannelCommandMeta) => {
+	const row = await core.Query.getRow("chat_data", "Meta_Channel_Command");
+	await row.load(channelId, true);
+
+	if (!row.loaded) {
+		row.values.Channel = channelId;
+	}
+
+	row.setValues({
+		Last_Command_Executed: meta.command,
+		Last_Command_Posted: meta.date,
+		Last_Command_Result: meta.result
+	});
+
+	await row.save({ skipLoad: true });
+};
 
 /**
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
  */
-export default class LoggerSingleton {
-	#crons = [];
-	#presentTables = null;
-	#lastSeenUserMap = new Map();
+class LoggerSingleton {
+	private lastSeenUserMap = new Map<User["ID"], number>();
+
+	private batches = new Set<Batch>();
+	private crons: CronJob[] = [];
+
+	private channels = [];
+	private platforms = [];
+	private messageBatches: Record<string, Batch> = {};
+	private presentTables = new Set<string>();
+
+	private messageCron?: CronJob;
+
+	private commandBatch?: Batch;
+	private commandCollector = new Set<unknown>();
+	private commandCron?: CronJob;
 
 	constructor () {
-		if (logging.messages.enabled) {
-			this.channels = [];
-			this.platforms = [];
-			this.batches = {};
-
-			const loggingWarnLimit = logging.messages.warnLimit ?? FALLBACK_WARN_LIMIT;
-
-			core.Query.getRecordset(rs => rs
-				.select("TABLE_NAME")
-				.from("INFORMATION_SCHEMA", "TABLES")
-				.where("TABLE_SCHEMA = %s", "chat_line")
-				.flat("TABLE_NAME")
-			).then(data => (this.#presentTables = data));
-
-			this.messageCron = new CronJob(logging.messages.cron, async () => {
-				const keys = Object.keys(this.batches);
-				for (let i = 0; i < keys.length; i++) {
-					const key = keys[i];
-					if (this.batches[key].records?.length > 0) {
-						if (this.batches[key].records.length > loggingWarnLimit) {
-							const length = this.batches[key].records.length;
-							const channelID = Number(key.split("-")[1]);
-							const channelData = sb.Channel.get(channelID);
-
-							await sb.Logger.log(
-								"Message.Warning",
-								`Channel "${channelData.Name}" exceeded logging limit ${length}/${loggingWarnLimit}`,
-								channelData,
-								null
-							);
-
-							this.batches[key].clear();
-							continue;
-						}
-
-						setTimeout(
-							() => this.batches[key]?.insert(),
-							i * 250
-						);
-					}
-				}
-			});
-
-			this.messageCron.start();
-			this.#crons.push(this.messageCron);
-		}
-
-		if (logging.commands.enabled) {
-			core.Query.getBatch(
-				"chat_data",
-				"Command_Execution",
-				[
-					"User_Alias",
-					"Command",
-					"Platform",
-					"Executed",
-					"Channel",
-					"Success",
-					"Invocation",
-					"Arguments",
-					"Result",
-					"Execution_Time"
-				]
-			).then(batch => (this.commandBatch = batch));
-
-			this.commandCollector = new Set();
-			this.commandCron = new CronJob(logging.commands.cron, async () => {
-				if (!this.commandBatch?.ready) {
-					return;
-				}
-
-				const channels = {};
-				for (const record of this.commandBatch.records) {
-					if (!record.Channel) {
-						continue; // Don't meta-log private message commands
-					}
-
-					const existing = channels[record.Channel];
-					if (!existing || existing.date < record.Executed) {
-						channels[record.Channel] = {
-							date: record.Executed,
-							command: record.Command,
-							result: record.Result
-						};
-					}
-				}
-
-				const metaPromises = Object.entries(channels).map(async (data) => {
-					const [channelId, meta] = data;
-					const row = await core.Query.getRow("chat_data", "Meta_Channel_Command");
-					await row.load(channelId, true);
-
-					if (!row.loaded) {
-						row.values.Channel = channelId;
-					}
-
-					row.setValues({
-						Last_Command_Executed: meta.command,
-						Last_Command_Posted: meta.date,
-						Last_Command_Result: meta.result
-					});
-
-					await row.save({ skipLoad: true });
-				});
-
-				await Promise.all([
-					this.commandBatch.insert({ ignore: true }),
-					...metaPromises
-				]);
-
-				this.commandCollector.clear();
-			});
-
-			this.commandCron.start();
-			this.#crons.push(this.commandCron);
-		}
-
 		if (logging.lastSeen.enabled) {
 			this.lastSeen = new Map();
 			this.lastSeenRunning = false;
@@ -194,34 +119,152 @@ export default class LoggerSingleton {
 			});
 
 			this.lastSeenCron.start();
-			this.#crons.push(this.lastSeenCron);
+			this.crons.push(this.lastSeenCron);
 		}
+	}
+
+	protected async start () {
+		const { commands, messages } = logging;
+
+		if (messages.enabled && messages.cron) {
+			const tables = await core.Query.getRecordset<string[]>(rs => rs
+				.select("TABLE_NAME")
+				.from("INFORMATION_SCHEMA", "TABLES")
+				.where("TABLE_SCHEMA = %s", "chat_line")
+				.flat("TABLE_NAME")
+			);
+
+			for (const table of tables) {
+				this.presentTables.add(table);
+			}
+
+			this.messageCron = new CronJob(messages.cron, () => void this.storeMessages());
+
+			this.messageCron.start();
+			this.crons.push(this.messageCron);
+		}
+
+		if (commands.enabled && commands.cron) {
+			const batch = await core.Query.getBatch(
+				"chat_data",
+				"Command_Execution",
+				[
+					"User_Alias",
+					"Command",
+					"Platform",
+					"Executed",
+					"Channel",
+					"Success",
+					"Invocation",
+					"Arguments",
+					"Result",
+					"Execution_Time"
+				]
+			);
+
+			this.commandCron = new CronJob(commands.cron, async () => this.storeCommands(batch));
+			this.commandCron.start();
+
+			this.batches.add(batch);
+			this.crons.push(this.commandCron);
+		}
+	}
+
+	private async storeMessages () {
+		let i = 0;
+		for (const [name, batch] of typedEntries(this.messageBatches)) {
+			if (batch.records.length === 0) {
+				continue;
+			}
+
+			if (batch.records.length > loggingWarnLimit) {
+				const length = batch.records.length;
+				const channelID = Number(name.split("-")[1]);
+				const channelData = sb.Channel.get(channelID);
+				if (!channelData) {
+					continue;
+				}
+
+				await this.log(
+					"Message.Warning",
+					`Channel "${channelData.Name}" exceeded logging limit ${length}/${loggingWarnLimit}`,
+					channelData,
+					null
+				);
+
+				batch.clear();
+				continue;
+			}
+
+			setTimeout(() => void batch.insert(), i * 250);
+			i++;
+		}
+	}
+
+	private async storeCommands (batch: Batch) {
+		if (!batch.ready) {
+			return;
+		}
+
+		type ExecutionRecord = {
+			User_Alias: User["ID"];
+			Command: Command["Name"];
+			Platform: Platform["ID"];
+			Channel: Channel["ID"];
+			Executed: SupiDate;
+			Result: string;
+		};
+
+		const channelMeta = new Map<number, ChannelCommandMeta>();
+		for (const record of batch.records) {
+			if (!record.Channel) {
+				continue; // Don't meta-log private message commands
+			}
+
+			const { Channel: channelId, Executed: date, Command: command, Result: result } = record as ExecutionRecord;
+			const existing = channelMeta.get(channelId);
+			if (!existing || existing.date < date) {
+				channelMeta.set(channelId, { date, command, result });
+			}
+		}
+
+		const metaPromises = [];
+		for (const [channelId, meta] of channelMeta.entries()) {
+			const promise = setMetaChannelCommand(channelId, meta);
+			metaPromises.push(promise);
+		}
+
+		await Promise.all([
+			batch.insert({ ignore: true }),
+			...metaPromises
+		]);
+
+		this.commandCollector.clear();
 	}
 
 	/**
 	 * Inserts a log message into the database - `chat_data.Log` table
-	 * @param {string} tag
-	 * @param {string} [description] = null
-	 * @param {{ ID: number } | null} [channel] = null
-	 * @param {{ ID: number } | null} [user] = null
-	 * @returns {Promise<number>} ID of the created database logging record
 	 */
-	async log (tag, description = null, channel = null, user = null) {
+	async log (tag: Tag, description: string | null = null, channel: Channel | null = null, user: User | null = null) {
 		const [parentTag, childTag = null] = tag.split(".");
 		const row = await core.Query.getRow("chat_data", "Log");
 
 		row.setValues({
 			Tag: parentTag,
 			Subtag: childTag,
-			Description: (typeof description === "string")
-				? description.slice(0, 65000)
-				: description,
+			Description: (typeof description === "string") ? description.slice(0, 65000) : description,
 			Channel: (channel) ? channel.ID : null,
 			User_Alias: (user) ? user.ID : null
 		});
 
-		const { insertId } = await row.save({ skipLoad: true });
-		return insertId;
+		const result = await row.save({ skipLoad: true });
+		if (!result || !("insertId" in result)) {
+			throw new SupiError({
+				message: "Assert error: Row not updated"
+			});
+		}
+
+		return result.insertId;
 	}
 
 	/**
@@ -261,14 +304,10 @@ export default class LoggerSingleton {
 	/**
 	 * Pushes a message to a specified channel's queue.
 	 * Queues are emptied accordingly to cron-jobs prepared in {@link LoggerSingleton.constructor}
-	 * @param {string} message
-	 * @param {User} userData
-	 * @param {Channel} channelData
-	 * @param {Platform} [platformData]
-	 * @returns {Promise<void>}
+	 * @todo why is channel nullable and platform also nullable lul
 	 */
-	async push (message, userData, channelData, platformData) {
-		if (this.#presentTables === null) {
+	async push (message: string, userData: User, channelData: Channel | null, platformData: Platform): Promise<void> {
+		if (this.presentTables.size === 0) {
 			return;
 		}
 
@@ -289,7 +328,7 @@ export default class LoggerSingleton {
 			if (!this.channels.includes(chan)) {
 				const name = channelData.getDatabaseName();
 
-				if (!this.#presentTables.includes(name)) {
+				if (!this.presentTables.has(name)) {
 					await channelData.setupLoggingTable();
 				}
 
@@ -310,7 +349,7 @@ export default class LoggerSingleton {
 					columns.push("Platform_ID"); // Always present
 				}
 
-				this.batches[chan] = await core.Query.getBatch("chat_line", name, columns);
+				this.messageBatches[chan] = await core.Query.getBatch("chat_line", name, columns);
 				this.channels.push(chan);
 			}
 
@@ -319,7 +358,7 @@ export default class LoggerSingleton {
 				Posted: new SupiDate()
 			};
 
-			const batch = this.batches[chan];
+			const batch = this.messageBatches[chan];
 			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias"); // legacy, should not occur anymore
 			const hasPlatformID = batch.columns.some(i => i.name === "Platform_ID");
 			const hasHistoric = batch.columns.some(i => i.name === "Historic");
@@ -353,7 +392,7 @@ export default class LoggerSingleton {
 
 				batch.clear();
 				batch.destroy();
-				delete this.batches[chan];
+				delete this.messageBatches[chan];
 			}
 		}
 		else if (platformData) {
@@ -361,11 +400,11 @@ export default class LoggerSingleton {
 
 			if (!this.platforms.includes(id)) {
 				const name = platformData.privateMessageLoggingTableName;
-				if (!this.#presentTables.includes(name)) {
+				if (!this.presentTables.has(name)) {
 					await platformData.setupLoggingTable();
 				}
 
-				this.batches[id] = await core.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID", "Historic"]);
+				this.messageBatches[id] = await core.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID", "Historic"]);
 				this.platforms.push(id);
 			}
 
@@ -383,7 +422,7 @@ export default class LoggerSingleton {
 				lineObject.Historic = true;
 			}
 
-			const batch = this.batches[id];
+			const batch = this.messageBatches[id];
 
 			batch.add(lineObject);
 		}
@@ -391,10 +430,9 @@ export default class LoggerSingleton {
 
 	/**
 	 * Logs a command execution.
-	 * @param {Object} options
 	 */
-	logCommandExecution (options) {
-		if (!logging.commands.enabled) {
+	logCommandExecution (options: unknown) {
+		if (!this.commandBatch) {
 			return;
 		}
 
@@ -446,7 +484,7 @@ export default class LoggerSingleton {
 		const count = this.lastSeen.get(channelData.ID).get(userData.ID)?.count ?? 0;
 		const now = new SupiDate();
 
-		this.#lastSeenUserMap.set(userData.ID, now.valueOf());
+		this.lastSeenUserMap.set(userData.ID, now.valueOf());
 		this.lastSeen.get(channelData.ID).set(userData.ID, {
 			message: message.slice(0, 2000),
 			count: count + 1,
@@ -454,28 +492,26 @@ export default class LoggerSingleton {
 		});
 	}
 
-	getUserLastSeen (userID) {
-		const result = this.#lastSeenUserMap.get(userID);
-		return (result) ? new SupiDate(result) : result;
+	getUserLastSeen (userId: User["ID"]) {
+		const result = this.lastSeenUserMap.get(userId);
+		return (result) ? new SupiDate(result) : null;
 	}
 
 	/**
 	 * Cleans up and destroys the logger instance
 	 */
 	destroy () {
-		for (const cron of this.#crons) {
-			cron.stop();
-		}
-		this.#crons = null;
-
-		if (this.channels) {
-			for (const chan of this.channels) {
-				this.batches[chan].destroy();
-			}
+		for (const cron of this.crons) {
+			void cron.stop();
 		}
 
-		this.batches = null;
+		for (const batch of Object.values(this.messageBatches)) {
+			batch.clear();
+		}
+
+		for (const batch of this.batches) {
+			batch.clear();
+		}
+		this.batches.clear();
 	}
-
-	get modulePath () { return "logger"; }
 };
