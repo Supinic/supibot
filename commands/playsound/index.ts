@@ -9,7 +9,7 @@ const {
 	listenerPort,
 	playsoundListUrl = "(no address configured)"
 } = getConfig().local ?? {};
-const listenerEnabled = (!listenerAddress || !listenerPort);
+const listenerEnabled = Boolean(listenerAddress && listenerPort);
 
 const BASE_PLAYSOUND_CACHE_KEY = "playsound-cooldown";
 const getPlaysoundCacheKey = (playsoundName: string) => `${BASE_PLAYSOUND_CACHE_KEY}-${playsoundName}`;
