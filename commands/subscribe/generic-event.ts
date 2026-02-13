@@ -125,9 +125,9 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 			}
 
 			const categories = (article.categories ?? []) as Category[];
-			return categories.some(cat => {
+			return categories.every(cat => {
 				const category = (typeof cat === "string") ? cat : cat._;
-				return skippedCategories.includes(category);
+				return !skippedCategories.includes(category);
 			});
 		})
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
