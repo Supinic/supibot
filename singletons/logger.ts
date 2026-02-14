@@ -8,6 +8,7 @@ import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import type { Platform } from "../platforms/template.js";
 
+
 const { logging } = getConfig();
 
 const notified = {
@@ -21,6 +22,19 @@ const loggingWarnLimit = logging.messages.warnLimit ?? FALLBACK_WARN_LIMIT;
 type PrimaryTag = "Command" | "Message" | "Twitch" | "Discord" | "Cytube" | "Module" | "System";
 type SecondaryTag = "Request" | "Fail" | "Warning" | "Success" | "Shadowban" | "Ban" | "Clearchat" | "Sub" | "Giftsub" | "Host" | "Error" | "Timeout" | "Restart" | "Other" | "Ritual" | "Join";
 type Tag = `${PrimaryTag}.${SecondaryTag}`;
+
+type CommandExecutionOptions = {
+	Executed: SupiDate;
+	User_Alias: User["ID"];
+	Command: Command["Name"];
+	Platform: Platform["ID"];
+	Channel: Channel["ID"];
+	Success: boolean;
+	Invocation: string;
+	Arguments: string[] | null;
+	Result: string | null;
+	Execution_Time: number;
+};
 
 type ChannelCommandMeta = { date: SupiDate; command: string; result: string | null; };
 const setMetaChannelCommand = async (channelId: number, meta: ChannelCommandMeta) => {
@@ -40,33 +54,92 @@ const setMetaChannelCommand = async (channelId: number, meta: ChannelCommandMeta
 	await row.save({ skipLoad: true });
 };
 
+let logger: LoggerSingleton;
+
 /**
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
  */
-class LoggerSingleton {
+export class LoggerSingleton {
 	private lastSeenUserMap = new Map<User["ID"], number>();
 
 	private batches = new Set<Batch>();
 	private crons: CronJob[] = [];
+	private started = false;
 
-	private channels = [];
-	private platforms = [];
-	private messageBatches: Record<string, Batch> = {};
-	private presentTables = new Set<string>();
+	private readonly channels = [];
+	private readonly platforms = [];
+	private readonly messageBatches: Record<string, Batch> = {};
+	private readonly presentTables = new Set<string>();
 
 	private messageCron?: CronJob;
 
 	private commandBatch?: Batch;
-	private commandCollector = new Set<unknown>();
+	private readonly commandCollector = new Set<unknown>();
 	private commandCron?: CronJob;
 
-	constructor () {
-		if (logging.lastSeen.enabled) {
-			this.lastSeen = new Map();
-			this.lastSeenRunning = false;
+	private readonly lastSeen = new Map<Channel["ID"], Map<User["ID"], { message: string; count: number; date: SupiDate; }>>();
+	private lastSeenRunning = false;
+	private lastSeenCron?: CronJob;
 
-			this.lastSeenCron = new CronJob(logging.lastSeen.cron, async () => {
+	constructor () {
+		if (logger) {
+			return logger;
+		}
+	}
+
+	protected async start () {
+		if (this.started) {
+			return;
+		}
+
+		const { commands, lastSeen, messages } = logging;
+
+		if (messages.enabled && messages.cron) {
+			const tables = await core.Query.getRecordset<string[]>(rs => rs
+				.select("TABLE_NAME")
+				.from("INFORMATION_SCHEMA", "TABLES")
+				.where("TABLE_SCHEMA = %s", "chat_line")
+				.flat("TABLE_NAME")
+			);
+
+			for (const table of tables) {
+				this.presentTables.add(table);
+			}
+
+			this.messageCron = new CronJob(messages.cron, () => void this.storeMessages());
+
+			this.messageCron.start();
+			this.crons.push(this.messageCron);
+		}
+
+		if (commands.enabled && commands.cron) {
+			const batch = await core.Query.getBatch(
+				"chat_data",
+				"Command_Execution",
+				[
+					"User_Alias",
+					"Command",
+					"Platform",
+					"Executed",
+					"Channel",
+					"Success",
+					"Invocation",
+					"Arguments",
+					"Result",
+					"Execution_Time"
+				]
+			);
+
+			this.commandCron = new CronJob(commands.cron, async () => this.storeCommands(batch));
+			this.commandCron.start();
+
+			this.batches.add(batch);
+			this.crons.push(this.commandCron);
+		}
+
+		if (lastSeen.enabled && lastSeen.cron) {
+			this.lastSeenCron = new CronJob(lastSeen.cron, async () => {
 				if (this.lastSeenRunning) {
 					return;
 				}
@@ -121,53 +194,8 @@ class LoggerSingleton {
 			this.lastSeenCron.start();
 			this.crons.push(this.lastSeenCron);
 		}
-	}
 
-	protected async start () {
-		const { commands, messages } = logging;
-
-		if (messages.enabled && messages.cron) {
-			const tables = await core.Query.getRecordset<string[]>(rs => rs
-				.select("TABLE_NAME")
-				.from("INFORMATION_SCHEMA", "TABLES")
-				.where("TABLE_SCHEMA = %s", "chat_line")
-				.flat("TABLE_NAME")
-			);
-
-			for (const table of tables) {
-				this.presentTables.add(table);
-			}
-
-			this.messageCron = new CronJob(messages.cron, () => void this.storeMessages());
-
-			this.messageCron.start();
-			this.crons.push(this.messageCron);
-		}
-
-		if (commands.enabled && commands.cron) {
-			const batch = await core.Query.getBatch(
-				"chat_data",
-				"Command_Execution",
-				[
-					"User_Alias",
-					"Command",
-					"Platform",
-					"Executed",
-					"Channel",
-					"Success",
-					"Invocation",
-					"Arguments",
-					"Result",
-					"Execution_Time"
-				]
-			);
-
-			this.commandCron = new CronJob(commands.cron, async () => this.storeCommands(batch));
-			this.commandCron.start();
-
-			this.batches.add(batch);
-			this.crons.push(this.commandCron);
-		}
+		this.started = true;
 	}
 
 	private async storeMessages () {
@@ -245,7 +273,7 @@ class LoggerSingleton {
 	/**
 	 * Inserts a log message into the database - `chat_data.Log` table
 	 */
-	async log (tag: Tag, description: string | null = null, channel: Channel | null = null, user: User | null = null) {
+	public async log (tag: Tag, description: string | null = null, channel: Channel | null = null, user: User | null = null) {
 		const [parentTag, childTag = null] = tag.split(".");
 		const row = await core.Query.getRow("chat_data", "Log");
 
@@ -269,36 +297,31 @@ class LoggerSingleton {
 
 	/**
 	 * Logs a new error, and returns its ID.
-	 * @param {string} type
-	 * @param {SupiError|Error} error
-	 * @param {Object} [data]
-	 * @param {"Internal"|"External"} [data.origin] Whether the error is first- or third-party
-	 * @param {Object} [data.context] Object with any additional info
-	 * @param {Array} [data.arguments] Possible command arguments that led to the error
-	 * @returns {Promise<number>} ID of the created database error record
 	 */
-	async logError (type, error, data = {}) {
-		if (!logging.errors.enabled) {
-			return;
-		}
-
-		const message = error.message ?? null;
-		if (message && message.includes("retrieve connection from pool timeout")) {
-			return;
-		}
-
+	public async logError (type: string, error: Error | SupiError, data: {
+		origin?: "Internal" | "External";
+		context?: object;
+		arguments?: string[]
+	} = {}): Promise<number> {
+		const { message, stack } = error;
 		const row = await core.Query.getRow("chat_data", "Error");
 		row.setValues({
 			Type: type,
 			Origin: data.origin ?? null,
-			Message: error.message ?? null,
-			Stack: error.stack ?? null,
+			Message: message,
+			Stack: stack ?? null,
 			Context: (data.context) ? JSON.stringify(data.context) : null,
 			Arguments: (data.arguments) ? JSON.stringify(data.arguments) : null
 		});
 
-		const { insertId } = await row.save({ skipLoad: true });
-		return insertId;
+		const result = await row.save({ skipLoad: true });
+		if (!result || !("insertId" in result)) {
+			throw new SupiError({
+				message: "Assert error: No updated columns in Row"
+			});
+		}
+
+		return Number(result.insertId);
 	}
 
 	/**
@@ -306,7 +329,7 @@ class LoggerSingleton {
 	 * Queues are emptied accordingly to cron-jobs prepared in {@link LoggerSingleton.constructor}
 	 * @todo why is channel nullable and platform also nullable lul
 	 */
-	async push (message: string, userData: User, channelData: Channel | null, platformData: Platform): Promise<void> {
+	public async push (message: string, userData: User, channelData: Channel | null, platformData: Platform): Promise<void> {
 		if (this.presentTables.size === 0) {
 			return;
 		}
@@ -431,7 +454,7 @@ class LoggerSingleton {
 	/**
 	 * Logs a command execution.
 	 */
-	logCommandExecution (options: unknown) {
+	public logCommandExecution (options: CommandExecutionOptions) {
 		if (!this.commandBatch) {
 			return;
 		}
@@ -444,55 +467,30 @@ class LoggerSingleton {
 		this.commandBatch.add(options);
 	}
 
-	async updateLastSeen (options) {
+	public updateLastSeen (options: { channelData: Channel, userData: User, message: string }) {
 		if (!logging.lastSeen.enabled) {
-			if (!notified.lastSeen) {
-				console.warn("Requested last-seen update, but it is not enabled", options);
-				notified.lastSeen = true;
-			}
-
 			return;
 		}
 
 		const { channelData, message, userData } = options;
-		if (!userData) {
-			throw new SupiError({
-				message: "Missing userData for lastSeen data"
-			});
-		}
-		else if (!channelData) {
-			throw new SupiError({
-				message: "Missing channelData for lastSeen data"
-			});
-		}
-		else if (!message) {
-			throw new SupiError({
-				message: "Missing message for lastSeen data",
-				arg: {
-					channel: channelData?.ID ?? null,
-					user: userData?.ID ?? null,
-					messageType: typeof message,
-					forcedMessage: String(message)
-				}
-			});
+		let map = this.lastSeen.get(channelData.ID);
+		if (!map) {
+			map = new Map();
+			this.lastSeen.set(channelData.ID, map);
 		}
 
-		if (!this.lastSeen.has(channelData.ID)) {
-			this.lastSeen.set(channelData.ID, new Map());
-		}
-
-		const count = this.lastSeen.get(channelData.ID).get(userData.ID)?.count ?? 0;
+		const count = map.get(userData.ID)?.count ?? 0;
 		const now = new SupiDate();
 
 		this.lastSeenUserMap.set(userData.ID, now.valueOf());
-		this.lastSeen.get(channelData.ID).set(userData.ID, {
+		map.set(userData.ID, {
 			message: message.slice(0, 2000),
 			count: count + 1,
 			date: now
 		});
 	}
 
-	getUserLastSeen (userId: User["ID"]) {
+	public getUserLastSeen (userId: User["ID"]) {
 		const result = this.lastSeenUserMap.get(userId);
 		return (result) ? new SupiDate(result) : null;
 	}
@@ -500,7 +498,7 @@ class LoggerSingleton {
 	/**
 	 * Cleans up and destroys the logger instance
 	 */
-	destroy () {
+	public destroy () {
 		for (const cron of this.crons) {
 			void cron.stop();
 		}
@@ -515,3 +513,6 @@ class LoggerSingleton {
 		this.batches.clear();
 	}
 };
+
+logger = new LoggerSingleton();
+export logger;

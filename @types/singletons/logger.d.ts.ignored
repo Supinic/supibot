@@ -19,18 +19,7 @@ declare type LastSeenOptions = {
     message: Message,
     userData: User
 };
-declare type CommandExecutionOptions = {
-    Executed: CoreDate;
-    User_Alias: User["ID"];
-    Command: Command["Name"];
-    Platform: Platform["ID"];
-    Channel: Channel["ID"];
-    Success: boolean;
-    Invocation: string;
-    Arguments: string[] | null;
-    Result: string | null;
-    Execution_Time: number;
-};
+declare
 declare type ErrorLogData = {
     origin?: "Internal" | "External" | null;
     message?: string | null;

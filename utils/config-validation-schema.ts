@@ -7,10 +7,11 @@ const PlatformConfigSchema = BasePlatformConfigSchema.extend({
 });
 
 const port = z.int().positive().max(65536);
-const loggingObject = z.discriminatedUnion("enabled", [
-	z.object({ enabled: z.literal(false), cron: z.string().optional() }),
-	z.object({ enabled: z.literal(true), cron: z.string() })
-]);
+const loggingObject = z.object({
+	enabled: z.boolean(),
+	cron: z.string().optional()
+});
+
 const moduleBase = (name: string) => z.object({
 	disableAll: z.boolean().optional(),
 	blacklist: z.array(z.string()),
@@ -91,11 +92,11 @@ export const ConfigSchema = z.strictObject({
 		})
 	}),
 	logging: z.strictObject({
-		messages: loggingObject,
+		messages: loggingObject.extend({
+			warnLimit: z.int().min(1).max(100_000).nullish()
+		}),
 		commands: loggingObject,
-		lastSeen: loggingObject,
-		errors: z.object({ enabled: z.boolean() }),
-		warnLimit: z.int().min(1).max(100_000).nullish()
+		lastSeen: loggingObject
 	}),
 	modules: z.strictObject({
 		"chat-modules": moduleBase("chat-modules"),
