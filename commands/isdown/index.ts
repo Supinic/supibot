@@ -5,7 +5,7 @@ import { declare } from "../../classes/command.js";
 
 const querySchema = z.object({
 	scan: z.object({
-		last_scan: z.iso.datetime(),
+		last_scan: z.iso.datetime().optional(),
 		error: z.string().optional()
 	}).optional(),
 	warnings: z.object({
