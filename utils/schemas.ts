@@ -234,15 +234,15 @@ const subDurationShape = z.object({
 export const ivrSubAgeSchema = z.object({
 	user: simpleUserShape,
 	channel: simpleUserShape,
-	statusHidden: z.boolean().nullable(),
-	followedAt: z.iso.datetime().nullable(),
-	streak: subDurationShape.nullable(),
-	cumulative: subDurationShape.nullable(),
+	statusHidden: z.boolean().nullish(),
+	followedAt: z.iso.datetime().nullish(),
+	streak: subDurationShape.nullish(),
+	cumulative: subDurationShape.nullish(),
 	meta: z.object({
 		type: z.string(),
 		tier: z.string(),
-		renewsAt: z.iso.datetime().nullable(),
-		endsAt: z.iso.datetime().nullable(),
-		gitMeta: z.unknown().nullable()
-	}).nullable()
+		renewsAt: z.iso.datetime().nullish(),
+		endsAt: z.iso.datetime().nullish(),
+		gitMeta: z.unknown().nullish()
+	}).nullish()
 });
