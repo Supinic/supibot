@@ -13,7 +13,7 @@ const gistSchema = z.object({
 	files: z.record(z.string(), z.object({
 		content: z.string(),
 		filename: z.string(),
-		language: z.string(),
+		language: z.string().nullable(),
 		type: z.string()
 	}))
 });
