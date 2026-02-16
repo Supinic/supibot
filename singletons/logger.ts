@@ -7,15 +7,9 @@ import type { Command } from "../classes/command.js";
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import type { Platform } from "../platforms/template.js";
-
+import type { JSONifiable } from "../utils/globals.js";
 
 const { logging } = getConfig();
-
-const notified = {
-	lastSeen: false,
-	privatePlatformLogging: []
-};
-
 const FALLBACK_WARN_LIMIT = 2500;
 const loggingWarnLimit = logging.messages.warnLimit ?? FALLBACK_WARN_LIMIT;
 
@@ -35,6 +29,7 @@ type CommandExecutionOptions = {
 	Result: string | null;
 	Execution_Time: number;
 };
+type ErrorType = "Backend" | "Command" | "Database" | "Website" | "Website - API" | "Other" | "Request";
 
 type ChannelCommandMeta = { date: SupiDate; command: string; result: string | null; };
 const setMetaChannelCommand = async (channelId: number, meta: ChannelCommandMeta) => {
@@ -54,8 +49,6 @@ const setMetaChannelCommand = async (channelId: number, meta: ChannelCommandMeta
 	await row.save({ skipLoad: true });
 };
 
-let logger: LoggerSingleton;
-
 /**
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
@@ -67,8 +60,8 @@ export class LoggerSingleton {
 	private crons: CronJob[] = [];
 	private started = false;
 
-	private readonly channels = [];
-	private readonly platforms = [];
+	private readonly loggedChannels = new Set<string>();
+	private readonly loggedPlatforms = new Set<string>();
 	private readonly messageBatches: Record<string, Batch> = {};
 	private readonly presentTables = new Set<string>();
 
@@ -82,19 +75,12 @@ export class LoggerSingleton {
 	private lastSeenRunning = false;
 	private lastSeenCron?: CronJob;
 
-	constructor () {
-		if (logger) {
-			return logger;
-		}
-	}
-
-	protected async start () {
+	public async start (): Promise<void> {
 		if (this.started) {
 			return;
 		}
 
 		const { commands, lastSeen, messages } = logging;
-
 		if (messages.enabled && messages.cron) {
 			const tables = await core.Query.getRecordset<string[]>(rs => rs
 				.select("TABLE_NAME")
@@ -298,10 +284,10 @@ export class LoggerSingleton {
 	/**
 	 * Logs a new error, and returns its ID.
 	 */
-	public async logError (type: string, error: Error | SupiError, data: {
+	public async logError (type: ErrorType, error: Error | SupiError, data: {
 		origin?: "Internal" | "External";
-		context?: object;
-		arguments?: string[]
+		context?: JSONifiable;
+		arguments?: JSONifiable[]
 	} = {}): Promise<number> {
 		const { message, stack } = error;
 		const row = await core.Query.getRow("chat_data", "Error");
@@ -325,11 +311,10 @@ export class LoggerSingleton {
 	}
 
 	/**
-	 * Pushes a message to a specified channel's queue.
-	 * Queues are emptied accordingly to cron-jobs prepared in {@link LoggerSingleton.constructor}
-	 * @todo why is channel nullable and platform also nullable lul
+	 * Pushes a message to a specified channel/platform's queue.
+	 * Queues are emptied accordingly to cron-jobs.
 	 */
-	public async push (message: string, userData: User, channelData: Channel | null, platformData: Platform): Promise<void> {
+	public async push (message: string, userData: User, channelData: Channel | null, platformData?: Platform): Promise<void> {
 		if (this.presentTables.size === 0) {
 			return;
 		}
@@ -337,117 +322,82 @@ export class LoggerSingleton {
 		if (channelData) {
 			if (!channelData.Logging.has("Lines")) {
 				if (channelData.Logging.has("Meta")) {
-					await this.updateLastSeen({
-						channelData,
-						message,
-						userData
-					});
+					this.updateLastSeen({ channelData, message, userData });
 				}
 
 				return;
 			}
 
 			const chan = `channel-${channelData.ID}`;
-			if (!this.channels.includes(chan)) {
+			if (!this.loggedChannels.has(chan)) {
 				const name = channelData.getDatabaseName();
 
 				if (!this.presentTables.has(name)) {
 					await channelData.setupLoggingTable();
 				}
 
-				const [hasUserAlias, hasHistoric, hasPlatformID] = await Promise.all([
-					core.Query.isTableColumnPresent("chat_line", name, "User_Alias"),
-					core.Query.isTableColumnPresent("chat_line", name, "Historic"),
-					core.Query.isTableColumnPresent("chat_line", name, "Platform_ID")
-				]);
-
 				const columns = ["Text", "Posted"];
-				if (hasUserAlias) {
-					columns.push("User_Alias"); // Backwards compatibility, should never occur
-				}
+				const hasHistoric = await core.Query.isTableColumnPresent("chat_line", name, "Historic");
 				if (hasHistoric) {
 					columns.push("Historic"); // Semi-backwards compatibility, should not occur in new bot forks
 				}
-				if (hasPlatformID) {
-					columns.push("Platform_ID"); // Always present
-				}
 
 				this.messageBatches[chan] = await core.Query.getBatch("chat_line", name, columns);
-				this.channels.push(chan);
+				this.loggedChannels.add(chan);
 			}
-
-			const lineObject = {
-				Text: message,
-				Posted: new SupiDate()
-			};
 
 			const batch = this.messageBatches[chan];
-			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias"); // legacy, should not occur anymore
-			const hasPlatformID = batch.columns.some(i => i.name === "Platform_ID");
 			const hasHistoric = batch.columns.some(i => i.name === "Historic");
 
-			if (hasUserAlias) {
-				lineObject.User_Alias = userData.ID;
-			}
-			if (hasPlatformID) {
-				try {
-					lineObject.Platform_ID = await channelData.Platform.fetchInternalPlatformIDByUsername(userData);
-					if (hasHistoric) {
-						lineObject.Historic = false;
-					}
-				}
-				catch {
-					lineObject.Platform_ID = userData.Name;
-					if (hasHistoric) {
-						lineObject.Historic = true;
-					}
-				}
-			}
-
+			let platformId;
+			let historic;
 			try {
-				batch.add(lineObject);
+				platformId = channelData.Platform.fetchInternalPlatformIDByUsername(userData);
+				if (hasHistoric) {
+					historic = false;
+				}
 			}
-			catch (e) {
-				console.error("Batch addition error", e);
-
-				const index = this.channels.indexOf(chan);
-				this.channels.splice(index, 1);
-
-				batch.clear();
-				batch.destroy();
-				delete this.messageBatches[chan];
+			catch {
+				platformId = userData.Name;
+				if (hasHistoric) {
+					historic = true;
+				}
 			}
+
+			batch.add({
+				Text: message,
+				Posted: new SupiDate(),
+				Platform_ID: platformId,
+				...((typeof historic === "boolean") ? { Historic: historic } : {})
+			});
 		}
 		else if (platformData) {
 			const id = `platform-${platformData.ID}`;
 
-			if (!this.platforms.includes(id)) {
+			if (!this.loggedPlatforms.has(id)) {
 				const name = platformData.privateMessageLoggingTableName;
 				if (!this.presentTables.has(name)) {
 					await platformData.setupLoggingTable();
 				}
 
-				this.messageBatches[id] = await core.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID", "Historic"]);
-				this.platforms.push(id);
+				this.messageBatches[id] = await core.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID"]);
+				this.loggedPlatforms.add(id);
 			}
 
-			const lineObject = {
-				Text: message,
-				Posted: new SupiDate()
-			};
-
+			let platformId;
 			try {
-				lineObject.Platform_ID = await platformData.fetchInternalPlatformIDByUsername(userData);
-				lineObject.Historic = false;
+				platformId = platformData.fetchInternalPlatformIDByUsername(userData);
 			}
 			catch {
-				lineObject.Platform_ID = userData.Name;
-				lineObject.Historic = true;
+				platformId = userData.Name;
 			}
 
 			const batch = this.messageBatches[id];
-
-			batch.add(lineObject);
+			batch.add({
+				Text: message,
+				Posted: new SupiDate(),
+				Platform_ID: platformId
+			});
 		}
 	}
 
@@ -514,5 +464,4 @@ export class LoggerSingleton {
 	}
 };
 
-logger = new LoggerSingleton();
-export logger;
+export const logger = new LoggerSingleton();

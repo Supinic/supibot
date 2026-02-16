@@ -1,5 +1,3 @@
-import { Date as CoreDate, Error as CoreError } from "supi-core";
-
 import { JSONifiable, Message } from "../globals";
 import { Channel } from "../classes/channel";
 import { Command } from "../classes/command";
@@ -10,10 +8,7 @@ declare type PrimaryLogTag = "Command"| "Message"| "Twitch"| "Discord"| "Cytube"
 declare type SecondaryLogTag = "Request"| "Fail"| "Warning"| "Success"| "Shadowban"| "Ban"| "Clearchat"| "Sub"| "Giftsub"| "Host"| "Error"| "Timeout"| "Restart"| "Other"| "Ritual"| "Join";
 declare type LogTag = `${PrimaryLogTag}.${SecondaryLogTag}`;
 
-declare type ErrorType = "Backend" | "Command" | "Database" | "Website" | "Website - API" | "Other" | "Request";
-
-declare type HasID = { ID: number };
-declare type VideoType = string;
+declare type  = string;
 declare type LastSeenOptions = {
     channelData: Channel,
     message: Message,
