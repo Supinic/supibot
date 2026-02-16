@@ -177,8 +177,8 @@ export default declare({
 			}
 
 			const cacheKey = `${context.params.hasteServer ?? provider}-${id}`;
-			const cacheData = ((context.params.force) ? null : await this.getCacheData(cacheKey)) as string | null;
-			if (cacheData) {
+			const cacheData = await this.getCacheData(cacheKey) as string | null;
+			if (cacheData && !context.params.force) {
 				return {
 					reply: cacheData,
 					cooldown: 5000
@@ -254,10 +254,23 @@ export default declare({
 					headers["if-modified-since"] = modifiedSince;
 				}
 
-				const response = await core.Got.get("GitHub")({
+				let response = await core.Got.get("GitHub")({
 					url: `gists/${id}`,
 					headers
 				});
+
+				// 304 = Not Modified, return cached data regardless of force (or fetch if unavailable)
+				if (response.statusCode === 304) {
+					if (cacheData) {
+						return {
+							reply: cacheData,
+							cooldown: 5000
+						};
+					}
+					else {
+						response = await core.Got.get("GitHub")({ url: `gists/${id}` });
+					}
+				}
 
 				// GitHub docs: `If you exceed your primary rate limit, you will receive a 403 or 429 response`
 				if (response.statusCode === 403 || response.statusCode === 429) {
