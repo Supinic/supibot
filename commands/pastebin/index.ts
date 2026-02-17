@@ -285,7 +285,7 @@ export default declare({
 					const { data } = gistErrorSchema.safeParse(response.body);
 					return {
 						success: false,
-						reply: `Could not load gist! ${data?.message ?? "(no error message))"}`
+						reply: `Could not load gist! ${data?.message ?? "(no error message)"}`
 					};
 				}
 
