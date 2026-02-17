@@ -369,7 +369,7 @@ export class User extends TemplateWithIdString {
 
 		const preparedName = User.normalizeUsername(name);
 		const pendingNewUser = User.pendingNewUsers.get(preparedName);
-		if (pendingNewUser) {
+		if (typeof pendingNewUser !== "undefined") {
 			return pendingNewUser;
 		}
 
