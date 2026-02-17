@@ -339,7 +339,7 @@ export const saveChannelDataProperty = async <T extends ChannelDataProperty> (
 
 	await row.load({ Property: propertyName, Channel: instanceId }, true);
 
-	let rawValue: string | null = null;
+	let rawValue: string | null;
 	if (value === null) {
 		rawValue = null;
 	}
@@ -370,7 +370,7 @@ export const saveUserDataProperty = async <T extends UserDataProperty> (
 
 	await row.load({ Property: propertyName, User_Alias: instanceId }, true);
 
-	let rawValue: string | null = null;
+	let rawValue: string | null;
 	if (value === null) {
 		rawValue = null;
 	}

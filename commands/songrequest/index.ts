@@ -212,7 +212,6 @@ export default declare({
 			}
 		}
 
-		let videoType: number | null = null;
 		if (url && linkParser.autoRecognize(url)) {
 			data = await linkParser.fetchData(url);
 
@@ -254,7 +253,6 @@ export default declare({
 				const { clip, clipKey } = response.body;
 				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
 
-				videoType = 19;
 				data = {
 					name: clip.title,
 					ID: `https://clips.twitch.tv/${clip.slug}`,
@@ -274,7 +272,6 @@ export default declare({
 				const name = decodeURIComponent(lastPathSegment);
 				const encoded = encodeURI(decodeURI(url));
 
-				videoType = 19;
 				data = {
 					name,
 					ID: encoded,
@@ -286,7 +283,7 @@ export default declare({
 
 		// If no data have been extracted from a link, attempt a search query on Youtube/Vimeo
 		if (!data) {
-			let lookup = null;
+			let lookup;
 			if (type === "youtube") {
 				const data = await searchYoutube(args.join(" "), {
 					filterShortsHeuristic: true
@@ -386,27 +383,6 @@ export default declare({
 			    success: false,
 			    reply: `Could not request: ${addResult.reason}`
 			};
-		}
-
-		const videoTypeName = data.type;
-		if (!videoType && videoTypeName) {
-			const dbVideoType = await core.Query.getRecordset<number | undefined>(rs => rs
-				.select("ID")
-				.from("data", "Video_Type")
-				.where("Parser_Name = %s", videoTypeName)
-				.limit(1)
-				.flat("ID")
-				.single()
-			);
-
-			if (!dbVideoType) {
-				throw new SupiError({
-				    message: "Assert error: Unknown video type coming from track-link-parser",
-					args: { videoTypeName }
-				});
-			}
-
-			videoType = dbVideoType;
 		}
 
 		let when = "right now";

@@ -11,7 +11,7 @@ type CoronaData = {
 const group = (num: number): string => core.Utils.groupDigits(num, " ");
 
 const fetchData = async (): Promise<{ success: false } | CoronaData> => {
-	let response = null;
+	let response;
 	try {
 		response = await core.Got.get("FakeAgent")({
 			url,

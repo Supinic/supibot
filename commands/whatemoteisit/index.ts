@@ -104,7 +104,7 @@ export default declare({
 			};
 		}
 
-		let tierString = "";
+		let tierString: string;
 		if (emoteType === "SUBSCRIPTIONS") {
 			if (!channelName && !channelLogin) {
 				const tier = (emoteTier) ? `tier ${emoteTier}` : "";

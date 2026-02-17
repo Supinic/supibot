@@ -404,7 +404,7 @@ export class ChatModule extends TemplateWithoutId {
 			return [];
 		}
 
-		let args: EventArgument[] = [];
+		let args;
 		try {
 			args = eval(rawArgs) as EventArgument[];
 		}

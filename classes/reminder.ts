@@ -481,7 +481,7 @@ export class Reminder extends TemplateWithId {
 
 				// Whether the source channel (where the Reminder was created) is equal to trigger channel (where the Reminder was fired)
 				let isSameChannel = false;
-				let reminderPlatform: Platform | null = null;
+				let reminderPlatform: Platform | null;
 				if (reminder.Channel) {
 					const reminderChannelData = Channel.get(reminder.Channel);
 					if (!reminderChannelData) {
