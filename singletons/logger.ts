@@ -68,8 +68,8 @@ export class LoggerSingleton {
 	private messageCron?: CronJob;
 
 	private commandBatch?: Batch;
-	private readonly commandCollector = new Set<unknown>();
 	private commandCron?: CronJob;
+	private readonly commandCollector = new Set<number>();
 
 	private readonly lastSeen = new Map<Channel["ID"], Map<User["ID"], { message: string; count: number; date: SupiDate; }>>();
 	private lastSeenRunning = false;
@@ -93,7 +93,7 @@ export class LoggerSingleton {
 				this.presentTables.add(table);
 			}
 
-			this.messageCron = new CronJob(messages.cron, () => void this.storeMessages());
+			this.messageCron = new CronJob(messages.cron, () => LoggerSingleton.storeMessages(this.messageBatches));
 
 			this.messageCron.start();
 			this.crons.push(this.messageCron);
@@ -117,9 +117,10 @@ export class LoggerSingleton {
 				]
 			);
 
-			this.commandCron = new CronJob(commands.cron, async () => this.storeCommands(batch));
+			this.commandCron = new CronJob(commands.cron, async () => LoggerSingleton.storeCommands(batch, this.commandCollector));
 			this.commandCron.start();
 
+			this.commandBatch = batch;
 			this.batches.add(batch);
 			this.crons.push(this.commandCron);
 		}
@@ -184,9 +185,9 @@ export class LoggerSingleton {
 		this.started = true;
 	}
 
-	private async storeMessages () {
+	private static storeMessages (batches: Record<string, Batch>) {
 		let i = 0;
-		for (const [name, batch] of typedEntries(this.messageBatches)) {
+		for (const [name, batch] of typedEntries(batches)) {
 			if (batch.records.length === 0) {
 				continue;
 			}
@@ -199,11 +200,8 @@ export class LoggerSingleton {
 					continue;
 				}
 
-				await this.log(
-					"Message.Warning",
-					`Channel "${channelData.Name}" exceeded logging limit ${length}/${loggingWarnLimit}`,
-					channelData,
-					null
+				console.warn(
+					`Channel ${channelData.Name} (${channelData.ID}) exceeded logging limit: ${length}/${loggingWarnLimit}`
 				);
 
 				batch.clear();
@@ -215,7 +213,7 @@ export class LoggerSingleton {
 		}
 	}
 
-	private async storeCommands (batch: Batch) {
+	private static async storeCommands (batch: Batch, collector: Set<number>) {
 		if (!batch.ready) {
 			return;
 		}
@@ -253,7 +251,7 @@ export class LoggerSingleton {
 			...metaPromises
 		]);
 
-		this.commandCollector.clear();
+		collector.clear();
 	}
 
 	/**
@@ -336,7 +334,7 @@ export class LoggerSingleton {
 					await channelData.setupLoggingTable();
 				}
 
-				const columns = ["Text", "Posted"];
+				const columns = ["Text", "Posted", "Platform_ID"];
 				const hasHistoric = await core.Query.isTableColumnPresent("chat_line", name, "Historic");
 				if (hasHistoric) {
 					columns.push("Historic"); // Semi-backwards compatibility, should not occur in new bot forks
@@ -409,11 +407,12 @@ export class LoggerSingleton {
 			return;
 		}
 
-		if (this.commandCollector.has(options.Executed.valueOf())) {
+		const timestamp = options.Executed.valueOf();
+		if (this.commandCollector.has(timestamp)) {
 			return;
 		}
 
-		this.commandCollector.add(options.Executed.valueOf());
+		this.commandCollector.add(timestamp);
 		this.commandBatch.add(options);
 	}
 
