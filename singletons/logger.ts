@@ -22,12 +22,12 @@ type CommandExecutionOptions = {
 	User_Alias: User["ID"];
 	Command: Command["Name"];
 	Platform: Platform["ID"];
-	Channel: Channel["ID"];
+	Channel: Channel["ID"] | null;
 	Success: boolean;
 	Invocation: string;
-	Arguments: string[] | null;
+	Arguments: string | null;
 	Result: string | null;
-	Execution_Time: number;
+	Execution_Time: number | null;
 };
 type ErrorType = "Backend" | "Command" | "Database" | "Website" | "Website - API" | "Other" | "Request";
 
@@ -286,8 +286,8 @@ export class LoggerSingleton {
 	 */
 	public async logError (type: ErrorType, error: Error | SupiError, data: {
 		origin?: "Internal" | "External";
-		context?: JSONifiable;
-		arguments?: JSONifiable[]
+		context?: unknown;
+		arguments?: JSONifiable
 	} = {}): Promise<number> {
 		const { message, stack } = error;
 		const row = await core.Query.getRow("chat_data", "Error");

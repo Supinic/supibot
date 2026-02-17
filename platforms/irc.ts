@@ -271,11 +271,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			this.resolveUserMessage(channelData, userData, message);
 
 			if (channelData.Logging.has("Meta")) {
-				await sb.Logger.updateLastSeen({
-					userData,
-					channelData,
-					message
-				});
+				sb.Logger.updateLastSeen({ userData, channelData, message });
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
 				await sb.Logger.push(message, userData, channelData);

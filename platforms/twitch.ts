@@ -854,11 +854,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		this.resolveUserMessage(channelData, userData, messageData.text);
 
 		if (channelData.Logging.has("Meta")) {
-			await sb.Logger.updateLastSeen({
-				userData,
-				channelData,
-				message: messageData.text
-			});
+			sb.Logger.updateLastSeen({ userData, channelData, message: messageData.text });
 		}
 		if (this.logging.messages && channelData.Logging.has("Lines")) {
 			await sb.Logger.push(messageData.text, userData, channelData);

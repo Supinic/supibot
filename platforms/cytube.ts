@@ -143,7 +143,7 @@ class CytubeClient {
 				});
 
 				if (this.channelData.Logging.has("Meta")) {
-					await sb.Logger.updateLastSeen({
+					sb.Logger.updateLastSeen({
 						userData,
 						channelData: this.channelData,
 						message: msg

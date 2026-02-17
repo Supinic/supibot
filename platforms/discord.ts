@@ -523,7 +523,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					);
 				}
 				else {
-					await sb.Logger.updateLastSeen({ channelData, userData, message: msg });
+					sb.Logger.updateLastSeen({ channelData, userData, message: msg });
 				}
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {

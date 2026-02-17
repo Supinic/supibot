@@ -17,8 +17,7 @@ import { Filter } from "./classes/filter.js";
 import { MpvClient as MpvClientConstructor } from "./singletons/mpv-client.js";
 import { Reminder } from "./classes/reminder.js";
 import { User } from "./classes/user.js";
-
-import Logger from "./singletons/logger.js";
+import { logger } from "./singletons/logger.js";
 import { Platform } from "./platforms/template.js";
 
 type PopulateOptions = {
@@ -35,7 +34,7 @@ interface GlobalSb {
 	ChatModule: typeof ChatModule;
 	Command: typeof Command;
 	Filter: typeof Filter;
-	Logger: Logger;
+	Logger: typeof logger;
 	Platform: typeof Platform;
 	Reminder: typeof Reminder;
 	User: typeof User;
@@ -170,16 +169,15 @@ globalThis.sb = {
 	Channel,
 	Reminder,
 	ChatModule,
-
-	Logger: new Logger(),
+	Logger: logger,
 	MpvClient,
-
 	API: initializeInternalApi()
 };
 
 console.timeEnd("basic bot modules");
 console.time("chat modules");
 
+void logger.start();
 supiCore.Got.importData(filterModuleDefinitions("name", gotDefinitions as GotInstanceDefinition[], config.modules.gots));
 Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands));
 await ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"]));
