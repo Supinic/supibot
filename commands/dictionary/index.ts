@@ -23,7 +23,7 @@ export default declare({
 	Aliases: ["dict"],
 	Cooldown: 10000,
 	Description: "Fetches the dictionary definition of a word in English. If there are multiple definitions, you can add \"index:#\" with a number to access specific definition indexes.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [{ name: "index", type: "string" }],
 	Whitelist_Response: null,
 	Code: (async function dictionary (context, ...args) {
