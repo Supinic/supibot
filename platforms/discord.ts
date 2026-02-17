@@ -552,7 +552,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				await this.mirror(msg, userData, channelData, { commandUsed: false });
 			}
 		}
-		else {
+		else if (privateMessage) {
 			if (this.logging.whispers) {
 				await sb.Logger.push(msg, userData, null, this);
 			}

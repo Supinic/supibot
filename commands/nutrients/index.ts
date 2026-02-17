@@ -3,7 +3,7 @@ import { declare } from "../../classes/command.js";
 import { SupiError } from "supi-core";
 
 const searchSchema = z.object({
-	totalHits: z.int().positive(),
+	totalHits: z.int().min(0),
 	currentPage: z.int().positive(),
 	foods: z.array(z.object({
 		description: z.string(),

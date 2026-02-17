@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
-import { ivrSubAgeSchema } from "../../utils/schemas.js";
+import { ivrErrorSchema, ivrSubAgeSchema } from "../../utils/schemas.js";
 
 export default declare({
 	Name: "followage",
@@ -59,6 +59,14 @@ export default declare({
 		const response = await core.Got.get("IVR")({
 			url: `v2/twitch/subage/${user}/${channel}`
 		});
+
+		if (!response.ok) {
+			const { data } = ivrErrorSchema.safeParse(response.body);
+			return {
+				success: false,
+				reply: `Could not check for followage! Reason: ${data?.error.message ?? "(no error message)"}`
+			};
+		}
 
 		const prefix = (user.toLowerCase() === context.user.Name) ? "You" : user;
 		const suffix = (channel.toLowerCase() === context.user.Name) ? "you" : channel;

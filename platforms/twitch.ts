@@ -666,6 +666,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		this.incrementMessageMetric("sent", null);
+		await sb.Logger.push(trimmedMessage, userData, null, this);
 
 		if (!response.ok) {
 			const data = JSON.stringify({

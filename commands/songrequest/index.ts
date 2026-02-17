@@ -355,6 +355,13 @@ export default declare({
 			};
 		}
 
+		if (length && length > REQUEST_TIME_LIMIT) {
+			return {
+				success: false,
+				reply: `Your request is too long! Duration: ${length} seconds, maximum: ${REQUEST_TIME_LIMIT} seconds.`
+			};
+		}
+
 		const authorString = (data.author) ? ` by ${data.author}` : "";
 		const segmentLength = (endTime ?? length ?? 0) - (startTime ?? 0);
 
