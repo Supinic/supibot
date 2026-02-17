@@ -178,9 +178,6 @@
     "lastSeen": {
       "enabled": true,
       "cron": "0 */5 * * * *"
-    },
-    "errors": {
-      "enabled": true
     }
   }
 }
