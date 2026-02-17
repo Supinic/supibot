@@ -1,5 +1,6 @@
 import { SupiError } from "supi-core";
 import { randomInt } from "../../utils/command-utils.js";
+import { logger } from "../../singletons/logger.js";
 
 const tableHistoricColumns = new Map();
 
@@ -141,7 +142,7 @@ const fetchChannelRandomLine = async function (channelData, options = {}) {
 	else {
 		const userData = await sb.User.get(randomLine.User_Alias);
 		if (!userData) {
-			await sb.Logger.log(
+			await logger.log(
 				"Command.Warning",
 				"Missing User_Alias",
 				channelData,
@@ -179,7 +180,7 @@ const fetchGroupResult = async function (type, group, userData = null) {
 		result = await Promise.any(promises);
 	}
 	catch (e) {
-		await sb.Logger.log(
+		await logger.log(
 			"Command.Warning",
 			`Group $rl error: ${JSON.stringify({ type, group, userData, e })}`
 		);

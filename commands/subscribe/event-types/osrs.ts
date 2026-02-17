@@ -1,6 +1,7 @@
 import * as z from "zod";
 import type { CustomEventDefinition } from "../generic-event.js";
 import { SupiError } from "supi-core";
+import { logger } from "../../../singletons/logger.js";
 
 const jagexRssSchema = z.object({
 	newsItems: z.array(z.object({
@@ -107,7 +108,7 @@ export default {
 		repeatedMessageCheck = articleString;
 
 		const noun = (newArticles.length === 1) ? "article" : "articles";
-		await sb.Logger.log("System.Request", JSON.stringify({
+		await logger.log("System.Request", JSON.stringify({
 			previousArticleIds: [...previousArticleIds],
 			newArticleIds: [...newArticleIds],
 			currentArticleIds: [...currentArticleIds],

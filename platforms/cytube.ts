@@ -7,6 +7,7 @@ import { BasePlatformConfigSchema } from "./schema.js";
 import type { Channel } from "../classes/channel.js";
 import type { User } from "../classes/user.js";
 import type { Emote } from "../utils/globals.js";
+import { logger } from "../singletons/logger.js";
 
 type PlaylistObject = VideoObject | {
 	media: VideoObject["media"];
@@ -143,14 +144,14 @@ class CytubeClient {
 				});
 
 				if (this.channelData.Logging.has("Meta")) {
-					await sb.Logger.updateLastSeen({
+					logger.updateLastSeen({
 						userData,
 						channelData: this.channelData,
 						message: msg
 					});
 				}
 				if (this.platform.logging.messages && this.channelData.Logging.has("Lines")) {
-					await sb.Logger.push(msg, userData, this.channelData);
+					await logger.push(msg, userData, this.channelData);
 				}
 
 				if (this.channelData.Mode === "Read") {
@@ -173,7 +174,7 @@ class CytubeClient {
 			}
 			else {
 				if (this.platform.logging.whispers) {
-					await sb.Logger.push(msg, userData, null, this.platform);
+					await logger.push(msg, userData, null, this.platform);
 				}
 
 				this.platform.resolveUserMessage(null, userData, msg);

@@ -15,6 +15,7 @@ import { process as processMetrics } from "./metrics.js";
 import { check as checkModeration } from "./moderation.js";
 
 import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
+import { logger } from "../../singletons/logger.js";
 
 export type ModelName = keyof typeof rawGptConfig.models;
 
@@ -165,7 +166,7 @@ export default declare({
 
 		const { response } = executionResult;
 		if (!response.ok) {
-			const logID = await sb.Logger.log(
+			const logID = await logger.log(
 				"Command.Warning",
 				`ChatGPT API fail: ${response.statusCode} → ${JSON.stringify(response.body)}`,
 				context.channel,

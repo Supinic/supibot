@@ -1,3 +1,5 @@
+import { logger } from "../../singletons/logger.js";
+
 export default {
 	Name: "lastseen",
 	Aliases: ["ls"],
@@ -39,7 +41,7 @@ export default {
 			};
 		}
 
-		let date = sb.Logger.getUserLastSeen(targetUser.ID);
+		let date = logger.getUserLastSeen(targetUser.ID);
 		if (!date) {
 			date = await core.Query.getRecordset(rs => rs
 				.select("Last_Message_Posted AS Date")

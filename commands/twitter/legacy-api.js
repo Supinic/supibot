@@ -174,11 +174,6 @@ const getTweet = async (context, bearerToken, user) => {
 
 	let eligibleTweets = response.body;
 	if (!Array.isArray(eligibleTweets)) {
-		await sb.Logger.log("Command.Warning", JSON.stringify({
-			eligibleTweets,
-			statusCode: response.statusCode
-		}));
-
 		return {
 			success: false,
 			reply: `Twitter response data is invalid! Contact @Supinic and/or try again later.`

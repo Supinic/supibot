@@ -3,6 +3,7 @@ import type { Http2Session } from "node:http2";
 import { isGotRequestError, type GotInstanceDefinition } from "supi-core";
 
 import { getConfig } from "../../config.js";
+import { logger } from "../../singletons/logger.js";
 const { defaultUserAgent } = getConfig().modules.gots;
 
 const agent = new Agent({
@@ -47,7 +48,7 @@ export default {
 						return err;
 					}
 
-					await sb.Logger.logError("Request", err, {
+					await logger.logError("Request", err, {
 						origin: "External",
 						context: {
 							code: err.code,

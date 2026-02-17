@@ -1,4 +1,5 @@
 import type { CronDefinition } from "../index.js";
+import { logger } from "../../singletons/logger.js";
 
 type SubscriptionRow = {
 	ID: number;
@@ -67,7 +68,7 @@ export default {
 			}
 		}
 
-		await sb.Logger.log("System.Success", JSON.stringify({
+		await logger.log("System.Success", JSON.stringify({
 			deactivated: result
 		}));
 	})

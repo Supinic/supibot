@@ -1,3 +1,5 @@
+import { logger } from "../../../singletons/logger.js";
+
 export default {
 	name: "reminder",
 	aliases: ["remind", "reminders"],
@@ -52,7 +54,7 @@ export default {
 
 			const reminder = sb.Reminder.get(ID);
 			if (!reminder) {
-				const logID = await sb.Logger.log(
+				const logID = await logger.log(
 					"Command.Fail",
 					`Can't find a reminder to unset: ${ID}`,
 					context.channel,

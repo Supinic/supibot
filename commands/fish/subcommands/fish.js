@@ -1,5 +1,6 @@
 import { SupiDate } from "supi-core";
 import { randomInt } from "../../../utils/command-utils.js";
+import { logger } from "../../../singletons/logger.js";
 import {
 	baitTypes,
 	COIN_EMOJI,
@@ -263,7 +264,7 @@ export default {
 				};
 			}
 			catch (e) {
-				await sb.Logger.logError("Command", e, {
+				await logger.logError("Command", e, {
 					origin: "External",
 					context: {
 						cause: "GPT within $fish"

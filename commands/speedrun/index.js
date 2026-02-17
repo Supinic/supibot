@@ -1,4 +1,5 @@
 import { SupiDate } from "supi-core";
+import { logger } from "../../singletons/logger.js";
 
 let speedrunGotInstance;
 const speedrunGot = (...args) => {
@@ -117,7 +118,7 @@ export default {
 				});
 			}
 			catch (e) {
-				await sb.Logger.log("Command.Warning", JSON.stringify({ description: "$speedrun", e }));
+				await logger.log("Command.Warning", JSON.stringify({ description: "$speedrun", e }));
 				return {
 					success: false,
 					reply: `Something went wrong while fetching runs data! Try providing a category, or a different one if you did.`

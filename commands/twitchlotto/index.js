@@ -1,4 +1,5 @@
 import { randomInt } from "../../utils/command-utils.js";
+import { logger } from "../../singletons/logger.js";
 import checkSafety from "./safety-check.js";
 import {
 	maxRetries,
@@ -194,7 +195,7 @@ export default {
 						arguments
 					});
 
-					const logId = await sb.Logger.log(
+					const logId = await logger.log(
 						"Command.Other",
 						`All images scored log: ${data}`,
 						context.channel,
