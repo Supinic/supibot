@@ -10,6 +10,7 @@ import { Platform, type PrepareMessageOptions } from "./template.js";
 import { User } from "../classes/user.js";
 import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
+import { logger } from "../singletons/logger.js";
 
 const DEFAULT_LOGGING_CONFIG = {
 	messages: true,
@@ -271,10 +272,10 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			this.resolveUserMessage(channelData, userData, message);
 
 			if (channelData.Logging.has("Meta")) {
-				sb.Logger.updateLastSeen({ userData, channelData, message });
+				logger.updateLastSeen({ userData, channelData, message });
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(message, userData, channelData);
+				await logger.push(message, userData, channelData);
 			}
 
 			channelData.events.emit("message", {
@@ -303,7 +304,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		}
 		else {
 			if (this.logging.whispers) {
-				await sb.Logger.push(message, userData, null, this);
+				await logger.push(message, userData, null, this);
 			}
 
 			this.resolveUserMessage(null, userData, message);

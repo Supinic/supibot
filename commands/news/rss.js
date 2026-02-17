@@ -1,5 +1,6 @@
 import { SupiDate, SupiError } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
+import { logger } from "../../singletons/logger.js";
 
 import definitions from "./definitions.json" with { type: "json" };
 const rssCacheKey = "command-news-rss-cache";
@@ -56,7 +57,7 @@ export default {
 					cause: e
 				});
 
-				await sb.Logger.logError("Command", err, {
+				await logger.logError("Command", err, {
 					origin: "Internal",
 					context: {
 						code: news.code,

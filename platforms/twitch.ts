@@ -36,6 +36,7 @@ import type { User } from "../classes/user.js";
 import { SupiDate, SupiError } from "supi-core";
 import type { Emote, ThirdPartyEmote } from "../utils/globals.js";
 import type { TwitchSubscriberData } from "../utils/schemas.js";
+import { logger } from "../singletons/logger.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -425,7 +426,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 		else if (isRevocationMessage(message)) {
 			console.warn("Subscription revoked", { message });
-			await sb.Logger.log(
+			await logger.log(
 				"Twitch.Warning",
 				`Subscription revoked: ${JSON.stringify(message)}`,
 				null,
@@ -666,7 +667,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		this.incrementMessageMetric("sent", null);
-		await sb.Logger.push(trimmedMessage, userData, null, this);
+		await logger.push(trimmedMessage, userData, null, this);
 
 		if (!response.ok) {
 			const data = JSON.stringify({
@@ -678,7 +679,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				stack: new Error().stack?.split(/\r?\n/)
 			});
 
-			await sb.Logger.log("Twitch.Warning", data, null, userData);
+			await logger.log("Twitch.Warning", data, null, userData);
 		}
 	}
 
@@ -831,7 +832,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 					}
 
 					await Promise.all([
-						sb.Logger.log("Twitch.Other", `Suspicious user: ${userData.Name} - ${userData.Twitch_ID}`, null, userData),
+						logger.log("Twitch.Other", `Suspicious user: ${userData.Name} - ${userData.Twitch_ID}`, null, userData),
 						userData.setDataProperty("twitch-userid-mismatch-notification", true)
 					]);
 				}
@@ -854,10 +855,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		this.resolveUserMessage(channelData, userData, messageData.text);
 
 		if (channelData.Logging.has("Meta")) {
-			sb.Logger.updateLastSeen({ userData, channelData, message: messageData.text });
+			logger.updateLastSeen({ userData, channelData, message: messageData.text });
 		}
 		if (this.logging.messages && channelData.Logging.has("Lines")) {
-			await sb.Logger.push(messageData.text, userData, channelData);
+			await logger.push(messageData.text, userData, channelData);
 		}
 
 		/**
@@ -919,7 +920,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		if (this.logging.bits && cheer) {
-			void sb.Logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
+			void logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
 		}
 
 		// If the handled message is a reply to another, append its content at the end.
@@ -978,7 +979,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		const message = whisper.text;
 		if (this.logging.whispers) {
-			await sb.Logger.push(message, userData, null, this);
+			await logger.push(message, userData, null, this);
 		}
 
 		this.resolveUserMessage(null, userData, message);
@@ -1024,7 +1025,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			return;
 		}
 
-		await sb.Logger.log("Twitch.Sub", JSON.stringify({ event }));
+		await logger.log("Twitch.Sub", JSON.stringify({ event }));
 
 		channelData.events.emit("subscription", {
 			event: "subscription",
@@ -1068,7 +1069,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		if (this.logging.hosts) {
-			await sb.Logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${viewers} viewers`);
+			await logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${viewers} viewers`);
 		}
 	}
 
@@ -1282,7 +1283,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!response.ok) {
 			if (response.statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${response.statusCode}`, channelData);
+				await logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
@@ -1310,7 +1311,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!response.ok) {
 			if (response.statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${response.statusCode}`, channelData);
+				await logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
@@ -1335,7 +1336,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!response.ok) {
 			if (response.statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${response.statusCode}`, channelData);
+				await logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
@@ -1568,14 +1569,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		const oldName = channelData.Name;
 		if (!existingChannelName) {
 			await channelData.saveProperty("Name", twitchChanelName);
-			await sb.Logger.log(
+			await logger.log(
 				"Twitch.Success",
 				`Name mismatch fixed: ${channelId}: Old=${oldName} New=${twitchChanelName}`
 			);
 		}
 		else {
 			this.#unsuccessfulRenameChannels.add(channelId);
-			await sb.Logger.log(
+			await logger.log(
 				"Twitch.Warning",
 				`Name conflict detected: ${channelId}: Old=${oldName} New=${twitchChanelName}`
 			);

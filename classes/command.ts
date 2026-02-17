@@ -32,6 +32,7 @@ import { type Language, getLanguage } from "../utils/languages.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import type { Emote } from "../utils/globals.js";
+import { logger } from "../singletons/logger.js";
 
 const { values: configValues, modules: modulesConfig, responses: configResponses } = getConfig();
 const COMMAND_PREFIX = modulesConfig.commands.prefix;
@@ -675,7 +676,7 @@ export class Command extends TemplateWithoutId {
 			if (!options.skipPending) {
 				const pending = Command.#cooldownManager.fetchPending(userData.ID);
 				if (pending) {
-					sb.Logger.logCommandExecution({
+					logger.logCommandExecution({
 						User_Alias: userData.ID,
 						Command: command.Name,
 						Platform: platformData.ID,
@@ -803,7 +804,7 @@ export class Command extends TemplateWithoutId {
 				reason: filterData.reason
 			});
 
-			sb.Logger.logCommandExecution({
+			logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: platformData.ID,
@@ -821,7 +822,7 @@ export class Command extends TemplateWithoutId {
 
 		// If params parsing failed, filters were checked and none applied, return the failure result now
 		if (failedParamsParseResult) {
-			sb.Logger.logCommandExecution({
+			logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: platformData.ID,
@@ -863,7 +864,7 @@ export class Command extends TemplateWithoutId {
 				result: (commandExecution.success === false) ? "fail" : "success"
 			});
 
-			sb.Logger.logCommandExecution({
+			logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: platformData.ID,
@@ -890,7 +891,7 @@ export class Command extends TemplateWithoutId {
 				result: "error"
 			});
 
-			sb.Logger.logCommandExecution({
+			logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: platformData.ID,
@@ -927,7 +928,7 @@ export class Command extends TemplateWithoutId {
 				};
 			}
 
-			const errorID = await sb.Logger.logError("Command", e, {
+			const errorID = await logger.logError("Command", e, {
 				origin,
 				context: {
 					identifier,

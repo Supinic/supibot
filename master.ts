@@ -34,7 +34,6 @@ interface GlobalSb {
 	ChatModule: typeof ChatModule;
 	Command: typeof Command;
 	Filter: typeof Filter;
-	Logger: typeof logger;
 	Platform: typeof Platform;
 	Reminder: typeof Reminder;
 	User: typeof User;
@@ -169,7 +168,6 @@ globalThis.sb = {
 	Channel,
 	Reminder,
 	ChatModule,
-	Logger: logger,
 	MpvClient,
 	API: initializeInternalApi()
 };
@@ -229,7 +227,7 @@ process.on("unhandledRejection", (reason) => {
 		? "External"
 		: "Internal";
 
-	void sb.Logger.logError("Backend", reason, {
+	void logger.logError("Backend", reason, {
 		origin,
 		context: {
 			cause: "UnhandledPromiseRejection"

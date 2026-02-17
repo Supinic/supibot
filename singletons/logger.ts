@@ -93,7 +93,7 @@ export class LoggerSingleton {
 				this.presentTables.add(table);
 			}
 
-			this.messageCron = new CronJob(messages.cron, () => LoggerSingleton.storeMessages(this.messageBatches));
+			this.messageCron = new CronJob(messages.cron, () => this.storeMessages());
 
 			this.messageCron.start();
 			this.crons.push(this.messageCron);
@@ -117,7 +117,7 @@ export class LoggerSingleton {
 				]
 			);
 
-			this.commandCron = new CronJob(commands.cron, async () => LoggerSingleton.storeCommands(batch, this.commandCollector));
+			this.commandCron = new CronJob(commands.cron, async () => this.storeCommands(batch));
 			this.commandCron.start();
 
 			this.commandBatch = batch;
@@ -185,9 +185,13 @@ export class LoggerSingleton {
 		this.started = true;
 	}
 
-	private static storeMessages (batches: Record<string, Batch>) {
+	private storeMessages () {
+		if (!this.started) {
+			return;
+		}
+
 		let i = 0;
-		for (const [name, batch] of typedEntries(batches)) {
+		for (const [name, batch] of typedEntries(this.messageBatches)) {
 			if (batch.records.length === 0) {
 				continue;
 			}
@@ -213,8 +217,8 @@ export class LoggerSingleton {
 		}
 	}
 
-	private static async storeCommands (batch: Batch, collector: Set<number>) {
-		if (!batch.ready) {
+	private async storeCommands (batch: Batch) {
+		if (!this.started || !batch.ready) {
 			return;
 		}
 
@@ -226,7 +230,6 @@ export class LoggerSingleton {
 			Executed: SupiDate;
 			Result: string;
 		};
-
 		const channelMeta = new Map<number, ChannelCommandMeta>();
 		for (const record of batch.records) {
 			if (!record.Channel) {
@@ -251,13 +254,17 @@ export class LoggerSingleton {
 			...metaPromises
 		]);
 
-		collector.clear();
+		this.commandCollector.clear();
 	}
 
 	/**
 	 * Inserts a log message into the database - `chat_data.Log` table
 	 */
 	public async log (tag: Tag, description: string | null = null, channel: Channel | null = null, user: User | null = null) {
+		if (!this.started) {
+			return;
+		}
+
 		const [parentTag, childTag = null] = tag.split(".");
 		const row = await core.Query.getRow("chat_data", "Log");
 

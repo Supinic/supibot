@@ -26,6 +26,7 @@ import type { DiscordEmote, Emote } from "../utils/globals.js";
 
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
+import { logger } from "../singletons/logger.js";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {
@@ -158,7 +159,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				return;
 			}
 
-			void sb.Logger.log("Discord.Error", err.toString(), null, null);
+			void logger.log("Discord.Error", err.toString(), null, null);
 		});
 	}
 
@@ -242,7 +243,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			};
 
 			if (e instanceof DiscordAPIError) {
-				await sb.Logger.logError("Backend", e, {
+				await logger.logError("Backend", e, {
 					origin: "External",
 					context: errorContext
 				});
@@ -405,7 +406,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				userLength: user.length
 			});
 
-			await sb.Logger.log("Discord.Warning", `Discord username length > 32 characters: ${json}`);
+			await logger.log("Discord.Warning", `Discord username length > 32 characters: ${json}`);
 			return;
 		}
 
@@ -515,7 +516,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 						messageObject
 					};
 
-					await sb.Logger.log(
+					await logger.log(
 						"Discord.Warning",
 						`No message text on Discord: ${JSON.stringify(obj)}`,
 						channelData,
@@ -523,11 +524,11 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					);
 				}
 				else {
-					sb.Logger.updateLastSeen({ channelData, userData, message: msg });
+					logger.updateLastSeen({ channelData, userData, message: msg });
 				}
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
+				await logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
 			}
 
 			channelData.events.emit("message", {
@@ -554,7 +555,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		}
 		else if (privateMessage) {
 			if (this.logging.whispers) {
-				await sb.Logger.push(msg, userData, null, this);
+				await logger.push(msg, userData, null, this);
 			}
 
 			this.resolveUserMessage(null, userData, msg);
@@ -705,7 +706,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 	async handleGuildCreate (guild: Guild) {
 		const message = `Joined guild ${guild.name}  - ID ${guild.id} - ${guild.memberCount} members`;
-		await sb.Logger.log("Discord.Join", message);
+		await logger.log("Discord.Join", message);
 
 		const announce = this.config.guildCreateAnnounceChannel;
 		if (announce) {

@@ -7,6 +7,7 @@ import { getConfig } from "../config.js";
 
 import type { Channel } from "./channel.js";
 import type { Platform } from "../platforms/template.js";
+import { logger } from "../singletons/logger.js";
 
 const { responses, values } = getConfig();
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
@@ -333,7 +334,7 @@ export class Banphrase extends TemplateWithId {
 				throw e;
 			}
 
-			await sb.Logger.log(
+			await logger.log(
 				"System.Warning",
 				`Banphrase API fail - code: ${e.code}, message: ${e.message}`,
 				channelData

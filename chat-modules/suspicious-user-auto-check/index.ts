@@ -7,6 +7,7 @@ import type { TwitchPlatform } from "../../platforms/twitch.js";
 import type { User } from "../../classes/user.js";
 import { SupiError } from "supi-core";
 import { ivrUserDataSchema } from "../../utils/schemas.js";
+import { logger } from "../../singletons/logger.js";
 
 type UserAliasRow = Pick<User, "Discord_ID" | "Twitch_ID" | "Name">;
 
@@ -94,7 +95,7 @@ export default {
 
 			const [data] = ivrUserDataSchema.parse(response.body);
 			if (data.login === raw.user) {
-				const logID = await sb.Logger.log(
+				const logID = await logger.log(
 					"Twitch.Warning",
 					`Weird suspicious case: ${JSON.stringify({ data, assumedUserID })}`
 				);
@@ -156,7 +157,7 @@ export default {
 			}
 
 			const json = JSON.stringify({ description, raw, reply: messageData.reply }, null, 4);
-			await sb.Logger.log(
+			await logger.log(
 				"Twitch.Other",
 				`TEST! Automatic suspicious user resolution: ${json}`,
 				channel,
