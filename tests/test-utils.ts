@@ -50,7 +50,7 @@ export const createTestCommand = (opts: Partial<CommandDefinition> = {}) => new 
 	Code: opts.Code ?? (() => ({ reply: null })),
 	Params: opts.Params ?? [],
 	Description: null,
-	Cooldown: null,
+	Cooldown: 0,
 	Flags: [],
 	Whitelist_Response: null,
 	Dynamic_Description: () => []
