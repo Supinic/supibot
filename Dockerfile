@@ -20,7 +20,6 @@ COPY --chown=supibot:supibot master.ts ./
 COPY --chown=supibot:supibot config.ts ./
 COPY --chown=supibot:supibot init ./init
 
-COPY --chown=supibot:supibot @types ./@types
 COPY --chown=supibot:supibot api ./api
 COPY --chown=supibot:supibot chat-modules ./chat-modules
 COPY --chown=supibot:supibot classes ./classes
