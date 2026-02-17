@@ -26,10 +26,11 @@ export default {
 
 			setTimeout(() => (channelData.Mode = "Read"), 5000);
 
+			const channelString = (channelData === context.channel) ? "this channel" : `channel "${channelData.Name}"`;
 			return {
 				reply: core.Utils.tag.trim `
-					I will go to read-only mode in channel "${channelData.Name}" after ~5 seconds.
-					Use the "${sb.Command.prefix}${this.Name} enable ${channelData.Name}" command in private messages to re-enable me.
+					I will go to read-only mode in ${channelString} after 5 seconds.
+					Use the "${sb.Command.prefix}bot enable ${channelData.Name}" command in private messages to re-enable me.
 				`
 			};
 		}
