@@ -3,12 +3,12 @@ import { SupiDate, SupiError } from "supi-core";
 import type { default as LinkParser } from "track-link-parser";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 
-import type { IvrClipData } from "../../utils/globals.js";
 import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
 import getLinkParser from "../../utils/link-parser.js";
 
 import { type User } from "../../classes/user.js";
 import { type MpvPlaylistItem } from "../../singletons/mpv-client.js";
+import { ivrClipSchema } from "../../utils/schemas.js";
 
 const { SONG_REQUESTS_STATE } = cacheKeys;
 
@@ -239,7 +239,7 @@ export default declare({
 					};
 				}
 
-				const response = await core.Got.get("IVR")<IvrClipData>({
+				const response = await core.Got.get("IVR")({
 					url: `v2/twitch/clip/${slug}`
 				});
 
@@ -250,7 +250,7 @@ export default declare({
 					};
 				}
 
-				const { clip, clipKey } = response.body;
+				const { clip, clipKey } = ivrClipSchema.parse(response.body);
 				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
 
 				data = {

@@ -246,3 +246,23 @@ export const ivrSubAgeSchema = z.object({
 		gitMeta: z.unknown().nullish()
 	}).nullish()
 });
+
+export const ivrEmoteSchema = z.object({
+	channelName: z.string().nullable(),
+	channelLogin: z.string().nullable(),
+	channelID: z.string().nullable(),
+	artist: z.object({
+		displayName: z.string().nullable(),
+		login: z.string().nullable(),
+		id: z.string().nullable()
+	}).nullable(),
+	emoteID: z.string(),
+	emoteCode: z.string(),
+	emoteURL: z.string(),
+	emoteSetID: z.string(),
+	emoteAssetType: z.string(),
+	emoteState: z.string(),
+	emoteType: z.string(),
+	emoteBitCost: z.int().optional(),
+	emoteTier: z.string().nullable()
+});

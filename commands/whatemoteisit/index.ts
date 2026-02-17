@@ -1,8 +1,8 @@
 import { type ContextPlatformSpecificData, declare } from "../../classes/command.js";
 import type { MessageData as TwitchMessageData } from "../../platforms/twitch.js";
 import { filterNonNullable } from "../../utils/ts-helpers.js";
-import type { IvrEmoteData } from "../../utils/globals.js";
 import { SupiError } from "supi-core";
+import { ivrEmoteSchema } from "../../utils/schemas.js";
 
 const REGEXES = {
 	V1: /^\d+$/,
@@ -56,7 +56,7 @@ export default declare({
 		);
 
 		const isEmoteID = (REGEXES.V1.test(input) || REGEXES.V2.test(input) || REGEXES.CDN.test(input));
-		const response = await core.Got.get("IVR")<IvrEmoteData>({
+		const response = await core.Got.get("IVR")({
 			url: `v2/twitch/emotes/${encodeURIComponent(inputEmoteIdentifier)}`,
 			searchParams: {
 				id: String(isEmoteID) // literally "true" or "false" based on if the input is an emote ID
@@ -64,7 +64,7 @@ export default declare({
 			throwHttpErrors: false
 		});
 
-		if (response.statusCode === 404 || !response.body.emoteID) {
+		if (!response.ok) {
 			return {
 				success: false,
 				reply: "Emote has not been found!"
@@ -81,7 +81,7 @@ export default declare({
 			emoteState,
 			emoteTier,
 			emoteType
-		} = response.body;
+		} = ivrEmoteSchema.parse(response.body);
 
 		const originID = await core.Query.getRecordset<number | undefined>(rs => rs
 			.select("ID")
