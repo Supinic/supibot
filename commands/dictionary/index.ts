@@ -5,7 +5,7 @@ const dictSchema = z.union([
 	z.object({ title: z.string(), message: z.string(), resolution: z.string() }), // Failure
 	z.array(z.object({
 		word: z.string(),
-		phonetic: z.string(),
+		phonetic: z.string().optional(),
 		phonetics: z.array(z.object({
 			text: z.string()
 		})),
