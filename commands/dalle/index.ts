@@ -1,15 +1,12 @@
-import createEmbeds from "./discord-embed.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "dalle",
 	Aliases: [],
-	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Links a random already-made DALL-E image, or one based on your prompt",
+	Description: "Fetches a random premade DALL-E image, either randomly or based on your search query.",
 	Flags: ["mention"],
-	Params: [
-		{ name: "id", type: "string" }
-	],
+	Params: [{ name: "id", type: "string" }],
 	Whitelist_Response: null,
 	Code: (async function dallE (context, ...args) {
 		const search = args.join(" ");
@@ -23,23 +20,22 @@ export default {
 
 		const { id } = context.params;
 		const isRandom = (args.length === 0);
-		const image = await core.Query.getRecordset(rs => rs
-			.select("ID", "Prompt", "Created", "Creation_Time")
-			.from("data", "DALL-E")
-			.orderBy("RAND()")
-			.where(
-				{ condition: Boolean(id) },
-				"ID = %s",
-				id
-			)
-			.where(
-				{ condition: (!id && !isRandom && search) },
-				"Prompt %*like*",
-				search
-			)
-			.limit(1)
-			.single()
-		);
+		const image = await core.Query.getRecordset<{ ID: number; Prompt: string; } | undefined>(rs => {
+			rs.select("ID", "Prompt", "Created", "Creation_Time")
+				.from("data", "DALL-E")
+				.orderBy("RAND()")
+				.limit(1)
+				.single();
+
+			if (id) {
+				rs.where("ID = %s", id);
+			}
+			if (!id && !isRandom && search) {
+				rs.where("Prompt %*like*", search);
+			}
+
+			return rs;
+		});
 
 		if (!image) {
 			return {
@@ -48,24 +44,12 @@ export default {
 			};
 		}
 
-		const discordData = {};
-		if (context.channel && context.platform.Name === "discord") {
-			const discordChannel = context.platform.client.channels.fetch(context.channel.Name);
-			if (discordChannel && discordChannel.members && discordChannel.members.size <= 1000) {
-				discordData.embeds = createEmbeds(image.ID, {
-					prompt: image.Prompt,
-					created: image.Created,
-					creationTime: image.Creation_Time
-				});
-			}
-		}
-
 		return {
-			reply: `https://supinic.com/data/dall-e/detail/${image.ID} DALL-E image set for "${image.Prompt}"`,
-			discord: discordData
+			success: true,
+			reply: `https://supinic.com/data/dall-e/detail/${image.ID} DALL-E image set for "${image.Prompt}"`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Searches for a DALL-E set of AI generated images, based on other people creating them.",
 		"The generation is broken since July 2025, so no more images can be created at the moment.",
 		"",
@@ -87,5 +71,5 @@ export default {
 		`<code>${prefix}dalle id:(post ID)</code>`,
 		`<code>${prefix}dalle id:e5832f798a41d335</code>`,
 		"Looks up a specific post by its ID"
-	])
-};
+	]
+});
