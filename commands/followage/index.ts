@@ -62,9 +62,19 @@ export default declare({
 
 		if (!response.ok) {
 			const { data } = ivrErrorSchema.safeParse(response.body);
+			const { message = "(no error message)" } = data?.error ?? {};
+
+			let resultMessage = message;
+			if (message.startsWith("Channel has been banned")) {
+				resultMessage = `@${channel} is currently banned`;
+			}
+			else if (message.startsWith("User has been banned")) {
+				resultMessage = `@${user} is currently banned`;
+			}
+
 			return {
 				success: false,
-				reply: `Could not check for followage! Reason: ${data?.error.message ?? "(no error message)"}`
+				reply: `Could not check for followage! Reason: ${resultMessage}`
 			};
 		}
 
