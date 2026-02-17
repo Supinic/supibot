@@ -906,11 +906,11 @@ export class Command extends TemplateWithoutId {
 			let origin: "Internal" | "External" = "Internal";
 			let errorContext: Record<string, string> = {};
 			const loggingContext = {
-				user: userData.ID,
+				user: `${userData.Name} (${userData.ID})`,
+				channel: `${channelData?.Name ?? "(PM)"} (${channelData?.ID ?? "N/A"})`,
 				command: command.Name,
 				invocation: identifier,
-				channel: channelData?.ID ?? null,
-				Platform: platformData.ID,
+				Platform: `${platformData.name} (${platformData.ID})`,
 				params: context.params,
 				isPrivateMessage
 			};
