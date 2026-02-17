@@ -3,7 +3,6 @@
   "version": "2.2.0",
   "type": "module",
   "dependencies": {
-    "@discordjs/formatters": "^0.6.2",
     "@jprochazk/roll-dice": "^0.4.2",
     "acorn-node": "^2.0.1",
     "async-markov": "supinic/async-markov",
@@ -49,11 +48,8 @@
   "license": "AGPL-3.0",
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/eslint-parser": "^7.28.6",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.0.0",
-    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-unicorn": "^63.0.0",
     "globals": "^17.3.0",
     "nyc": "^17.1.0",

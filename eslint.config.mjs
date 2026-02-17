@@ -1,12 +1,10 @@
 import tseslint from "typescript-eslint";
 import eslintJs from "@eslint/js";
-import importPlugin from "eslint-plugin-import";
 import unicornPlugin from "eslint-plugin-unicorn";
 import globals from "globals";
 
 export default tseslint.config(
 	eslintJs.configs.recommended,
-	importPlugin.flatConfigs.errors,
 	unicornPlugin.configs.recommended,
 	tseslint.configs.strictTypeChecked,
 	{
@@ -47,8 +45,6 @@ export default tseslint.config(
 			"eol-last": ["warn", "always"],
 			eqeqeq: "error",
 			"function-call-argument-newline": ["warn", "consistent"],
-			"import/extensions": ["error", "always"],
-			"import/no-unresolved": "off",
 			"implicit-arrow-linebreak": ["error", "beside"],
 			indent: ["warn", "tab", {
 				SwitchCase: 1
@@ -256,7 +252,6 @@ export default tseslint.config(
 				max: 2
 			}],
 			"unicorn/prefer-module": "off",
-			"import/extensions": "off",
 			"unicorn/consistent-function-scoping": "off",
 			"unicorn/no-useless-undefined": "off",
 			"unicorn/no-await-expression-member": "off",
