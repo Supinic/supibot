@@ -402,7 +402,7 @@ export class LoggerSingleton {
 	/**
 	 * Logs a command execution.
 	 */
-	public logCommandExecution (options: CommandExecutionOptions) {
+	public logCommandExecution (options: CommandExecutionOptions): void {
 		if (!this.commandBatch) {
 			return;
 		}
@@ -416,7 +416,10 @@ export class LoggerSingleton {
 		this.commandBatch.add(options);
 	}
 
-	public updateLastSeen (options: { channelData: Channel, userData: User, message: string }) {
+	/**
+	 * Updates the last-seen metadata for a given user.
+	 */
+	public updateLastSeen (options: { channelData: Channel, userData: User, message: string }): void {
 		if (!logging.lastSeen.enabled) {
 			return;
 		}
@@ -439,7 +442,10 @@ export class LoggerSingleton {
 		});
 	}
 
-	public getUserLastSeen (userId: User["ID"]) {
+	/**
+	 * Fetches the given user's last-seen timestamp, if available.
+	 */
+	public getUserLastSeen (userId: User["ID"]): SupiDate | null {
 		const result = this.lastSeenUserMap.get(userId);
 		return (result) ? new SupiDate(result) : null;
 	}
@@ -447,7 +453,7 @@ export class LoggerSingleton {
 	/**
 	 * Cleans up and destroys the logger instance
 	 */
-	public destroy () {
+	public destroy (): void {
 		for (const cron of this.crons) {
 			void cron.stop();
 		}
