@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import * as assert from "node:assert";
 import { describe, it, beforeEach, afterEach, mock } from "node:test";
 import { Command, type ParameterType } from "../../../classes/command.js";
 import { SupiDate } from "supi-core";

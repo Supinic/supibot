@@ -70,5 +70,8 @@
     // It also enables the `incremental` option, allowing it to perform incremental builds instead of full rebuilds, reducing compile times significantly.
     "composite": true,
     "incremental": true
+  },
+  "watchOptions": {
+    "excludeDirectories": ["**/node_modules", "tests"]
   }
 }
