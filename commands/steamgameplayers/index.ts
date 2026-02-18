@@ -4,7 +4,7 @@ import * as z from "zod";
 
 import { declare } from "../../classes/command.js";
 
-const SteamAppSchema = z.object({
+const steamAppSchema = z.object({
 	response: z.object({
 		apps: z.array(
 			z.object({
@@ -33,7 +33,7 @@ const fetchGamesData = async () => {
 		}
 	});
 
-	const { apps } = SteamAppSchema.parse(response.body).response;
+	const { apps } = steamAppSchema.parse(response.body).response;
 	await core.Cache.setByPrefix("latest-steam-games-update", SupiDate.now() / 1000);
 	if (!apps) {
 		return;
@@ -55,7 +55,7 @@ const fetchGamesData = async () => {
 	}
 };
 
-const SteamRecommendationSchema = z.object({
+const steamRecommendationSchema = z.object({
 	success: z.union([z.literal(0), z.literal(1)]),
 	results: z.object({
 		rollups: z.array(
@@ -71,7 +71,7 @@ const fetchRecommendationData = async (gameId: string | number) => {
 		url: `https://store.steampowered.com/appreviewhistogram/${gameId}`
 	});
 
-	const { success, results } = SteamRecommendationSchema.parse(response.body);
+	const { success, results } = steamRecommendationSchema.parse(response.body);
 	if (!response.ok || success !== 1) {
 		return {
 			result: "Could not fetch reviews data!"
@@ -102,22 +102,24 @@ const fetchRecommendationData = async (gameId: string | number) => {
 	};
 };
 
-const SteamPlayerCountSchema = z.object({
+const steamPlayerCountSchema = z.object({
 	response: z.object({
 		player_count: z.number().min(0)
 	})
 });
 
-const SteamGameDataSchema = z.record(
-	z.string(),
+const steamGameDataSchema = z.record(z.string(), z.discriminatedUnion("success", [
 	z.object({
-		success: z.boolean(),
+		success: z.literal(true),
 		data: z.object({
 			name: z.string(),
 			developers: z.array(z.string())
 		})
-	}).optional()
-);
+	}),
+	z.object({
+		success: z.literal(false)
+	})
+]).optional());
 
 let updateCronJob: CronJob | null = null;
 export default declare({
@@ -148,6 +150,8 @@ export default declare({
 
 		let gameId = context.params.gameID ?? null;
 		const gameName = args.join(" ");
+		let adjustedGameName = gameName;
+
 		if (!gameId) {
 			if (!gameName) {
 				return {
@@ -205,6 +209,7 @@ export default declare({
 				}
 
 				gameId = foundGame.ID;
+				adjustedGameName = foundGame.Name;
 			}
 		}
 
@@ -224,7 +229,7 @@ export default declare({
 			};
 		}
 
-		const { response: playerCountData } = SteamPlayerCountSchema.parse(playerCountResponse.body);
+		const { response: playerCountData } = steamPlayerCountSchema.parse(playerCountResponse.body);
 		const gameDataResponse = await core.Got.get("GenericAPI")({
 			url: "https://store.steampowered.com/api/appdetails",
 			throwHttpErrors: false,
@@ -233,11 +238,11 @@ export default declare({
 			}
 		});
 
-		const gameSchema = SteamGameDataSchema.parse(gameDataResponse.body)[gameId];
+		const gameSchema = steamGameDataSchema.parse(gameDataResponse.body)[gameId];
 		if (!gameSchema || !gameSchema.success) {
 			return {
 				success: false,
-				reply: "This Steam game supposedly exists, but there is no data associated with it!"
+				reply: `Steam item "${adjustedGameName}" does not have any player data available!`
 			};
 		}
 
