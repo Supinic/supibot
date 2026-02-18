@@ -7,7 +7,7 @@ const dictSchema = z.union([
 		word: z.string(),
 		phonetic: z.string().optional(),
 		phonetics: z.array(z.object({
-			text: z.string()
+			text: z.string().optional()
 		})),
 		meanings: z.array(z.object({
 			partOfSpeech: z.string(),
