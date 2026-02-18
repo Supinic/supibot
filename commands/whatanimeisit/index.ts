@@ -8,8 +8,8 @@ const searchSchema = z.object({
 		anilist: z.object({
 			isAdult: z.boolean(),
 			title: z.object({
-				english: z.string().optional(),
-				romaji: z.string().optional(),
+				english: z.string().nullish(),
+				romaji: z.string().nullish(),
 				native: z.string()
 			})
 		}),
@@ -18,8 +18,8 @@ const searchSchema = z.object({
 		at: z.float32(),
 		duration: z.float32(),
 		similarity: z.float32().min(0).max(1),
-		episode: z.int().optional(),
-		season: z.int().optional(),
+		episode: z.int().nullish(),
+		season: z.int().nullish(),
 		filename: z.string(),
 		image: z.string(),
 		video: z.string()
