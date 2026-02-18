@@ -21,7 +21,7 @@ const espnSchema = z.object({
 				address: z.object({
 					city: z.string(),
 					state: z.string(),
-					country: z.string()
+					country: z.string().optional()
 				})
 			}).optional()
 		})),
