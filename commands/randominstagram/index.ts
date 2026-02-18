@@ -11,7 +11,7 @@ const querySchema = z.object({
 						display_url: z.string(),
 						owner: z.object({ username: z.string() }),
 						is_video: z.boolean(),
-						accessibility_caption: z.string().optional(),
+						accessibility_caption: z.string().nullish(),
 						edge_media_to_caption: z.object({
 							edges: z.array(z.object({
 								node: z.object({ text: z.string() })
