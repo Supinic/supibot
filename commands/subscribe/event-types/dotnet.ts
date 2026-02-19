@@ -14,5 +14,8 @@ export default {
 	cacheKey: "dotnet-blog-last-publish-date",
 	subName: ".NET devblog",
 	type: "rss",
-	url: "https://devblogs.microsoft.com/dotnet/feed"
+	url: "https://devblogs.microsoft.com/dotnet/feed",
+	options: {
+		ignoredCategories: ["copilot"]
+	}
 } satisfies RssEventDefinition;
