@@ -1,20 +1,12 @@
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
 
-const ERROR_REASONS = {
-	"public-incoming": "That person has too many public reminders pending!",
-	"public-outgoing": "You have too many public reminders pending!",
-	"private-incoming": "That person has too many private reminders pending!",
-	"private-outgoing": "You have too many private reminders pending!",
-	"existing-pingme": "You already have a \"pingme\" reminder set up for that user!"
-};
-
-export default {
+export default declare({
 	Name: "pingme",
 	Aliases: ["letmeknow", "lmk"],
-	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Sets a self-notification in the current channel when the target user is spotted in a different channel.",
-	Flags: ["block","mention","opt-out","pipe"],
+	Flags: ["block", "mention", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function pingMe (context, user, ...args) {
@@ -46,11 +38,12 @@ export default {
 			};
 		}
 
-		const { success, cause, ID } = await sb.Reminder.create({
+		const text = (args.length === 0) ? null : args.join(" ");
+		const result = await sb.Reminder.create({
 			Channel: context.channel?.ID || null,
 			User_From: context.user.ID,
 			User_To: targetUser.ID,
-			Text: args.filter(Boolean).join(" ") ?? null,
+			Text: text,
 			Schedule: null,
 			Created: new SupiDate(),
 			Private_Message: Boolean(context.privateMessage),
@@ -58,18 +51,22 @@ export default {
 			Type: "Pingme"
 		});
 
-		if (success && !cause) {
+		if (result.success) {
+			const { ID } = result;
 			return {
+				success: true,
 				reply: `I will ping you when they type in chat (ID ${ID})`
 			};
 		}
 		else {
+			const { cause } = result;
 			return {
-				reply: `Could not set up a ping! ${ERROR_REASONS[cause] ?? "(Unknown)"}`
+				success: false,
+				reply: `Could not set up a ping! ${cause}}`
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Sets a notification to yourself for when the target user types in a channel with Supibot.",
 		"",
 
@@ -80,5 +77,5 @@ export default {
 		`<code>${prefix}pingme (user) (... custom text)</code>`,
 		"Same as above, but your custom text will be mentioned as well.",
 		"This is useful if you want to set a note or something of that matter."
-	])
-};
+	]
+});

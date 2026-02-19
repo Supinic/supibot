@@ -1,6 +1,6 @@
 import { randomInt as cryptoRandomInt } from "node:crypto";
 import RSSParser from "rss-parser";
-import { parse as chronoParse, type ParsingOption } from "chrono-node";
+import { parse as chronoParse, type ParsingOption, type Component as ChronoComponent } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
 
 import { Filter, type Type as FilterType } from "../classes/filter.js";
@@ -260,6 +260,9 @@ export const getPathFromURL = (stringURL: string): string | null => {
 	return `${path}${url.search}`;
 };
 
+const CHRONO_COMPONENTS = [
+	"year", "month", "day", "weekday", "hour", "minute", "second", "millisecond", "meridiem", "timezoneOffset"
+] satisfies readonly ChronoComponent[];
 export const parseChrono = (string: string, referenceDate?: SupiDate, options?: ParsingOption) => {
 	const chronoData = chronoParse(string, referenceDate, options);
 	if (chronoData.length === 0) {
@@ -267,10 +270,12 @@ export const parseChrono = (string: string, referenceDate?: SupiDate, options?: 
 	}
 
 	const [chrono] = chronoData;
+	const isRelative = CHRONO_COMPONENTS.every(i => !chrono.start.isCertain(i));
 	return {
 		date: chrono.start.date(),
 		component: chrono.start,
-		text: chrono.text
+		text: chrono.text,
+		isRelative
 	};
 };
 

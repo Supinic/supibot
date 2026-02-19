@@ -1,24 +1,17 @@
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.js";
 import { fetchTimeData, parseChrono } from "../../utils/command-utils.js";
 
+// SQL DATETIME limit - 9999-12-31 23:59:59.999
+const MAXIMUM_SQL_TIMESTAMP = 253_402_297_199_999;
 const MESSAGE_LIMIT = 2000;
-const MAXIMUM_SQL_TIMESTAMP = 253_402_297_199_999; // SQL DATETIME limit - 9999-12-31 23:59:59.999
-const ERROR_REASONS = {
-	"scheduled-incoming": "That person has too many timed reminders pending for them on that day!",
-	"scheduled-outgoing": "You have too many timed reminders pending on that day!",
-	"public-incoming": "That person has too many public reminders pending!",
-	"public-outgoing": "You have too many public reminders pending!",
-	"private-incoming": "That person has too many private reminders pending!",
-	"private-outgoing": "You have too many private reminders pending!"
-};
 
-export default {
+export default declare({
 	Name: "remind",
-	Aliases: ["notify","remindme","remindprivate","privateremind"],
-	Author: "supinic",
+	Aliases: ["notify", "remindme", "remindprivate", "privateremind"],
 	Cooldown: 10000,
 	Description: "Sets a notification for a given user. Can also set a time to ping that user (or yourself) in a given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
-	Flags: ["block","mention","opt-out","pipe"],
+	Flags: ["block", "mention", "opt-out", "pipe"],
 	Params: [
 		{ name: "after", type: "string" },
 		{ name: "at", type: "string" },
@@ -27,16 +20,16 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function remind (context, ...args) {
-		const chronoParams = Object.keys(context.params).filter(i => i !== "private");
-		if (chronoParams.length >= 2) {
+		const { params } = context;
+		const chronoParams = Object.keys(params).filter(i => i !== "private");
+		if (chronoParams.length > 1) {
 			return {
 				success: false,
 				reply: `Cannot specify more than one of the parameters "after", "at" and "on" at the same time!`
 			};
 		}
 
-		const chronoType = chronoParams[0] ?? null;
-		const chronoParam = context.params[chronoType];
+		const chronoParam = params.after ?? params.at ?? params.on ?? null;
 		if (!chronoParam && args.length === 0) {
 			return {
 				success: false,
@@ -49,7 +42,11 @@ export default {
 			? await sb.User.get(args[0], true)
 			: null;
 
-		if (context.invocation.includes("me") || args[0] === "me" || (targetUser && targetUser.ID === context.user.ID)) {
+		if (
+			context.invocation.endsWith("me")
+			|| args[0] === "me"
+			|| (targetUser && targetUser.ID === context.user.ID)
+		) {
 			targetUser = context.user;
 
 			if (!context.invocation.includes("me")) {
@@ -90,8 +87,8 @@ export default {
 			};
 		}
 
-		let isPrivate = Boolean(context.invocation.includes("private") || context.params.private);
-		if (isPrivate && context.channel !== null) {
+		let isPrivate = Boolean(context.invocation.includes("private") || params.private);
+		if (isPrivate && context.channel) {
 			return {
 				success: false,
 				reply: "You must create private reminders in private messages only!",
@@ -100,8 +97,6 @@ export default {
 		}
 
 		let reminderText = args.join(" ").replaceAll(/\s+/g, " ").trim();
-
-		// const timedRegex = /\b(in|on|at)\b/i;
 		const timedRegex = /\b(in|at)\b/i;
 		let targetReminderDate = null;
 		let targetReminderDelta = "when they next type in chat";
@@ -109,7 +104,10 @@ export default {
 
 		const now = new SupiDate();
 		if (chronoParam) {
-			let chronoValue = (chronoType === "after" && !chronoParam.includes(":")) ? `in ${chronoParam}` : chronoParam;
+			let chronoValue = (params.after && !chronoParam.includes(":"))
+				? `in ${chronoParam}`
+				: chronoParam;
+
 			chronoValue = chronoValue
 				.replaceAll(/(\b|\d)hr(\b|\d)/g, "$1hr$2")
 				.replaceAll(/(\b|\d)m(\b|\d)/g, "$1min$2")
@@ -123,15 +121,14 @@ export default {
 				};
 			}
 
+			const { isRelative } = preCheckChronoData;
 			const location = await context.user.getDataProperty("location");
-			const hasExplicitTimezone = (typeof preCheckChronoData.component.knownValues.timezoneOffset === "number");
-			const isRelative = (Object.keys(preCheckChronoData.component.knownValues).length === 0);
-			let referenceDate = null;
+			const hasExplicitTimezone = preCheckChronoData.component.isCertain("timezoneOffset");
 
+			let referenceDate;
 			if (!hasExplicitTimezone && !isRelative && location) {
-				const date = preCheckChronoData.component.date();
 				const response = await fetchTimeData({
-					date,
+					date: new SupiDate(preCheckChronoData.component.date()),
 					coordinates: location.coordinates
 				});
 
@@ -168,12 +165,12 @@ export default {
 			// S#12177
 			// If there is no user-provided day value (e.g. "2 am") and that timestamp has already been passed today,
 			// automatically add one day to the resulting date object - we assume it's tomorrow.
-			if (chronoData.component.impliedValues.day && chronoData.date < now) {
+			if (!chronoData.component.isCertain("day") && chronoData.date < now) {
 				targetReminderDate.addDays(1);
 			}
 
 			targetReminderDate.milliseconds = now.milliseconds;
-			delta = core.Utils.round(targetReminderDate - now, -3);
+			delta = core.Utils.round(targetReminderDate.valueOf() - now.valueOf(), -3);
 		}
 		else if (timedRegex.test(reminderText)) {
 			reminderText = reminderText.replaceAll(/\bhr\b/g, "hour");
@@ -192,7 +189,7 @@ export default {
 
 					continues = false;
 					const current = timeData.ranges[i];
-					const next = timeData.ranges[i + 1];
+					const next = timeData.ranges.at(i + 1);
 
 					delta += current.time;
 					targetReminderDate = targetReminderDate ?? SupiDate.now();
@@ -214,7 +211,7 @@ export default {
 						reminderText = reminderText.slice(0, current.start) + reminderText.slice(current.end);
 						break;
 					}
-					else {
+					else if (next) {
 						const amount = next.start - current.start;
 						reminderText = reminderText.slice(0, current.start) + "\u0000".repeat(amount) + reminderText.slice(next.start);
 						continues = true;
@@ -247,7 +244,7 @@ export default {
 					reply: "Timed reminders set in the past are only available for people that posess a time machine!"
 				};
 			}
-			else if (Math.abs(now - comparison) < 30_000) {
+			else if (Math.abs(now.valueOf() - comparison.valueOf()) < 30_000) {
 				return {
 					success: false,
 					reply: "You cannot set a timed reminder in less than 30 seconds!",
@@ -281,12 +278,12 @@ export default {
 
 		// If it is a timed reminder via PMs, only allow it if it is a self reminder.
 		// Scheduled reminders for users via PMs violate the philosophy of reminders.
-		if (context.privateMessage && delta !== 0 && !context.params.after) {
+		if (context.privateMessage && delta !== 0 && !params.after) {
 			if (targetUser === context.user) {
 				isPrivate = true;
 			}
 			else {
-				const forcePrivateString = (context.params.private === false)
+				const forcePrivateString = (params.private === false)
 					? " (no matter what you set the private parameter to)"
 					: "";
 
@@ -297,28 +294,24 @@ export default {
 			}
 		}
 
-		const type = (chronoType === "after") ? "Deferred" : "Reminder";
+		const type = (params.after) ? "Deferred" : "Reminder";
 		const message = (reminderText)
 			? core.Utils.wrapString(reminderText, MESSAGE_LIMIT)
 			: "(no message)";
 
 		const result = await sb.Reminder.create({
-			Channel: context?.channel?.ID ?? null,
+			Channel: context.channel?.ID ?? null,
 			Platform: context.platform.ID,
 			User_From: context.user.ID,
 			User_To: targetUser.ID,
 			Text: message.trim(),
-			Schedule: targetReminderDate ?? null,
+			Created: new SupiDate(),
+			Schedule: (targetReminderDate) ? new SupiDate(targetReminderDate) : null,
 			Private_Message: isPrivate,
 			Type: type
 		});
 
 		if (result.success) {
-			if (result.ID % 1_000_000 === 0) {
-				const trollShift = (Math.random() > 0.5) ? 1 : -1;
-				result.ID += trollShift;
-			}
-
 			const who = (targetUser.ID === context.user.ID) ? "you" : targetUser.Name;
 			const target = (targetUser.ID === context.user.ID) ? "you" : "they";
 			const method = (isPrivate) ? "privately " : "";
@@ -340,11 +333,11 @@ export default {
 		else {
 			return {
 				success: false,
-				reply: ERROR_REASONS[result.cause] ?? `Reminder not created - result is ${result.cause}.`
+				reply: result.reason
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Reminds a given person.",
 		"There are multiple ways to remind, either whenever they type, or a timed reminder.",
 		"",
@@ -396,5 +389,5 @@ export default {
 		"Creates a regular reminder that will only fire when you or target user type in chat <b>after</b> the provided time has passed.",
 		"E.g. for the 10am example, any messages sent by yourself up to 10:00:00 will not make the reminder fire, whereas the first one afterwards will.",
 		""
-	])
-};
+	]
+});
