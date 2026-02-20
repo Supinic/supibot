@@ -1,9 +1,10 @@
 import { type GotResponse, SupiError } from "supi-core";
-import { checkInputLimits, determineOutputLimit, getHistoryMode, getTemperature, getUserHash, GptTemplate } from "./gpt-template.js";
+import { checkInputLimits, getHistoryMode, getUserHash, type GptTemplate } from "./gpt-template.js";
 import GptHistory from "./history-control.js";
-import { GptContext, ModelData } from "./index.js";
+import type { GptContext } from "./index.js";
+import type { ModelData } from "./config-schema.js";
 
-const DEFAULT_SYSTEM_MESSAGE = "Keep the response as short and concise as possible. Don't include URLs and other links in the response unless explicitly asked.";
+const DEFAULT_SYSTEM_MESSAGE = "Be extremely concise. Do not add URLs to the response.";
 
 type OpenAiMessage = {
 	annotations: unknown[];
@@ -26,17 +27,19 @@ type OpenAiResponse = {
 		prompt_tokens: number;
 		total_tokens: number;
 	}
-}
+};
 type OpenAiPayload = {
 	model: string;
 	messages: unknown[];
 	user: string;
 	temperature?: number;
+	service_tier?: "flex" | "auto";
 	top_p?: number;
 	frequency_penalty?: number;
 	presence_penalty?: number;
 	max_completion_tokens?: number;
 	max_tokens?: number;
+	reasoning_effort?: "minimal" | "low" | "medium" | "high";
 };
 
 const getHistory = async (context: GptContext, query: string, options: { noSystemRole: boolean }) => {
@@ -72,8 +75,9 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 	}
 };
 
-const gptLinkRegex = /\[.+?]\((.+)[?&]utm_source=openai\)/gi;
-const removeMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "$1");
+const gptLinkRegex = /\(?\[.+?]\((.+)[?&]utm_source=openai\)\)?/gi;
+const trimMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "$1").trim();
+const removeMarkdownLinks = (input: string) => input.replaceAll(gptLinkRegex, "").trim();
 
 export const GptOpenAI = {
 	async execute (context: GptContext, query: string, modelData: ModelData) {
@@ -102,18 +106,6 @@ export const GptOpenAI = {
 			}
 		}
 
-		const outputLimitCheck = determineOutputLimit(context, modelData);
-		if (!outputLimitCheck.success) {
-			return outputLimitCheck;
-		}
-		const { outputLimit } = outputLimitCheck;
-
-		const temperatureCheck = getTemperature(context);
-		if (!temperatureCheck.success) {
-			return temperatureCheck;
-		}
-		const { temperature } = temperatureCheck;
-
 		const json: OpenAiPayload = {
 			model: modelData.url,
 			messages,
@@ -121,17 +113,17 @@ export const GptOpenAI = {
 		};
 
 		if (modelData.search !== true) {
-			json.temperature = temperature;
 			json.top_p = 1;
 			json.frequency_penalty = 0;
 			json.presence_penalty = 0;
 		}
+		if (modelData.flexProcessing === true) {
+			json.service_tier = "flex";
+		}
 
 		if (modelData.usesCompletionTokens === true) {
-			json.max_completion_tokens = 10_000;
-		}
-		else {
-			json.max_tokens = outputLimit;
+			json.reasoning_effort = "low";
+			json.max_completion_tokens = 2500;
 		}
 
 		const response = await core.Got.get("GenericAPI")<OpenAiResponse>({
@@ -168,9 +160,14 @@ export const GptOpenAI = {
 	},
 	extractMessage (context, response: GotResponse<OpenAiResponse>) {
 		const message = response.body.choices[0].message.content.trim();
-		return (context.platform.name === "twitch")
-			? removeMarkdownLinks(message)
-			: message;
+		if (context.platform.name === "twitch") {
+			return (context.append.pipe)
+				? trimMarkdownLinks(message)
+				: removeMarkdownLinks(message);
+		}
+		else {
+			return message;
+		}
 	},
 
 	async setHistory (context: GptContext, query: string, reply: string) {

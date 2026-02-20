@@ -1,4 +1,4 @@
-import { RssEventDefinition } from "../generic-event.js";
+import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "Typescript",
@@ -14,5 +14,8 @@ export default {
 	cacheKey: "typescript-blog-last-publish-date",
 	subName: "Typescript devblog",
 	type: "rss",
-	url: "https://devblogs.microsoft.com/typescript/feed"
+	url: "https://devblogs.microsoft.com/typescript/feed",
+	options: {
+		ignoredCategories: ["copilot"]
+	}
 } satisfies RssEventDefinition;

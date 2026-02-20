@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default class RedditPost {
 	#author;
 	#created;
@@ -28,7 +30,7 @@ export default class RedditPost {
 		}
 
 		this.#author = data.author;
-		this.#created = new sb.Date(data.created_utc * 1000);
+		this.#created = new SupiDate(data.created_utc * 1000);
 		this.#id = data.id;
 		this.#url = data.url;
 		this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;

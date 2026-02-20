@@ -1,4 +1,6 @@
+import { SupiDate, SupiError } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
+import { logger } from "../../singletons/logger.js";
 
 import definitions from "./definitions.json" with { type: "json" };
 const rssCacheKey = "command-news-rss-cache";
@@ -20,13 +22,13 @@ export default {
 	},
 	fetch: async (context, code, query) => {
 		if (!code) {
-			throw new sb.Error({ message: "No code provided" });
+			throw new SupiError({ message: "No code provided" });
 		}
 
 		const lower = code.toLowerCase();
 		const news = definitions.find(i => i.code === lower || i.alternateCodes?.includes(lower));
 		if (!news) {
-			throw new sb.Error({ message: "Extra news code does not exist" });
+			throw new SupiError({ message: "Extra news code does not exist" });
 		}
 
 		const source = core.Utils.randArray(news.sources);
@@ -50,12 +52,12 @@ export default {
 				feed = await parseRSS(xml);
 			}
 			catch (e) {
-				const err = new sb.Error({
+				const err = new SupiError({
 					message: "RSS fetching/parsing failed",
 					cause: e
 				});
 
-				await sb.Logger.logError("Command", err, {
+				await logger.logError("Command", err, {
 					origin: "Internal",
 					context: {
 						code: news.code,
@@ -74,7 +76,7 @@ export default {
 				title: (i.title) ? i.title.trim() : null,
 				content: (i.content) ? i.content.trim() : null,
 				link: i.link || i.url,
-				published: new sb.Date(i.pubDate).valueOf()
+				published: new SupiDate(i.pubDate).valueOf()
 			}));
 
 			await core.Cache.set({
@@ -117,7 +119,7 @@ export default {
 		const includeLink = context.params.link ?? Boolean(source.includeLink);
 
 		const delta = (published)
-			? `(published ${core.Utils.timeDelta(new sb.Date(published))})`
+			? `(published ${core.Utils.timeDelta(new SupiDate(published))})`
 			: "";
 
 		let result;

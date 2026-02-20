@@ -1,13 +1,14 @@
 import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
 
 import {
 	isArgumentsData,
 	type CreateData as FilterCreateData,
-	type DbArgumentDescriptor,
-	type Type as FilterType
+	type FilterArgumentDescriptor,
+	type Type as FilterType,
+	type FilterArgumentDatabaseShape
 } from "../../classes/filter.js";
 
-import type { Context, CommandDefinition, StrictResult } from "../../classes/command.js";
 import type { Channel } from "../../classes/channel.js";
 import type { User } from "../../classes/user.js";
 
@@ -28,29 +29,27 @@ const NO_RESPONSE_FILTER_TYPES: Set<FilterType> = new Set([
 
 const isFilterType = (input: string): input is FilterType => AVAILABLE_BAN_FILTER_TYPES.includes(input);
 
-const paramsDefinition = [
-	{ name: "all", type: "boolean" },
-	{ name: "channel", type: "string" },
-	{ name: "clear", type: "boolean" },
-	{ name: "command", type: "string" },
-	{ name: "index", type: "number" },
-	{ name: "invocation", type: "string" },
-	{ name: "multiplier", type: "number" },
-	{ name: "noResponse", type: "boolean" },
-	{ name: "type", type: "string" },
-	{ name: "string", type: "string" },
-	{ name: "user", type: "string" }
-] as const;
-
-export default {
+export default declare({
 	Name: "ban",
 	Aliases: ["unban"],
 	Cooldown: 5000,
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by channel owners and Supibot ambassadors.",
 	Flags: ["mention"],
-	Params: paramsDefinition,
+	Params: [
+		{ name: "all", type: "boolean" },
+		{ name: "channel", type: "string" },
+		{ name: "clear", type: "boolean" },
+		{ name: "command", type: "string" },
+		{ name: "index", type: "number" },
+		{ name: "invocation", type: "string" },
+		{ name: "multiplier", type: "number" },
+		{ name: "noResponse", type: "boolean" },
+		{ name: "type", type: "string" },
+		{ name: "string", type: "string" },
+		{ name: "user", type: "string" }
+	],
 	Whitelist_Response: null,
-	Code: (async function ban (context: Context<typeof paramsDefinition>): Promise<StrictResult> {
+	Code: (async function ban (context) {
 		const { invocation } = context;
 		const type = core.Utils.capitalize(context.params.type ?? "Blacklist");
 		if (!isFilterType(type)) {
@@ -71,16 +70,22 @@ export default {
 			Issued_By: context.user.ID
 		};
 
+		const isAdmin = await context.user.getDataProperty("administrator");
 		if (context.params.channel) {
-			const channelData = sb.Channel.get(context.params.channel, context.platform);
-			if (!channelData) {
-				return {
-					success: false,
-					reply: "Channel was not found!"
-				};
+			if (isAdmin && context.params.channel === "global") {
+				options.Channel = null;
 			}
+			else {
+				const channelData = sb.Channel.get(context.params.channel, context.platform);
+				if (!channelData) {
+					return {
+						success: false,
+						reply: "Channel was not found!"
+					};
+				}
 
-			options.Channel = channelData.ID;
+				options.Channel = channelData.ID;
+			}
 		}
 		if (context.params.command) {
 			const commandData = sb.Command.get(context.params.command);
@@ -152,7 +157,6 @@ export default {
 			options.User_Alias = userData.ID;
 		}
 
-		const isAdmin = await context.user.getDataProperty("administrator");
 		if (!options.Channel && !isAdmin) {
 			if (!context.channel) {
 				return {
@@ -252,13 +256,32 @@ export default {
 		if (filterResult.length !== 0) {
 			const [existing] = filterResult;
 
-			if (existing.Issued_By !== context.user.ID && !isAdmin) {
-				return {
-					success: false,
-					reply: "This ban has not been created by you, so you cannot modify it!"
-				};
+			let appendix = "";
+			if (existing.Issued_By !== context.user.ID) {
+				const issuerUser = await sb.User.get(existing.Issued_By);
+				if (!issuerUser) {
+					throw new SupiError({
+						message: "Assert error: Issuer user does not exist"
+					});
+				}
+
+				const [currentPerm, issuerPerm] = await Promise.all([
+					context.getUserPermissions(),
+					context.getUserPermissions({ user: issuerUser })
+				]);
+
+				if (currentPerm.flag < issuerPerm.flag) {
+					return {
+						success: false,
+						reply: `This filter has been created by user with level ${issuerPerm.name}, which is higher than yours, so you cannot modify it!`
+					};
+				}
+				else {
+					appendix = ` (this filter has been created by @${issuerUser.Name})`;
+				}
 			}
-			else if (type === "Arguments") {
+
+			if (type === "Arguments") {
 				if (!existing.Data) {
 					throw new SupiError({
 						message: `Invalid filter definition - missing Data`
@@ -276,7 +299,7 @@ export default {
 						await existing.toggle();
 					}
 
-					const newData: DbArgumentDescriptor[] = [...existing.Data];
+					const newData: FilterArgumentDescriptor[] = [...existing.Data];
 					for (const item of existing.Data) {
 						if (item.index === index && item.string === string) {
 							return {
@@ -298,7 +321,8 @@ export default {
 						}
 
 						if (changed) {
-							await existing.saveProperty("Data", JSON.stringify(newData));
+							const shape = { args: newData } satisfies FilterArgumentDatabaseShape;
+							await existing.saveProperty("Data", JSON.stringify(shape));
 							return {
 								success: true,
 								reply: `Successfully added a new item to Arguments filter (ID ${existing.ID})`
@@ -321,7 +345,9 @@ export default {
 
 							if (condition && item.string === string) {
 								existing.Data.splice(i, 1);
-								await existing.saveProperty("Data");
+
+								const shape = { args: existing.Data } satisfies FilterArgumentDatabaseShape;
+								await existing.saveProperty("Data", JSON.stringify(shape));
 
 								return {
 									success: true,
@@ -336,7 +362,8 @@ export default {
 						};
 					}
 					else if (clear) {
-						await existing.saveProperty("Data", "[]");
+						const emptyShape = { args: [] } satisfies FilterArgumentDatabaseShape;
+						await existing.saveProperty("Data", JSON.stringify(emptyShape));
 						return {
 							success: true,
 							reply: `Successfully cleared all items from the Arguments filter (ID ${existing.ID})`
@@ -416,7 +443,7 @@ export default {
 				const [prefix, suffix] = (existing.Active) ? ["", " again"] : ["un", ""];
 				return {
 					success: true,
-					reply: `Successfully ${prefix}banned${suffix}.`
+					reply: `Successfully ${prefix}banned${suffix}.${appendix}`
 				};
 			}
 		}
@@ -509,7 +536,7 @@ export default {
 
 			`<code>$ban <u>noResponse:true</u> (...)</code>`,
 			`If the <code>noResponse</code> parameter is set, this will make it so that the bot will not reply in the case this ban is triggered.`,
-			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not rpely.",
+			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not reply.",
 			"Note: This is not applicable to user-specific bans. In those cases, the user must be reminded that they are indeed banned.",
 			"",
 
@@ -566,4 +593,4 @@ export default {
 			""
 		];
 	})
-} satisfies CommandDefinition;
+});

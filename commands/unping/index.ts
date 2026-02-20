@@ -1,26 +1,24 @@
 import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
 import { Filter } from "../../classes/filter.js";
-import type { Command, Context } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-const params = [
-	{ name: "command", type: "string" },
-	{ name: "channel", type: "string" },
-	{ name: "id", type: "number" },
-	{ name: "invocation", type: "string" },
-	{ name: "platform", type: "string" },
-	{ name: "user", type: "string" }
-] as const;
-
-export default {
+export default declare({
 	Name: "unping",
 	Aliases: ["reping"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Sets/unsets a command pinging you when it's being invoked.",
 	Flags: ["mention"],
-	Params: params,
+	Params: [
+		{ name: "command", type: "string" },
+		{ name: "channel", type: "string" },
+		{ name: "id", type: "number" },
+		{ name: "invocation", type: "string" },
+		{ name: "platform", type: "string" },
+		{ name: "user", type: "string" }
+	],
 	Whitelist_Response: null,
-	Code: (async function unping (this: Command, context: Context<typeof params>, ...args: string[]) {
+	Code: (async function unping (context, ...args: string[]) {
 		const parse = await parseGenericFilterOptions("Unping", context.params, args, {
 			argsOrder: ["command"],
 			includeUser: true
@@ -125,4 +123,4 @@ export default {
 				</li>
 			</ul>`
 	])
-};
+});

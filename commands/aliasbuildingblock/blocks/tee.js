@@ -17,6 +17,8 @@ export default {
 		context.tee.push(input);
 
 		return {
+			success: true,
+			hasExternalInput: true,
 			reply: input
 		};
 	}

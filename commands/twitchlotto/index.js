@@ -1,4 +1,5 @@
 import { randomInt } from "../../utils/command-utils.js";
+import { logger } from "../../singletons/logger.js";
 import checkSafety from "./safety-check.js";
 import {
 	maxRetries,
@@ -6,7 +7,7 @@ import {
 	flags,
 	scoreThreshold,
 	detections as detectionsDefinitions,
-	createRecentUseCacheKey,
+	createRecentUseCacheKey as getKey,
 	formatScore
 } from "./definitions.js";
 
@@ -96,7 +97,7 @@ export default {
 			if (!this.data.channels.includes(channel)) {
 				return {
 					success: false,
-					reply: "This channel is not currently supported!"
+					reply: `This channel is not currently supported! Check the list of supported channels here: ${this.getDetailURL()}`
 				};
 			}
 		}
@@ -194,7 +195,7 @@ export default {
 						arguments
 					});
 
-					const logId = await sb.Logger.log(
+					const logId = await logger.log(
 						"Command.Other",
 						`All images scored log: ${data}`,
 						context.channel,
@@ -352,7 +353,7 @@ export default {
 			}
 		}
 
-		await this.setCacheData(createRecentUseCacheKey(context), image.Link, {
+		await core.Cache.setByPrefix(getKey(context), image.Link, {
 			expiry: 600_000
 		});
 

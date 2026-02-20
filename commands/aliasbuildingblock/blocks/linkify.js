@@ -18,6 +18,8 @@ export default {
 		const query = args.join(" ");
 		if (query.length <= limit) {
 			return {
+				success: true,
+				hasExternalInput: true,
 				reply: query
 			};
 		}

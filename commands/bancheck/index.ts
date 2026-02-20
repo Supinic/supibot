@@ -1,14 +1,14 @@
 import { linkRegex } from "../../utils/regexes.js";
-import { GenericRequestError } from "supi-core";
-import type { CommandDefinition } from "../../classes/command.js";
+import { isGotRequestError } from "supi-core";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "bancheck",
 	Aliases: ["bc"],
 	Cooldown: 10000,
 	Description: "Checks if a given message would be banphrased in a given channel. Only works for channels that I am in, plus the result isn't 100% guaranteed!",
 	Flags: ["mention", "non-nullable", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function banCheck (context, channel, ...rest) {
 		if (!channel) {
@@ -67,8 +67,8 @@ export default {
 				console.warn(e);
 
 				let code: string | number = "(N/A)";
-				if (e instanceof GenericRequestError) {
-					code = e.statusCode ?? e.message;
+				if (isGotRequestError(e)) {
+					code = e.response?.statusCode ?? e.message;
 				}
 				else if (e instanceof Error) {
 					code = e.message;
@@ -133,4 +133,4 @@ export default {
 		}
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

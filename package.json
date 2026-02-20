@@ -3,41 +3,39 @@
   "version": "2.2.0",
   "type": "module",
   "dependencies": {
-    "@discordjs/formatters": "^0.6.1",
     "@jprochazk/roll-dice": "^0.4.2",
     "acorn-node": "^2.0.1",
     "async-markov": "supinic/async-markov",
-    "bing-chat": "^0.2.3",
-    "chrono-node": "^2.8.0",
-    "cron": "^4.3.0",
+    "chrono-node": "^2.9.0",
+    "cron": "^4.4.0",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "^14.19.3",
+    "discord.js": "^14.25.1",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser",
-    "transliteration": "^2.3.5",
-    "vm2": "^3.9.19",
-    "ws": "^8.18.2"
+    "transliteration": "^2.6.1",
+    "vm2": "^3.10.5",
+    "ws": "^8.19.0",
+    "zod": "^4.3.6"
   },
   "engines": {
-    "node": ">= 20.0"
+    "node": ">= 24.0"
   },
   "scripts": {
     "build": "tsc",
+    "check": "yarn clean && tsc --incremental false --composite false && yarn lint && yarn test",
+    "clean": "rm -f ./tests/test-utils.js && find ./tests -type f -name \"*.test.js\" -delete && find ./tests -type d -name build -prune -exec rm -r -- {} +",
     "start": "tsc && yarn node --env-file=.env --enable-experimental-regexp-engine ./build/master.js",
     "debug": "tsc && yarn node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./build/master.js",
     "init-database": "tsc && node init/script.js",
     "auto-setup": "tsc && node --env-file=.env init/auto-setup.js",
-    "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core && tsc",
-    "prod-update": "git pull origin master && yarn workspaces focus --production -A && tsc",
-    "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
-    "test": "yarn build && mocha ./build/tests --recursive --exit",
-    "coverage": "nyc yarn test",
-    "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core"
+    "test": "node --test-reporter=dot --import ./tests/register-loader.mjs --experimental-test-module-mocks --test",
+    "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core",
+    "validate:config": "node ./build/utils/validate-config.js"
   },
   "main": "build/master.js",
   "author": "Supinic <supinic@protonmail.com>",
@@ -45,17 +43,13 @@
   "license": "AGPL-3.0",
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
-    "@babel/core": "^7.27.1",
-    "@babel/eslint-parser": "^7.27.1",
-    "eslint": "^9.26.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-unicorn": "^59.0.0",
-    "globals": "^16.0.0",
-    "mocha": "^11.2.2",
-    "nyc": "^17.1.0",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.0",
+    "eslint-plugin-unicorn": "^63.0.0",
+    "globals": "^17.3.0",
     "supi-db-init": "supinic/supi-db-init",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.31.1"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0"
   },
   "nyc": {
     "all": false,
@@ -64,5 +58,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.12.0"
 }

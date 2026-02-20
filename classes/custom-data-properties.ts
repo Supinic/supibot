@@ -1,9 +1,9 @@
 import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
-import type { SimpleGenericData } from "../@types/globals.js";
+import type { SimpleGenericData } from "../utils/globals.js";
 import type { Query } from "supi-core";
 
-import { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
+import type { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
 type TwitchLottoFlagName = typeof twitchLottoFlags[number]["name"];
 
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
@@ -119,6 +119,9 @@ const userDataSchema = {
 		};
 	},
 	customDeveloperData: {} as SimpleGenericData,
+	// Specifically declared as `string` instead of `ModelName`, because the GPT model definitions can change
+	// over time, and declaring it as a looser definition forces to check if it's currently valid.
+	defaultGptModel: "string",
 	defaultUserLanguage: {} as {
 		code: string;
 		name: string;
@@ -336,7 +339,7 @@ export const saveChannelDataProperty = async <T extends ChannelDataProperty> (
 
 	await row.load({ Property: propertyName, Channel: instanceId }, true);
 
-	let rawValue: string | null = null;
+	let rawValue: string | null;
 	if (value === null) {
 		rawValue = null;
 	}
@@ -367,7 +370,7 @@ export const saveUserDataProperty = async <T extends UserDataProperty> (
 
 	await row.load({ Property: propertyName, User_Alias: instanceId }, true);
 
-	let rawValue: string | null = null;
+	let rawValue: string | null;
 	if (value === null) {
 		rawValue = null;
 	}

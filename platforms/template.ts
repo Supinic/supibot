@@ -1,7 +1,8 @@
+import type * as z from "zod";
 import { type Counter, SupiError } from "supi-core";
 
-import { User } from "../classes/user.js";
-import { Channel, Like as ChannelLike } from "../classes/channel.js";
+import type { User } from "../classes/user.js";
+import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
 import createMessageLoggingTable from "../utils/create-db-table.js";
@@ -12,22 +13,14 @@ import type { CytubeConfig, CytubePlatform } from "./cytube.js";
 import type { IrcConfig, IrcPlatform } from "./irc.js";
 
 import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
-import type { Emote } from "../@types/globals.d.ts";
+import type { Emote } from "../utils/globals.js";
+
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-export type Like = Platform | number | string;
-export interface BaseConfig {
-	ID: number;
-	host?: string | null;
-	messageLimit: number;
-	selfId: string | null;
-	selfName: string;
-	active: boolean;
-	platform: unknown;
-	logging: unknown;
-	mirrorIdentifier?: string | null;
-}
+import type { BasePlatformConfigSchema } from "./schema.js";
+export type BaseConfig = z.infer<typeof BasePlatformConfigSchema>;
 
+export type Like = Platform | number | string;
 export type PrepareMessageOptions = {
 	extraLength?: number;
 	removeEmbeds?: boolean;
@@ -130,8 +123,8 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 	protected abstract initListeners (): void;
 	public abstract connect (): Promise<void>;
-	public abstract send (message: string, channel: Channel, options?: GenericSendOptions): Promise<void>;
-	public abstract pm (message: string, user: User, channel?: Channel | Record<string, unknown>): Promise<void>;
+	public abstract send (message: string, channel: Channel, options?: GenericSendOptions): Promise<unknown>;
+	public abstract pm (message: string, user: User, channel?: Channel | null | Record<string, unknown>): Promise<void>;
 	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean> | null;
 	public abstract populateUserList (channelData: Channel): never[] | Promise<string[]>;
 	public abstract populateGlobalEmotes (): never[] | Promise<Emote[]>;
@@ -507,6 +500,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public static getAsserted (identifier: "discord"): DiscordPlatform;
 	public static getAsserted (identifier: "cytube"): CytubePlatform;
 	public static getAsserted (identifier: "irc", host: string): IrcPlatform;
+	public static getAsserted (identifier: number, host?: string): Platform;
 	public static getAsserted (identifier: string | number) {
 		const platform = Platform.get(identifier);
 		if (!platform) {

@@ -1,4 +1,5 @@
-import { randomInt } from "../../utils/command-utils.js";
+import { randomInt, TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+
 import textCaseCode from "./text-case-code.js";
 import officialCharactersMap from "./definitions/official-characters.json" with { type: "json" };
 
@@ -16,8 +17,6 @@ import MorseData from "./definitions/morse.json" with { type: "json" };
 import LingoCockneyDefinition from "./lingo-translations/cockney.json" with { type: "json" };
 import LingoCowboyDefinition from "./lingo-translations/cowboy.json" with { type: "json" };
 import LingoOutbackDefinition from "./lingo-translations/outback.json" with { type: "json" };
-
-const ANTI_PING_CHARACTER = "\u{E0000}";
 
 const convert = {
 	method: (string, fn, context) => fn(string, context),
@@ -233,13 +232,13 @@ const types = [
 		description: "Every word will have an invisible character added, so that it does not mention users in e.g. Chatterino.",
 		data: (message) => message.split(" ").map(word => {
 			if (/^\w+$/.test(word)) {
-				return `${word[0]}\u{E0000}${word.slice(1)}`;
+				return `${word[0]}\u{34f}${word.slice(1)}`;
 			}
 			else {
 				return word;
 			}
 		}).join(" "),
-		reverseData: (message) => message.split(" ").map(word => word.replaceAll(ANTI_PING_CHARACTER, "")).join(" ")
+		reverseData: (message) => message.split(" ").map(word => word.replaceAll(TWITCH_ANTIPING_CHARACTER, "")).join(" ")
 	},
 	{
 		name: "trim",

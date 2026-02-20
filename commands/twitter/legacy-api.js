@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 const fetchAuthData = async () => {
 	const apiTokenKey = "twitter-api-bearer-token";
 	let bearerToken = await core.Cache.getByPrefix(apiTokenKey);
@@ -172,11 +174,6 @@ const getTweet = async (context, bearerToken, user) => {
 
 	let eligibleTweets = response.body;
 	if (!Array.isArray(eligibleTweets)) {
-		await sb.Logger.log("Command.Warning", JSON.stringify({
-			eligibleTweets,
-			statusCode: response.statusCode
-		}));
-
 		return {
 			success: false,
 			reply: `Twitter response data is invalid! Contact @Supinic and/or try again later.`
@@ -248,7 +245,7 @@ const getTweet = async (context, bearerToken, user) => {
 	}
 
 	const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${user}/status/${tweet.id_str}` : "";
-	const delta = core.Utils.timeDelta(new sb.Date(tweet.created_at));
+	const delta = core.Utils.timeDelta(new SupiDate(tweet.created_at));
 	const fullText = core.Utils.fixHTML(tweet.full_text ?? "");
 	const fixedText = `${fullText} ${replyUrl}`;
 
@@ -270,7 +267,7 @@ const getTweet = async (context, bearerToken, user) => {
 };
 */
 
-const getSelloutDate = () => new sb.Date.UTC(2023, 2, 9);
+const getSelloutDate = () => new SupiDate.UTC(2023, 2, 9);
 
 export default {
 	fetchAuthData,

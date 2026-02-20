@@ -15,6 +15,7 @@ export default {
 	],
 	execute: async (context, options = {}) => {
 		const { channelData, subcommand } = options;
+		const channelString = (channelData === context.channel) ? "this channel" : `channel "${channelData.Name}"`;
 
 		if (subcommand === "disable") {
 			if (channelData.Mode === "Read") {
@@ -27,9 +28,10 @@ export default {
 			setTimeout(() => (channelData.Mode = "Read"), 5000);
 
 			return {
+				success: true,
 				reply: core.Utils.tag.trim `
-					I will go to read-only mode in channel "${channelData.Name}" after ~5 seconds.
-					Use the "${sb.Command.prefix}${this.Name} enable ${channelData.Name}" command in private messages to re-enable me.
+					I will go to read-only mode in ${channelString} after 5 seconds.
+					Use the "${sb.Command.prefix}bot enable ${channelData.Name}" command in private messages to re-enable me.
 				`
 			};
 		}
@@ -37,13 +39,14 @@ export default {
 			if (channelData.Mode !== "Read") {
 				return {
 					success: false,
-					reply: `I'm already active in channel "${channelData.Name}"!`
+					reply: `I'm already active in ${channelString}!`
 				};
 			}
 
 			channelData.Mode = "Write";
 			return {
-				reply: "I successfully disabled read-only mode and will respond to messages again."
+				success: true,
+				reply: `I successfully disabled the read-only mode in ${channelString}, and will respond to messages again.`
 			};
 		}
 		else {

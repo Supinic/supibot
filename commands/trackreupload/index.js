@@ -7,7 +7,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Sets a track ID in the list already to have the next track as a reupload. The next track can be an existing ID (if it's not a reupload already) or a new link, in which case it gets added to the list.",
 	Flags: ["developer","mention","pipe","whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: "Only available for people who know what they're doing Kappa",
 	Code: (async function trackReload (extra, existingID, reuploadLink) {
 		existingID = Number(existingID);

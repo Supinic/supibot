@@ -1,6 +1,7 @@
 import { SupiError } from "supi-core";
 import type { GptContext } from "./index.js";
 import { typedEntries } from "../../utils/ts-helpers.js";
+import { logger } from "../../singletons/logger.js";
 
 type ModerationCategory =
 	| "harrassment" | "harrassment/threatening"
@@ -45,12 +46,13 @@ export const check = async (context: GptContext, text: string) => {
 			Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 		},
 		json: {
+			model: "omni-moderation-latest",
 			input: text
 		}
 	});
 
 	if (!moderationCheck.ok || !Array.isArray(moderationCheck.body.results)) {
-		const logId = await sb.Logger.log(
+		const logId = await logger.log(
 			"Command.Warning",
 			`GPT moderation failed! ${JSON.stringify({ body: moderationCheck.body })}`,
 			context.channel,
@@ -66,7 +68,7 @@ export const check = async (context: GptContext, text: string) => {
 	const [moderationResult] = moderationCheck.body.results;
 	const { categories, category_scores: scores } = moderationResult;
 	if (categories.hate || categories["violence/graphic"] || categories["sexual/minors"]) {
-		const logId = await sb.Logger.log(
+		const logId = await logger.log(
 			"Command.Warning",
 			`Unsafe GPT content generated! ${JSON.stringify({ text, scores })}`,
 			context.channel,
@@ -99,6 +101,7 @@ export const checkImage = async (url: string) => {
 			Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 		},
 		json: {
+			model: "omni-moderation-latest",
 			input: [{
 				image_url: { url },
 				type: "image_url"

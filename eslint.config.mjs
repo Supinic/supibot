@@ -1,21 +1,18 @@
 import tseslint from "typescript-eslint";
 import eslintJs from "@eslint/js";
-import importPlugin from "eslint-plugin-import";
 import unicornPlugin from "eslint-plugin-unicorn";
 import globals from "globals";
 
 export default tseslint.config(
 	eslintJs.configs.recommended,
-	importPlugin.flatConfigs.errors,
-	unicornPlugin.configs["flat/recommended"],
+	unicornPlugin.configs.recommended,
 	tseslint.configs.strictTypeChecked,
 	{
-		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs"]
+		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
 	},
 	{
 		languageOptions: {
 			parserOptions: {
-				project: true,
 				projectService: true,
 				tsconfigRootDir: import.meta.dirname
 			},
@@ -48,8 +45,6 @@ export default tseslint.config(
 			"eol-last": ["warn", "always"],
 			eqeqeq: "error",
 			"function-call-argument-newline": ["warn", "consistent"],
-			"import/extensions": ["error", "always"],
-			"import/no-unresolved": "off",
 			"implicit-arrow-linebreak": ["error", "beside"],
 			indent: ["warn", "tab", {
 				SwitchCase: 1
@@ -133,7 +128,7 @@ export default tseslint.config(
 				consistent: true
 			}],
 			"object-curly-spacing": ["warn", "always", {
-				arraysInObjects: false,
+				arraysInObjects: true,
 				objectsInObjects: true
 			}],
 			"object-property-newline": ["warn", {
@@ -209,6 +204,7 @@ export default tseslint.config(
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
 
+			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
 				allowNumber: true
 			}],
@@ -217,6 +213,11 @@ export default tseslint.config(
 			}],
 			"@typescript-eslint/no-unused-vars": "warn", // Only warn for unused vars instead of resulting in an error
 			"@typescript-eslint/no-unnecessary-condition": "warn", // Only warn for unnecessary conditions  instead of resulting in an error
+			"@typescript-eslint/no-unnecessary-type-conversion": "off", // Maybe re-enable later to force proper types
+			"@typescript-eslint/no-useless-default-assignment": "off", // Does not work for rest arguments
+
+			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
+			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
 
 			"unicorn/prevent-abbreviations": "off",
 			"unicorn/no-null": "off",
@@ -234,13 +235,29 @@ export default tseslint.config(
 			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
 			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
 			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
+			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
 			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
-			"unicorn/prefer-switch": ["error", {
-				minimumCases: 4
-			}],
 
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error"
+		}
+	},
+	{
+		files: ["tests/**/*.{test,spec}.ts", "**/*.test.ts"],
+		languageOptions: {
+		},
+		rules: {
+			"max-nested-callbacks": "off",
+			"max-statements-per-line": ["warn", {
+				max: 2
+			}],
+			"unicorn/prefer-module": "off",
+			"unicorn/consistent-function-scoping": "off",
+			"unicorn/no-useless-undefined": "off",
+			"unicorn/no-await-expression-member": "off",
+			"@typescript-eslint/no-floating-promises": "off",
+			"@typescript-eslint/no-unused-vars": "off",
+			"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }]
 		}
 	}
 );

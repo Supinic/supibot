@@ -1,6 +1,12 @@
 import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const {
+	maxIncomingActiveReminders,
+	maxOutgoingActiveReminders,
+	maxIncomingScheduledReminders,
+	maxOutgoingScheduledReminders
+} = getConfig().values;
 
 import AwayFromKeyboard from "./afk.js";
 import Banphrase from "./banphrase.js";
@@ -20,12 +26,24 @@ type ConstructorData = Pick<Reminder, "ID" | "User_From" | "User_To" | "Channel"
 type HistoryConstructorData = ConstructorData & { Cancelled: boolean; };
 
 type CreateData = Omit<ConstructorData, "ID">;
-type CreateResult = {
-	success: boolean;
-	cause: string | null,
-	ID?: Reminder["ID"] | null;
-};
-type LimitCheckResult = { success: true; } | { success: false; cause: string; };
+type CreateResult = { success: true; cause: null; ID: Reminder["ID"] } | LimitCheckFailure;
+
+const ERROR_REASONS = {
+	"scheduled-incoming": "That person has too many timed reminders pending for them on that day!",
+	"scheduled-outgoing": "You have too many timed reminders pending on that day!",
+	"public-incoming": "That person has too many public reminders pending!",
+	"public-outgoing": "You have too many public reminders pending!",
+	"private-incoming": "That person has too many private reminders pending!",
+	"private-outgoing": "You have too many private reminders pending!",
+	"existing-pingme": "You have too many private reminders pending!"
+} as const;
+
+type Cause =
+	| "scheduled-incoming" | "scheduled-outgoing" | "public-incoming"
+ 	| "public-outgoing" | "private-incoming" | "private-outgoing"
+	| "existing-pingme";
+type LimitCheckFailure = { success: false; cause: Cause; reason: typeof ERROR_REASONS[Cause]; };
+type LimitCheckResult = { success: true; } | LimitCheckFailure;
 
 /**
  * Represents a pending reminder from (usually) one user to another.
@@ -473,25 +491,28 @@ export class Reminder extends TemplateWithId {
 					});
 				}
 
-				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
-				const channelStringName = (isChannelStalkOptedOut === true)
-					? "[EXPUNGED]"
-					: channelData.getFullName();
-
-				let reminderPlatform: Platform | null = null;
+				// Whether the source channel (where the Reminder was created) is equal to trigger channel (where the Reminder was fired)
+				let isSameChannel = false;
+				let reminderPlatform: Platform | null;
 				if (reminder.Channel) {
-					const channelData = Channel.get(reminder.Channel);
-					if (!channelData) {
+					const reminderChannelData = Channel.get(reminder.Channel);
+					if (!reminderChannelData) {
 						throw new SupiError({
 							message: "Invalid Channel in Reminder"
 						});
 					}
 
-					reminderPlatform = channelData.Platform;
+					isSameChannel = (channelData === reminderChannelData);
+					reminderPlatform = reminderChannelData.Platform;
 				}
 				else {
 					reminderPlatform = Platform.get(reminder.Platform);
 				}
+
+				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
+				const channelStringName = (isChannelStalkOptedOut === true && !isSameChannel)
+					? "[EXPUNGED]"
+					: channelData.getFullName();
 
 				const uncheckedAuthorMention = await reminderPlatform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
@@ -696,6 +717,7 @@ export class Reminder extends TemplateWithId {
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
+				.where("User_From IS NOT NULL") // Do not count system reminders
 				.where("User_To = %n", userTo)
 			),
 			core.Query.getRecordset<Item[]>(rs => rs
@@ -707,40 +729,43 @@ export class Reminder extends TemplateWithId {
 			)
 		]);
 
-		const incomingLimit = config.values.maxIncomingActiveReminders;
-		const outgoingLimit = config.values.maxOutgoingActiveReminders;
+		const incomingLimit = maxIncomingActiveReminders;
+		const outgoingLimit = maxOutgoingActiveReminders;
 		const [privateIncoming, publicIncoming] = core.Utils.splitByCondition(incomingData, (i: Item) => i.Private_Message);
 		const [privateOutgoing, publicOutgoing] = core.Utils.splitByCondition(outgoingData, (i: Item) => i.Private_Message);
 
 		if (publicIncoming.length >= incomingLimit) {
 			return {
 				success: false,
-				cause: "public-incoming"
+				cause: "public-incoming",
+				reason: ERROR_REASONS["public-incoming"]
 			};
 		}
 		else if (publicOutgoing.length >= outgoingLimit) {
 			return {
 				success: false,
-				cause: "public-outgoing"
+				cause: "public-outgoing",
+				reason: ERROR_REASONS["public-outgoing"]
 			};
 		}
 		else if (privateIncoming.length >= incomingLimit) {
 			return {
 				success: false,
-				cause: "private-outgoing"
+				cause: "private-outgoing",
+				reason: ERROR_REASONS["private-outgoing"]
 			};
 		}
 		else if (privateOutgoing.length >= outgoingLimit) {
 			return {
 				success: false,
-				cause: "private-outgoing"
+				cause: "private-outgoing",
+				reason: ERROR_REASONS["private-outgoing"]
 			};
 		}
 
 		if (schedule) {
-			const incomingScheduledLimit = config.values.maxIncomingScheduledReminders;
-			const outgoingScheduledLimit = config.values.maxOutgoingScheduledReminders;
-
+			const incomingScheduledLimit = maxIncomingScheduledReminders;
+			const outgoingScheduledLimit = maxOutgoingScheduledReminders;
 			const [scheduledIncoming, scheduledOutgoing] = await Promise.all([
 				core.Query.getRecordset<number>(rs => rs
 					.select("COUNT(*) AS Count")
@@ -773,13 +798,15 @@ export class Reminder extends TemplateWithId {
 			if (scheduledIncoming >= incomingScheduledLimit) {
 				return {
 					success: false,
-					cause: "scheduled-incoming"
+					cause: "scheduled-incoming",
+					reason: ERROR_REASONS["scheduled-incoming"]
 				};
 			}
 			else if (scheduledOutgoing >= outgoingScheduledLimit) {
 				return {
 					success: false,
-					cause: "scheduled-outgoing"
+					cause: "scheduled-outgoing",
+					reason: ERROR_REASONS["scheduled-outgoing"]
 				};
 			}
 		}
@@ -798,7 +825,8 @@ export class Reminder extends TemplateWithId {
 			if (existingPingmeReminderID) {
 				return {
 					success: false,
-					cause: "existing-pingme"
+					cause: "existing-pingme",
+					reason: ERROR_REASONS["existing-pingme"]
 				};
 			}
 		}

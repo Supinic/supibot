@@ -1,4 +1,4 @@
-import { CustomEventDefinition } from "../generic-event.js";
+import type { CustomEventDefinition } from "../generic-event.js";
 
 import cacheKeys from "../../../utils/shared-cache-keys.json" with { type: "json" };
 import { SupiDate } from "supi-core";
@@ -36,7 +36,10 @@ export default {
 		}
 
 		const data = response.body.sort((a, b) => new SupiDate(b.created_at).valueOf() - new SupiDate(a.created_at).valueOf());
-		const latest = data[0];
+		const latest = data.at(0);
+		if (!latest) {
+			return null;
+		}
 
 		const latestCacheVersion = await core.Cache.getByPrefix(LATEST_NODE_JS_VERSION);
 		if (latest.tag_name === latestCacheVersion) {

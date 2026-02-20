@@ -4,7 +4,7 @@ const getCooldownKey = (userData, channelData) => `${BASE_CACHE_KEY}-${userData.
 export default {
 	name: "chatter",
 	aliases: [],
-	description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll. If you want to not appear in the results, use the \"$set noAbbChatter\" command.",
+	description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll. If you would rather not appear in the results, use the \"$set no-abb-chatter\" command.",
 	examples: [
 		["$abb chatter", "(user)"], ["$abb chatter excludeSelf:true", "(someone who is not you)"]
 	],

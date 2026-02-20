@@ -1,4 +1,5 @@
 import { SupiError } from "supi-core";
+import type { OsrsSubcommandDefinition } from "../index.js";
 import {
 	fetchUserData,
 	parseUserIdentifier,
@@ -9,40 +10,29 @@ import {
 
 import SetCommand from "../../set/subcommands/osrs-username.js";
 
-import type { Command, Context } from "../../../classes/command.js";
-
-// @todo remove and import instead once the top command is TS
-type OsrsCommandParams = [
-	{ name: "activity", type: "string" },
-	{ name: "boss", type: "string" },
-	{ name: "force", type: "boolean" },
-	{ name: "rude", type: "boolean" },
-	{ name: "seasonal", type: "boolean" },
-	{ name: "skill", type: "string" },
-	{ name: "virtual", type: "boolean" }
-];
-
 export default {
 	name: "kc",
 	title: "Kill count",
 	aliases: ["kill-count"],
-	description: [
-		`<code>$osrs kc activity:"(activity name)" (username)</code>`,
-		`<code>$osrs kill-count activity:"(activity name)" (username)</code>`,
-		`<code>$osrs kc boss:"(activity name)" (username)</code>`,
+	default: false,
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}osrs kc activity:"(activity name)" (username)</code>`,
+		`<code>${prefix}osrs kill-count activity:"(activity name)" (username)</code>`,
+		`<code>${prefix}osrs kc boss:"(activity name)" (username)</code>`,
 		"For given user and activity, prints their kill-count and ranking.",
 		"",
 
-		`<code>$osrs kc (activity)</code>`,
-		`<code>$osrs kc jad</code>`,
-		`If you have set up your username via the <code>$set ${SetCommand.name}</code>, you can use the name of the activity directly!`,
+		`<code>${prefix}osrs kc (activity)</code>`,
+		`<code>${prefix}osrs kc jad</code>`,
+		`If you have set up your username via the <code>${prefix}set ${SetCommand.name}</code>, you can use the name of the activity directly!`,
 		"",
 
-		`<code>$osrs kc @Username (activity)</code>`,
-		`<code>$osrs kc @Supinic Corrupted Gauntlet</code>`,
+		`<code>${prefix}osrs kc @Username (activity)</code>`,
+		`<code>${prefix}osrs kc @Supinic Corrupted Gauntlet</code>`,
 		"Same as above, but if the target has their OSRS username set, you can use the command like this."
 	],
-	execute: async function (this: Command, context: Context<OsrsCommandParams>, ...args: string[]) {
+	execute: async function (context, ...args) {
 		let parsedUserData;
 		let activity;
 		if (!context.params.activity && !context.params.boss) {
@@ -109,10 +99,14 @@ export default {
 			? "Seasonal user"
 			: core.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));
 
+		const rankString = (rank === null) ? `unranked` : `rank #${rank}`;
 		return {
-			reply: (rank === null)
+			// As of 2025-11-18, the Jagex API no longer produces "-1" for activities of unranked accounts.
+			// It always provides value ("killcount") but rank can still be null.
+			// I'm leaving the check here, but if the API doesn't change, it can be removed.
+			reply: (rank === null && value === null)
 				? `${ironman} ${username} is not ranked for ${name}.`
-				: `${ironman} ${username}'s KC for ${name}: ${value} - rank #${rank}.`
+				: `${ironman} ${username}'s KC for ${name}: ${value} - ${rankString}.`
 		};
 	}
-};
+} satisfies OsrsSubcommandDefinition;

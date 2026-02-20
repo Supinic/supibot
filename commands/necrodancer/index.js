@@ -1,9 +1,10 @@
+import { SupiDate } from "supi-core";
 import { searchYoutube } from "../../utils/command-utils.js";
 import gameData from "./game-data.json" with { type: "json" };
 const { zones } = gameData;
 
-import config from "../../config.json" with { type: "json" };
-const { listenerAddress, listenerPort } = config.local ?? {};
+import { getConfig } from "../../config.js";
+const { listenerAddress, listenerPort } = getConfig().local ?? {};
 
 const EXTRA_COOLDOWN = 600_000;
 const ZONE_COOLDOWN = 300_000;
@@ -48,7 +49,7 @@ export default {
 			};
 		}
 
-		const now = sb.Date.now();
+		const now = SupiDate.now();
 		const { invocation } = context;
 		if (invocation === "ndr" || invocation === "necrodancerreset") {
 			const permissions = await context.getUserPermissions();

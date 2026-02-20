@@ -1,8 +1,10 @@
 import fs from "node:fs/promises";
 import { CronJob } from "cron";
-import config from "../../config.json" with { type: "json" };
+import { SupiDate } from "supi-core";
 
-const BASE_PATH = config.basePath;
+import { getConfig } from "../../config.js";
+const BASE_PATH = getConfig().basePath;
+
 const MODEL_SIZE_THRESHOLD = 100;
 const WORD_LIMIT = 20;
 const DEFAULT_WORD_AMOUNT = 15;
@@ -64,7 +66,7 @@ export default {
 				continue;
 			}
 
-			const fileName = `markov-dump-${new sb.Date().format("Y-m-d H:i")}-channel-${channelID}.json`;
+			const fileName = `markov-dump-${new SupiDate().format("Y-m-d H:i")}-channel-${channelID}.json`;
 			fs.writeFile(`${BASE_PATH}/markovs/${fileName}`, JSON.stringify(markov));
 		}
 	},

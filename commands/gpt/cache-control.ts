@@ -3,7 +3,7 @@ import ChatGptConfig from "./config.json" with { type: "json" };
 import type { User } from "../../classes/user.js";
 import type { Platform } from "../../platforms/template.js";
 import type { TwitchPlatform } from "../../platforms/twitch.js";
-import type { ModelData } from "./index.js";
+import type { ModelData } from "./config-schema.js";
 
 const createCacheKey = (id: number) => `gpt-token-usage-user-${id}`;
 const isTwitchPlatform = (input: Platform | null): input is TwitchPlatform => {
@@ -165,9 +165,9 @@ export const checkLimits = async (userData: User) => {
 };
 
 export const addUsageRecord = async (userData: User, value: number, modelData: ModelData) => {
-	const { pricePerMtoken } = modelData;
+	const { pricePerMtoken, flatCost = 0 } = modelData;
 	const cacheKey = createCacheKey(userData.ID);
-	const normalizedValue = core.Utils.round(value * pricePerMtoken, 2);
+	const normalizedValue = core.Utils.round(value * pricePerMtoken, 2) + flatCost;
 
 	await core.Cache.server.zadd(cacheKey, SupiDate.now(), normalizedValue);
 };

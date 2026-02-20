@@ -1,4 +1,6 @@
+import { SupiDate } from "supi-core";
 import { randomInt } from "../../../utils/command-utils.js";
+import { logger } from "../../../singletons/logger.js";
 import {
 	baitTypes,
 	COIN_EMOJI,
@@ -19,7 +21,7 @@ const createGptPrompt = (executor, resultFish, sizeString) => core.Utils.tag.tri
 	Make it very concise - a maximum of 150 characters.
 `;
 
-const formatDelay = (delay) => core.Utils.timeDelta(sb.Date.now() + delay, true);
+const formatDelay = (delay) => core.Utils.timeDelta(SupiDate.now() + delay, true);
 
 const useDiscordReactions = (context, config, resultType) => {
 	if (context.platform.Name !== "discord") {
@@ -74,7 +76,7 @@ export default {
 
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
-		if (fishData.readyTimestamp !== 0 && sb.Date.now() < fishData.readyTimestamp) {
+		if (fishData.readyTimestamp !== 0 && SupiDate.now() < fishData.readyTimestamp) {
 			if (useDiscordReactions(context, discordReactionType, "fail")) {
 				return {
 					success: false,
@@ -92,7 +94,7 @@ export default {
 		}
 
 		if (fishData.trap?.active === true) {
-			const now = sb.Date.now();
+			const now = SupiDate.now();
 			if (now > fishData.trap.end) {
 				return {
 					success: false,
@@ -150,7 +152,7 @@ export default {
 
 			fishData.catch.dryStreak++;
 			fishData.catch.luckyStreak = 0;
-			fishData.readyTimestamp = sb.Date.now() + fishingDelay + 1000;
+			fishData.readyTimestamp = SupiDate.now() + fishingDelay + 1000;
 
 			if (fishData.catch.dryStreak > fishData.lifetime.dryStreak) {
 				fishData.lifetime.dryStreak = fishData.catch.dryStreak;
@@ -214,7 +216,7 @@ export default {
 			fishData.lifetime.luckyStreak = fishData.catch.luckyStreak;
 		}
 
-		fishData.readyTimestamp = sb.Date.now() + successfulFishDelay; // 30 minutes
+		fishData.readyTimestamp = SupiDate.now() + successfulFishDelay; // 30 minutes
 
 		let sizeString = "";
 		if (caughtFishData.size) {
@@ -249,7 +251,7 @@ export default {
 				channel: context.channel,
 				platform: context.platform,
 				params: {
-					temperature: 1
+					model: "mistral"
 				}
 			});
 
@@ -262,7 +264,7 @@ export default {
 				};
 			}
 			catch (e) {
-				await sb.Logger.logError("Command", e, {
+				await logger.logError("Command", e, {
 					origin: "External",
 					context: {
 						cause: "GPT within $fish"

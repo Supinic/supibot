@@ -6,6 +6,8 @@ export default {
 		["$abb say hello", "hello"]
 	],
 	execute: (context, ...args) => ({
+		success: true,
+		hasExternalInput: true,
 		reply: args.join(" ")
 	})
 };

@@ -1,33 +1,42 @@
+import * as z from "zod";
 import WebSocket from "ws";
-import { randomBytes } from "node:crypto";
 
-import { Platform, BaseConfig } from "./template.js";
+import { randomBytes } from "node:crypto";
+import { setTimeout as wait } from "node:timers/promises";
+
+import { BasePlatformConfigSchema } from "./schema.js";
+import { Platform } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
 import TwitchUtils, {
-	MessageNotification,
+	type MessageNotification,
 	isMessageNotification,
-	TwitchWebsocketMessage,
+	type TwitchWebsocketMessage,
 	isWelcomeMessage,
 	isReconnectMessage,
 	isRevocationMessage,
 	isNotificationMessage,
 	isKeepaliveMessage,
-	NotificationMessage,
-	SessionReconnectMessage,
+	type NotificationMessage,
+	type SessionReconnectMessage,
 	isWhisperNotification,
 	isRaidNotification,
 	isSubscribeNotification,
 	isStreamChangeNotification,
-	WhisperNotification,
-	SubscribeMessageNotification,
-	RaidNotification, StreamOnlineNotification, StreamOfflineNotification, BroadcasterSubscription
+	type WhisperNotification,
+	type SubscribeMessageNotification,
+	type RaidNotification,
+	type StreamOnlineNotification,
+	type StreamOfflineNotification
 } from "./twitch-utils.js";
 
-import { Channel } from "../classes/channel.js";
-import { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
+import type { User } from "../classes/user.js";
 import { SupiDate, SupiError } from "supi-core";
-import type { Emote } from "../@types/globals.d.ts";
+import type { Emote, ThirdPartyEmote } from "../utils/globals.js";
+import type { TwitchSubscriberData } from "../utils/schemas.js";
+import { logger } from "../singletons/logger.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -40,6 +49,7 @@ const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const MESSAGE_MODERATION_CODES = new Set(["channel_settings", "automod_held"]);
+const STREAM_SLICE_PAGE = 100;
 
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
 const PRIVATE_COMMAND_FILTERED_RESPONSE = "That command is not available via private messages.";
@@ -80,7 +90,6 @@ const DEFAULT_PLATFORM_CONFIG = {
 	recentBanThreshold: null,
 	updateAvailableBotEmotes: false,
 	ignoredUserNotices: [],
-	sameMessageEvasionCharacter: "󠀀",
 	rateLimits: "default",
 	reconnectAnnouncement: null,
 	emitLiveEventsOnlyForFlaggedChannels: false,
@@ -97,6 +106,29 @@ const TWITCH_SUBSCRIPTION_PLANS = {
 	3000: "$25",
 	Prime: "Prime"
 } as const;
+
+type MessageRejectionRow = {
+	Timestamp: SupiDate;
+	Channel: Channel["ID"] | null;
+	Status: number;
+	Error: string | null;
+	Error_Message: string | null;
+	Chat_Message: string;
+};
+let messageRejectionTableExists: boolean | null = null;
+const logMessageRejection = async (data: Omit<MessageRejectionRow, "Timestamp">) => {
+	messageRejectionTableExists ??= await core.Query.isTablePresent("data", "Message_Rejection_Log");
+	if (!messageRejectionTableExists) {
+		return;
+	}
+
+	const row = await core.Query.getRow<MessageRejectionRow>("data", "Message_Rejection_Log");
+	row.setValues({
+		...data,
+		Timestamp: new SupiDate()
+	});
+	await row.save({ skipLoad: true });
+};
 
 type UserLookupResponse = {
 	data: {
@@ -220,6 +252,7 @@ export type MessageData = {
 	color: MessageNotification["payload"]["event"]["color"];
 	animationId: MessageNotification["payload"]["event"]["channel_points_animation_id"];
 	rewardId: MessageNotification["payload"]["event"]["channel_points_custom_reward_id"];
+	reply: MessageNotification["payload"]["event"]["reply"];
 };
 
 type ConnectOptions = {
@@ -227,50 +260,56 @@ type ConnectOptions = {
 	skipSubscriptions?: boolean;
 };
 
-export interface TwitchConfig extends BaseConfig {
-	selfId: string;
-	logging: {
-		bits?: boolean,
-		messages?: boolean,
-		subs?: boolean,
-		timeouts?: boolean,
-		whispers?: boolean
-		hosts?: boolean;
-	};
-	platform: {
-		modes?: Record<"Write" | "VIP" | "Moderator", {
-			queueSize?: number;
-			cooldown?: number;
-		}>;
-		reconnectAnnouncement?: {
-			channels: string[];
-			string: string;
-		} | null;
-		partChannelsOnPermaban?: boolean;
-		clearRecentBansTimer?: number;
-		recentBanThreshold?: number | null;
-		updateAvailableBotEmotes?: boolean;
-		ignoredUserNotices?: readonly string[];
-		sameMessageEvasionCharacter?: string;
-		rateLimits?: "default" | "knownBot" | "verifiedBot",
-		emitLiveEventsOnlyForFlaggedChannels?: boolean;
-		suspended?: boolean;
-		joinChannelsOverride?: readonly string[];
-		spamPreventionThreshold?: number;
-		sendVerificationChallenge?: boolean;
-		recentBanPartTimeout?: number;
-		trackChannelsLiveStatus?: boolean;
-		whisperMessageLimit?: number;
-		privateMessageResponseFiltered?: string;
-		privateMessageResponseNoCommand?: string;
-		privateMessageResponseUnrelated?: string;
-	};
-}
+const modeSchema = z.object({
+	queueSize: z.int().positive().optional(),
+	cooldown: z.int().positive().optional()
+});
+export const TwitchConfigSchema = BasePlatformConfigSchema.extend({
+	selfId: z.string().regex(/\d+/),
+	logging: z.object({
+		bits: z.boolean().optional(),
+		messages: z.boolean().optional(),
+		subs: z.boolean().optional(),
+		timeouts: z.boolean().optional(),
+		whispers: z.boolean().optional(),
+		hosts: z.boolean().optional()
+	}),
+	platform: z.object({
+		modes: z.object({
+			Write: modeSchema.optional(),
+			VIP: modeSchema.optional(),
+			Moderator: modeSchema.optional()
+		}).optional(),
+		reconnectAnnouncement: z.object({
+			channels: z.array(z.string()),
+			string: z.string()
+		}).optional().nullable(),
+		partChannelsOnPermaban: z.boolean().optional(),
+		clearRecentBansTimer: z.number().optional(),
+		recentBanThreshold: z.number().optional().nullable(),
+		updateAvailableBotEmotes: z.boolean().optional(),
+		ignoredUserNotices: z.readonly(z.array(z.string())).optional(),
+		rateLimits: z.enum(["default", "knownBot", "verifiedBot"]).optional(),
+		emitLiveEventsOnlyForFlaggedChannels: z.boolean().optional(),
+		suspended: z.boolean().optional(),
+		joinChannelsOverride: z.readonly(z.array(z.string())).optional(),
+		spamPreventionThreshold: z.number().optional(),
+		sendVerificationChallenge: z.boolean().optional(),
+		trackChannelsLiveStatus: z.boolean().optional(),
+		whisperMessageLimit: z.int().positive().optional(),
+		privateMessageResponseFiltered: z.string().optional(),
+		privateMessageResponseNoCommand: z.string().optional(),
+		privateMessageResponseUnrelated: z.string().optional()
+		// recentBanPartTimeout: z.number().optional(),
+	})
+});
+export type TwitchConfig = z.infer<typeof TwitchConfigSchema>;
 
 export class TwitchPlatform extends Platform<TwitchConfig> {
 	public readonly supportsMeAction = true;
 	public readonly dynamicChannelAddition = true;
 	private readonly reconnectCheck: NodeJS.Timeout;
+	private readonly liveChannelsCheck: NodeJS.Timeout;
 	private readonly previousMessageMeta: Map<Channel["ID"], { time: number; length: number; }> = new Map();
 	private readonly userCommandSpamPrevention: Map<User["ID"], number> = new Map();
 
@@ -293,9 +332,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 		};
 
-		super("twitch", resultConfig);
+		super("twitch", TwitchConfigSchema.parse(resultConfig));
 
-		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
+		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000).unref();
+		this.liveChannelsCheck = setInterval(() => void this.#recheckLiveChannels(), 300_000).unref();
 	}
 
 	async connect (options: ConnectOptions = {}) {
@@ -325,6 +365,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
+			await TwitchUtils.ensureInitialChannelId(this);
 			const existingSubs = await TwitchUtils.getExistingSubscriptions(false);
 
 			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
@@ -384,11 +425,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			await this.handleReconnect(message);
 		}
 		else if (isRevocationMessage(message)) {
-			console.warn("Subscription revoked", { data });
-
-			await sb.Logger.log(
+			console.warn("Subscription revoked", { message });
+			await logger.log(
 				"Twitch.Warning",
-				`Subscription revoked: ${JSON.stringify(data)}`,
+				`Subscription revoked: ${JSON.stringify(message)}`,
 				null,
 				null
 			);
@@ -442,9 +482,16 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	 * @param [options.meAction] If `true`, adds a ".me" at the start of the message to create a "me action".
 	 * If not `true`, will escape all leading command characters (period "." or slash "/") by doubling them up.
 	 */
-	async send (message: string, channelData: Channel, options: { meAction?: boolean; } = {}) {
+	async send (
+		message: string,
+		channelData: Channel,
+		options: { meAction?: boolean; } = {}
+	): Promise<
+		| { success: false; }
+		| { success: true; messageId: string; }
+	> {
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
-			return;
+			return { success: false } as const;
 		}
 
 		const baseMessage = message;
@@ -462,15 +509,19 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			const now = SupiDate.now();
 			const { length = 0, time = 0 } = this.previousMessageMeta.get(channelData.ID) ?? {};
 			if (time + WRITE_MODE_MESSAGE_DELAY > now) {
-				setTimeout(() => void this.send(message, channelData), now - time);
-				return;
+				this.previousMessageMeta.set(channelData.ID, {
+					length: message.length,
+					time: now + time
+				});
+
+				await wait(now - time);
 			}
 
 			// Ad-hoc figuring out whether the message about to be sent is the same as the previous message.
 			// Ideally, this is determined by string comparison, but keeping strings of last messages over
 			// thousands of channels isn't exactly memory friendly. So we just keep the lengths and hope it works.
 			if (message.length === length) {
-				message += ` ${this.config.sameMessageEvasionCharacter}`;
+				message += ` ${TWITCH_ANTIPING_CHARACTER}`;
 			}
 		}
 
@@ -488,10 +539,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			data: (MessageSendSuccess | MessageSendFailure)[];
 		};
 
-		const response = await core.Got.get("Helix")<SendMessageResponse>({
-			url: "chat/messages",
+		const response = await core.Got.get("GenericAPI")<SendMessageResponse>({
+			url: "https://api.twitch.tv/helix/chat/messages",
 			method: "POST",
 			throwHttpErrors: false,
+			headers: {
+				Authorization: `Bearer ${await TwitchUtils.getAppAccessToken()}`,
+				"Client-ID": process.env.TWITCH_CLIENT_ID
+			},
 			json: {
 				broadcaster_id: channelData.Specific_ID,
 				sender_id: this.selfId,
@@ -510,19 +565,28 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		if (!response.ok) {
-			console.warn("HTTP not sent!", {
-				status: response.statusCode,
-				body: response.body,
-				message,
-				channel: channelData.Name,
-				options
+			const errorResponse = response.body as unknown as { message: string; error: string; }; // @todo type error case properly
+			void logMessageRejection({
+				Channel: channelData.ID,
+				Chat_Message: message,
+				Status: response.statusCode,
+				Error: errorResponse.error,
+				Error_Message: errorResponse.message
 			});
 
-			return;
+			return { success: false } as const;
 		}
 
 		const replyData = response.body.data[0];
 		if (!replyData.is_sent) {
+			void logMessageRejection({
+				Channel: channelData.ID,
+				Chat_Message: message,
+				Status: response.statusCode,
+				Error: replyData.drop_reason.code,
+				Error_Message: replyData.drop_reason.message
+			});
+
 			console.warn("JSON not sent!", {
 				time: new SupiDate().format("Y-m-d H:i:s"),
 				channel: {
@@ -536,13 +600,19 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			if (MESSAGE_MODERATION_CODES.has(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
 				await this.send(BAD_MESSAGE_RESPONSE, channelData);
 			}
+
+			return { success: false } as const;
 		}
-		else {
-			this.previousMessageMeta.set(channelData.ID, {
-				length: message.length,
-				time: SupiDate.now()
-			});
-		}
+
+		this.previousMessageMeta.set(channelData.ID, {
+			length: message.length,
+			time: SupiDate.now()
+		});
+
+		return {
+			success: true,
+			messageId: replyData.message_id
+		} as const;
 	}
 
 	async me (message: string, channel: Channel) {
@@ -597,14 +667,19 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		this.incrementMessageMetric("sent", null);
+		await logger.push(trimmedMessage, userData, null, this);
 
 		if (!response.ok) {
 			const data = JSON.stringify({
 				body: response.body,
-				statusCode: response.statusCode
+				statusCode: response.statusCode,
+				message: trimmedMessage,
+				rawMessage: message,
+				// eslint-disable-next-line unicorn/error-message
+				stack: new Error().stack?.split(/\r?\n/)
 			});
 
-			await sb.Logger.log("Twitch.Warning", data, null, userData);
+			await logger.log("Twitch.Warning", data, null, userData);
 		}
 	}
 
@@ -689,13 +764,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			badges,
 			color,
 			animationId,
-			rewardId
+			rewardId,
+			reply
 		};
 
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
 
 		if (!userData) {
-			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, this, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, senderUserId, channelName, this, messageData);
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
@@ -736,10 +812,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification") as boolean | undefined;
 				if (!notified) {
 					const replyMessage = core.Utils.tag.trim `
-						@${userData.Name}, you have been flagged as suspicious.
-						This is because I have seen your Twitch username on a different account before.
-						This is usually caused by renaming into an account that existed before.
-						To remedy this, head into Supinic's channel chat twitch.tv/supinic and mention this.												
+						@${userData.Name}, I can't reply to your commands any more. 
+						This is because I have seen your username used on a different account.
+						To fix this: Go into my chat at twitch.tv/supibot then say the word "username" and I'll guide you through.
+						This takes just a minute at most :)
 					`;
 
 					if (channelData) {
@@ -756,13 +832,13 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 					}
 
 					await Promise.all([
-						sb.Logger.log("Twitch.Other", `Suspicious user: ${userData.Name} - ${userData.Twitch_ID}`, null, userData),
+						logger.log("Twitch.Other", `Suspicious user: ${userData.Name} - ${userData.Twitch_ID}`, null, userData),
 						userData.setDataProperty("twitch-userid-mismatch-notification", true)
 					]);
 				}
 			}
 
-			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, this, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, senderUserId, channelName, this, messageData);
 
 			return;
 		}
@@ -779,14 +855,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		this.resolveUserMessage(channelData, userData, messageData.text);
 
 		if (channelData.Logging.has("Meta")) {
-			await sb.Logger.updateLastSeen({
-				userData,
-				channelData,
-				message: messageData.text
-			});
+			logger.updateLastSeen({ userData, channelData, message: messageData.text });
 		}
 		if (this.logging.messages && channelData.Logging.has("Lines")) {
-			await sb.Logger.push(messageData.text, userData, channelData);
+			await logger.push(messageData.text, userData, channelData);
 		}
 
 		/**
@@ -848,11 +920,11 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		if (this.logging.bits && cheer) {
-			void sb.Logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
+			void logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
 		}
 
 		// If the handled message is a reply to another, append its content at the end.
-		// This is so that a possible command execution can be handled with the reply's message as input..
+		// This is so that a possible command execution can be handled with the reply's message as input.
 		let targetMessage = messageData.text;
 		if (reply) {
 			// The original message starts with the thread author's username mention, so replace that first
@@ -907,7 +979,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		const message = whisper.text;
 		if (this.logging.whispers) {
-			await sb.Logger.push(message, userData, null, this);
+			await logger.push(message, userData, null, this);
 		}
 
 		this.resolveUserMessage(null, userData, message);
@@ -953,7 +1025,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			return;
 		}
 
-		await sb.Logger.log("Twitch.Sub", JSON.stringify({ event }));
+		await logger.log("Twitch.Sub", JSON.stringify({ event }));
 
 		channelData.events.emit("subscription", {
 			event: "subscription",
@@ -997,7 +1069,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		if (this.logging.hosts) {
-			await sb.Logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${viewers} viewers`);
+			await logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${viewers} viewers`);
 		}
 	}
 
@@ -1134,7 +1206,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	 * Determines whether a user is subscribed to a given Twitch channel.
 	 */
 	async fetchUserAdminSubscription (userData: User) {
-		const subscriberList = await core.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST) as BroadcasterSubscription[] | null;
+		const subscriberList = await core.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST) as TwitchSubscriberData | null;
 		if (!subscriberList || !Array.isArray(subscriberList)) {
 			return false;
 		}
@@ -1211,7 +1283,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!response.ok) {
 			if (response.statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${response.statusCode}`, channelData);
+				await logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
@@ -1239,7 +1311,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!response.ok) {
 			if (response.statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${response.statusCode}`, channelData);
+				await logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
@@ -1264,7 +1336,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!response.ok) {
 			if (response.statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${response.statusCode}`, channelData);
+				await logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
@@ -1323,20 +1395,25 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				channel: i.owner_id
 			};
 		});
+
 		const ffzEmotes = rawFFZEmotes.flatMap(i => i.emoticons).map(i => ({
 			ID: i.id,
 			name: i.name,
-			type: "ffz" as const,
+			type: "ffz",
 			global: true,
-			animated: false
-		}));
+			animated: false,
+			zeroWidth: false
+		})) satisfies ThirdPartyEmote[];
+
 		const bttvEmotes = rawBTTVEmotes.map(i => ({
 			ID: i.id,
 			name: i.code,
 			type: "bttv" as const,
 			global: true,
-			animated: (i.imageType === "gif")
-		}));
+			animated: (i.imageType === "gif"),
+			zeroWidth: false
+		})) satisfies ThirdPartyEmote[];
+
 		const sevenTvEmotes = rawSevenTvEmotes.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -1345,7 +1422,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			animated: i.data.animated,
 			// eslint-disable-next-line no-bitwise
 			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
-		}));
+		})) satisfies ThirdPartyEmote[];
 
 		return [
 			...twitchEmotes,
@@ -1411,7 +1488,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
 			client.close();
 			void this.connect({ skipSubscriptions: true });
-		}, NO_EVENT_RECONNECT_TIMEOUT);
+		}, NO_EVENT_RECONNECT_TIMEOUT).unref();
 
 		const start = SupiDate.now();
 		client.once("pong", () => {
@@ -1422,6 +1499,61 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		client.ping();
+	}
+
+	async #recheckLiveChannels () {
+		const client = this.client;
+		if (!client) {
+			return;
+		}
+
+		const cacheLiveChannelIds = await this.getLiveChannelIdList();
+		if (cacheLiveChannelIds.length === 0) {
+			return;
+		}
+
+		const simpleSchema = z.object({
+			data: z.array(z.object({ user_id: z.string() }))
+		});
+
+		const currentlyLiveChannelsSet = new Set<string>();
+		for (let slice = 0; slice < cacheLiveChannelIds.length; slice += STREAM_SLICE_PAGE) {
+			const channelIds = cacheLiveChannelIds.slice(slice * STREAM_SLICE_PAGE, (slice + 1) * STREAM_SLICE_PAGE);
+			const searchParams = new URLSearchParams({
+				type: "live",
+				first: String(STREAM_SLICE_PAGE)
+			});
+
+			for (const channelId of channelIds) {
+				searchParams.append("user_id", channelId);
+			}
+
+			const response = await core.Got.get("Helix")({
+				url: "streams",
+				searchParams
+			});
+
+			const { data } = simpleSchema.parse(response.body);
+			for (const stream of data) {
+				currentlyLiveChannelsSet.add(stream.user_id);
+			}
+		}
+
+		const cacheLiveChannelsSet = new Set(cacheLiveChannelIds);
+		const missedChannels = cacheLiveChannelsSet.difference(currentlyLiveChannelsSet);
+		for (const channelId of missedChannels) {
+			const channelData = sb.Channel.getBySpecificId(channelId, this);
+			if (!channelData) {
+				continue;
+			}
+
+			channelData.events.emit("offline", {
+				event: "offline",
+				channel: channelData
+			});
+
+			await this.removeLiveChannelIdList(channelId);
+		}
 	}
 
 	async fixChannelRename (channelData: Channel, twitchChanelName: string, channelId: string) {
@@ -1437,14 +1569,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		const oldName = channelData.Name;
 		if (!existingChannelName) {
 			await channelData.saveProperty("Name", twitchChanelName);
-			await sb.Logger.log(
+			await logger.log(
 				"Twitch.Success",
 				`Name mismatch fixed: ${channelId}: Old=${oldName} New=${twitchChanelName}`
 			);
 		}
 		else {
 			this.#unsuccessfulRenameChannels.add(channelId);
-			await sb.Logger.log(
+			await logger.log(
 				"Twitch.Warning",
 				`Name conflict detected: ${channelId}: Old=${oldName} New=${twitchChanelName}`
 			);
@@ -1461,6 +1593,9 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		if (this.client) {
 			this.client.terminate();
 		}
+
+		clearInterval(this.reconnectCheck);
+		clearInterval(this.liveChannelsCheck);
 
 		this.client = null;
 	}

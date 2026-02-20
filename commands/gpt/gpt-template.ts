@@ -2,9 +2,9 @@ import { createHash } from "node:crypto";
 
 import config from "./config.json" with { type: "json" };
 import History from "./history-control.js";
-import type { GptContext, ModelData } from "./index.js";
-
-import type { GotResponse } from "supi-core"; // @todo why error type???
+import type { GptContext } from "./index.js";
+import type { ModelData } from "./config-schema.js";
+import { type GotResponse } from "supi-core";
 
 type ExecuteFailure = {
 	success: false;
@@ -18,7 +18,7 @@ type HistorySuccess = {
 };
 type OutputLimit = {
 	success: true;
-	outputLimit: number;
+	outputLimit: number | null;
 };
 type InputLimitCheck = {
 	success: true;
@@ -31,9 +31,17 @@ type GptHistoryMode = "enabled" | "disabled";
 
 export const determineOutputLimit = (context: GptContext, modelData: ModelData): OutputLimit | ExecuteFailure => {
 	const { limit } = context.params;
-	let outputLimit = modelData.outputLimit.default;
+	let outputLimit = modelData.outputLimit?.default ?? null;
 
 	if (typeof limit === "number") {
+		if (outputLimit === null) {
+			return {
+			    success: false,
+				reply: "Your selected model does not support setting an output limit!",
+				cooldown: 2500
+			};
+		}
+
 		if (!core.Utils.isValidInteger(limit)) {
 			return {
 				success: false,
@@ -42,8 +50,8 @@ export const determineOutputLimit = (context: GptContext, modelData: ModelData):
 			};
 		}
 
-		const maximum = modelData.outputLimit.maximum;
-		if (limit > maximum) {
+		const maximum = modelData.outputLimit?.maximum ?? null;
+		if (maximum !== null && limit > maximum) {
 			return {
 				success: false,
 				cooldown: 2500,
@@ -116,6 +124,10 @@ export const handleHistoryCommand = async (context: GptContext, query: string): 
 	}
 
 	const command = context.params.history;
+	if (command === "ignore") {
+		return;
+	}
+
 	const historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? config.defaultHistoryMode;
 	if (command === "enable" || command === "disable") {
 		if (historyMode === command) {
@@ -143,10 +155,19 @@ export const handleHistoryCommand = async (context: GptContext, query: string): 
 				reply: "Successfully cleared your ChatGPT history."
 			};
 		}
+		else {
+			return;
+		}
 	}
 	else if (command === "export" || command === "check") {
 		return await History.dump(context.user);
 	}
+
+	return {
+		success: false,
+		reply: "Invalid history command used!",
+		cooldown: 2500
+	};
 };
 
 export const getHistoryMode = async (context: GptContext) => {

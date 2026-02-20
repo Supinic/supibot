@@ -31,7 +31,6 @@ import CountLineChannelCommand from "./countlinechannel/index.js";
 import CountLineTotalCommand from "./countlinetotal/index.js";
 import CryptoCommand from "./crypto/index.js";
 import CryptoGameCommand from "./cryptogame/index.js";
-import CryptoWalletCommand from "./cryptowallet/index.js";
 import CurrencyCommand from "./currency/index.js";
 import CurrentCommand from "./current/index.js";
 import DalleCommand from "./dalle/index.js";
@@ -52,8 +51,7 @@ import FakeNewsCommand from "./fakenews/index.js";
 import FaqCommand from "./faq/index.js";
 import FillCommand from "./fill/index.js";
 import FindRaidStreamsCommand from "./findraidstreams/index.js";
-import FirstChannelFollowerCommand from "./firstchannelfollower/index.js";
-import FirstFollowedChannelCommand from "./firstfollowedchannel/index.js";
+import { FirstChannelFollowerCommand, FirstFollowedChannelCommand } from "./first-followers/index.js";
 import FirstLineCommand from "./firstline/index.js";
 import FirstSeenCommand from "./firstseen/index.js";
 import FishCommand from "./fish/index.js";
@@ -62,15 +60,11 @@ import Formula1Command from "./formula1/index.js";
 import ForsenCDCommand from "./forsenCD/index.js";
 import ForsenECommand from "./forsenE/index.js";
 import FunFactCommand from "./funfact/index.js";
-import GachiCommand from "./gachi/index.js";
 import GachiCheckCommand from "./gachicheck/index.js";
 import GachiSearchCommand from "./gachisearch/index.js";
-import GamesDoneQuickCommand from "./gamesdonequick/index.js";
 import GetProfilePictureCommand from "./getprofilepicture/index.js";
-import GetVideoDataCommand from "./getvideodata/index.js";
 import GiftCommand from "./gift/index.js";
 import GitHubCommand from "./github/index.js";
-import GitHubStatusCommand from "./githubstatus/index.js";
 import GptCommand from "./gpt/index.js";
 import HaHAACommand from "./haHAA/index.js";
 import HelpCommand from "./help/index.js";
@@ -79,7 +73,6 @@ import HowLongToBeatCommand from "./howlongtobeat/index.js";
 import IdCommand from "./id/index.js";
 import InspireMeCommand from "./inspireme/index.js";
 import IsDownCommand from "./isdown/index.js";
-import KanjiCommand from "./kanji/index.js";
 import KissCommand from "./kiss/index.js";
 import KnowYourMemeCommand from "./knowyourmeme/index.js";
 import LastLineCommand from "./lastline/index.js";
@@ -87,15 +80,12 @@ import LastSeenCommand from "./lastseen/index.js";
 import LinkCommand from "./link/index.js";
 import LiveUamapCommand from "./liveuamap/index.js";
 import MarkovCommand from "./markov/index.js";
-import MastodonCommand from "./mastodon/index.js";
 import MathCommand from "./math/index.js";
-import MdnCommand from "./mdn/index.js";
 import MeCommand from "./me/index.js";
 import MetricsCommand from "./metrics/index.js";
 import MobaCommand from "./moba/index.js";
 import NecroDancerCommand from "./necrodancer/index.js";
 import NewsCommand from "./news/index.js";
-import NpmCommand from "./npm/index.js";
 import NutrientsCommand from "./nutrients/index.js";
 import OcrCommand from "./ocr/index.js";
 import OptOutCommand from "./optout/index.js";
@@ -130,7 +120,6 @@ import RandomMemeCommand from "./randommeme/index.js";
 import RandomPastebinCommand from "./randompastebin/index.js";
 import RandomSadCatCommand from "./randomsadcat/index.js";
 import RandomScpCommand from "./randomscp/index.js";
-import RandomUploaderVideoCommand from "./randomuploadervideo/index.js";
 import RandomWordCommand from "./randomword/index.js";
 import RecordCommand from "./record/index.js";
 import ReloadCommand from "./reload/index.js";
@@ -150,18 +139,15 @@ import SongRequestCommand from "./songrequest/index.js";
 import SongRequestQueueCommand from "./songrequestqueue/index.js";
 import SortCommand from "./sort/index.js";
 import SpeedrunCommand from "./speedrun/index.js";
-import StackOverflowSearchCommand from "./stackoverflowsearch/index.js";
 import StalkCommand from "./stalk/index.js";
 import StatisticsCommand from "./statistics/index.js";
 import SteamGamePlayersCommand from "./steamgameplayers/index.js";
 import StockCommand from "./stock/index.js";
 import StreamCommand from "./stream/index.js";
-import StreamGamesCommand from "./streamgames/index.js";
 import StreamInfoCommand from "./streaminfo/index.js";
 import SubAgeCommand from "./subage/index.js";
 import SubscribeCommand from "./subscribe/index.js";
 import SuggestCommand from "./suggest/index.js";
-import SupiBotUpdatesCommand from "./supibotupdates/index.js";
 import TestCommand from "./test/index.js";
 import TextToSpeechCommand from "./texttospeech/index.js";
 import TextTransformCommand from "./texttransform/index.js";
@@ -183,7 +169,6 @@ import UnmentionCommand from "./unmention/index.js";
 import UnpingCommand from "./unping/index.js";
 import UrbanCommand from "./urban/index.js";
 import VanishCommand from "./vanish/index.js";
-import VideoStatsCommand from "./videostats/index.js";
 import WeatherCommand from "./weather/index.js";
 import WhatAnimeIsItCommand from "./whatanimeisit/index.js";
 import WhatEmoteIsItCommand from "./whatemoteisit/index.js";
@@ -228,7 +213,6 @@ export default [
 	CountLineTotalCommand,
 	CryptoCommand,
 	CryptoGameCommand,
-	CryptoWalletCommand,
 	CurrencyCommand,
 	CurrentCommand,
 	DalleCommand,
@@ -259,15 +243,11 @@ export default [
 	ForsenCDCommand,
 	ForsenECommand,
 	FunFactCommand,
-	GachiCommand,
 	GachiCheckCommand,
 	GachiSearchCommand,
-	GamesDoneQuickCommand,
 	GetProfilePictureCommand,
-	GetVideoDataCommand,
 	GiftCommand,
 	GitHubCommand,
-	GitHubStatusCommand,
 	GptCommand,
 	HaHAACommand,
 	HelpCommand,
@@ -276,7 +256,6 @@ export default [
 	IdCommand,
 	InspireMeCommand,
 	IsDownCommand,
-	KanjiCommand,
 	KissCommand,
 	KnowYourMemeCommand,
 	LastLineCommand,
@@ -284,15 +263,12 @@ export default [
 	LinkCommand,
 	LiveUamapCommand,
 	MarkovCommand,
-	MastodonCommand,
 	MathCommand,
-	MdnCommand,
 	MeCommand,
 	MetricsCommand,
 	MobaCommand,
 	NecroDancerCommand,
 	NewsCommand,
-	NpmCommand,
 	NutrientsCommand,
 	OcrCommand,
 	OptOutCommand,
@@ -326,7 +302,6 @@ export default [
 	RandomPastebinCommand,
 	RandomSadCatCommand,
 	RandomScpCommand,
-	RandomUploaderVideoCommand,
 	RandomWordCommand,
 	RecordCommand,
 	ReloadCommand,
@@ -346,18 +321,15 @@ export default [
 	SongRequestQueueCommand,
 	SortCommand,
 	SpeedrunCommand,
-	StackOverflowSearchCommand,
 	StalkCommand,
 	StatisticsCommand,
 	SteamGamePlayersCommand,
 	StockCommand,
 	StreamCommand,
-	StreamGamesCommand,
 	StreamInfoCommand,
 	SubAgeCommand,
 	SubscribeCommand,
 	SuggestCommand,
-	SupiBotUpdatesCommand,
 	TestCommand,
 	TextToSpeechCommand,
 	TextTransformCommand,
@@ -379,7 +351,6 @@ export default [
 	UnpingCommand,
 	UrbanCommand,
 	VanishCommand,
-	VideoStatsCommand,
 	WeatherCommand,
 	WhatAnimeIsItCommand,
 	WhatEmoteIsItCommand,

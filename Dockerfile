@@ -1,7 +1,9 @@
-FROM node:latest
+FROM node:25
+
+RUN npm install -g --force corepack
+RUN npm install -g typescript
 
 RUN corepack enable
-RUN npm install -g typescript
 
 RUN useradd -m supibot
 USER supibot
@@ -15,9 +17,9 @@ COPY --chown=supibot:supibot yarn.lock ./
 RUN yarn install
 
 COPY --chown=supibot:supibot master.ts ./
+COPY --chown=supibot:supibot config.ts ./
 COPY --chown=supibot:supibot init ./init
 
-COPY --chown=supibot:supibot @types ./@types
 COPY --chown=supibot:supibot api ./api
 COPY --chown=supibot:supibot chat-modules ./chat-modules
 COPY --chown=supibot:supibot classes ./classes
@@ -27,6 +29,8 @@ COPY --chown=supibot:supibot gots ./gots
 COPY --chown=supibot:supibot platforms ./platforms
 COPY --chown=supibot:supibot singletons ./singletons
 COPY --chown=supibot:supibot utils ./utils
+
+RUN yarn build
 
 COPY docker-entrypoint.sh /usr/local/bin/
 

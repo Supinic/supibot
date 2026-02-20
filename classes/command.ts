@@ -1,7 +1,6 @@
 import {
 	SupiDate,
 	SupiError,
-	isGenericRequestError,
 	isGotRequestError,
 	type Counter,
 	type Query,
@@ -12,26 +11,31 @@ import {
 } from "supi-core";
 import type { BaseMessageOptions } from "discord.js";
 
+import { ZodError } from "zod";
+import { getConfig } from "../config.js";
+
 type DiscordEmbeds = BaseMessageOptions["embeds"];
 
-import { TemplateWithoutId, TemplateDefinition } from "./template.js";
+import { TemplateWithoutId, type TemplateDefinition } from "./template.js";
 
-import Banphrase from "./banphrase.js";
+import { Banphrase } from "./banphrase.js";
 import { Filter } from "./filter.js";
-import User from "./user.js";
-import { Channel, privateMessageChannelSymbol } from "./channel.js";
-import { Platform, type GetEmoteOptions } from "../platforms/template.js";
-import CooldownManager from "../utils/cooldown-manager.js";
-import { type Language, getLanguage } from "../utils/languages.js";
+import { type Channel, privateMessageChannelSymbol } from "./channel.js";
+import { permissions as userPermissions, permissionNames as userPermissionNames, type PermissionNumbers, type User } from "./user.js";
 
+import type { Platform, GetEmoteOptions } from "../platforms/template.js";
 import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
 import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
-import { whitespaceRegex } from "../utils/regexes.js";
-import config from "../config.json" with { type: "json" };
-import { Emote } from "../@types/globals.js";
+import CooldownManager from "../utils/cooldown-manager.js";
+import { type Language, getLanguage } from "../utils/languages.js";
 
-const COMMAND_PREFIX = config.modules.commands.prefix;
+import { whitespaceRegex } from "../utils/regexes.js";
+import type { Emote } from "../utils/globals.js";
+import { logger } from "../singletons/logger.js";
+
+const { values: configValues, modules: modulesConfig, responses: configResponses } = getConfig();
+const COMMAND_PREFIX = modulesConfig.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
 type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
@@ -45,7 +49,7 @@ type ParameterValueMap = {
 	regex: RegExp;
 	language: Language;
 };
-type ParameterType = keyof ParameterValueMap;
+export type ParameterType = keyof ParameterValueMap;
 type ParameterValue = ParameterValueMap[ParameterType];
 type ParameterDefinition = {
 	readonly name: string;
@@ -63,6 +67,7 @@ type ResultFailure = { success: false; reply: string; };
 export type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
+	text?: string;
 	replyWithPrivateMessage?: boolean;
 	cooldown?: CooldownDefinition;
 	partialReplies?: {
@@ -78,7 +83,7 @@ export type StrictResult = {
 		skipWhitespaceCheck?: boolean;
 	}
 };
-type Result = StrictResult & {
+export type Result = StrictResult & {
 	reason?: string;
 	replyWithMeAction?: boolean;
 	discord?: {
@@ -100,19 +105,25 @@ export type ContextData<T extends ParameterDefinitions = ParameterDefinitions> =
 	params?: Context<T>["params"];
 };
 export type ContextAppendData = {
-	tee?: Invocation[];
-	pipe?: boolean;
+	alias?: boolean;
+	aliasArgs?: readonly string[];
 	aliasCount?: number;
-	commandList?: Command["Name"][];
 	aliasStack?: Command["Name"][];
+	aliasTry?: {
+		userName?: User["Name"];
+	};
+	badges?: unknown;
+	commandList?: Command["Name"][];
+	emotes?: unknown;
 	flags?: unknown;
 	id?: string;
 	messageID?: string;
-	badges?: unknown;
-	emotes?: unknown;
-	skipPending?: boolean;
-	privateMessage?: boolean;
+	pipe?: boolean;
+	pipeCount?: number;
 	platform?: never; // @todo this is a temporary check for refactor purposes
+	privateMessage?: boolean;
+	skipPending?: boolean;
+	tee?: Invocation[];
 };
 export type ContextPlatformSpecificData = TwitchAppendData | DiscordAppendData | null;
 
@@ -123,7 +134,8 @@ type PermissionOptions = {
 };
 type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & GetEmoteOptions>;
 
-export type Flag = "block" | "developer" | "external-input" | "mention" | "non-nullable" | "opt-out"
+export type Flag =
+	| "block" | "developer" | "external-input" | "mention" | "non-nullable" | "opt-out"
 	| "read-only" | "ping" | "pipe" | "rollback" | "skip-banphrase" | "system" | "whitelist";
 
 export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
@@ -190,13 +202,13 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 
-		const promises: (Promise<boolean | null> | null)[] = [
+		const promises: Promise<boolean | null>[] = [
 			userData.getDataProperty("administrator")
 		];
 		if (channelData) {
 			promises.push(
 				channelData.isUserAmbassador(userData),
-				platformData.isUserChannelOwner(channelData, userData)
+				Promise.resolve(platformData.isUserChannelOwner(channelData, userData))
 			);
 		}
 
@@ -207,24 +219,31 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			channelOwner: Boolean(data[2])
 		};
 
-		let flag = User.permissions.regular;
+		let name: keyof typeof userPermissions | null = null;
+		let flag: PermissionNumbers = userPermissions.regular;
 		if (flags.administrator) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.administrator;
+			flag |= userPermissions.administrator;
+			name ??= userPermissionNames.ADMINISTRATOR;
 		}
 		if (flags.channelOwner) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.channelOwner;
+			flag |= userPermissions.channelOwner;
+			name ??= userPermissionNames.CHANNEL_OWNER;
 		}
 		if (flags.ambassador) {
 			// eslint-disable-next-line no-bitwise
-			flag |= User.permissions.ambassador;
+			flag |= userPermissions.ambassador;
+			name ??= userPermissionNames.AMBASSADOR;
 		}
+
+		name ??= userPermissionNames.REGULAR;
 
 		return {
 			flag,
+			name,
 			// eslint-disable-next-line no-bitwise
-			is: (type: keyof typeof User.permissions) => ((flag & User.permissions[type]) !== 0)
+			is: (type: keyof typeof userPermissions) => ((flag & userPermissions[type]) !== 0)
 		};
 	}
 
@@ -261,17 +280,16 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	get tee () { return this.append.tee; }
 }
 
-export interface CommandDefinition extends TemplateDefinition {
+export interface CommandDefinition <T extends ParameterDefinitions = ParameterDefinitions> extends TemplateDefinition {
 	Name: Command["Name"];
 	Aliases: Command["Aliases"] | null;
 	Description: Command["Description"];
 	Cooldown: Command["Cooldown"];
 	Flags: Command["Flags"];
-	Params: Command["Params"] | null;
+	Params: T;
 	Whitelist_Response: Command["Whitelist_Response"];
-	Code: Command["Code"];
+	Code: (this: Command, context: Context<T>, ...args: string[]) => StrictResult | Promise<StrictResult>;
 	Dynamic_Description: Command["Dynamic_Description"];
-
 	initialize?: CustomInitFunction;
 	destroy?: CustomDestroyFunction;
 }
@@ -280,7 +298,7 @@ export type DescriptionFunction = (this: Command, prefix: string) => string[] | 
 export type CustomInitFunction = (this: Command) => Promise<void> | void;
 export type CustomDestroyFunction = (this: Command) => void;
 
-type ExecuteOptions = {
+export type ExecuteOptions = ContextAppendData & {
 	skipPending?: boolean;
 	privateMessage?: boolean;
 	skipBanphrases?: boolean;
@@ -299,12 +317,87 @@ type CooldownObject = {
 };
 type CooldownDefinition = number | null | CooldownObject;
 
+export type ExtractContext <T extends CommandDefinition> = Context<T["Params"]>;
+
+export interface SubcommandDefinition<T extends CommandDefinition = CommandDefinition> {
+	name: string;
+	title: string;
+	aliases: string[];
+	description: string[];
+	getDescription?: (prefix: string) => string[] | Promise<string[]>;
+	default?: boolean;
+	flags?: Record<string, boolean>;
+	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
+}
+
+export class SubcommandCollection {
+	public readonly name: string;
+	public readonly names: readonly string[];
+
+	private readonly defaultCommand: SubcommandDefinition | null;
+	private readonly subcommands: SubcommandDefinition[];
+
+	constructor (name: string, subcommands: SubcommandDefinition[]) {
+		this.name = name;
+		this.subcommands = subcommands;
+		this.names = this.subcommands.map(i => i.name);
+
+		const defaultSubcommands = subcommands.filter(i => i.default);
+		this.defaultCommand = (defaultSubcommands.length === 1)
+			? defaultSubcommands[0]
+			: null;
+	}
+
+	get (name: string | undefined) {
+		if (typeof name !== "string") {
+			return null;
+		}
+
+		for (const subcommand of this.subcommands) {
+			if (subcommand.name === name || subcommand.aliases.includes(name)) {
+				return subcommand;
+			}
+		}
+
+		return null;
+	}
+
+	async createDescription () {
+		const result: string[] = [];
+		for (const subcommand of this.subcommands) {
+			const description = (subcommand.getDescription)
+				? await subcommand.getDescription(Command.prefix)
+				: subcommand.description;
+
+			result.push(
+				`<h6>${subcommand.title}</h6>`,
+				...description,
+				"",
+				""
+			);
+		}
+
+		return result;
+	}
+
+	get default () {
+		if (!this.defaultCommand) {
+			throw new SupiError({
+			    message: "No default subcommand in collection",
+				args: { name: this.name }
+			});
+		}
+
+		return this.defaultCommand;
+	}
+}
+
 export class Command extends TemplateWithoutId {
 	readonly Name: string;
 	readonly Aliases: string[];
 	readonly Description: string | null;
-	readonly Cooldown: number | null;
-	readonly Flags: Readonly<Flag[]>;
+	readonly Cooldown: number;
+	readonly Flags: readonly Flag[];
 	readonly Params: ParameterDefinitions = [];
 	readonly Whitelist_Response: string | null;
 	readonly Code: ExecuteFunction;
@@ -313,7 +406,7 @@ export class Command extends TemplateWithoutId {
 	#ready = false;
 	#destroyed = false;
 	readonly #customDestroy: CustomDestroyFunction | null;
-	readonly data = {};
+	readonly data: Record<string, unknown> = {};
 
 	static readonly importable = true;
 	static readonly uniqueIdentifier = "Name";
@@ -331,11 +424,11 @@ export class Command extends TemplateWithoutId {
 		this.Name = data.Name;
 		this.Aliases = data.Aliases ?? [];
 		this.Description = data.Description ?? null;
-		this.Cooldown = data.Cooldown ?? null;
+		this.Cooldown = data.Cooldown;
 		this.Whitelist_Response = data.Whitelist_Response ?? null;
 
 		this.Flags = Object.freeze(data.Flags);
-		this.Params = data.Params ?? [];
+		this.Params = data.Params;
 
 		this.Code = data.Code;
 		this.Dynamic_Description = data.Dynamic_Description ?? null;
@@ -400,8 +493,8 @@ export class Command extends TemplateWithoutId {
 
 	getDetailURL (options: { useCodePath?: boolean } = {}) {
 		const baseURL = (options.useCodePath)
-			? config.values.commandCodeUrlPrefix
-			: config.values.commandDetailUrlPrefix;
+			? configValues.commandCodeUrlPrefix
+			: configValues.commandDetailUrlPrefix;
 
 		return (baseURL)
 			? `${baseURL}/${encodeURIComponent(this.Name)}`
@@ -506,6 +599,20 @@ export class Command extends TemplateWithoutId {
 		}
 	}
 
+	static getAsserted (identifier: Command | string): Command {
+		const command = Command.get(identifier);
+		if (!command) {
+			throw new SupiError({
+			    message: `Assert error: Fetched command does not exist`,
+				args: {
+					command: (typeof identifier === "string") ? identifier : identifier.Name
+				}
+			});
+		}
+
+		return command;
+	}
+
 	static async checkAndExecute (data: {
 		  command: string, // @todo consider renaming `command` to `invocation` here
 		  args: string[],
@@ -522,7 +629,7 @@ export class Command extends TemplateWithoutId {
 			user: userData,
 			platform: platformData,
 			options,
-			platformSpecificData = null
+			platformSpecificData
 		} = data;
 
 		if (!identifier) {
@@ -569,6 +676,19 @@ export class Command extends TemplateWithoutId {
 			if (!options.skipPending) {
 				const pending = Command.#cooldownManager.fetchPending(userData.ID);
 				if (pending) {
+					logger.logCommandExecution({
+						User_Alias: userData.ID,
+						Command: command.Name,
+						Platform: platformData.ID,
+						Executed: new SupiDate(),
+						Channel: channelData?.ID ?? null,
+						Success: false,
+						Invocation: identifier,
+						Arguments: null,
+						Result: `Pending failure: ${JSON.stringify(pending)}`,
+						Execution_Time: null
+					});
+
 					return {
 						reply: (options.privateMessage) ? pending.description : null,
 						reason: "pending"
@@ -655,7 +775,7 @@ export class Command extends TemplateWithoutId {
 		if (!filterData.success && (!options.skipGlobalBan || !isFilterGlobalBan)) {
 			Command.#cooldownManager.unsetPending(userData.ID);
 
-			let length = command.Cooldown;
+			let length: number | null = command.Cooldown;
 			const cooldownFilter = Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
@@ -684,12 +804,25 @@ export class Command extends TemplateWithoutId {
 				reason: filterData.reason
 			});
 
+			logger.logCommandExecution({
+				User_Alias: userData.ID,
+				Command: command.Name,
+				Platform: platformData.ID,
+				Executed: new SupiDate(),
+				Channel: channelData?.ID ?? null,
+				Success: false,
+				Invocation: identifier,
+				Arguments: JSON.stringify(args.filter(Boolean)),
+				Result: `Filter failure: ${JSON.stringify(filterData)}`,
+				Execution_Time: null
+			});
+
 			return filterData;
 		}
 
 		// If params parsing failed, filters were checked and none applied, return the failure result now
 		if (failedParamsParseResult) {
-			sb.Logger.logCommandExecution({
+			logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: platformData.ID,
@@ -731,7 +864,7 @@ export class Command extends TemplateWithoutId {
 				result: (commandExecution.success === false) ? "fail" : "success"
 			});
 
-			sb.Logger.logCommandExecution({
+			logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: platformData.ID,
@@ -739,7 +872,7 @@ export class Command extends TemplateWithoutId {
 				Channel: channelData?.ID ?? null,
 				Success: true,
 				Invocation: identifier,
-				Arguments: JSON.stringify(args.filter(Boolean)),
+				Arguments: JSON.stringify(argumentArray.filter(Boolean)),
 				Result: result,
 				Execution_Time: core.Utils.round(Number(end - start) / 1_000_000, 3)
 			});
@@ -758,7 +891,7 @@ export class Command extends TemplateWithoutId {
 				result: "error"
 			});
 
-			sb.Logger.logCommandExecution({
+			logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: platformData.ID,
@@ -766,7 +899,7 @@ export class Command extends TemplateWithoutId {
 				Channel: channelData?.ID ?? null,
 				Success: false,
 				Invocation: identifier,
-				Arguments: JSON.stringify(args.filter(Boolean)),
+				Arguments: JSON.stringify(argumentArray.filter(Boolean)),
 				Result: e.message,
 				Execution_Time: null
 			});
@@ -774,27 +907,16 @@ export class Command extends TemplateWithoutId {
 			let origin: "Internal" | "External" = "Internal";
 			let errorContext: Record<string, string> = {};
 			const loggingContext = {
-				user: userData.ID,
+				user: `${userData.Name} (${userData.ID})`,
+				channel: `${channelData?.Name ?? "(PM)"} (${channelData?.ID ?? "N/A"})`,
 				command: command.Name,
 				invocation: identifier,
-				channel: channelData?.ID ?? null,
-				Platform: platformData.ID,
+				Platform: `${platformData.name} (${platformData.ID})`,
 				params: context.params,
 				isPrivateMessage
 			};
 
-			if (isGenericRequestError(e)) {
-				origin = "External";
-				const { hostname, statusCode, statusMessage } = e.args as Record<string, string>;
-				errorContext = {
-					type: "Command request error",
-					hostname,
-					message: e.simpleMessage,
-					statusCode,
-					statusMessage
-				};
-			}
-			else if (isGotRequestError(e)) {
+			if (isGotRequestError(e)) {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
@@ -806,7 +928,7 @@ export class Command extends TemplateWithoutId {
 				};
 			}
 
-			const errorID = await sb.Logger.logError("Command", e, {
+			const errorID = await logger.logError("Command", e, {
 				origin,
 				context: {
 					identifier,
@@ -816,26 +938,25 @@ export class Command extends TemplateWithoutId {
 				arguments: args
 			});
 
-			if (isGenericRequestError(e)) {
-				const { hostname } = errorContext;
-				execution = {
-					success: false,
-					reason: "generic-request-error",
-					reply: `Third party service ${hostname} failed! 🚨 (ID ${errorID})`
-				};
-			}
-			else if (isGotRequestError(e)) {
+			if (isGotRequestError(e)) {
 				execution = {
 					success: false,
 					reason: "got-error",
 					reply: `Third party service failed! 🚨 (ID ${errorID})`
 				};
 			}
+			else if (e instanceof ZodError) {
+				execution = {
+					success: false,
+					reason: "zod-error",
+					reply: `Schema validation failed! 🚨 (ID ${errorID})`
+				};
+			}
 			else {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
 				const reply = (channelHasFullErrorMessage)
 					? `Error ID ${errorID} - ${e.message}`
-					: config.responses.commandErrorResponse;
+					: `${configResponses.commandErrorResponse} (error ID ${errorID})`;
 
 				execution = {
 					success: false,
@@ -960,7 +1081,7 @@ export class Command extends TemplateWithoutId {
 		// If the `hasPrefix` condition is met (we want the external prefix to be added), we check two more conditions:
 		// a) Either the command succeeded and the prefix isn't skipped, or
 		// b) The prefix is forced no matter the command's success status.
-		// The "channel alias" prefix takes precedence before teh "external input" one.
+		// The "channel alias" prefix takes precedence before the "external input" one.
 		const hasPrefix = Boolean(!options.partialExecute && execution.hasExternalInput);
 		if (execution.isChannelAlias) {
 			execution.reply = `#⃣  ${execution.reply}`;
@@ -1014,7 +1135,7 @@ export class Command extends TemplateWithoutId {
 			}
 		}
 		else {
-			let length = commandData.Cooldown ?? 0;
+			let length = commandData.Cooldown;
 			const cooldownFilter = Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
@@ -1343,3 +1464,5 @@ export class Command extends TemplateWithoutId {
 		return COMMAND_PREFIX;
 	}
 }
+
+export const declare = <const T extends ParameterDefinitions> (def: CommandDefinition<T>) => def;

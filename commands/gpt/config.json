@@ -7,7 +7,7 @@
     "maximum": 100
   },
   "lengthLimitExceededMessage": {
-    "history": "Maximum history length exceeded for this model! Shorten your query, or clear your history with \"$gpt history:clear\" instead.",
+    "history": "Maximum input + history length exceeded for this model! Shorten your query, or clear your history with \"$gpt history:clear\" instead.",
     "regular": "Maximum query length exceeded for this model! Shorten your query instead."
   },
   "userTokenLimits": {
@@ -21,61 +21,58 @@
     }
   },
   "models": {
+    "base": {
+      "url": "gpt-5.2",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "pricePerMtoken": 3.90,
+      "usesCompletionTokens": true,
+      "flexProcessing": true,
+      "noTemperature": true
+    },
+    "5.1": {
+      "url": "gpt-5.1",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "pricePerMtoken": 5.50,
+      "usesCompletionTokens": true,
+      "flexProcessing": true,
+      "noTemperature": true
+    },
     "mini": {
-      "url": "gpt-4.1-mini",
+      "url": "gpt-5-mini",
+      "type": "openai",
+      "default": false,
+      "inputLimit": 1500,
+      "pricePerMtoken": 1.12,
+      "usesCompletionTokens": true,
+      "flexProcessing": true,
+      "noTemperature": true
+    },
+    "nano": {
+      "url": "gpt-5-nano",
       "type": "openai",
       "default": true,
       "inputLimit": 1500,
-      "outputLimit": {
-        "default": 150,
-        "maximum": 500
-      },
-      "pricePerMtoken": 0.42
-    },
-    "base": {
-      "url": "gpt-4.1",
-      "type": "openai",
-      "default": false,
-      "inputLimit": 1500,
-      "outputLimit": {
-        "default": 150,
-        "maximum": 500
-      },
-      "pricePerMtoken": 1.84
-    },
-    "nano": {
-      "url": "gpt-4.1-nano",
-      "type": "openai",
-      "default": false,
-      "inputLimit": 1500,
-      "outputLimit": {
-        "default": 150,
-        "maximum": 500
-      },
-      "pricePerMtoken": 0.12
+      "pricePerMtoken": 0.22,
+      "usesCompletionTokens": true,
+      "flexProcessing": true,
+      "noTemperature": true
     },
     "search": {
       "url": "gpt-4o-mini-search-preview",
       "type": "openai",
       "default": false,
-      "inputLimit": 1500,
+      "inputLimit": 1000,
       "outputLimit": {
-        "default": 150,
+        "default": 250,
         "maximum": 500
       },
       "search": true,
-      "pricePerMtoken": 0.40
-    },
-    "qwen": {
-      "url": "qwen",
-      "type": "nexra-complements",
-      "default": false,
-      "inputLimit": 5000,
-      "outputLimit": {
-        "default": 5000,
-        "maximum": 5000
-      },
-      "pricePerMtoken": 0.05
+      "pricePerMtoken": 0.12,
+      "flatCost": 3000
     },
     "mixtral": {
       "url": "mistralai/Mixtral-8x22B-Instruct-v0.1",
@@ -121,18 +118,16 @@
       },
       "pricePerMtoken": 0.08
     },
-    "o4-mini": {
-      "type": "openai",
+    "maverick": {
+      "url": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+      "type": "deepinfra",
       "default": false,
-      "subscriberOnly": true,
-      "noSystemRole": true,
-      "usesCompletionTokens": true,
       "inputLimit": 1000,
       "outputLimit": {
-        "default": 200,
-        "maximum": 500
+        "default": 500,
+        "maximum": 1000
       },
-      "pricePerMtoken": 3.00
+      "pricePerMtoken": 0.25
     }
   }
 }

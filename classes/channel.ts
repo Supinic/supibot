@@ -1,11 +1,11 @@
 import EventEmitter from "node:events";
-import { SupiError, SupiDate } from "supi-core";
+import { SupiError, type SupiDate } from "supi-core";
 
 import {
 	Platform,
-	Like as PlatformLike,
-	GenericSendOptions,
-	PrepareMessageOptions
+	type Like as PlatformLike,
+	type GenericSendOptions,
+	type PrepareMessageOptions
 } from "../platforms/template.js";
 
 import {
@@ -17,22 +17,19 @@ import {
 	saveChannelDataProperty
 } from "./custom-data-properties.js";
 
-import { User } from "./user.js";
+import type { User } from "./user.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
 import { TemplateWithId } from "./template.js";
-import { Emote } from "../@types/globals.js";
-import { string } from "random-js";
+import type { Emote } from "../utils/globals.js";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 
 type BanphraseDowntimeBehaviour = "Ignore" | "Notify" | "Nothing" | "Refuse" | "Whisper";
-const channelModes = ["Inactive", "Last seen", "Read", "Write", "VIP", "Moderator"] as const;
-type Mode = (typeof channelModes)[number];
-
+type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
 type LogType = "Lines" | "Meta";
 
 type EditableProperty = "Name" | "Mode" | "Mention" | "NSFW" | "Mirror" | "Description"
-	| "Links_Allowed" | "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL";
+	| "Links_Allowed" | "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL" | "Specific_ID";
 type ConstructorData = Pick<Channel,
 	"ID" | "Name" | "Specific_ID" | "Mode" | "Mention" | "Message_Limit"
 	| "NSFW" | "Mirror" | "Description" | "Links_Allowed"
@@ -58,7 +55,6 @@ type DatabaseChannelData = {
 // type GetStringEmoteOptions = GetEmoteOptions & { returnEmoteObject?: false; };
 
 export type Like = string | number | Channel;
-export const isChannelMode = (input: string): input is Mode => channelModes.includes(input as Mode);
 
 type MoveDataOptions = {
 	deleteOriginalValues?: boolean;
@@ -170,8 +166,8 @@ export class Channel extends TemplateWithId {
 		return ambassadors.includes(userData.ID);
 	}
 
-	send (message: string, options: GenericSendOptions = {}): Promise<void> {
-		return this.Platform.send(message, this, options);
+	async send (message: string, options: GenericSendOptions = {}): Promise<void> {
+		await this.Platform.send(message, this, options);
 	}
 
 	async isLive (): Promise<boolean | null> {
@@ -370,6 +366,17 @@ export class Channel extends TemplateWithId {
 		}
 
 		return null;
+	}
+
+	static getAsserted (identifier: string | number, platformIdentifier?: Platform | string | number): Channel {
+		const channel = Channel.get(identifier, platformIdentifier);
+		if (!channel) {
+			throw new SupiError({
+				message: `Assert error: asserted Channel ${identifier} is not available`
+			});
+		}
+
+		return channel;
 	}
 
 	static getBySpecificId (identifier: Channel["Specific_ID"], platform: Platform | string | number) {
@@ -574,7 +581,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	static normalizeName (username: string): string {
-		return username.toLowerCase().replace(/^@/, "");
+		return username.toLowerCase().replace(/^@/, "").replaceAll(/\W/g, "");
 	}
 }
 

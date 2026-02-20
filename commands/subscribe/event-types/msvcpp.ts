@@ -1,4 +1,4 @@
-import { RssEventDefinition } from "../generic-event.js";
+import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "MSVC++",
@@ -14,5 +14,8 @@ export default {
 	cacheKey: "msvcpp-blog-last-publish-date",
 	subName: "MSVC++ devblog",
 	type: "rss",
-	url: "https://devblogs.microsoft.com/cppblog/feed"
+	url: "https://devblogs.microsoft.com/cppblog/feed",
+	options: {
+		ignoredCategories: ["copilot"]
+	}
 } satisfies RssEventDefinition;

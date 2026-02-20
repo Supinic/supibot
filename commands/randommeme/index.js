@@ -1,4 +1,4 @@
-import { GenericRequestError } from "supi-core";
+import { SupiDate } from "supi-core";
 import config from "./config.json" with { type: "json" };
 import Subreddit from "./subreddit.js";
 
@@ -77,13 +77,10 @@ export default {
 				};
 			}
 			else if (statusCode !== 200 && statusCode !== 404) {
-				throw new GenericRequestError({
-					statusCode,
-					hostname: "reddit.com",
-					statusMessage: body.statusMessage ?? null,
-					message: `Fetching ${subreddit}/about.json failed`,
-					stack: null
-				});
+				return {
+					success: false,
+					reply: `Reddit responded with an error (${statusCode})! Try again later.`
+				};
 			}
 
 			forum = new Subreddit(body);
@@ -123,7 +120,7 @@ export default {
 			};
 		}
 
-		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
+		if (forum.posts.length === 0 || SupiDate.now() > forum.expiration) {
 			const response = await redditGot(`${subreddit}/hot.json`);
 			const { statusCode, body } = response;
 
@@ -134,13 +131,10 @@ export default {
 				};
 			}
 			else if (statusCode !== 200) {
-				throw new GenericRequestError({
-					statusCode,
-					hostname: "reddit.com",
-					statusMessage: body.statusMessage ?? null,
-					message: `Fetching ${subreddit}/hot.json failed`,
-					stack: null
-				});
+				return {
+					success: false,
+					reply: `Reddit responded with an error (${statusCode})! Try again later.`
+				};
 			}
 
 			forum.setExpiration();

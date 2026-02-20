@@ -13,7 +13,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Posts a random picture for a given animal type.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomAnimalPicture (context, input) {
 		const type = PICTURE_INVOCATIONS_MAP[context.invocation] ?? input?.toLowerCase() ?? null;

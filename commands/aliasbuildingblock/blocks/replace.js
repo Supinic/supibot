@@ -15,8 +15,9 @@ export default {
 		}
 
 		return {
-			reply: args.join(" ")
-				.replace(context.params.regex, context.params.replacement)
+			success: true,
+			hasExternalInput: true,
+			reply: args.join(" ").replace(context.params.regex, context.params.replacement)
 		};
 	}
 };

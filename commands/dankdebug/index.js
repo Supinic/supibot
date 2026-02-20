@@ -1,4 +1,5 @@
 import { VM } from "vm2";
+import { logger } from "../../singletons/logger.js";
 import { postToHastebin } from "../../utils/command-utils.js";
 import preventTomfoolery from "./anti-tomfoolery.js";
 import analyze from "./acorn-heuristic.js";
@@ -138,7 +139,7 @@ export default {
 				};
 			}
 			else if (e?.message?.includes("Asynchronous execution timed out")) {
-				await sb.Logger.log(
+				await logger.log(
 					"Command.Warning",
 					`$js: Async execution timed out: ${context.user.Name} exceeded async timeout in ${context.channel?.Name ?? "whispers"}`
 				);
@@ -209,10 +210,7 @@ export default {
 		if (result && typeof result === "object") {
 			try {
 				return {
-					reply: JSON.stringify(result, null, 1),
-					meta: {
-						skipWhitespaceCheck: true
-					}
+					reply: JSON.stringify(result, null, 1)
 				};
 			}
 			catch (e) {
@@ -226,10 +224,7 @@ export default {
 		else {
 			return {
 				cooldown,
-				reply: String(result),
-				meta: {
-					skipWhitespaceCheck: true
-				}
+				reply: String(result)
 			};
 		}
 	}),

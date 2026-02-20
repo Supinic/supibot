@@ -1,7 +1,6 @@
 import { randomInt as cryptoRandomInt } from "node:crypto";
-
 import RSSParser from "rss-parser";
-import { parse as chronoParse, type ParsingOption } from "chrono-node";
+import { parse as chronoParse, type ParsingOption, type Component as ChronoComponent } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
 
 import { Filter, type Type as FilterType } from "../classes/filter.js";
@@ -9,6 +8,10 @@ import type { Command, Context as CommandContext, Flag as CommandFlag } from "..
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import type { Platform } from "../platforms/template.js";
+import type { Coordinates } from "./globals.js";
+
+import { getConfig } from "../config.js";
+export const { prefix } = getConfig().modules.commands;
 
 type CommandContextParams = CommandContext["params"];
 
@@ -33,6 +36,7 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 } as const;
 
 export const VIDEO_TYPE_REPLACE_PREFIX = "$";
+export const TWITCH_ANTIPING_CHARACTER = "\u034F";
 
 export const randomInt = (min: number, max: number): number => {
 	if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
@@ -54,7 +58,6 @@ export const randomInt = (min: number, max: number): number => {
 	return (min + roll);
 };
 
-type Coordinates = { lat: number; lng: number; };
 /**
  * Fetches time data for given GPS coordinates and timestamp, if provided.
  */
@@ -93,22 +96,28 @@ export const fetchTimeData = async (data: { coordinates: Coordinates, date?: Sup
 	};
 };
 
+const getFormTypes = (type: "image" | "video") => (type === "image")
+	? { filename: "image.png", mime: "image/png" }
+	: { filename: "video.mp4", mime: "video/mp4" };
+
 type ImageUploadResult = {
 	statusCode: number;
 	link: string | null;
 };
+type UploadOptions = { type?: "image" | "video"; };
+type SmartUploadOptions = UploadOptions & { order?: ("nuuls" | "imgur" | "kappa")[] };
 
 /**
  * Uploads a file to {@link https://imgur.com}
  */
-export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" | "video"; }): Promise<ImageUploadResult> => {
+export const uploadToImgur = async (fileData: Buffer, options: UploadOptions = {}): Promise<ImageUploadResult> => {
 	const { type = "image" } = options;
 	const endpoint = (type === "image") ? "image" : "upload";
-	const filename = (type === "image") ? "image.jpg" : "video.mp4";
+	const { filename, mime } = getFormTypes(type);
 
 	// !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
 	const formData = new FormData();
-	formData.append("image", new Blob([fileData]), filename);
+	formData.append("image", new Blob([fileData.buffer as ArrayBuffer], { type: mime }), filename);
 	formData.append("type", "image");
 	formData.append("title", "Simple upload");
 
@@ -146,9 +155,12 @@ export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" 
 /**
  * Uploads a file to {@link https://i.nuuls.com}
  */
-export const uploadToNuuls = async (fileData: string): Promise<ImageUploadResult> => {
+export const uploadToNuuls = async (fileData: Buffer, options: UploadOptions = {}): Promise<ImageUploadResult> => {
+	const { type = "image" } = options;
+	const { filename, mime } = getFormTypes(type);
+
 	const formData = new FormData();
-	formData.append("attachment", fileData);
+	formData.append("file", new Blob([fileData.buffer as ArrayBuffer], { type: mime }), filename);
 
 	const response = await core.Got.get("GenericAPI")({
 		method: "POST",
@@ -167,6 +179,58 @@ export const uploadToNuuls = async (fileData: string): Promise<ImageUploadResult
 	return {
 		statusCode: response.statusCode,
 		link: (response.ok) ? response.body : null
+	};
+};
+
+/**
+ * Uploads a file to {@link https://i.nuuls.com}
+ */
+export const uploadToKappaLol = async (fileData: Buffer, options: UploadOptions = {}): Promise<ImageUploadResult> => {
+	const { type = "image" } = options;
+	const { filename, mime } = getFormTypes(type);
+
+	const formData = new FormData();
+	formData.append("file", new Blob([fileData.buffer as ArrayBuffer], { type: mime }), filename);
+
+	const response = await core.Got.get("GenericAPI")({
+		method: "POST",
+		throwHttpErrors: false,
+		url: "https://kappa.lol/api/upload",
+		responseType: "text",
+		body: formData,
+		retry: {
+			limit: 0
+		},
+		timeout: {
+			request: 10_000
+		}
+	});
+
+	return {
+		statusCode: response.statusCode,
+		link: (response.ok) ? response.body : null
+	};
+};
+
+const UPLOAD_MAP = {
+	imgur: uploadToImgur,
+	nuuls: uploadToNuuls,
+	kappa: uploadToKappaLol
+} as const;
+const DEFAULT_ORDER = ["nuuls", "kappa", "imgur"] as const;
+
+export const uploadFile = async (fileData: Buffer, options: SmartUploadOptions): Promise<ImageUploadResult> => {
+	const uploadOptions = { type: options.type };
+	for (const item of options.order ?? DEFAULT_ORDER) {
+		const result = await UPLOAD_MAP[item](fileData, uploadOptions);
+		if (result.link) {
+			return result;
+		}
+	}
+
+	return {
+		link: null,
+		statusCode: 500
 	};
 };
 
@@ -196,6 +260,9 @@ export const getPathFromURL = (stringURL: string): string | null => {
 	return `${path}${url.search}`;
 };
 
+const CHRONO_COMPONENTS = [
+	"year", "month", "day", "weekday", "hour", "minute", "second", "millisecond", "meridiem", "timezoneOffset"
+] satisfies readonly ChronoComponent[];
 export const parseChrono = (string: string, referenceDate?: SupiDate, options?: ParsingOption) => {
 	const chronoData = chronoParse(string, referenceDate, options);
 	if (chronoData.length === 0) {
@@ -203,10 +270,12 @@ export const parseChrono = (string: string, referenceDate?: SupiDate, options?: 
 	}
 
 	const [chrono] = chronoData;
+	const isRelative = CHRONO_COMPONENTS.every(i => !chrono.start.isCertain(i));
 	return {
 		date: chrono.start.date(),
 		component: chrono.start,
-		text: chrono.text
+		text: chrono.text,
+		isRelative
 	};
 };
 
@@ -215,19 +284,20 @@ type GoogleAddressComponent = {
 	short_name: string;
 	types: string[];
 };
+type GoogleCoordinates = { lat: number; lng: number; };
 type GoogleGeoData = {
 	address_components: GoogleAddressComponent[];
 	formatted_address: string;
 	geometry: {
 		bounds: {
-			northeast: Coordinates;
-			southwest: Coordinates;
+			northeast: GoogleCoordinates;
+			southwest: GoogleCoordinates;
 		};
-		location: Coordinates;
+		location: GoogleCoordinates;
 		location_type: string;
 		viewport: {
-			northeast: Coordinates;
-			southwest: Coordinates;
+			northeast: GoogleCoordinates;
+			southwest: GoogleCoordinates;
 		};
 	};
 	place_id: string;
@@ -237,7 +307,7 @@ type GoogleGeoData = {
 /**
  * Returns Google Geo Data for given query.
  */
-export const fetchGeoLocationData = async (query: string) => {
+export const fetchGeoLocationData = async (query: string | Coordinates) => {
 	if (!process.env.API_GOOGLE_GEOCODING) {
 		throw new SupiError({
 			message: "No Google geolocation API key configured (API_GOOGLE_GEOCODING)"
@@ -249,19 +319,27 @@ export const fetchGeoLocationData = async (query: string) => {
 		results: GoogleGeoData[];
 	};
 
+	const searchParams: Record<string, string> = {
+		key: process.env.API_GOOGLE_GEOCODING
+	};
+
+	if (typeof query === "string") {
+		searchParams.address = query;
+	}
+	else {
+		searchParams.latlng = `${query.lat},${query.lng}`;
+	}
+
 	const response = await core.Got.get("GenericAPI")<GeoApiResponse>({
 		url: "https://maps.googleapis.com/maps/api/geocode/json",
-		searchParams: {
-			key: process.env.API_GOOGLE_GEOCODING,
-			address: query
-		}
+		searchParams
 	});
 
 	if (response.body.status !== "OK") {
 		return {
 			success: false,
 			cause: response.body.status
-		};
+		} as const;
 	}
 
 	const results = response.body.results;

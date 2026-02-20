@@ -1,3 +1,5 @@
+import { logger } from "../../singletons/logger.js";
+
 export default {
 	Name: "lastseen",
 	Aliases: ["ls"],
@@ -5,7 +7,7 @@ export default {
 	Cooldown: 5000,
 	Description: "For a given user, this command tells you when they were last seen - based on their chat activity.",
 	Flags: ["block","mention","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function lastSeen (context, user) {
 		if (!user) {
@@ -39,7 +41,7 @@ export default {
 			};
 		}
 
-		let date = sb.Logger.getUserLastSeen(targetUser.ID);
+		let date = logger.getUserLastSeen(targetUser.ID);
 		if (!date) {
 			date = await core.Query.getRecordset(rs => rs
 				.select("Last_Message_Posted AS Date")

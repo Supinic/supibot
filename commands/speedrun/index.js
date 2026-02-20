@@ -1,3 +1,6 @@
+import { SupiDate } from "supi-core";
+import { logger } from "../../singletons/logger.js";
+
 let speedrunGotInstance;
 const speedrunGot = (...args) => {
 	speedrunGotInstance ??= core.Got.get("GenericAPI").extend({
@@ -115,7 +118,7 @@ export default {
 				});
 			}
 			catch (e) {
-				await sb.Logger.log("Command.Warning", JSON.stringify({ description: "$speedrun", e }));
+				await logger.log("Command.Warning", JSON.stringify({ description: "$speedrun", e }));
 				return {
 					success: false,
 					reply: `Something went wrong while fetching runs data! Try providing a category, or a different one if you did.`
@@ -198,7 +201,7 @@ export default {
 		}
 
 		const link = run.videos?.links?.[0]?.uri ?? run.weblink;
-		const date = new sb.Date(run.date).format("Y-m-d");
+		const date = new SupiDate(run.date).format("Y-m-d");
 		const time = core.Utils.formatTime(run.times.primary_t);
 		return {
 			reply: core.Utils.tag.trim `

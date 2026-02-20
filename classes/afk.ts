@@ -7,12 +7,11 @@ import User from "./user.js";
 import type Channel from "./channel.js";
 
 import afkDefinitions from "./afk-definitions.json" with { type: "json" };
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const { responses: configResponses } = getConfig();
+const { responses } = afkDefinitions;
 
 export type Status = "afk" | "gn" | "brb" | "shower" | "poop" | "lurk" | "work" | "study" | "nap" | "food";
-
-const { responses } = afkDefinitions;
-const configResponses = config.responses;
 
 type DurationStatus = {
 	interval: [number, number | null];
@@ -33,7 +32,7 @@ type ConstructorData = {
 };
 type DatabaseConstructorData = ConstructorData & { Active: boolean; };
 
-type NewAfkData = ConstructorData & {
+export type NewAfkData = ConstructorData & {
 	Interrupted_ID?: AwayFromKeyboard["ID"] | null;
 };
 
@@ -232,6 +231,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 	static async set (userData: User, data: Partial<NewAfkData> = {}) {
 		const now = new SupiDate();
 		const afkData = {
+			Active: true,
 			User_Alias: userData.ID,
 			Text: data.Text ?? null,
 			Silent: Boolean(data.Silent),

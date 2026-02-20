@@ -1,37 +1,25 @@
-import GptConfig from "./config.json" with { type: "json" };
-import GptCache from "./cache-control.js";
-import { process as processMetrics } from "./metrics.js";
-import { check as checkModeration } from "./moderation.js";
+import { SupiError } from "supi-core";
+import { declare, type Context } from "../../classes/command.js";
+import { typedEntries } from "../../utils/ts-helpers.js";
 
-import { determineOutputLimit, GptTemplate, handleHistoryCommand } from "./gpt-template.js";
+import rawGptConfig from "./config.json" with { type: "json" };
+import { gptConfigSchema } from "./config-schema.js";
+const GptConfig = gptConfigSchema.parse(rawGptConfig);
+
+import GptCache from "./cache-control.js";
+import { determineOutputLimit, handleHistoryCommand, type GptTemplate } from "./gpt-template.js";
 import { GptOpenAI } from "./gpt-openai.js";
 import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
 import { GptDeepInfra } from "./gpt-deepinfra.js";
+import { process as processMetrics } from "./metrics.js";
+import { check as checkModeration } from "./moderation.js";
 
-import { type Context, type CommandDefinition } from "../../classes/command.js";
-import { SupiError } from "supi-core";
-import { typedEntries } from "../../utils/ts-helpers.js";
+import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
+import { logger } from "../../singletons/logger.js";
 
-export type ModelName = keyof typeof GptConfig.models;
-export type ModelData = {
-	url: string;
-	type: "openai" | "deepinfra" | "nexra" | "nexra-complements";
-	default: boolean;
-	disabled?: boolean;
-	disableReason?: string;
-	inputLimit: number;
-	outputLimit: {
-		default: number;
-		maximum: number;
-	};
-	pricePerMtoken: number;
-	subscriberOnly?: boolean;
-	noSystemRole?: boolean;
-	usesCompletionTokens?: boolean;
-	search?: boolean;
-};
+export type ModelName = keyof typeof rawGptConfig.models;
 
-const models = GptConfig.models as Record<ModelName, ModelData>;
+const models = GptConfig.models;
 const defaultModelEntry = typedEntries(models).find(i => i[1].default);
 if (!defaultModelEntry) {
 	throw new SupiError({
@@ -39,8 +27,8 @@ if (!defaultModelEntry) {
 	});
 }
 
-const [defaultModelName, defaultModel] = defaultModelEntry;
-const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
+const defaultModelName = defaultModelEntry[0] as ModelName;
+export const isModelName = (input: string): input is ModelName => Object.keys(GptConfig.models).includes(input);
 
 const handlerMap = {
 	openai: GptOpenAI,
@@ -60,7 +48,7 @@ const params = [
 ] as const;
 export type GptContext = Context<typeof params>;
 
-export default {
+export default declare({
 	Name: "gpt",
 	Aliases: ["chatgpt"],
 	Cooldown: 15000,
@@ -71,7 +59,7 @@ export default {
 	initialize: async function () {
 		isLogTablePresent = await core.Query.isTablePresent("data", "ChatGPT_Log");
 	},
-	Code: (async function chatGPT (context: GptContext, ...args) {
+	Code: (async function chatGPT (context, ...args) {
 		const query = args.join(" ").trim();
 		const historyCommandResult = await handleHistoryCommand(context, query);
 		if (historyCommandResult) {
@@ -104,13 +92,23 @@ export default {
 			modelName = paramsModelName;
 		}
 		else {
-			modelName = defaultModelName;
+			const userDefaultModel = await context.user.getDataProperty("defaultGptModel");
+			if (userDefaultModel) {
+				if (!isModelName(userDefaultModel)) {
+					return {
+					    success: false,
+					    reply: `Your saved model ${userDefaultModel} is no longer valid! Change it to a currently available one.`
+					};
+				}
+
+				modelName = userDefaultModel;
+			}
+			else {
+				modelName = defaultModelName;
+			}
 		}
 
-		const modelData: ModelData = (context.params.model)
-			? models[modelName]
-			: defaultModel;
-
+		const modelData = models[modelName];
 		if (modelData.disabled) {
 			return {
 				success: false,
@@ -126,6 +124,12 @@ export default {
 					reply: "This model is only available to subscribers!"
 				};
 			}
+		}
+		else if (modelData.noTemperature && typeof context.params.temperature === "number") {
+			return {
+			    success: false,
+			    reply: "This model does not support setting a custom temperature!"
+			};
 		}
 
 		const limitCheckResult = await GptCache.checkLimits(context.user);
@@ -162,7 +166,7 @@ export default {
 
 		const { response } = executionResult;
 		if (!response.ok) {
-			const logID = await sb.Logger.log(
+			const logID = await logger.log(
 				"Command.Warning",
 				`ChatGPT API fail: ${response.statusCode} → ${JSON.stringify(response.body)}`,
 				context.channel,
@@ -210,8 +214,11 @@ export default {
 			const completionTokens = Handler.getCompletionTokens(response);
 
 			let emoji = "🤖";
-			if (outputLimitCheck.success && completionTokens !== null && completionTokens >= outputLimitCheck.outputLimit) {
-				emoji = "⏳";
+			if (outputLimitCheck.success) {
+				const { outputLimit } = outputLimitCheck;
+				if (completionTokens !== null && outputLimit !== null && completionTokens >= outputLimit) {
+					emoji = "⏳";
+				}
 			}
 
 			result = {
@@ -227,7 +234,7 @@ export default {
 			row.setValues({
 				User_Alias: context.user.ID,
 				Channel: context.channel?.ID ?? null,
-				Model: modelName,
+				Model: modelData.url,
 				Query: query,
 				Reply: reply,
 				Parameters: (Object.keys(context.params).length > 0)
@@ -257,18 +264,24 @@ export default {
 		const { outputLimit } = GptConfig;
 
 		const modelListHTML = typedEntries(models).map(([name, modelData]) => {
-			const isDefaultEmoji = (modelData.default) ? "✔" : "❌";
-			const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
-			const searchableEmoji = (modelData.search === true) ? "✔" : "❌";
+			const provider = modelData.type;
+			const type = modelData.url.split("/").at(-1) ?? modelData.url;
+			const isDefaultEmoji = (modelData.default) ? "✅" : "-";
+			const isSearchableEmoji = (modelData.search === true) ? "✅" : "-";
+			// const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
 
+			let priceString = String(modelData.pricePerMtoken);
+			if (modelData.flatCost) {
+				priceString += ` + flat ${modelData.flatCost}`;
+			}
 			return core.Utils.tag.trim `
 				<tr>
 					<td>${name}</td>
-					<td>${modelData.type}</td>
-					<td>${modelData.pricePerMtoken}</td>
+					<td>${provider}</td>
+					<td>${type}</td>
+					<td>${priceString}</td>
 					<td>${isDefaultEmoji}</td>
-					<td>${isSubscriberOnlyEmoji}</td>
-					<td>${searchableEmoji}</td>
+					<td>${isSearchableEmoji}</td>
 				</tr>
 			`;
 		}).join("");
@@ -277,10 +290,10 @@ export default {
 			<table>
 				<thead>
 					<th>Name</th>
+					<th>Provider</th>
 					<th>Type</th>
 					<th>Pricing</th>
 					<th>Default</th>
-					<th>Sub only</th>
 					<th>Online search</th>
 				</thead>
 				<tbody>
@@ -324,6 +337,11 @@ export default {
 			`<code>${prefix}gpt model:(name) (your query)</code>`,
 			`<code>${prefix}gpt model:turbo What should I name my goldfish?</code>`,
 			"Queries ChatGPT with your selected model.",
+			"",
+
+			"<h5>Default model</h5>",
+			`If you find yourself using a specific model a lot, you can set it as your "default model", which will then be used whenever you don't provide another model to be used.`,
+			`For more info, see the <a href="/bot/command/detail/set">${prefix}set ${setDefaultModelSubcommand.name}</a> command.`,
 			"",
 
 			"<h5>Temperature</h5>",
@@ -379,4 +397,4 @@ export default {
 			"<b>Warning!</b> This limit only applies to ChatGPT's <b>output</b>! You must control the length of your input query yourself."
 		];
 	}
-} satisfies CommandDefinition;
+});

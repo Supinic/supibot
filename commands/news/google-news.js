@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
 
 const cleanString = (str) => core.Utils.fixHTML(core.Utils.removeHTML(str)).replaceAll(/\s+/g, " ");
@@ -43,7 +44,7 @@ export default {
 		const articles = rss.items.map(i => ({
 			title: (i.title) ? cleanString(i.title.trim()) : null,
 			content: (i.content) ? cleanString(i.content.trim()) : null,
-			published: new sb.Date(i.pubDate).valueOf()
+			published: new SupiDate(i.pubDate).valueOf()
 		}));
 
 		const article = (context.params.latest)
@@ -53,13 +54,17 @@ export default {
 		const { content, title, published } = article;
 		const separator = (title && content) ? " - " : "";
 		const delta = (published)
-			? `(published ${core.Utils.timeDelta(new sb.Date(published))})`
+			? `(published ${core.Utils.timeDelta(new SupiDate(published))})`
 			: "";
 
 		let result;
 		const dashlessTitle = title.replaceAll("-", "").replaceAll(/\s+/g, " ");
-		if (dashlessTitle.includes(content) || content.includes(dashlessTitle)) {
+		const dashlessContent = content.replaceAll("-", "").replaceAll(/\s+/g, " ");
+		if (dashlessTitle.includes(dashlessContent)) {
 			result = `${title ?? ""} ${delta}`;
+		}
+		else if (dashlessContent.includes(dashlessTitle)) {
+			result = `${content ?? ""} ${delta}`;
 		}
 		else {
 			result = `${title ?? ""}${separator}${content ?? ""} ${delta}`;

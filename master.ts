@@ -1,7 +1,6 @@
 import * as supiCore from "supi-core";
 import type { GotInstanceDefinition } from "supi-core";
-
-import config from "./config.json" with { type: "json" };
+import { getConfig } from "./config.js";
 import initializeInternalApi from "./api/index.js";
 
 import commandDefinitions from "./commands/index.js";
@@ -9,17 +8,16 @@ import chatModuleDefinitions from "./chat-modules/index.js";
 import { definitions as gotDefinitions } from "./gots/index.js";
 import initializeCrons from "./crons/index.js";
 
-import Filter from "./classes/filter.js";
-import { Command, CommandDefinition } from "./classes/command.js";
-import User from "./classes/user.js";
-import AwayFromKeyboard from "./classes/afk.js";
-import Banphrase from "./classes/banphrase.js";
-import Channel from "./classes/channel.js";
-import Reminder from "./classes/reminder.js";
-import { ChatModule, ChatModuleDefinition } from "./classes/chat-module.js";
-import { VlcConnector } from "./singletons/vlc-client.js";
-
-import Logger from "./singletons/logger.js";
+import { AwayFromKeyboard } from "./classes/afk.js";
+import { Banphrase } from "./classes/banphrase.js";
+import { Channel } from "./classes/channel.js";
+import { ChatModule, type ChatModuleDefinition } from "./classes/chat-module.js";
+import { Command, type CommandDefinition } from "./classes/command.js";
+import { Filter } from "./classes/filter.js";
+import { MpvClient as MpvClientConstructor } from "./singletons/mpv-client.js";
+import { Reminder } from "./classes/reminder.js";
+import { User } from "./classes/user.js";
+import { logger } from "./singletons/logger.js";
 import { Platform } from "./platforms/template.js";
 
 type PopulateOptions = {
@@ -29,22 +27,6 @@ type PopulateOptions = {
 };
 
 interface GlobalSb {
-	/** @deprecated use `import { SupiDate } from "supi-core"` instead */
-	Date: typeof supiCore.SupiDate;
-	/** @deprecated use `import { SupiError } from "supi-core"` instead */
-	Error: typeof supiCore.SupiError;
-
-	/** @deprecated use `core.Got` instead */
-	Got: typeof supiCore.Got;
-	/** @deprecated use `core.Metrics` instead */
-	Metrics: supiCore.Metrics;
-	/** @deprecated use `core.Cache` instead */
-	Cache: supiCore.Cache;
-	/** @deprecated use `core.Query` instead */
-	Query: supiCore.Query;
-	/** @deprecated use `core.Utils` instead */
-	Utils: supiCore.Utils;
-
 	API: ReturnType<typeof initializeInternalApi>;
 	AwayFromKeyboard: typeof AwayFromKeyboard;
 	Banphrase: typeof Banphrase;
@@ -52,11 +34,10 @@ interface GlobalSb {
 	ChatModule: typeof ChatModule;
 	Command: typeof Command;
 	Filter: typeof Filter;
-	Logger: Logger;
 	Platform: typeof Platform;
 	Reminder: typeof Reminder;
 	User: typeof User;
-	VideoLANConnector: VlcConnector | null;
+	MpvClient: MpvClientConstructor | null;
 }
 interface GlobalCore {
 	Got: typeof supiCore.Got;
@@ -67,19 +48,9 @@ interface GlobalCore {
 }
 
 declare global {
-	// eslint-disable-next-line no-var
 	var sb: GlobalSb;
-	// eslint-disable-next-line no-var
 	var core: GlobalCore;
 }
-
-type VlcConfig = {
-	vlcBaseUrl: string | null;
-	vlcPassword: string | null;
-	vlcPort: number | null;
-	vlcUrl: string | null;
-	vlcUsername: string | null;
-};
 
 function filterModuleDefinitions <T extends "name" | "Name", U extends { [K in T]: string; }> (
 	property: T,
@@ -120,6 +91,7 @@ const MODULE_INITIALIZE_ORDER = [
 	[ChatModule]
 ] as const;
 
+const config = getConfig();
 const platformsConfig = config.platforms;
 if (platformsConfig.length === 0) {
 	throw new Error("No platforms configured! Supibot will now exit.");
@@ -148,38 +120,6 @@ globalThis.core = {
 	Utils: new supiCore.Utils()
 };
 
-// @ts-expect-error Assignment is partial due to legacy globals split */
-globalThis.sb = {
-	get Date () {
-		// console.warn("Deprecated sb.Date access");
-		return supiCore.Date;
-	},
-	get Error () {
-		// console.warn("Deprecated sb.Error access");
-		return supiCore.Error;
-	},
-	get Got () {
-		console.warn("Deprecated sb.Got access");
-		return supiCore.Got;
-	},
-	get Query () {
-		console.warn("Deprecated sb.Query access");
-		return core.Query;
-	},
-	get Cache () {
-		console.warn("Deprecated sb.Cache access");
-		return core.Cache;
-	},
-	get Metrics () {
-		console.warn("Deprecated sb.Metrics access");
-		return core.Metrics;
-	},
-	get Utils () {
-		console.warn("Deprecated sb.Utils access");
-		return core.Utils;
-	}
-};
-
 console.timeEnd("supi-core");
 
 const platforms: Set<Platform> = new Set();
@@ -204,28 +144,22 @@ for (let i = 0; i < MODULE_INITIALIZE_ORDER.length; i++) {
 	await Promise.all(promises);
 }
 
-// Initialize the VLC module if configured
-let VideoLANConnector;
-const { vlcUrl, vlcUsername, vlcPassword, vlcPort } = config.local as Partial<VlcConfig>;
-if (vlcUrl) {
-	VideoLANConnector = new VlcConnector({
-		host: vlcUrl,
-		port: vlcPort ?? 8080,
-		username: vlcUsername ?? "",
-		password: vlcPassword ?? "",
-		running: true
+// Initialize the mpv client if configured
+let MpvClient;
+const { listenerAddress, listenerPort } = config.local ?? {};
+if (listenerAddress) {
+	MpvClient = new MpvClientConstructor({
+		host: listenerAddress,
+		port: listenerPort ?? 8080
 	});
 }
 else {
-	console.debug("Missing VLC configuration (vlcUrl and/or vlcBaseUrl), module creation skipped");
-	VideoLANConnector = null;
+	console.debug("Missing MPV configuration (listenerAddress), module creation skipped");
+	MpvClient = null;
 }
 
 globalThis.sb = {
-	...sb,
-
 	Platform,
-
 	Filter,
 	Command,
 	User,
@@ -234,25 +168,19 @@ globalThis.sb = {
 	Channel,
 	Reminder,
 	ChatModule,
-
-	Logger: new Logger(),
-	VideoLANConnector,
-
+	MpvClient,
 	API: initializeInternalApi()
 };
 
 console.timeEnd("basic bot modules");
 console.time("chat modules");
 
+void logger.start();
 supiCore.Got.importData(filterModuleDefinitions("name", gotDefinitions as GotInstanceDefinition[], config.modules.gots));
 Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands));
 await ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"]));
 
 console.timeEnd("chat modules");
-
-console.time("crons");
-initializeCrons(config.modules.crons);
-console.timeEnd("crons");
 
 core.Metrics.registerCounter({
 	name: "supibot_messages_sent_total",
@@ -283,6 +211,10 @@ if (promises.length === 0) {
 
 await Promise.all(promises);
 
+console.time("crons");
+initializeCrons(config.modules.crons);
+console.timeEnd("crons");
+
 console.debug("Connected to all platforms. Ready!");
 console.groupEnd();
 
@@ -295,7 +227,7 @@ process.on("unhandledRejection", (reason) => {
 		? "External"
 		: "Internal";
 
-	void sb.Logger.logError("Backend", reason, {
+	void logger.logError("Backend", reason, {
 		origin,
 		context: {
 			cause: "UnhandledPromiseRejection"

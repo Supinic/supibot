@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "GitHub",
 	optionsType: "function",
@@ -16,5 +18,5 @@ export default {
 		};
 	}),
 	parent: "Global",
-	description: null
-};
+	description: "Sets up a GitHub instance with the API key, if available. Otherwise reverts to no-auth."
+} satisfies GotInstanceDefinition;

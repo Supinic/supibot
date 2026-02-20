@@ -38,7 +38,7 @@ export default {
 			const emoji = await context.getBestAvailableEmote(["supiniScience", "peepoZ", ":z"], "😐");
 			return {
 				success: false,
-				reply: `I don't eat cookies! ${emoji} 🍪 Sugar is bad for my circuits...`
+				reply: `I don't eat cookies! ${emoji} Sugar is bad for my circuits...`
 			};
 		}
 

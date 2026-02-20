@@ -1,9 +1,9 @@
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 import type { Status as AfkStatus } from "../../classes/afk.js";
 import afkDefinitions from "../../classes/afk-definitions.json" with { type: "json" };
 import { SupiError } from "supi-core";
 
-type Invocation = {
+type AfkInvocation = {
 	name: AfkStatus;
 	specialSuffix?: "foodEmojis";
 	aliases?: string[];
@@ -12,17 +12,17 @@ type Invocation = {
 	noTextString: string;
 };
 
-const invocations = afkDefinitions.invocations as Invocation[];
+const invocations = afkDefinitions.invocations as AfkInvocation[];
 const { specialSuffixes } = afkDefinitions;
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;
 
-export default {
+export default declare({
 	Name: "afk",
 	Aliases: ["gn", "brb", "shower", "food", "lurk", "poop", "💩", "work", "study", "nap"],
 	Cooldown: 10_000,
 	Description: "Flags you as AFK. Supports a custom AFK message.",
 	Flags: ["pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function afk (context, ...args) {
 		if (context.privateMessage && sb.AwayFromKeyboard.get(context.user)) {
@@ -32,7 +32,7 @@ export default {
 			};
 		}
 
-		const invocation = context.invocation as AfkStatus; // @todo remove type cast when CommandDefinition is fully generic
+		const invocation = context.invocation;
 		const target = invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
 		if (!target) {
 			throw new SupiError({
@@ -102,4 +102,4 @@ export default {
 
 		`and more - check the aliases`
 	]
-} satisfies CommandDefinition;
+});

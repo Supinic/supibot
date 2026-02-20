@@ -35,6 +35,8 @@ export default {
 		const actualRepeats = Math.min(amount, maximumRepeats);
 
 		return {
+			success: true,
+			hasExternalInput: true,
 			reply: query.repeat(actualRepeats)
 		};
 	}

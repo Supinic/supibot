@@ -1,12 +1,16 @@
-// @ts-expect-error Module has no @types repository associated with it. Will use local interface as definition
+import * as z from "zod";
+
+// @ts-expect-error Module has no @types repository associated with it. Will use a local interface as definition
 import { Client as IrcClient } from "irc-framework";
-import { EventEmitter } from "node:events";
+import type { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
-import { Platform, BaseConfig, PrepareMessageOptions } from "./template.js";
+import { BasePlatformConfigSchema } from "./schema.js";
+import { Platform, type PrepareMessageOptions } from "./template.js";
 import { User } from "../classes/user.js";
-import { Channel, Like as ChannelLike } from "../classes/channel.js";
+import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Command } from "../classes/command.js";
+import { logger } from "../singletons/logger.js";
 
 const DEFAULT_LOGGING_CONFIG = {
 	messages: true,
@@ -18,23 +22,27 @@ type HandleCommandData = {
 	privateMessage: boolean;
 };
 
-export interface IrcConfig extends BaseConfig {
-	platform: {
-		url: string;
-		port?: number;
-		secure?: boolean;
-		tls?: boolean;
-		authentication: {
-			type: string;
-			envVariable: string;
-			user: string;
-		};
-	};
-	logging: {
-		messages?: boolean;
-		whispers?: boolean;
-	};
-}
+export const IrcConfigSchema = BasePlatformConfigSchema.extend({
+	platform: z.object({
+		url: z.string(),
+		port: z.int()
+			.min(1)
+			.max(65536)
+			.optional(),
+		secure: z.boolean().optional(),
+		tls: z.boolean().optional(),
+		authentication: z.object({
+			type: z.string(),
+			envVariable: z.string(),
+			user: z.string()
+		})
+	}),
+	logging: z.object({
+		messages: z.boolean().optional(),
+		whispers: z.boolean().optional()
+	})
+});
+export type IrcConfig = z.infer<typeof IrcConfigSchema>;
 
 type IrcConnectOptions = {
 	nick: string;
@@ -75,7 +83,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			resultConfig.logging.whispers = DEFAULT_LOGGING_CONFIG.whispers;
 		}
 
-		super("irc", resultConfig);
+		super("irc", IrcConfigSchema.parse(resultConfig));
 
 		if (!this.host) {
 			throw new SupiError({
@@ -264,14 +272,10 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			this.resolveUserMessage(channelData, userData, message);
 
 			if (channelData.Logging.has("Meta")) {
-				await sb.Logger.updateLastSeen({
-					userData,
-					channelData,
-					message
-				});
+				logger.updateLastSeen({ userData, channelData, message });
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(message, userData, channelData);
+				await logger.push(message, userData, channelData);
 			}
 
 			channelData.events.emit("message", {
@@ -300,7 +304,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		}
 		else {
 			if (this.logging.whispers) {
-				await sb.Logger.push(message, userData, null, this);
+				await logger.push(message, userData, null, this);
 			}
 
 			this.resolveUserMessage(null, userData, message);

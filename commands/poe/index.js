@@ -7,7 +7,7 @@ export default {
 	Cooldown: 7500,
 	Description: "A collection of various Path of Exile-related commands. Check the extended help on the website for more info.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function poe (context, type, ...args) {
 		type = (type ?? "league").toLowerCase();

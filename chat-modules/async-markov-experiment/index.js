@@ -1,4 +1,4 @@
-const TWITCH_ANTIPING_CHARACTER = "\u{E0000}";
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 
 export default {
 	Name: "async-markov-experiment",

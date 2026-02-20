@@ -1,3 +1,4 @@
+import { SupiDate } from "supi-core";
 import { getTwitchGameID } from "../../utils/command-utils.js";
 const EARLIEST_CLIP_DATE = new Date("2011-01-01");
 
@@ -53,7 +54,7 @@ export default {
 			}
 		}
 
-		const now = new sb.Date();
+		const now = new SupiDate();
 		const dateRange = [EARLIEST_CLIP_DATE, now];
 
 		if (context.params.dateFrom) {
@@ -188,7 +189,7 @@ export default {
 			};
 		}
 
-		const delta = core.Utils.timeDelta(new sb.Date(clip.created_at));
+		const delta = core.Utils.timeDelta(new SupiDate(clip.created_at));
 		return {
 			reply: `"${clip.title}" - ${clip.duration} sec, clipped by ${clip.creator_name}, ${delta}: ${clip.url}`
 		};

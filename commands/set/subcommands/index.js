@@ -1,5 +1,6 @@
 import AmbassadorSubcommand from "./ambassador.js";
 import BirthdaySubcommand from "./birthday.js";
+import DefaultGptModelSubcommand from "./default-gpt-model.js";
 import DiscordSubcommand from "./discord.js";
 import GachiSubcommand from "./gachi.js";
 import LanguageSubcommand from "./language.js";
@@ -19,6 +20,7 @@ import TwitchLottoSubcommands from "./twitch-lotto.js";
 export default [
 	AmbassadorSubcommand,
 	BirthdaySubcommand,
+	DefaultGptModelSubcommand,
 	DiscordSubcommand,
 	GachiSubcommand,
 	LanguageSubcommand,

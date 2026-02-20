@@ -1,10 +1,13 @@
+import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { CytubeConnector, type EmoteObject, type UserObject, type QueueObject, type VideoObject } from "cytube-connector";
 
-import { Platform, BaseConfig, MirrorOptions } from "./template.js";
+import { Platform, type MirrorOptions } from "./template.js";
+import { BasePlatformConfigSchema } from "./schema.js";
 import type { Channel } from "../classes/channel.js";
 import type { User } from "../classes/user.js";
-import { Emote } from "../@types/globals.js";
+import type { Emote } from "../utils/globals.js";
+import { logger } from "../singletons/logger.js";
 
 type PlaylistObject = VideoObject | {
 	media: VideoObject["media"];
@@ -141,14 +144,14 @@ class CytubeClient {
 				});
 
 				if (this.channelData.Logging.has("Meta")) {
-					await sb.Logger.updateLastSeen({
+					logger.updateLastSeen({
 						userData,
 						channelData: this.channelData,
 						message: msg
 					});
 				}
 				if (this.platform.logging.messages && this.channelData.Logging.has("Lines")) {
-					await sb.Logger.push(msg, userData, this.channelData);
+					await logger.push(msg, userData, this.channelData);
 				}
 
 				if (this.channelData.Mode === "Read") {
@@ -171,7 +174,7 @@ class CytubeClient {
 			}
 			else {
 				if (this.platform.logging.whispers) {
-					await sb.Logger.push(msg, userData, null, this.platform);
+					await logger.push(msg, userData, null, this.platform);
 				}
 
 				this.platform.resolveUserMessage(null, userData, msg);
@@ -414,7 +417,8 @@ class CytubeClient {
 			name: emote.name,
 			type: "cytube",
 			global: false,
-			animated: Boolean(emote.image && emote.image.includes(".gif"))
+			animated: Boolean(emote.image && emote.image.includes(".gif")),
+			zeroWidth: false
 		};
 	}
 }
@@ -427,15 +431,16 @@ const DEFAULT_PLATFORM_CONFIG = {
 	messageDelayThreshold: 30000
 };
 
-export interface CytubeConfig extends BaseConfig {
-	platform: {
-		messageDelayThreshold?: number;
-	};
-	logging: {
-		messages?: boolean;
-		whispers?: boolean;
-	};
-}
+export const CytubeConfigSchema = BasePlatformConfigSchema.extend({
+	platform: z.object({
+		messageDelayThreshold: z.int().positive().optional()
+	}),
+	logging: z.object({
+		messages: z.boolean().optional(),
+		whispers: z.boolean().optional()
+	})
+});
+export type CytubeConfig = z.infer<typeof CytubeConfigSchema>;
 
 export class CytubePlatform extends Platform<CytubeConfig> {
 	private readonly clients: Map<Channel["ID"], CytubeClient> = new Map();
@@ -452,7 +457,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			resultConfig.platform.messageDelayThreshold = DEFAULT_PLATFORM_CONFIG.messageDelayThreshold;
 		}
 
-		super("cytube", resultConfig);
+		super("cytube", CytubeConfigSchema.parse(resultConfig));
 	}
 
 	async connect () {

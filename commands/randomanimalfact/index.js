@@ -13,7 +13,7 @@ export default {
 	Cooldown: 10000,
 	Description: "Posts a random fact about a selected animal type.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function randomAnimalFact (context, input) {
 		const type = INVOCATIONS_MAP[context.invocation] ?? input?.toLowerCase() ?? null;

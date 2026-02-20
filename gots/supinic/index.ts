@@ -1,3 +1,5 @@
+import type { GotInstanceDefinition } from "supi-core";
+
 export default {
 	name: "Supinic",
 	optionsType: "object",
@@ -8,5 +10,5 @@ export default {
 		}
 	},
 	parent: "Global",
-	description: null
-};
+	description: "Instance bound to the supinic.com API, used in various project-related commands"
+} satisfies GotInstanceDefinition;

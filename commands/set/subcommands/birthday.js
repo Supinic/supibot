@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	name: "birthday",
 	aliases: ["bday"],
@@ -15,7 +17,7 @@ export default {
 			};
 		}
 
-		const date = new sb.Date(query);
+		const date = new SupiDate(query);
 		if (Number.isNaN(date.valueOf())) {
 			return {
 				success: false,

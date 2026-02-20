@@ -1,4 +1,4 @@
-import { RssEventDefinition } from "../generic-event.js";
+import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: ".NET",
@@ -14,5 +14,8 @@ export default {
 	cacheKey: "dotnet-blog-last-publish-date",
 	subName: ".NET devblog",
 	type: "rss",
-	url: "https://devblogs.microsoft.com/dotnet/feed"
+	url: "https://devblogs.microsoft.com/dotnet/feed",
+	options: {
+		ignoredCategories: ["copilot"]
+	}
 } satisfies RssEventDefinition;

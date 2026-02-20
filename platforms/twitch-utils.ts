@@ -1,8 +1,8 @@
 import { SupiError } from "supi-core";
 
-import { TwitchPlatform } from "./twitch.js";
-import { User } from "../classes/user.js";
-import { Channel } from "../classes/channel.js";
+import type { TwitchPlatform } from "./twitch.js";
+import type { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
 
 const { env } = globalThis.process;
 
@@ -37,20 +37,6 @@ export type RevokedSubscription = Subscription & {
 	status: "user_removed" | "authorization_revoked" | "version_removed";
 }
 export type SubscriptionTier = "1000" | "2000" | "3000" | "Prime";
-export type BroadcasterSubscription = {
-	broadcaster_id: string;
-	broadcaster_login: string;
-	broadcaster_name: string;
-	gifter_id: string;
-	gifter_login: string;
-	gifter_name: string;
-	is_gift: boolean;
-	plan_name: string;
-	tier: Omit<SubscriptionTier, "Prime">;
-	user_id: string;
-	user_name: string;
-	user_login: string;
-};
 
 export interface BaseWebsocketMessage {
 	metadata: {
@@ -747,7 +733,7 @@ const fetchToken = async () => {
 };
 
 type MessageData = MessageNotification["payload"]["event"]["message"];
-const emitRawUserMessageEvent = (username: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
+const emitRawUserMessageEvent = (username: string, userId: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
 	if (!username || !channelName) {
 		throw new SupiError({
 			message: "No username or channel name provided for raw event",
@@ -767,8 +753,10 @@ const emitRawUserMessageEvent = (username: string, channelName: string, platform
 			user: null,
 			channel: channelData,
 			platform,
+			messageData: message,
 			raw: {
-				user: username
+				user: username,
+				userId
 			}
 		});
 	}
@@ -803,6 +791,25 @@ const initSubCacheCheckInterval = () => {
 
 const sanitizeMessage = (string: string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");
 
+const ensureInitialChannelId = async (platform: TwitchPlatform) => {
+	const initialChannel = process.env.INITIAL_TWITCH_CHANNEL;
+	if (!initialChannel) {
+		return;
+	}
+
+	const channelData = sb.Channel.get(initialChannel, platform);
+	if (!channelData || channelData.Specific_ID) {
+		return;
+	}
+
+	const channelId = await platform.getUserID(initialChannel);
+	if (!channelId) {
+		return;
+	}
+
+	await channelData.saveProperty("Specific_ID", channelId);
+};
+
 export default {
 	getConduitId,
 	getAppAccessToken,
@@ -823,5 +830,6 @@ export default {
 	populateUserChannelActivity,
 	initTokenCheckInterval,
 	initSubCacheCheckInterval,
-	sanitizeMessage
+	sanitizeMessage,
+	ensureInitialChannelId
 };

@@ -1,11 +1,11 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
-
-import config from "../../config.json" with { type: "json" };
-import type { CommandDefinition } from "../../classes/command.js";
-
+import { declare } from "../../classes/command.js";
 const shell = promisify(exec);
-const { basePath } = config;
+
+import { getConfig } from "../../config.js";
+import { hasKey } from "../../utils/ts-helpers.js";
+const { basePath } = getConfig();
 
 const restartMethods = {
 	pull: {
@@ -15,30 +15,27 @@ const restartMethods = {
 			`git -C ${basePath} pull origin master`
 		]
 	},
-	prodUpdate: {
-		message: "yarn prod-update",
-		commands: ["yarn prod-update"]
+	yarn: {
+		message: "yarn",
+		commands: ["COREPACK_ENABLE_DOWNLOAD_PROMPT=0 yarn"]
 	},
 	build: {
 		message: "yarn build",
 		commands: ["yarn build"]
 	}
 } as const;
-const isRestartMethod = (input: string): input is keyof typeof restartMethods => (
-	Object.keys(restartMethods).includes(input)
-);
 
-export default {
+export default declare({
 	Name: "restart",
 	Aliases: null,
 	Cooldown: 10_000,
 	Description: "Restarts the bot. Optionally, also pulls git changes and/or upgrades packages via yarn.",
 	Flags: ["system", "whitelist"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: "Only available to administrators or helpers!",
 	Code: async function restart (context, ...commands) {
 		for (const name of commands) {
-			if (!isRestartMethod(name)) {
+			if (!hasKey(restartMethods, name)) {
 				return {
 					success: false,
 					reply: `Incorrect reload command provided! Use one of: ${Object.keys(restartMethods).join(", ")}`
@@ -64,7 +61,7 @@ export default {
 		};
 	},
 	Dynamic_Description: () => [
-		"Restarts the process of Supibot or the supinic.com website.",
+		"Exits the bot process, relying on a wrapping service to restart it.",
 		"Only usable by administrators and whitelisted users.",
 		"The subcommands, except for \"all\" can be combined between each other",
 		"",
@@ -77,8 +74,8 @@ export default {
 		"Runs <code>git pull</code>, then exits the process.",
 		"",
 
-		"<code>$restart bot prodUpdate</code>",
-		"Runs <code>yarn prod-update</code>, then exits the process.",
+		"<code>$restart yarn</code>",
+		"Runs <code>yarn</code>, then exits the process.",
 		"",
 
 		"<code>$restart bot build</code>",
@@ -86,6 +83,6 @@ export default {
 		"",
 
 		"<code>$restart bot all</code>",
-		"Combination of all commands in this order: pull, prod-update, build, exit."
+		"Combination of all commands in this order: pull, yarn, build, exit."
 	]
-} satisfies CommandDefinition;
+});

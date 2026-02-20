@@ -1,7 +1,27 @@
-import { CustomEventDefinition } from "../generic-event.js";
+import * as z from "zod";
+import type { CustomEventDefinition } from "../generic-event.js";
+import { SupiError } from "supi-core";
+import { logger } from "../../../singletons/logger.js";
+
+const jagexRssSchema = z.object({
+	newsItems: z.array(z.object({
+		newsId: z.int(),
+		categoryId: z.int(),
+		time: z.string(), // timestamp (with millis)
+		formattedDate: z.string(), // DD (full month) YYYY
+		title: z.string(),
+		link: z.string(),
+		summary: z.string(),
+		summaryImageLink: z.string(),
+		largeMediaType: z.int(),
+		sticky: z.boolean()
+	}))
+});
 
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
-const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id";
+const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id-list";
+const SLIDING_CACHE_SIZE = 20000;
+let repeatedMessageCheck: string | undefined;
 
 type OsrsResponse = {
 	newsItems: {
@@ -17,7 +37,7 @@ type OsrsResponse = {
 export default {
 	name: "OSRS",
 	aliases: [],
-	notes: "Every 5 minutes, Supibot checks for news on the Old School Runescape website. If a new article is detected, you will be notified in the channel you subscribed in.",
+	notes: "Every minute, Supibot checks for news on the Old School Runescape website. If a new article is detected, you will be notified in the channel you subscribed in.",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new OSRS article is published.",
@@ -38,56 +58,60 @@ export default {
 			return null;
 		}
 
-		const newsItems = response.body.newsItems.filter(i => !i.sticky);
-		const previousArticleId = (await core.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) as number | null) ?? 0;
+		const { newsItems } = jagexRssSchema.parse(response.body);
+		const previousArticleIdList = (await core.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) as number[] | null) ?? [];
 
-		// Huge assumption: Jagex will release new articles on "top" of the JSON feed
-		const previousArticleIndex = newsItems.findIndex(i => i.newsId === previousArticleId);
-		const logObject = {
-			newsItems,
-			previousArticleId,
-			previousArticleIndex
-		};
+		const previousArticleIds = new Set(previousArticleIdList);
+		const currentArticleIds = new Set(newsItems.map(i => i.newsId));
 
-		// Ignore if no previous article found - save the latest one
-		if (previousArticleIndex === -1) {
-			const topArticleId = newsItems[0].newsId;
-			await core.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, topArticleId, {
-				expiry: 14 * 864e5 // 14 days
-			});
-			//
-			// await sb.Logger.log("System.Request", JSON.stringify({
-			// 	...logObject,
-			// 	topArticleId
-			// }));
+		const cacheArray = [...previousArticleIds.union(currentArticleIds)]
+			.sort((a, b) => b - a)
+			.slice(0, SLIDING_CACHE_SIZE);
 
-			return null;
-		}
-		// Ignore if feed head equals to the latest article (no new articles)
-		else if (previousArticleIndex === 0) {
-			// await sb.Logger.log("System.Request", JSON.stringify(logObject));
-			return null;
-		}
-
-		const eligibleArticles = newsItems.slice(0, previousArticleIndex);
-		const latestArticleId = eligibleArticles[0].newsId;
-
-		await core.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, latestArticleId, {
+		await core.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, cacheArray, {
 			expiry: 14 * 864e5 // 14 days
 		});
 
-		// Safeguard for accidental multi-article notification
-		if (eligibleArticles.length > 3) {
+		// Grab article IDs not in the previous list
+		const newArticleIds = currentArticleIds.difference(previousArticleIds);
+		if (newArticleIds.size === 0) {
+			// If no new articles, exit out
 			return null;
 		}
 
-		const articleString = eligibleArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
-		const noun = (eligibleArticles.length === 1) ? "article" : "articles";
+		const intersection = previousArticleIds.intersection(currentArticleIds);
+		if (intersection.size === 0) {
+			// If there is no overlap at all between previous and current news IDs, exit out
+			// This means the previous set is either very outdated or not initialized at all
+			return null;
+		}
 
-		await sb.Logger.log("System.Request", JSON.stringify({
-			...logObject,
-			latestArticleId,
-			eligibleArticles,
+		const newArticles = newsItems.filter(i => newArticleIds.has(i.newsId));
+		if (newArticles.length === 0) {
+			// Should never happen due to conditions above
+			throw new SupiError({
+			    message: "Assert error: No eligible articles filtered",
+				args: { ids: [...newArticleIds] }
+			});
+		}
+
+		// Safeguard for accidental multi-article notification
+		if (newArticles.length > 3) {
+			return null;
+		}
+
+		const articleString = newArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
+		if (repeatedMessageCheck === articleString) { // Fallback spam protection
+			return null;
+		}
+
+		repeatedMessageCheck = articleString;
+
+		const noun = (newArticles.length === 1) ? "article" : "articles";
+		await logger.log("System.Request", JSON.stringify({
+			previousArticleIds: [...previousArticleIds],
+			newArticleIds: [...newArticleIds],
+			currentArticleIds: [...currentArticleIds],
 			articleString
 		}));
 

@@ -1,4 +1,4 @@
-import { RssEventDefinition } from "../generic-event.js";
+import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "V8",

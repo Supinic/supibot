@@ -1,3 +1,5 @@
+import { logger } from "../../../singletons/logger.js";
+
 export default {
 	name: "reminder",
 	aliases: ["remind", "reminders"],
@@ -15,10 +17,6 @@ export default {
 		.single()
 		.flat("ID")
 	),
-	set: () => ({
-		success: false,
-		reply: `Use the $remind command instead!`
-	}),
 	unset: async (context, ID) => {
 		const row = await core.Query.getRow("chat_data", "Reminder");
 		await row.load(ID, true);
@@ -56,7 +54,7 @@ export default {
 
 			const reminder = sb.Reminder.get(ID);
 			if (!reminder) {
-				const logID = await sb.Logger.log(
+				const logID = await logger.log(
 					"Command.Fail",
 					`Can't find a reminder to unset: ${ID}`,
 					context.channel,

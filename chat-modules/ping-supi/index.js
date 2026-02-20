@@ -1,3 +1,5 @@
+import { SupiDate } from "supi-core";
+
 export default {
 	Name: "ping-supi",
 	Events: ["message"],
@@ -11,7 +13,7 @@ export default {
 		const strictRegex = /\bsupinic(?!\.com)\b/i;
 
 		const skippedUsers = [1, 1127, 582108, 8697460, 12182780, 17865963];
-		const now = sb.Date.now();
+		const now = SupiDate.now();
 
 		if (now > this.data.timeout && relaxedRegex.test(message) && !skippedUsers.includes(user?.ID)) {
 			if (channel) {

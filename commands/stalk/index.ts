@@ -1,18 +1,18 @@
-import { SupiDate, SupiError } from "supi-core";
-import type { Context, CommandDefinition } from "../../classes/command.js";
-import type { IvrUserData } from "../../@types/globals.js";
+import { type SupiDate, SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
+import { ivrUserDataSchema } from "../../utils/schemas.js";
 
 const omittedBanReasons = new Set(["TOS_TEMPORARY", "TOS_INDEFINITE"]);
 
-export default {
+export default declare({
 	Name: "stalk",
 	Aliases: null,
 	Cooldown: 5000,
 	Description: "For a given user, attempts to find the message they last sent in chat, plus the channel and time when they posted it.",
 	Flags: ["block","external-input","mention","opt-out","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
-	Code: (async function stalk (context: Context<[]>, user) {
+	Code: (async function stalk (context, user) {
 		if (!user) {
 			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
 			return {
@@ -75,7 +75,7 @@ export default {
 		// Automated protection of the bot from being banned:
 		// Do not allow stalking of banned Twitch users in Twitch channels - available in Twitch whispers and other platforms.
 		if (targetUser.Twitch_ID && context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
-			const response = await core.Got.get("IVR")<IvrUserData[] | undefined>({
+			const response = await core.Got.get("IVR")({
 				url: "v2/twitch/user",
 				searchParams: {
 					id: targetUser.Twitch_ID
@@ -84,7 +84,7 @@ export default {
 
 			// Only refuse to send the message if the ban type ("reason") is a TOS violation.
 			// Memo: possibly also refuse to send when type is `DEACTIVATED`?
-			const userInfo = response.body?.[0];
+			const userInfo = ivrUserDataSchema.parse(response.body).at(0);
 			if (userInfo && userInfo.banned && omittedBanReasons.has(userInfo.banReason)) {
 				return {
 					success: false,
@@ -101,7 +101,7 @@ export default {
 		let channelString = stalkChannelData.getFullName();
 		let messageString = stalkData.Text;
 		const isStalkPrevented = await stalkChannelData.getDataProperty("stalkPrevention");
-		if (isStalkPrevented) {
+		if (isStalkPrevented && context.channel !== stalkChannelData) {
 			channelString = `${stalkChannelData.Platform.name}-[EXPUNGED]`;
 			messageString = "[EXPUNGED]";
 		}
@@ -127,4 +127,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

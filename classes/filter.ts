@@ -1,23 +1,25 @@
 import { SupiError } from "supi-core";
 import { TemplateWithId } from "./template.js";
 
-import { Channel, isChannel, privateMessageChannelSymbol } from "./channel.js";
-import User from "./user.js";
-import type Platform from "../platforms/template.js";
+import { type Channel, isChannel, privateMessageChannelSymbol } from "./channel.js";
+import { User } from "./user.js";
+import type { Platform } from "../platforms/template.js";
 import type { Command } from "./command.js";
-import type { XOR } from "../@types/globals.d.ts";
+import type { XOR } from "../utils/globals.js";
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
 
 export type Type =
 	"Blacklist" | "Whitelist" | "Opt-out" | "Block" | "Unping" | "Unmention" |
 	"Cooldown" | "Flags" | "Offline-only" | "Online-only" | "Arguments" | "Reminder-prevention";
 
 type CooldownData = XOR<{ multiplier: number }, { override: number, respect?: boolean }>;
-export type DbArgumentDescriptor = {
+export type FilterArgumentDescriptor = {
 	index?: number | string;
 	range?: number[] | string[] | string;
 	regex?: string | string[] | RegExp;
 	string?: string;
 };
+export type FilterArgumentDatabaseShape = { args: FilterArgumentDescriptor[] };
 
 type StringArgumentDescriptor = XOR<{ string: string; }, { regex: RegExp; }>;
 type NumberArgumentDescriptor = XOR<{ index: number; }, { range: [number, number]; }>;
@@ -259,7 +261,7 @@ export class Filter extends TemplateWithId {
 		}
 
 		if (this.Type === "Arguments") {
-			const { args } = data as { args?: DbArgumentDescriptor[] };
+			const { args } = data as Partial<FilterArgumentDatabaseShape>;
 			if (!args) {
 				console.warn("Invalid Args filter - missing args object");
 				return null;
@@ -648,6 +650,8 @@ export class Filter extends TemplateWithId {
 		return { success: true };
 	}
 
+	// @todo 1) change options.Data to be passed as object
+	// @todo 2) add data validation for specific Filter types (e.g. Arguments, Cooldown)
 	static async create (options: CreateData) {
 		const data = {
 			Platform: options.Platform ?? null,
@@ -713,8 +717,8 @@ export class Filter extends TemplateWithId {
 		for (const user of unpingUsers) {
 			// Only unping usernames if they are not followed by a specific set of characters.
 			// This refers to "." and "@" - these are usually parts of URLs or e-mail addresses.
-			const regex = new RegExp(`(?<![\\/=])\\b(${user.Name})(?![.@]\\w+)`, "gi");
-			string = string.replace(regex, (name: string) => `${name[0]}\u{E0000}${name.slice(1)}`);
+			const regex = new RegExp(String.raw `(?<![\/=])\b(${user.Name})(?![.@]\w+)`, "gi");
+			string = string.replace(regex, (name: string) => `${name[0]}${TWITCH_ANTIPING_CHARACTER}${name.slice(1)}`);
 		}
 
 		return string;

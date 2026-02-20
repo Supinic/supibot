@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import subcommands from "./subcommands/index.js";
 const subcommandNames = subcommands.map(i => i.name);
 
@@ -8,11 +9,11 @@ export default {
 	Cooldown: 10000,
 	Description: "Command for everything related to CS:GO within FACEIT",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function faceit (context, subcommandName, ...args) {
 		if (!process.env.API_FACEIT_KEY) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No FaceIt key configured (API_FACEIT_KEY)"
 			});
 		}

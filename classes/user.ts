@@ -1,7 +1,9 @@
 import { SupiDate, SupiError, type Batch, type Row } from "supi-core";
 import { TemplateWithIdString } from "./template.js";
 
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+const { userAdditionCriticalLoadThreshold, userAdditionHighLoadThreshold } = getConfig().values;
+
 import {
 	type UserDataProperty,
 	type UserDataPropertyMap,
@@ -32,6 +34,21 @@ type NameObject = {
 
 const HIGH_LOAD_CACHE_PREFIX = "sb-user-high-load";
 const HIGH_LOAD_CACHE_EXPIRY = 60_000;
+const pendingUserAdditionPromises: Map<User["Name"], Promise<User | null>> = new Map();
+
+export const permissions = {
+	regular: 0b0000_0001,
+	ambassador: 0b0000_0010,
+	channelOwner: 0b0000_0100,
+	administrator: 0b1000_0000
+} as const;
+export const permissionNames = {
+	REGULAR: "regular",
+	AMBASSADOR: "ambassador",
+	CHANNEL_OWNER: "channelOwner",
+	ADMINISTRATOR: "administrator"
+} as const satisfies Record<string, keyof typeof permissions>;
+export type PermissionNumbers = (typeof User.permissions[keyof typeof User.permissions]);
 
 export class User extends TemplateWithIdString {
 	readonly ID: number;
@@ -40,25 +57,20 @@ export class User extends TemplateWithIdString {
 	readonly Name: string;
 	readonly Started_Using: SupiDate;
 
+	static readonly data: Map<string, User> = new Map();
+	private static lastUserDataClear = 0;
 	static readonly mapCacheExpiration = 300_000;
 	static readonly redisCacheExpiration = 3_600_000;
-	static readonly mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
-	static data: Map<string, User> = new Map();
 	static readonly dataCache: WeakMap<User, Partial<UserDataPropertyMap>> = new WeakMap();
 	static readonly pendingNewUsers: Map<User["Name"], Promise<User> | null> = new Map();
 
-	static readonly permissions = {
-		regular: 0b0000_0001,
-		ambassador: 0b0000_0010,
-		channelOwner: 0b0000_0100,
-		administrator: 0b1000_0000
-	} as const;
+	static readonly permissions = permissions;
 
 	static highLoadUserBatch: Batch | undefined;
 	static highLoadUserInterval: NodeJS.Timeout;
 	static {
-		User.highLoadUserInterval = setInterval(() => void User.handleHighLoad(), HIGH_LOAD_CACHE_EXPIRY);
+		User.highLoadUserInterval = setInterval(() => void User.handleHighLoad(), HIGH_LOAD_CACHE_EXPIRY).unref();
 	}
 
 	constructor (data: ConstructorData) {
@@ -147,6 +159,12 @@ export class User extends TemplateWithIdString {
 	static async initialize () {}
 
 	static async get (identifier: Like, strict: boolean = true, options: GetOptions = {}): Promise<User | null> {
+		const now = SupiDate.now();
+		if (now >= (User.lastUserDataClear + User.mapCacheExpiration)) {
+			User.data.clear();
+			User.lastUserDataClear = now;
+		}
+
 		if (identifier instanceof User) {
 			return identifier;
 		}
@@ -205,10 +223,20 @@ export class User extends TemplateWithIdString {
 			}
 			// 4. If strict mode is off, create the user and return the instance immediately
 			else if (!strict) {
-				const newlyAddedUserData = await User.add(username, {
+				// Prevent duplicate additions while the same username is pending in database
+				const existingPromise = pendingUserAdditionPromises.get(username);
+				if (existingPromise) {
+					return existingPromise;
+				}
+
+				const newUserDataPromise = User.add(username, {
 					Discord_ID: options.Discord_ID ?? null,
 					Twitch_ID: options.Twitch_ID ?? null
 				});
+				pendingUserAdditionPromises.set(username, newUserDataPromise);
+
+				const newlyAddedUserData = await newUserDataPromise;
+				pendingUserAdditionPromises.delete(username);
 
 				// 4-1. If high-load (batching) or critical-load (no inserts) are enabled,
 				// don't populate caches and immediately return `null`.
@@ -226,6 +254,18 @@ export class User extends TemplateWithIdString {
 			await User.populateCaches(userData);
 			return userData;
 		}
+	}
+
+	static async getAsserted (identifier: string | number): Promise<User> {
+		const userData = await User.get(identifier, true);
+		if (!userData) {
+			throw new SupiError({
+			    message: "Assert error: User.getAsserted did not find User",
+				args: { identifier }
+			});
+		}
+
+		return userData;
 	}
 
 	static async getMultiple (identifiers: Like[]) {
@@ -309,6 +349,8 @@ export class User extends TemplateWithIdString {
 				return user;
 			}
 		}
+
+		return null;
 	}
 
 	static normalizeUsername (username: string) {
@@ -327,18 +369,18 @@ export class User extends TemplateWithIdString {
 
 		const preparedName = User.normalizeUsername(name);
 		const pendingNewUser = User.pendingNewUsers.get(preparedName);
-		if (pendingNewUser) {
+		if (typeof pendingNewUser !== "undefined") {
 			return pendingNewUser;
 		}
 
 		const keys = await core.Cache.getKeysByPrefix(`${HIGH_LOAD_CACHE_PREFIX}*`);
 
 		// If there are too many new users queued (above criticalLoadThreshold), all new users being added are skipped
-		if (keys.length > config.values.userAdditionCriticalLoadThreshold) {
+		if (keys.length > userAdditionCriticalLoadThreshold) {
 			return null;
 		}
 		// If there are many new users queued (above highLoadThreshold), new users will be batched instead
-		else if (keys.length > config.values.userAdditionHighLoadThreshold) {
+		else if (keys.length > userAdditionHighLoadThreshold) {
 			User.pendingNewUsers.set(preparedName, null);
 
 			if (User.highLoadUserBatch) {
@@ -465,7 +507,7 @@ export class User extends TemplateWithIdString {
 	}
 
 	static destroy () {
-		clearInterval(User.mapExpirationInterval);
+		clearInterval(User.highLoadUserInterval);
 		User.data.clear();
 	}
 }

@@ -6,6 +6,8 @@ export default {
 		["$abb explode this is a test", "t h i s i s a t e s t"]
 	],
 	execute: (context, ...args) => ({
+		success: true,
+		hasExternalInput: true,
 		reply: [...args.join(" ")].join(" ").replaceAll(/\s+/g, " ")
 	})
 };

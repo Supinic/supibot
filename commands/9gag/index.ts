@@ -1,42 +1,61 @@
+import * as z from "zod";
 import { SupiDate } from "supi-core";
-import type { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-type NineGagData = {
-	data: {
-		posts: {
-			title: string;
-			nsfw: 0 | 1;
-			creationTs: number;
-			upVoteCount: number;
-			id: string;
-		}[];
-	};
-};
+const scrapeDataRegex = /window\._config\s*=\s*JSON\.parse\s*\((.+)\).+?<\/script>/;
+const nineGagSchema = z.object({
+	data: z.object({
+		posts: z.array(z.object({
+			title: z.string(),
+			nsfw: z.literal([0, 1]),
+			creationTs: z.int(),
+			upVoteCount: z.int(),
+			id: z.string()
+		}))
+	})
+});
 
-export default {
+export default declare({
 	Name: "9gag",
 	Aliases: ["gag"],
 	Cooldown: 10_000,
-	Description: "Searches 9gag for posts that fit your search text, or a random featured one if you don't provide anything.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
-	Params: null,
+	Description: "Fetches a random featured post from the front page of 9GAG.",
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
+	Params: [],
 	Whitelist_Response: null,
-	Code: async function nineGag (context, ...args) {
-		const options = (args.length === 0)
-			? { url: "https://9gag.com/v1/group-posts/group/default/type/hot" }
-			: {
-				url: "https://9gag.com/v1/search-posts",
-				searchParams: new URLSearchParams({
-					query: args.join(" ")
-				})
-			};
+	Code: async function nineGag (context) {
+		const response = await core.Got.get("GenericAPI")({
+			url: "https://9gag.com",
+			responseType: "text"
+		});
 
-		const response = await core.Got.get("GenericAPI")<NineGagData>(options);
+		const match = response.body.match(scrapeDataRegex);
+		if (!match) {
+			return {
+			    success: false,
+			    reply: "Could not find any posts on 9GAG!"
+			};
+		}
+
+		let rawData;
+		try {
+			const string = JSON.parse(match[1]) as string; // doubly encoded
+			rawData = JSON.parse(string) as unknown;
+		}
+		catch {
+			return {
+			    success: false,
+			    reply: "Could not parse the data from 9GAG's front page!"
+			};
+		}
 
 		const nsfw = Boolean(context.channel?.NSFW);
+		const { data } = nineGagSchema.parse(rawData);
+
+		const noAdvertisingPosts = data.posts.filter(i => i.creationTs !== 0); // Advertising posts have timestamp = 0
 		const filteredPosts = (nsfw)
-			? response.body.data.posts
-			: response.body.data.posts.filter(i => i.nsfw !== 1);
+			? noAdvertisingPosts
+			: noAdvertisingPosts.filter(i => i.nsfw !== 1);
 
 		if (filteredPosts.length === 0) {
 			return {
@@ -53,14 +72,10 @@ export default {
 		};
 	},
 	Dynamic_Description: (prefix) => [
-		"Either searches 9gag for a post that matches your query, or posts a random one if you don't provide anything to search.",
+		"Posts a random featured post from the 9GAG frontpage.",
 		"",
 
 		`<code>${prefix}9gag</code>`,
-		"Fetches a recent random 9gag post.",
-		"",
-
-		`<code>${prefix}9gag (query)</code>`,
-		"Fetches a recent random 9gag post that matches your query."
+		"Fetches a recent random frontpage 9GAG post."
 	]
-} satisfies CommandDefinition;
+});

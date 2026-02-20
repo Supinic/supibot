@@ -1,12 +1,12 @@
-import { CommandDefinition } from "../../classes/command.js";
+import { declare } from "../../classes/command.js";
 
-export default {
+export default declare({
 	Name: "beefact",
 	Aliases: null,
 	Cooldown: 10_000,
 	Description: "Posts a random fact about bees.",
 	Flags: ["mention", "pipe"],
-	Params: null,
+	Params: [],
 	Whitelist_Response: null,
 	Code: (async function beeFact () {
 		const fact = await core.Query.getRecordset<string>(rs => rs
@@ -24,4 +24,4 @@ export default {
 		};
 	}),
 	Dynamic_Description: null
-} satisfies CommandDefinition;
+});

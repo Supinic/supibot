@@ -1,22 +1,29 @@
+import { isGotRequestError, SupiDate, SupiError, type RecordUpdater } from "supi-core";
 import { TemplateWithId } from "./template.js";
-import type { Channel } from "./channel.js";
-import type Platform from "../platforms/template.js";
-
-import config from "../config.json" with { type: "json" };
-import regexes from "../utils/regexes.js";
-import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
+import { asciiArtRegex, emojiRegex, linkRegex, whitespaceRegex } from "../utils/regexes.js";
 import { transliterate as executeTransliteration } from "transliteration";
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
+import { getConfig } from "../config.js";
 
-const { responses, values } = config;
+import type { Channel } from "./channel.js";
+import type { Platform } from "../platforms/template.js";
+import { logger } from "../singletons/logger.js";
+
+const { responses, values } = getConfig();
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
 const apiResultSymbol: unique symbol = Symbol("banphrase-api-result");
 const inactiveSymbol: unique symbol = Symbol("banphrase-inactive");
 
-const banphraseConfigData = {
+const getBanphraseConfigData = () => ({
+	TWITCH_ANTIPING_CHARACTER,
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
 	transliterate: (input: string) => executeTransliteration(input),
-	...regexes
-} as const;
+	asciiArtRegex,
+	emojiRegex,
+	linkRegex,
+	whitespaceRegex,
+	Date: SupiDate
+} as const);
 
 export type Type = "Denial" | "API response" | "Custom response" | "Replacement" | "Inactive";
 type ConstructorData = {
@@ -81,8 +88,9 @@ type ExternalExecuteOptions = {
 };
 type ExternalApiType = "Pajbot";
 
-type ReplacementFunction = (message: string, configData?: typeof banphraseConfigData) => string | Promise<string>;
-type CustomResponseFunction = (message: string, configData?: typeof banphraseConfigData) => string | null | Promise<string | null>;
+type BanphraseConfigData = ReturnType<typeof getBanphraseConfigData>;
+type ReplacementFunction = (message: string, configData?: BanphraseConfigData) => string | Promise<string>;
+type CustomResponseFunction = (message: string, configData?: BanphraseConfigData) => string | null | Promise<string | null>;
 type BanphraseCodeFunction = ReplacementFunction | CustomResponseFunction;
 
 const isBanphraseFunction = (input: unknown): input is Banphrase["Code"] => (typeof input === "function");
@@ -162,7 +170,7 @@ export class Banphrase extends TemplateWithId {
 		}
 
 		try {
-			return await this.Code(message, banphraseConfigData);
+			return await this.Code(message, getBanphraseConfigData());
 		}
 		catch (e) {
 			console.warn("banphrase failed", message, this, e);
@@ -290,7 +298,7 @@ export class Banphrase extends TemplateWithId {
 
 		if (options.skipBanphraseAPI || !channelData?.Banphrase_API_Type || !channelData.Banphrase_API_URL) {
 			return {
-				string: message,
+				string: resultMessage,
 				passed: true
 			};
 		}
@@ -300,7 +308,7 @@ export class Banphrase extends TemplateWithId {
 		let isExternallyBanphrased: boolean | null = null;
 		try {
 			const responseData = await Banphrase.executeExternalAPI(
-				message.slice(0, 1000),
+				resultMessage.slice(0, 1000),
 				channelData.Banphrase_API_Type,
 				channelData.Banphrase_API_URL,
 				{ fullResponse: true }
@@ -314,7 +322,7 @@ export class Banphrase extends TemplateWithId {
 					API: channelData.Banphrase_API_URL,
 					Channel: channelData.ID,
 					Platform: channelData.Platform.ID,
-					Message: message,
+					Message: resultMessage,
 					Response: JSON.stringify(responseData[apiDataSymbol])
 				});
 
@@ -326,7 +334,7 @@ export class Banphrase extends TemplateWithId {
 				throw e;
 			}
 
-			await sb.Logger.log(
+			await logger.log(
 				"System.Warning",
 				`Banphrase API fail - code: ${e.code}, message: ${e.message}`,
 				channelData
@@ -335,14 +343,14 @@ export class Banphrase extends TemplateWithId {
 			switch (channelData.Banphrase_API_Downtime) {
 				case "Ignore":
 					return {
-						string: message,
+						string: resultMessage,
 						passed: true,
 						warn: true
 					};
 
 				case "Notify":
 					return {
-						string: `⚠ ${message}`,
+						string: `⚠ ${resultMessage}`,
 						passed: true,
 						warn: true
 					};
@@ -379,7 +387,7 @@ export class Banphrase extends TemplateWithId {
 
 				case "Whisper": {
 					return {
-						string: `Banphrase failed, your command result: ${message}.`,
+						string: `Banphrase failed, your command result: ${resultMessage}.`,
 						passed: true,
 						privateMessage: true,
 						warn: true
@@ -399,7 +407,7 @@ export class Banphrase extends TemplateWithId {
 					continue;
 				}
 
-				const result = await banphrase.execute(message);
+				const result = await banphrase.execute(resultMessage);
 				if (typeof result === "string") {
 					return {
 						string: result,

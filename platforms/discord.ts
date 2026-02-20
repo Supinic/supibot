@@ -1,27 +1,32 @@
+import * as z from "zod";
 import { randomBytes } from "node:crypto";
+import { SupiError } from "supi-core";
 import {
-	BaseMessageOptions,
-	Channel as DiscordChannel,
+	type BaseMessageOptions,
+	type Channel as DiscordChannel,
+	type Emoji as DiscordEmoji,
+	type Guild,
+	type GuildMember,
+	type Message as DiscordMessage,
+	type User as DiscordUser,
 	ChannelType,
 	Client,
 	DiscordAPIError,
-	Emoji as DiscordEmoji,
 	GatewayIntentBits,
-	Guild, GuildMember,
-	Message as DiscordMessage,
 	Partials,
 	PermissionFlagsBits,
 	Routes,
 	TextChannel,
-	User as DiscordUser,
 	escapeMarkdown
 } from "discord.js";
 
-import { BaseConfig, Platform, PlatformVerificationStatus, PrepareMessageOptions } from "./template.js";
-import type { Emote } from "../@types/globals.d.ts";
-import User from "../classes/user.js";
-import { SupiError } from "supi-core";
-import Channel from "../classes/channel.js";
+import { BasePlatformConfigSchema } from "./schema.js";
+import { Platform, type PlatformVerificationStatus, type PrepareMessageOptions } from "./template.js";
+import type { DiscordEmote, Emote } from "../utils/globals.js";
+
+import type { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
+import { logger } from "../singletons/logger.js";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {
@@ -74,17 +79,18 @@ const formatEmoji = (emote: Emote) => {
 	}
 };
 
-export interface DiscordConfig extends BaseConfig {
-	selfId: string;
-	platform: {
-		sendVerificationChallenge?: boolean;
-		guildCreateAnnounceChannel?: string | string[] | null;
-	};
-	logging: {
-		messages?: boolean;
-		whispers?: boolean;
-	};
-}
+export const DiscordConfigSchema = BasePlatformConfigSchema.extend({
+	selfId: z.string(),
+	platform: z.object({
+		sendVerificationChallenge: z.boolean().optional(),
+		guildCreateAnnounceChannel: z.union([z.string(), z.array(z.string())]).nullish()
+	}),
+	logging: z.object({
+		messages: z.boolean().optional(),
+		whispers: z.boolean().optional()
+	})
+});
+export type DiscordConfig = z.infer<typeof DiscordConfigSchema>;
 
 export class DiscordPlatform extends Platform<DiscordConfig> {
 	#emoteFetchingPromise: Promise<Emote[]> | null = null;
@@ -99,7 +105,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		resultConfig.platform.sendVerificationChallenge ??= false;
 		resultConfig.platform.guildCreateAnnounceChannel ??= null;
 
-		super("discord", resultConfig);
+		super("discord", DiscordConfigSchema.parse(resultConfig));
 
 		this.client = new Client({
 			intents: [
@@ -153,7 +159,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				return;
 			}
 
-			void sb.Logger.log("Discord.Error", err.toString(), null, null);
+			void logger.log("Discord.Error", err.toString(), null, null);
 		});
 	}
 
@@ -164,14 +170,14 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		}
 
 		if (message) {
-			const emojiNameRegex = /^[\w\d]+$/;
+			const emojiNameRegex = /^\W+$/;
 			const words = message
 				.split(/\s+/)
 				.filter(Boolean)
 				.filter(i => i.length > 2 && emojiNameRegex.test(i));
 
 			const wordSet = new Set(words);
-			const globalEmotes = await this.fetchGlobalEmotes();
+			const globalEmotes = await this.fetchGlobalEmotes() as DiscordEmote[];
 			const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
 
 			for (const word of wordSet) {
@@ -180,7 +186,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					continue;
 				}
 
-				let emote: Emote;
+				let emote;
 				const eligibleGuildEmotes = eligibleEmotes.filter(i => i.guild === channelObject.guild.id);
 				if (eligibleGuildEmotes.length !== 0) {
 					emote = eligibleGuildEmotes[0];
@@ -194,7 +200,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 				// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 				// All emotes on Discord are wrapped at least by colons
-				const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
+				const regex = new RegExp(String.raw `(?<!(:))\b${emote.name}\b(?!(:))`, "g");
 				message = message.replace(regex, formatEmoji(emote));
 			}
 		}
@@ -237,7 +243,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			};
 
 			if (e instanceof DiscordAPIError) {
-				await sb.Logger.logError("Backend", e, {
+				await logger.logError("Backend", e, {
 					origin: "External",
 					context: errorContext
 				});
@@ -400,7 +406,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				userLength: user.length
 			});
 
-			await sb.Logger.log("Discord.Warning", `Discord username length > 32 characters: ${json}`);
+			await logger.log("Discord.Warning", `Discord username length > 32 characters: ${json}`);
 			return;
 		}
 
@@ -510,7 +516,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 						messageObject
 					};
 
-					await sb.Logger.log(
+					await logger.log(
 						"Discord.Warning",
 						`No message text on Discord: ${JSON.stringify(obj)}`,
 						channelData,
@@ -518,11 +524,11 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					);
 				}
 				else {
-					await sb.Logger.updateLastSeen({ channelData, userData, message: msg });
+					logger.updateLastSeen({ channelData, userData, message: msg });
 				}
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
+				await logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
 			}
 
 			channelData.events.emit("message", {
@@ -547,9 +553,9 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				await this.mirror(msg, userData, channelData, { commandUsed: false });
 			}
 		}
-		else {
+		else if (privateMessage) {
 			if (this.logging.whispers) {
-				await sb.Logger.push(msg, userData, null, this);
+				await logger.push(msg, userData, null, this);
 			}
 
 			this.resolveUserMessage(null, userData, msg);
@@ -700,7 +706,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 	async handleGuildCreate (guild: Guild) {
 		const message = `Joined guild ${guild.name}  - ID ${guild.id} - ${guild.memberCount} members`;
-		await sb.Logger.log("Discord.Join", message);
+		await logger.log("Discord.Join", message);
 
 		const announce = this.config.guildCreateAnnounceChannel;
 		if (announce) {

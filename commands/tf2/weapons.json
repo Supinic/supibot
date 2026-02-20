@@ -693,7 +693,7 @@
     "slot": "melee"
   },
   {
-    "name": "shotgun",
+    "name": "Shotgun",
     "classes": [
       "Engineer"
     ],

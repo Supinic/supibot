@@ -1,0 +1,77 @@
+import { declare } from "../../classes/command.js";
+import { ivrUserDataSchema } from "../../utils/schemas.js";
+
+export default declare({
+	Name: "getprofilepicture",
+	Aliases: ["avatar", "pfp"],
+	Cooldown: 10000,
+	Description: "For a given Twitch user, this command will fetch their profile picture.",
+	Flags: ["mention", "non-nullable", "pipe"],
+	Params: [
+		{ name: "banner", type: "boolean" },
+		{ name: "linkOnly", type: "boolean" }
+	],
+	Whitelist_Response: null,
+	Code: async function profilePicture (context, username?: string) {
+		const login = sb.User.normalizeUsername(username ?? context.user.Name);
+		const response = await core.Got.get("IVR")({
+			url: "v2/twitch/user",
+			searchParams: { login }
+		});
+
+		const user = ivrUserDataSchema.parse(response.body).at(0);
+		if (!user) {
+			return {
+				success: false,
+				reply: `No such user found!`
+			};
+		}
+
+		if (context.params.banner === true) {
+			if (user.banner === null) {
+				return {
+					success: false,
+					reply: (context.params.linkOnly === true)
+						? "N/A"
+						: `User ${user.displayName} has no profile banner set up!`
+				};
+			}
+
+			return {
+				reply: (context.params.linkOnly === true)
+					? user.banner
+					: `Profile banner for ${user.displayName}: ${user.banner}`
+			};
+		}
+
+		return {
+			reply: (context.params.linkOnly)
+				? user.logo
+				: `Profile picture for ${user.displayName}: ${user.logo}`
+		};
+	},
+	Dynamic_Description: (prefix) => [
+		"Fetches a Twitch user's profile picture, or other pictures related to their account.",
+		"",
+
+		`<code>${prefix}getprofilepicture (user)</code>`,
+		`<code>${prefix}avatar (user)</code>`,
+		`<code>${prefix}pfp (user)</code>`,
+		`<code>${prefix}pfp supinic</code>`,
+		"Posts the user's profile picture.",
+		"",
+
+		`<code>${prefix}pfp <u>linkOnly:true</u> (user)</code>`,
+		`<code>${prefix}pfp <u>linkOnly:true</u> @pajlada</code>`,
+		"Post only the link to the picture, with no other text describing it.",
+		"",
+
+		`<code>${prefix}pfp <u>banner:true</u> (user)</code>`,
+		`<code>${prefix}pfp <u>banner:true</u> @supinic</code>`,
+		"Post the user's profile banner, if they have one set up. If they don't have one, a message describing that will appear instead.",
+		"",
+		`<code>${prefix}pfp <u>banner:true</u> <u>linkOnly:true</u> (user)</code>`,
+		`<code>${prefix}pfp <u>banner:true</u> <u>linkOnly:true</u> @pajlada</code>`,
+		`Post only the link to the user's profile banner. If they don't have one, the message "N/A" will show up.`
+	]
+});
