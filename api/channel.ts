@@ -1,3 +1,6 @@
+import { ApiDefinition } from "./index.js";
+import { isChannelMode } from "../classes/channel.js";
+
 export default {
 	reloadAll: async () => {
 		await sb.Channel.reloadData();
@@ -18,21 +21,20 @@ export default {
 				data: { message: "No channel or platform provided" }
 			};
 		}
-
-		const platformData = sb.Platform.get(platformName);
-		if (!platformData) {
+		if (platformName !== "twitch") {
 			return {
 				statusCode: 400,
 				data: { message: "Invalid platform provided" }
 			};
 		}
-		else if (!platformData.dynamicChannelAddition) {
+		if (!isChannelMode(botChannelMode)) {
 			return {
 				statusCode: 400,
-				data: { message: "Provided platform cannot dynamically add new channels" }
+				data: { message: "Invalid channel mode provided" }
 			};
 		}
 
+		const platformData = sb.Platform.getAsserted(platformName);
 		const channelID = await platformData.getUserID(channelName);
 		if (!channelID) {
 			return {
@@ -55,7 +57,7 @@ export default {
 	},
 	stats: async () => {
 		let total = 0;
-		const platformStats = {};
+		const platformStats: Record<string, number> = {};
 
 		for (const [platformData, platformMap] of sb.Channel.data.entries()) {
 			if (!platformData) {
@@ -116,4 +118,4 @@ export default {
 			data: { message: "OK" }
 		};
 	}
-};
+} satisfies ApiDefinition;

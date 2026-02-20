@@ -21,11 +21,14 @@ import { User } from "./user.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
 import { TemplateWithId } from "./template.js";
 import { Emote } from "../@types/globals.js";
+import { string } from "random-js";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 
 type BanphraseDowntimeBehaviour = "Ignore" | "Notify" | "Nothing" | "Refuse" | "Whisper";
-type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
+const channelModes = ["Inactive", "Last seen", "Read", "Write", "VIP", "Moderator"] as const;
+type Mode = (typeof channelModes)[number];
+
 type LogType = "Lines" | "Meta";
 
 type EditableProperty = "Name" | "Mode" | "Mention" | "NSFW" | "Mirror" | "Description"
@@ -55,6 +58,7 @@ type DatabaseChannelData = {
 // type GetStringEmoteOptions = GetEmoteOptions & { returnEmoteObject?: false; };
 
 export type Like = string | number | Channel;
+export const isChannelMode = (input: string): input is Mode => channelModes.includes(input as Mode);
 
 type MoveDataOptions = {
 	deleteOriginalValues?: boolean;

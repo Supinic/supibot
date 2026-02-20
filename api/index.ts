@@ -12,25 +12,28 @@ import PlatformDefinition from "./platform.js";
 import ReminderDefinition from "./reminder.js";
 import UserDefinition from "./user.js";
 import { JSONifiable } from "../@types/globals.js";
+import error from "supi-core/build/objects/error.js";
 
-type ApiSuccessResponse = {
+type ApiDataSuccess = {
 	statusCode?: number;
 	data: Record<string, JSONifiable>;
-	skipResponseHandling?: boolean;
 	headers?: Record<string, string>;
 };
+type ApiSkipSuccess = { skipResponseHandling: true; };
+type ApiSuccessResponse = ApiDataSuccess | ApiSkipSuccess;
 type ApiFailureResponse = {
 	statusCode: number;
 	error: {
 		message: string;
 		reason?: string;
 	};
+	headers?: Record<string, string>;
 };
 type ApiResponse = ApiSuccessResponse | ApiFailureResponse;
 type ApiFunction = (req: http.IncomingMessage, res: http.ServerResponse, url: URL) => Promise<ApiResponse>;
 export type ApiDefinition = Record<string, ApiFunction>;
 
-const routeDefinitions = {
+const routeDefinitions: Record<string, ApiDefinition> = {
 	afk: AfkDefinition,
 	channel: ChannelDefinition,
 	command: CommandDefinition,
@@ -41,6 +44,7 @@ const routeDefinitions = {
 	reminder: ReminderDefinition,
 	user: UserDefinition
 };
+
 const routes = Object.keys(routeDefinitions);
 
 const isValidRoute = (input: string): input is keyof typeof routeDefinitions => routes.includes(input);
@@ -81,15 +85,13 @@ async function handler (req: http.IncomingMessage, res: http.ServerResponse, bas
 	}
 
 	const endpointDefinition = routeDefinition[endpoint];
-	const {
-		skipResponseHandling = false,
-		error = null,
-		data = null,
-		headers = {},
-		statusCode = 200
-	} = await target(req, res, url);
+	const result = await endpointDefinition(req, res, url);
 
-	if (!skipResponseHandling) {
+	if (!("skipResponseHandling" in result)) {
+		const { headers = {}, statusCode = 200 } = result;
+		const data = ("data" in result) ? result.data : null;
+		const error = ("error" in result) ? result.error : null;
+
 		headers["Content-Type"] ??= "application/json";
 		res.writeHead(statusCode, headers);
 
