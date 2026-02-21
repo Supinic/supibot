@@ -1,4 +1,4 @@
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
 import http from "node:http";
 import https from "node:https";
 
@@ -11,17 +11,16 @@ import MetricsDefinition from "./metrics.js";
 import PlatformDefinition from "./platform.js";
 import ReminderDefinition from "./reminder.js";
 import UserDefinition from "./user.js";
-import { JSONifiable } from "../@types/globals.js";
-import error from "supi-core/build/objects/error.js";
 
-type ApiDataSuccess = {
-	statusCode?: number;
-	data: Record<string, JSONifiable>;
+import type { JSONifiable } from "../utils/globals.js";
+
+type ApiSuccess = {
+	statusCode: number;
+	data: JSONifiable;
 	headers?: Record<string, string>;
 };
-type ApiSkipSuccess = { skipResponseHandling: true; };
-type ApiSuccessResponse = ApiDataSuccess | ApiSkipSuccess;
-type ApiFailureResponse = {
+type ApiSkip = { skipResponseHandling: true; };
+type ApiFailure = {
 	statusCode: number;
 	error: {
 		message: string;
@@ -29,10 +28,11 @@ type ApiFailureResponse = {
 	};
 	headers?: Record<string, string>;
 };
-type ApiResponse = ApiSuccessResponse | ApiFailureResponse;
-type ApiFunction = (req: http.IncomingMessage, res: http.ServerResponse, url: URL) => Promise<ApiResponse>;
+type ApiResponse = ApiSuccess | ApiSkip | ApiFailure;
+type ApiFunction = (req: http.IncomingMessage, res: http.ServerResponse, url: URL) => ApiResponse | Promise<ApiResponse>;
 export type ApiDefinition = Record<string, ApiFunction>;
 
+const router = new Map<string, Map<string, ApiFunction>>();
 const routeDefinitions: Record<string, ApiDefinition> = {
 	afk: AfkDefinition,
 	channel: ChannelDefinition,
@@ -45,68 +45,52 @@ const routeDefinitions: Record<string, ApiDefinition> = {
 	user: UserDefinition
 };
 
-const routes = Object.keys(routeDefinitions);
-
-const isValidRoute = (input: string): input is keyof typeof routeDefinitions => routes.includes(input);
-const isValidEndpoint = (route: ApiDefinition, input: string): input is keyof typeof route => {
-	const endpoints = Object.keys(route);
-	return endpoints.includes(input);
-};
-
 const handleNotFound = (res: http.ServerResponse, path: string) => {
-	res.writeHead(404, { "Content-Type": "application/json" });
-	res.end(JSON.stringify({
-		statusCode: 404,
-		data: null,
-		error: {
-			path,
-			message: "Endpoint not found"
-		},
-		timestamp: Date.now()
-	}));
+	res.statusCode = 404;
+	res.end(`Not found: ${path}`);
 };
 
-async function handler (req: http.IncomingMessage, res: http.ServerResponse, baseUrl: string) {
+const handleRequest = async (req: http.IncomingMessage, res: http.ServerResponse, baseUrl: string) => {
 	if (!req.url) {
 		return;
 	}
 
-	const url = new URL(req.url, baseUrl);
+	const url = new URL(req.url ?? "/", baseUrl);
 	const [route, endpoint] = url.pathname.split("/").filter(Boolean);
-	if (!isValidRoute(route)) {
-		handleNotFound(res, route);
+	if (!route || !endpoint) {
+		handleNotFound(res, "malformed path");
 		return;
 	}
 
-	const routeDefinition = routeDefinitions[route];
-	if (!isValidEndpoint(routeDefinition, endpoint)) {
+	const handler = router.get(route)?.get(endpoint);
+	if (!handler) {
 		handleNotFound(res, `${route}/${endpoint}`);
 		return;
 	}
 
-	const endpointDefinition = routeDefinition[endpoint];
-	const result = await endpointDefinition(req, res, url);
-
-	if (!("skipResponseHandling" in result)) {
-		const { headers = {}, statusCode = 200 } = result;
-		const data = ("data" in result) ? result.data : null;
-		const error = ("error" in result) ? result.error : null;
-
-		headers["Content-Type"] ??= "application/json";
-		res.writeHead(statusCode, headers);
-
-		res.end(JSON.stringify({
-			statusCode,
-			data,
-			error,
-			timestamp: Date.now()
-		}));
+	const result = await handler(req, res, url);
+	if ("skipResponseHandling" in result) {
+		return;
 	}
-}
+
+	const { headers = {}, statusCode = 200 } = result;
+	const data = ("data" in result) ? result.data : null;
+	const error = ("error" in result) ? result.error : null;
+
+	headers["Content-Type"] ??= "application/json";
+	res.writeHead(statusCode, headers);
+
+	res.end(JSON.stringify({
+		statusCode,
+		data,
+		error,
+		timestamp: Date.now()
+	}));
+};
 
 export default function initialize () {
-	const { api } = config;
-	if (!api.port || typeof api.secure !== "boolean") {
+	const { api } = getConfig();
+	if (!api || !api.port || typeof api.secure !== "boolean") {
 		console.warn("Internal API port/security is not configured - internal API will not start");
 		return;
 	}
@@ -116,69 +100,19 @@ export default function initialize () {
 	const baseURL = `${protocol}://localhost:${port}`;
 
 	const server = (api.secure)
-		? https.createServer((req, res) => void handler(req, res, baseURL))
-		: http.createServer((req, res) => void handler(req, res, baseURL));
+		? https.createServer((req, res) => void handleRequest(req, res, baseURL))
+		: http.createServer((req, res) => void handleRequest(req, res, baseURL));
 
-	/*
-	const server = httpInterface.createServer(async (req, res) => {
-		const url = new URL(req.url, baseURL);
-		const path = url.pathname.split("/").filter(Boolean);
-
-		let target = routeDefinitions[path[0]];
-		if (target && path.length === 1) {
-			target = target.index;
-		}
-		else if (path.length > 1) {
-			for (let i = 1; i < path.length; i++) {
-				target = target?.[path[i]];
-			}
+	for (const [routeName, endpoints] of Object.entries(routeDefinitions)) {
+		const endpointMap = new Map<string, ApiFunction>();
+		for (const [endpoint, handler] of Object.entries(endpoints)) {
+			endpointMap.set(endpoint, handler);
 		}
 
-		if (!target) {
-			res.writeHead(404, { "Content-Type": "application/json" });
-			res.end(JSON.stringify({
-				statusCode: 404,
-				data: null,
-				error: {
-					path,
-					message: "Endpoint not found"
-				},
-				timestamp: Date.now()
-			}));
-
-			return;
-		}
-		else if (typeof target !== "function") {
-			throw new Error(`Internal API error - invalid definition for path ${path.join("/")}`);
-		}
-
-		const {
-			skipResponseHandling = false,
-			error = null,
-			data = null,
-			headers = {},
-			statusCode = 200
-		} = await target(req, res, url);
-
-		if (!skipResponseHandling) {
-			headers["Content-Type"] ??= "application/json";
-			res.writeHead(statusCode, headers);
-
-			res.end(JSON.stringify({
-				statusCode,
-				data,
-				error,
-				timestamp: Date.now()
-			}));
-		}
-	});
-*/
+		router.set(routeName, endpointMap);
+	}
 
 	server.listen(port);
 
-	return {
-		server,
-		routeDefinitions,
-		port
-	};
+	return { server, routeDefinitions, port };
 };

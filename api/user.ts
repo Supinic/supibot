@@ -1,16 +1,15 @@
+import type { ApiDefinition } from "./index.js";
+
 export default {
 	invalidateCache: async (req, res, url) => {
 		const names = url.searchParams.getAll("name").filter(Boolean);
 		const promises = names.map(i => sb.User.invalidateUserCache(i));
 
-		const result = await Promise.allSettled(promises);
-		const [succeeded, failed] = core.Utils.splitByCondition(result, i => i.status === "fulfilled");
+		await Promise.allSettled(promises);
+
 		return {
 			statusCode: 200,
-			data: {
-				succeeded,
-				failed
-			}
+			data: "OK"
 		};
 	}
-};
+} satisfies ApiDefinition;

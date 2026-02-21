@@ -1,3 +1,5 @@
+import type { ApiDefinition } from "./index.js";
+
 export default {
 	index: async (req, res) => {
 		const data = await core.Metrics.registry.metrics();
@@ -12,4 +14,4 @@ export default {
 			skipResponseHandling: true
 		};
 	}
-};
+} satisfies ApiDefinition;

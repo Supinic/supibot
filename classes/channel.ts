@@ -25,7 +25,13 @@ import type { Emote } from "../utils/globals.js";
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 
 type BanphraseDowntimeBehaviour = "Ignore" | "Notify" | "Nothing" | "Refuse" | "Whisper";
-type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
+
+const modes = ["Inactive", "Last seen", "Read", "Write", "VIP", "Moderator"] as const;
+type Mode = (typeof modes)[number];
+export const isChannelMode = (input: unknown): input is Mode => (
+	(typeof input === "string" && (modes as readonly string[]).includes(input))
+);
+
 type LogType = "Lines" | "Meta";
 
 type EditableProperty = "Name" | "Mode" | "Mention" | "NSFW" | "Mirror" | "Description"
@@ -79,14 +85,11 @@ export class Channel extends TemplateWithId {
 	readonly Logging: Set<LogType>;
 	readonly Mirror: Channel["ID"] | null;
 	readonly Description: string | null;
-
-	readonly sessionData: Record<string, string> = {};
 	readonly events: EventEmitter = new EventEmitter();
 
-	static redisPrefix = "sb-channel";
-	static dataCache: WeakMap<Channel, Partial<ChannelDataPropertyMap>> = new WeakMap();
-	static uniqueIdentifier = "ID";
-	static data: Map<Platform, Map<Channel["Name"], Channel>> = new Map();
+	static readonly dataCache: WeakMap<Channel, Partial<ChannelDataPropertyMap>> = new WeakMap();
+	static readonly uniqueIdentifier = "ID";
+	static readonly data: Map<Platform, Map<Channel["Name"], Channel>> = new Map();
 
 	#setupLoggingTablePromise: Promise<{ success: boolean }> | null = null;
 

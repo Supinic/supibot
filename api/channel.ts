@@ -1,4 +1,4 @@
-import { ApiDefinition } from "./index.js";
+import type { ApiDefinition } from "./index.js";
 import { isChannelMode } from "../classes/channel.js";
 
 export default {
@@ -55,15 +55,11 @@ export default {
 			data: { message: "Channel joined succesfully" }
 		};
 	},
-	stats: async () => {
+	stats: () => {
 		let total = 0;
 		const platformStats: Record<string, number> = {};
 
 		for (const [platformData, platformMap] of sb.Channel.data.entries()) {
-			if (!platformData) {
-				continue;
-			}
-
 			for (const channelData of platformMap.values()) {
 				if (channelData.Mode === "Inactive") {
 					continue;

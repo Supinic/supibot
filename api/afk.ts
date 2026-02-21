@@ -1,4 +1,4 @@
-import { ApiDefinition } from "./index.js";
+import type { ApiDefinition } from "./index.js";
 
 export default {
 	reloadAll: async () => {

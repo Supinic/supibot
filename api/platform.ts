@@ -1,10 +1,12 @@
+import type { ApiDefinition } from "./index.js";
+
 export default {
-	list: async () => {
-		const platforms = sb.Platform.list;
+	list: () => {
+		const platforms = sb.Platform.getList();
 		const data = platforms.map(i => ({
 			ID: i.ID,
 			name: i.name,
-			host: i.host,
+			host: i.host ?? null,
 			active: i.active,
 			selfId: i.selfId,
 			selfName: i.selfName
@@ -15,6 +17,7 @@ export default {
 			data
 		};
 	},
+
 	discordGuildCount: async () => {
 		const platformData = sb.Platform.get("discord");
 		if (!platformData) {
@@ -32,4 +35,4 @@ export default {
 			}
 		};
 	}
-};
+} satisfies ApiDefinition;

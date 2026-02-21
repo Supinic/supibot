@@ -1,5 +1,7 @@
+import type { ApiDefinition } from "./index.js";
+
 export default {
-	prefix: async () => ({
+	prefix: () => ({
 		statusCode: 200,
 		data: {
 			prefix: sb.Command.prefix
@@ -21,6 +23,12 @@ export default {
 		const platform = url.searchParams.get("platform") ?? "twitch";
 		const channel = url.searchParams.get("channel");
 		const user = url.searchParams.get("user");
+		if (!channel || !user) {
+			return {
+				statusCode: 400,
+				error: { message: `Missing user and/or channel identifiers` }
+			};
+		}
 
 		const platformData = sb.Platform.get(platform);
 		if (!platformData) {
@@ -54,7 +62,10 @@ export default {
 		return {
 			statusCode: 200,
 			data: {
-				result: execution
+				result: {
+					success: execution.success ?? true,
+					reply: execution.reply ?? null
+				}
 			}
 		};
 	},
@@ -79,10 +90,9 @@ export default {
 		const info = {
 			prefix: sb.Command.prefix,
 			aliases: commandData.Aliases,
-			author: commandData.Author,
 			cooldown: commandData.Cooldown,
 			description: commandData.Description,
-			dynamicDescription: null,
+			dynamicDescription: null as null | readonly string[],
 			flags: commandData.Flags,
 			name: commandData.Name,
 			params: commandData.Params
@@ -94,11 +104,15 @@ export default {
 				info.dynamicDescription = await commandData.getDynamicDescription();
 			}
 			catch (e) {
+				if (!(e instanceof Error)) {
+					throw e;
+				}
+
 				return {
 					statusCode: 500,
 					error: {
 						reason: "Command dynamic description function failed",
-						message: e.message
+						message: String(e.message)
 					}
 				};
 			}
@@ -172,7 +186,7 @@ export default {
 				statusCode: 500,
 				error: {
 					reason: "Command dynamic description function failed",
-					message: e.message
+					message: (e instanceof Error) ? e.message : String(e)
 				}
 			};
 		}
@@ -184,4 +198,4 @@ export default {
 			}
 		};
 	}
-};
+} satisfies ApiDefinition;
