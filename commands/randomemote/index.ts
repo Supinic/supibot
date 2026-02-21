@@ -59,11 +59,14 @@ export default declare({
 		} = context.params;
 
 		const filteredEmotes = emotes.filter(i => {
-			const zw = ("zeroWidth" in i && match(zeroWidth, i.zeroWidth));
+			const zw = ("zeroWidth" in i)
+				? match(zeroWidth, i.zeroWidth)
+				: match(zeroWidth, false); // assume emotes without "zeroWidth" are never zero-width
+
 			return (
-				match(animated, i.animated ?? false)
+				zw
+				&& match(animated, i.animated ?? false)
 				&& match(globalEmotes, i.global)
-				&& match(zeroWidth, zw)
 				&& match(bttv, i.type === "bttv")
 				&& match(ffz, i.type === "ffz")
 				&& match(sevenTv, i.type === "7tv")
