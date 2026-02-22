@@ -64,7 +64,8 @@ export default {
 			data: {
 				result: {
 					success: execution.success ?? true,
-					reply: execution.reply ?? null
+					reply: execution.reply ?? null,
+					reason: execution.reason ?? null
 				}
 			}
 		};
