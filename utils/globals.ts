@@ -34,7 +34,7 @@ export type Coordinates = { lat: number; lng: number; } | { lat: string; lng: st
 export type Port = number;
 export type URL = string;
 export type Stringifiable = boolean | number | string;
-export type JSONifiable = null | boolean | number | string | { [P: string]: JSONifiable } | JSONifiable[];
+export type JSONifiable = null | boolean | number | string | { [P: string]: JSONifiable } | readonly JSONifiable[];
 export type SimpleGenericData = Record<string, JSONifiable>;
 export interface GenericFlagsObject {
     [key: string]: boolean

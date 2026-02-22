@@ -1,8 +1,9 @@
 import { freemem, totalmem } from "node:os";
 import { SupiDate } from "supi-core";
+import type { ApiDefinition } from "./index.js";
 
 export default {
-	summary: async () => {
+	summary: () => {
 		const uptime = Math.trunc(process.uptime() * 1000);
 		const started = new SupiDate().addMilliseconds(-uptime);
 		const processMemory = process.memoryUsage();
@@ -15,7 +16,7 @@ export default {
 						free: freemem(),
 						total: totalmem()
 					},
-					process: processMemory
+					process: { ...processMemory }
 				},
 				uptime: {
 					time: uptime,
@@ -24,4 +25,4 @@ export default {
 			}
 		};
 	}
-};
+} satisfies ApiDefinition;

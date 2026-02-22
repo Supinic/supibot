@@ -727,14 +727,8 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 	}
 
 	async handleGuildDelete (guild: Guild) {
-		const platformMap = sb.Channel.data.get(this);
-		if (!platformMap) {
-			throw new SupiError({
-				message: "Assert error: No Discord platform available in Channel"
-			});
-		}
-
-		for (const channelData of platformMap.values()) {
+		const channels = sb.Channel.getJoinableForPlatform(this);
+		for (const channelData of channels) {
 			if (channelData.Specific_ID !== guild.id) {
 				continue;
 			}

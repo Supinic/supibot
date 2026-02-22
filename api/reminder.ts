@@ -1,3 +1,5 @@
+import type { ApiDefinition } from "./index.js";
+
 export default {
 	reloadAll: async () => {
 		await sb.Channel.reloadData();
@@ -6,11 +8,12 @@ export default {
 			data: { message: "OK" }
 		};
 	},
+
 	reloadSpecific: async (req, res, url) => {
 		const IDs = url.searchParams.getAll("ID").map(Number).filter(Boolean);
 		const result = await sb.Reminder.reloadSpecific(...IDs);
 
-		const [active, inactive] = core.Utils.splitByCondition(IDs, i => sb.Reminder.get(i));
+		const [active, inactive] = core.Utils.splitByCondition(IDs, i => Boolean(sb.Reminder.get(i)));
 		return {
 			statusCode: 200,
 			data: {
@@ -21,6 +24,7 @@ export default {
 			}
 		};
 	},
+
 	unset: async (req, res, url) => {
 		const user = url.searchParams.get("user");
 		if (!user) {
@@ -70,4 +74,4 @@ export default {
 			data: { message: "OK" }
 		};
 	}
-};
+} satisfies ApiDefinition;
