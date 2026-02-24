@@ -3,7 +3,6 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "Bun",
 	aliases: [],
-	notes: "Posts new Bun blogposts whenever one is published",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new Bun blogpost is published.",

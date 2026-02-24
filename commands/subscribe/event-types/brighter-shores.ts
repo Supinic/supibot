@@ -17,9 +17,9 @@ type SteamApiResponse = {
 
 const definition: CustomEventDefinition = {
 	name: "Brighter Shores",
-	aliases: ["BS", "brighter shores"],
-	notes: "Posts update news about Brighter Shores",
+	aliases: ["BS"],
 	channelSpecificMention: true,
+	notes: `Checks for Brighter Shores updates on <a href="//store.steampowered.com/app/2791440">its Steam page</a>.`,
 	response: {
 		added: "You will now be pinged whenever a new BS update is published.",
 		removed: "You will no longer receive pings when a new BS update is published."

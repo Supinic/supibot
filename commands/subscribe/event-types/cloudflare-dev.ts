@@ -3,7 +3,6 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "Cloudflare Developer Products",
 	aliases: ["cfdev"],
-	notes: "Posts new Cloudflare Developer products updates",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a Cloudflare Developer product is updated.",

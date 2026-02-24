@@ -14,7 +14,7 @@ export default declare({
 	Aliases: ["unsubscribe"],
 	Cooldown: 5000,
 	Description: "Subscribe or unsubscribe to a plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention", "pipe", "skip-banphrase"],
 	Params: subscribeCommandParams,
 	Whitelist_Response: null,
 	initialize: function () {
@@ -201,13 +201,20 @@ export default declare({
 		}
 	},
 	Dynamic_Description: (prefix) => {
-		const typesList = subscriptions.map(i => core.Utils.tag.trim `
-			<li>
-				<code>${i.name}</code>
-				<br>Aliases: ${i.aliases.map(j => `<code>${j}</code>`).join(", ") || "(none)"}
-				<br>${i.notes}			
-			</li>
-		`).join("");
+		const tableBody = subscriptions.map(i => {
+			const urlString = ("url" in i) ? `<a href="${i.url}">RSS</a>` : "N/A";
+			const aliasString = (i.aliases.length !== 0) ? i.aliases.join(", ") : "N/A";
+			const notesString = ("notes" in i && i.notes) ? i.notes : "";
+
+			return core.Utils.tag.trim `
+				<tr>
+					<td>${i.name}</td>
+					<td>${aliasString}</td>
+					<td>${urlString}</td>
+					<td>${notesString}			
+				</tr>
+			`;
+		}).join("");
 
 		return [
 			"Subscribes or unsubscribes your account from an event in Supibot's database.",
@@ -229,7 +236,8 @@ export default declare({
 			"",
 
 			"List of available events:",
-			`<ul>${typesList}</ul>`
+			`<table><thead><th style="min-width:50px">Name</th><th>Aliases</th><th style="min-width:45px">Source</th><th>Notes</th></thead>${tableBody}</table>`,
+			""
 		];
 	}
 });

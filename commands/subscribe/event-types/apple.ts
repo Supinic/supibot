@@ -3,7 +3,6 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "Apple Newsroom",
 	aliases: ["apple"],
-	notes: "Posts new Apple Newsroom articles",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new Apple Newsroom article is posted.",

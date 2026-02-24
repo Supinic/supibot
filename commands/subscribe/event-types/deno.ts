@@ -3,7 +3,6 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "Deno",
 	aliases: [],
-	notes: "Deno article",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new Deno article is published.",

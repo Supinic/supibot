@@ -3,7 +3,6 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "V8",
 	aliases: [],
-	notes: "V8 versions",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new V8 version is released.",

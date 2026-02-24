@@ -2,8 +2,7 @@ import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "MSVC++",
-	aliases: ["msvc++", "MSVCPP", "msvcpp"],
-	notes: "Every five minutes, Supibot checks new devblogs on Microsoft's Visual Studio C++ website. If a new article is detected, you will be notified in the channel you subscribed in.",
+	aliases: ["msvcpp"],
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new MSVC++ devblog is published.",

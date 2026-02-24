@@ -2,8 +2,7 @@ import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "Arch Linux",
-	aliases: ["arch", "archlinux"],
-	notes: "Posts new Arch Linux news articles whenever one is published",
+	aliases: ["arch"],
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new Arch Linux article is published.",

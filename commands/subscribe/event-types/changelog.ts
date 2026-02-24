@@ -5,7 +5,7 @@ export default {
 	aliases: [],
 	type: "special",
 	generic: false,
-	notes: "Every minute, Supibot checks for new changelogs. If you are subscribed, you will receive a private system reminder from Supibot.",
+	notes: "Posts news updates about changes to Supibot's code.",
 	channelSpecificMention: false,
 	response: {
 		added: "You will now receive a reminder whenever a new changelog is posted.",

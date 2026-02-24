@@ -3,7 +3,7 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "Steam Giveaways",
 	aliases: ["steam-giveaway"],
-	notes: "Every five minutes, Supibot checks for new Steam giveaways on the GamerPower website.",
+	notes: "Notifies about new Steam giveaways on the GamerPower website.",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new Steam giveaway is detected.",

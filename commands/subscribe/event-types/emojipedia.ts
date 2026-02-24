@@ -3,7 +3,6 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "Emojipedia",
 	aliases: ["emoji"],
-	notes: "Posts new Emojipedia blogposts whenever one is published",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new Emojipedia blogpost is published.",

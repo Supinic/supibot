@@ -3,7 +3,6 @@ import type { RssEventDefinition } from "../generic-event.js";
 export default {
 	name: "Factorio",
 	aliases: [],
-	notes: "Posts new Factorio blog posts",
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new Factorio blogpost is published.",

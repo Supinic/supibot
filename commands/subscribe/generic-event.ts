@@ -164,7 +164,7 @@ type BaseEventDefinition = {
 	type: "rss" | "custom" | "special";
 	name: string;
 	aliases: string[];
-	notes: string;
+	notes?: string;
 	channelSpecificMention?: boolean;
 	generic: boolean;
 };

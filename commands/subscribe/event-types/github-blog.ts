@@ -2,8 +2,7 @@ import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "GitHub Blog",
-	aliases: ["github-blog", "github"],
-	notes: "Posts new GitHub blogposts whenever one is published",
+	aliases: ["github"],
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever a new GitHub blogpost is published.",
