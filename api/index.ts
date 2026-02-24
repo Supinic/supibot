@@ -56,8 +56,8 @@ const handleRequest = async (req: http.IncomingMessage, res: http.ServerResponse
 	}
 
 	const url = new URL(req.url ?? "/", baseUrl);
-	const [route, endpoint] = url.pathname.split("/").filter(Boolean);
-	if (!route || !endpoint) {
+	const [route, endpoint = "index"] = url.pathname.split("/").filter(Boolean);
+	if (!route) {
 		handleNotFound(res, "malformed path");
 		return;
 	}
