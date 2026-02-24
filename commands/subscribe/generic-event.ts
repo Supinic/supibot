@@ -77,6 +77,33 @@ const createReminders = async function (users: UserSubscription[], message: stri
 
 type HandleOptions = { lastSeenThreshold?: number; };
 
+const sendChannelSubscriptionMessage = async (message: string, channelID: number, userDataList: UserSubscription[]): Promise<void> => {
+	const channelData = sb.Channel.get(channelID);
+	if (!channelData) {
+		return;
+	}
+
+	const threshold = new SupiDate().addMonths(-3);
+	const longInactiveUsers = await core.Query.getRecordset<number[]>(rs => rs
+		.select("User_Alias")
+		.from("chat_data", "Message_Meta_User_Alias")
+		.where("Channel = %n", channelID)
+		.where("User_Alias IN %n+", userDataList.map(i => i.ID))
+		.where("Last_Message_Posted < %d", threshold)
+		.flat("User_Alias")
+	);
+
+	const chatPing = userDataList
+		.filter(i => !longInactiveUsers.includes(i.ID))
+		.map(i => `@${i.Username}`);
+
+	if (chatPing.length === 0) {
+		return;
+	}
+
+	await channelData.send(`${chatPing.join(" ")} ${message}`);
+};
+
 const handleSubscription = async function (subType: SubscriptionType, message: string, options: HandleOptions = {}) {
 	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType, options.lastSeenThreshold);
 
@@ -95,15 +122,13 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
 		userArray.push(user);
 	}
 
+	const promises = [];
 	for (const [channelID, userDataList] of channelUsers.entries()) {
-		const chatPing = userDataList.map(i => `@${i.Username}`).join(" ");
-		const channelData = sb.Channel.get(channelID);
-		if (!channelData) {
-			continue;
-		}
-
-		await channelData.send(`${chatPing} ${message}`);
+		const promise = sendChannelSubscriptionMessage(message, channelID, userDataList);
+		promises.push(promise);
 	}
+
+	await Promise.allSettled(promises);
 };
 
 type WeirdRssCategory = { _: string; $: Record<string, string> };
