@@ -200,10 +200,12 @@ export default tseslint.config(
 			"unicorn/prefer-date-now": "warn",
 			"unicorn/prefer-includes": "warn",
 			"unicorn/prefer-math-trunc": "warn",
+			"unicorn/prefer-string-raw": "off",
 			"unicorn/prefer-string-starts-ends-with": "warn",
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
 
+			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
 				allowNumber: true
