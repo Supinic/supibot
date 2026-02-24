@@ -23,10 +23,10 @@ export default {
 		const platform = url.searchParams.get("platform") ?? "twitch";
 		const channel = url.searchParams.get("channel");
 		const user = url.searchParams.get("user");
-		if (!channel || !user) {
+		if (!user) {
 			return {
 				statusCode: 400,
-				error: { message: `Missing user and/or channel identifiers` }
+				error: { message: `Missing user identifier` }
 			};
 		}
 
@@ -38,7 +38,19 @@ export default {
 			};
 		}
 
-		const channelData = sb.Channel.get(channel, platformData) ?? null;
+		let channelData = null;
+		if (channel) {
+			const potentialChannel = sb.Channel.get(channel, platformData);
+			if (!potentialChannel) {
+				return {
+					statusCode: 400,
+					error: { message: `Invalid channel provided` }
+				};
+			}
+
+			channelData = potentialChannel;
+		}
+
 		const userData = await sb.User.get(user, true) ?? null;
 		if (!userData) {
 			return {
