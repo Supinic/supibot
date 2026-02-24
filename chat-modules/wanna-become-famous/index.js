@@ -30,6 +30,12 @@ export default {
 		else if (msg.includes("upgrade your stream")) {
 			reason = "upgrading your stream";
 		}
+		else if (msg.includes("stream promotion")) {
+			reason = "promoting your stream";
+		}
+		else if (msg.includes(".ru")) {
+			reason = "being suspicious";
+		}
 		else if (basicRegex.test(msg)) {
 			reason = "no more spam";
 		}
