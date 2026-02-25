@@ -246,8 +246,8 @@ export default declare({
 				}
 
 				const channelData = sb.Channel.get("supinic", "twitch");
-				if (channelData) {
-					void channelData.send(`Seems like the HLTB endpoint has changed, it is now "${newEndpoint}" Clueless @Supinic`);
+				if (newEndpoint !== endpoint && channelData) {
+					void channelData.send(`Clueless @Supinic Seems like the HLTB endpoint has changed. Old: "${endpoint}" New: "${newEndpoint}"`);
 				}
 			}
 		}
