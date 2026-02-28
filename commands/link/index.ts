@@ -23,7 +23,7 @@ export default declare({
 				reply: `You probably meant to use the "$alias link" command!`
 			};
 		}
-		if (!context.channel) {
+		if (context.channel) {
 			return {
 				success: false,
 				reply: "This command is only used for account linking, and must be used in PMs!"
