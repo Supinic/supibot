@@ -33,14 +33,12 @@ export default declare({
 	Aliases: null,
 	Cooldown: 5000,
 	Description: "Creates a random sequence of words based on a Markov-chain module from Twitch chat.",
-	Flags: ["non-nullable","pipe"],
-	Params: [
-		{ name: "channel", type: "string" },
-		{ name: "stop", type: "boolean" }
-	],
+	Flags: ["non-nullable", "pipe"],
+	Params: [{ name: "channel", type: "string" }],
 	Whitelist_Response: null,
 	Code: function markov (context, input) {
-		let targetChannel;
+		let markov;
+		const { markovs } = getMarkovData();
 		if (context.params.channel) {
 			const channelData = sb.Channel.get(context.params.channel);
 			if (!channelData) {
@@ -50,28 +48,22 @@ export default declare({
 				};
 			}
 
-			targetChannel = channelData;
-		}
-		else if (context.channel) {
-			targetChannel = context.channel;
+			markov = markovs.get(channelData.ID);
 		}
 		else {
-			targetChannel = sb.Channel.get("forsen"); // legacy fallback behaviour
+			if (context.channel) {
+				markov = markovs.get(context.channel.ID);
+			}
+
+			markov ??= markovs.get(sb.Channel.getAsserted("forsen").ID);
 		}
 
-		if (!targetChannel) {
-			return {
-				success: false,
-				reply: `No such channel exists!`
-			};
-		}
-
-		const { markovs } = getMarkovData();
-		const markov = markovs.get(targetChannel.ID);
 		if (!markov) {
 			return {
 				success: false,
-				reply: "This channel does not have a markov-chain module configured!"
+				reply: (context.params.channel)
+					? "Your specific channel does not have a markov-chain module configured!"
+					: "Could not load the markov-chain module for fallback channel!"
 			};
 		}
 		else if (markov.size < MODEL_SIZE_THRESHOLD) {
@@ -92,6 +84,7 @@ export default declare({
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Chat_Module = %s", "async-markov-experiment")
 			.where("Channel.Platform = %n", 1)
+			.where("Channel.Mode <> %s", "Inactive")
 			.join({
 				toTable: "Channel",
 				on: "Channel_Chat_Module.Channel = Channel.ID"
@@ -99,20 +92,24 @@ export default declare({
 		);
 
 		const channelList = channels.map(i => (
-			`<li><a href="//twitch.tv/${i.name}">${i.name}</a> -- <a href="/data/other/markov/${i.channelId}/words">List of words</a>`
+			`<li><a href="//twitch.tv/${i.name}">${i.name}</a>`
 		)).join("");
 
 		return [
 			`Uses a <a href="//en.wikipedia.org/wiki/Markov_model">Markov model</a> to generate "real-looking" sentences based on Twitch chat.`,
-			"Various channels are supported, and the command currently uses @Forsen's channel by default if no channel is provided.",
+			"Only the below listed channel are supported.",
 			"",
 
 			`<code>${prefix}markov</code>`,
-			"Generates random words, with the first one being chosen randomly as well.",
+			"Generates random words.",
+			"Uses the current channel's markov-chain module, if it is configured.",
+			"If not, defaults to the module running in @Forsen's channel.",
 			"",
 
 			`<code>${prefix}markov channel:(channel)</code>`,
 			"Generates words in the specified channel's context.",
+			"",
+
 			`List of currently supported channels: <ul>${channelList}</ul>`
 		];
 	}
