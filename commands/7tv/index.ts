@@ -105,7 +105,7 @@ const getEmotesInSet = async (setId: string) => {
 };
 
 const addEmote = async (token: string, emoteId: string, setId: string, channelData: Channel) => {
-	const variables = { emoteId, setId };
+	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation AddEmoteToSet($setId: Id!, $emoteId: EmoteSetEmoteId!) {
 		emoteSets {
@@ -131,7 +131,7 @@ const addEmote = async (token: string, emoteId: string, setId: string, channelDa
 };
 
 const removeEmote = async (token: string, emoteId: string, setId: string, channelData: Channel) => {
-	const variables = { emoteId, setId };
+	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation RemoveEmoteFromSet($setId: Id!, $emoteId: EmoteSetEmoteId!) {
 		emoteSets {
