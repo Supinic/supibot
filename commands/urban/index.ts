@@ -1,7 +1,7 @@
 import { declare } from "../../classes/command.js";
 import * as z from "zod";
-const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
 
+const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
 const urbanResponseSchema = z.object({
 	list: z.array(
 		z.object({
@@ -18,7 +18,6 @@ const urbanResponseSchema = z.object({
 		})
 	)
 });
-
 const urbanAutocompleteResponseSchema = z.object({
 	results: z.array(
 		z.object({
@@ -29,7 +28,6 @@ const urbanAutocompleteResponseSchema = z.object({
 });
 
 type UrbanItem = z.infer<typeof urbanResponseSchema>["list"][number];
-
 const prepareItemStrings = (item: UrbanItem) => {
 	const url = new URL(item.permalink);
 	// const id = url.pathname.replace("/", ""); // Looks like this no longer works as of cca. 2025-07-06
@@ -44,6 +42,17 @@ const prepareItemStrings = (item: UrbanItem) => {
 	const content = (item.definition + example).replaceAll(/[\][]/g, "");
 	return { link, content, thumbs };
 };
+
+/**
+ * Here is a guideline for the current API to obtain votes:
+ * For the given definition IDs, a hex signature is required. The signature is unique for combination of IDs and is order-specific
+ * Possible way to get this:
+ * 1) Do the fetching as normal, obtain the result item ID
+ * 2) Scrape https://urbanup.com/${id}
+ * 3) Look for <body> attribute "...signature" and the item IDs related to it
+ * 4A) Fetch https://www.urbandictionary.com/api/vote?defids=(comma separated list))&signature=(signature))
+ * 4B) Just scrape the HTML from 2) - attributes data-x-text=upCount/downCount
+ */
 
 export default declare({
 	Name: "urban",
