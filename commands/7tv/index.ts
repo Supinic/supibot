@@ -107,10 +107,10 @@ const getEmotesInSet = async (setId: string) => {
 const addEmote = async (token: string, emoteId: string, setId: string, channelData: Channel) => {
 	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
-	const query = `mutation AddEmoteToSet($setId: Id!, $emoteId: EmoteSetEmoteId!) {
+	const query = `mutation AddEmoteToSet($setId: Id!, $emote: EmoteSetEmoteId!) {
 		emoteSets {
 			emoteSet(id: $setId) {
-				addEmote(id: $emoteId) { id }
+				addEmote(id: $emote) { id }
 			}
 		}
 	}`;
@@ -133,10 +133,10 @@ const addEmote = async (token: string, emoteId: string, setId: string, channelDa
 const removeEmote = async (token: string, emoteId: string, setId: string, channelData: Channel) => {
 	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
-	const query = `mutation RemoveEmoteFromSet($setId: Id!, $emoteId: EmoteSetEmoteId!) {
+	const query = `mutation RemoveEmoteFromSet($setId: Id!, $emote: EmoteSetEmoteId!) {
 		emoteSets {
 			emoteSet(id: $setId) {
-				removeEmote(id: $emoteId) { id }
+				removeEmote(id: $emote) { id }
 			}
 		}
 	}`;
