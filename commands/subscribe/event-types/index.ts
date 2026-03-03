@@ -21,6 +21,7 @@ import RuneliteSubDefinition from "./runelite.js";
 import RustSubDefinition from "./rust.js";
 import SteamGiveawayDefinition from "./steam-giveaway.js";
 import SuggestionSubDefinition from "./suggestion.js";
+import TwitchDevDefinition from "./twitch-dev.js";
 import V8SubDefinition from "./v8.js";
 
 export default [
@@ -45,5 +46,6 @@ export default [
 	RustSubDefinition,
 	SteamGiveawayDefinition,
 	SuggestionSubDefinition,
+	TwitchDevDefinition,
 	V8SubDefinition
 ] satisfies EventDefinition[];
