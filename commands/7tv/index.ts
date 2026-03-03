@@ -104,7 +104,7 @@ const getEmotesInSet = async (setId: string) => {
 	return sevenTvEmoteSetEmotesSchema.parse(response.body).data.emoteSets.emoteSet.emotes.items;
 };
 
-const addEmote = async (token: string, emoteId: string, setId: string, channelData: Channel) => {
+const addEmote = async (token: string, emoteId: string, setId: string) => {
 	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation AddEmoteToSet($setId: Id!, $emote: EmoteSetEmoteId!) {
@@ -117,20 +117,9 @@ const addEmote = async (token: string, emoteId: string, setId: string, channelDa
 
 	const response = await core.Got.gql({ url, query, headers, variables });
 	sevenTvAddEmoteSchema.parse(response.body);
-
-	const existingSet = await channelData.getDataProperty("sevenTvRotatingEmotes");
-	if (!existingSet) {
-		throw new SupiError({
-			message: "Assert error: Guaranteed emote set data does not exist",
-			args: { channel: channelData.ID }
-		});
-	}
-
-	existingSet.emotes.push({ id: emoteId, added: SupiDate.now() });
-	await channelData.setDataProperty("sevenTvRotatingEmotes", existingSet);
 };
 
-const removeEmote = async (token: string, emoteId: string, setId: string, channelData: Channel) => {
+const removeEmote = async (token: string, emoteId: string, setId: string) => {
 	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation RemoveEmoteFromSet($setId: Id!, $emote: EmoteSetEmoteId!) {
@@ -143,22 +132,6 @@ const removeEmote = async (token: string, emoteId: string, setId: string, channe
 
 	const response = await core.Got.gql({ url, query, headers, variables });
 	sevenTvRemoveEmoteSchema.parse(response.body);
-
-	const existingSet = await channelData.getDataProperty("sevenTvRotatingEmotes");
-	if (!existingSet) {
-		throw new SupiError({
-			message: "Assert error: Guaranteed emote set data does not exist",
-			args: { channel: channelData.ID }
-		});
-	}
-
-	const emoteIndex = existingSet.emotes.findIndex(i => i.id === emoteId);
-	if (emoteIndex === -1) {
-		return;
-	}
-
-	existingSet.emotes.splice(emoteIndex, 1);
-	await channelData.setDataProperty("sevenTvRotatingEmotes", existingSet);
 };
 
 const sevenTvIdRegex = /([A-Z0-9]{26})/;
@@ -206,23 +179,33 @@ export default declare({
 			};
 		}
 
-		const combinedEmoteData = [];
-		for (const emote of apiEmotes) {
-			const local = localData.emotes.find(i => i.id === emote.id);
-			combinedEmoteData.push({
-				id: emote.id,
-				added: local?.added ?? 0
-			});
-		}
+		const apiEmoteIds = new Set(apiEmotes.map(i => i.id));
+		const combinedEmoteData = localData.emotes.filter(i => apiEmoteIds.has(i.id));
 
 		if (combinedEmoteData.length >= EMOTE_LIMIT) {
-			const sorted = combinedEmoteData.toSorted((a, b) => a.added - b.added);
-			const candidate = sorted[0];
+			let index = 0;
+			let added = Infinity;
+			for (let i = 0; i < combinedEmoteData.length; i++) {
+				const emote = combinedEmoteData[i];
+				if (emote.added < added) {
+					index = i;
+					added = emote.added;
+				}
+			}
 
-			await removeEmote(token, candidate.id, localData.emoteSetId, context.channel);
+			const candidate = combinedEmoteData[index];
+			await removeEmote(token, candidate.id, localData.emoteSetId);
+
+			combinedEmoteData.splice(index, 1);
 		}
 
-		await addEmote(token, emoteId, localData.emoteSetId, context.channel);
+		await addEmote(token, emoteId, localData.emoteSetId);
+		combinedEmoteData.push({ id: emoteId, added: SupiDate.now() });
+
+		await context.channel.setDataProperty("sevenTvRotatingEmotes", {
+			emoteSetId: localData.emoteSetId,
+			emotes: combinedEmoteData
+		});
 
 		return {
 			success: true,
