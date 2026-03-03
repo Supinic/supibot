@@ -96,7 +96,7 @@ const fetchEmoteSet = async (token: string, channelData: Channel) => {
 
 const getEmotesInSet = async (setId: string) => {
 	const variables = { setId };
-	const query = `query EmotesInSet(setId: Id!) {
+	const query = `query EmotesInSet($setId: Id!) {
 	  emoteSets {
 		emoteSet(id: $setId) {
 		  emotes(page: 1, perPage: 100) {
