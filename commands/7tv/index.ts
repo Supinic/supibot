@@ -34,7 +34,7 @@ const sevenTvEmoteSetEmotesSchema = z.object({
 	})
 });
 
-const url = "https://7tv.io/v3/gql";
+const url = "https://7tv.io/v4/gql";
 const getSevenTvUserData = async (twitchUserId: string) => {
 	const response = await core.Got.get("GenericAPI")({
 		url: `https://7tv.io/v3/users/twitch/${twitchUserId}`
@@ -69,17 +69,17 @@ const fetchEmoteSet = async (token: string, channelData: Channel) => {
 	}
 
 	const name = "Rotating emotes handled by Supibot";
-	const variables = { name, ownerId };
-	const headers = { Bearer: token };
+	const variables = { name, ownerId, tags: [] };
+	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation CreateEmoteSet($name: String!, $tags: [String!]!, $ownerId: Id!) {
-		emoteSet {
+		emoteSets {
 			create(name: $name, tags: $tags, ownerId: $ownerId) {
 				id
 			}
 		}
 	}`;
 
-	const response = await core.Got.gql({ url, query, variables, headers });
+	const response = await core.Got.gql({ url, headers, query, variables });
 	const newEmoteSetId = sevenTvCreateEmoteSetSchema.parse(response.body).data.emoteSets.id;
 
 	return {
@@ -109,7 +109,7 @@ const getEmotesInSet = async (setId: string) => {
 
 const modifyEmoteSet = async (operation: "ADD" | "REMOVE", token: string, emoteId: string, emoteSet: string) => {
 	const variables = { emoteId, emoteSet };
-	const headers = { Bearer: token };
+	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation addEmote($emoteSet: ObjectID!, $emoteId: ObjectID!) {
 		emoteSet(id: $emoteSet) {
 			emotes(id: $emoteId, action: ${operation}) {
