@@ -90,7 +90,7 @@ const getEmotesInSet = async (setId: string) => {
 	const query = `query EmotesInSet($setId: Id!) {
 	  emoteSets {
 		emoteSet(id: $setId) {
-		  emotes(page: 1, perPage: 100) {
+		  emotes(page: 1, perPage: 1000) {
 			items { 
 				id
 				alias
