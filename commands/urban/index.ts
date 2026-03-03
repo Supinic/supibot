@@ -121,16 +121,16 @@ export default declare({
 		}
 
 		const { list } = urbanResponseSchema.parse(response.body);
-		if (list.length === 0) {
+		const items = list
+			.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase())
+			.sort((a, b) => b.thumbs_up - a.thumbs_up);
+
+		if (items.length === 0) {
 			return {
 				success: false,
 				reply: "No such definition exists!"
 			};
 		}
-
-		const items = list
-			.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase())
-			.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
 		const index = context.params.index ?? 0;
 		const item = items.at(index);
