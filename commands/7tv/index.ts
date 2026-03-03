@@ -72,7 +72,7 @@ const fetchEmoteSet = async (token: string, channelData: Channel) => {
 	const variables = { name, ownerId };
 	const headers = { Bearer: token };
 	const query = `mutation CreateEmoteSet($name: String!, $tags: [String!]!, $ownerId: Id!) {
-		emoteSets {
+		emoteSet {
 			create(name: $name, tags: $tags, ownerId: $ownerId) {
 				id
 			}
