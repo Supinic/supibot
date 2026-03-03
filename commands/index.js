@@ -1,3 +1,4 @@
+import SevenTvCommand from "./7tv/index.js";
 import EightBallCommand from "./8ball/index.js";
 import NineGagCommand from "./9gag/index.js";
 import AboutCommand from "./about/index.js";
@@ -180,6 +181,7 @@ import YouTubeSearchCommand from "./youtubesearch/index.js";
 
 export default [
 	PercentCommand,
+	SevenTvCommand,
 	EightBallCommand,
 	NineGagCommand,
 	AboutCommand,
