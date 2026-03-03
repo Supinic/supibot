@@ -40,7 +40,7 @@ const getSevenTvUserData = async (twitchUserId: string) => {
 		url: `https://7tv.io/v3/users/twitch/${twitchUserId}`
 	});
 
-	return sevenTvUserIdSchema.parse(response).user;
+	return sevenTvUserIdSchema.parse(response.body).user;
 };
 
 const fetchEmoteSet = async (token: string, channelData: Channel) => {
@@ -80,7 +80,7 @@ const fetchEmoteSet = async (token: string, channelData: Channel) => {
 	}`;
 
 	const response = await core.Got.gql({ url, query, variables, headers });
-	const newEmoteSetId = sevenTvCreateEmoteSetSchema.parse(response).data.emoteSets.id;
+	const newEmoteSetId = sevenTvCreateEmoteSetSchema.parse(response.body).data.emoteSets.id;
 
 	return {
 		emoteSetId: newEmoteSetId,
