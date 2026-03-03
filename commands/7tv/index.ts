@@ -31,7 +31,7 @@ const sevenTvEmoteSetEmotesSchema = z.object({
 const sevenTvAddEmoteSchema = z.object({
 	data: z.object({
 		emoteSets: z.object({
-			emotes: z.object({
+			emoteSet: z.object({
 				addEmote: z.object({ id: z.string() })
 			})
 		})
@@ -40,7 +40,7 @@ const sevenTvAddEmoteSchema = z.object({
 const sevenTvRemoveEmoteSchema = z.object({
 	data: z.object({
 		emoteSets: z.object({
-			emotes: z.object({
+			emoteSet: z.object({
 				removeEmote: z.object({ id: z.string() })
 			})
 		})
@@ -56,7 +56,7 @@ const getSevenTvUserData = async (twitchUserId: string) => {
 	return sevenTvUserIdSchema.parse(response.body).user;
 };
 
-const fetchEmoteSet = async (token: string, channelData: Channel) => {
+const fetchEmoteSet = async (channelData: Channel) => {
 	if (channelData.Platform.name !== "twitch") {
 		throw new SupiError({
 			message: "Channel is not Twitch lol"
@@ -195,7 +195,7 @@ export default declare({
 		}
 
 		const emoteId = match[1];
-		const localData = await fetchEmoteSet(token, context.channel);
+		const localData = await fetchEmoteSet(context.channel);
 		const apiEmotes = await getEmotesInSet(localData.emoteSetId);
 
 		const existing = apiEmotes.some(i => i.id === emoteId);
