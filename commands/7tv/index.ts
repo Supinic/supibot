@@ -16,7 +16,11 @@ const sevenTvUserIdSchema = z.object({
 });
 const sevenTvCreateEmoteSetSchema = z.object({
 	data: z.object({
-		emoteSets: z.object({ id: z.string() })
+		emoteSets: z.object({
+			create: z.object({
+				id: z.string()
+			})
+		})
 	})
 });
 const sevenTvEmoteSetEmotesSchema = z.object({
@@ -80,7 +84,7 @@ const fetchEmoteSet = async (token: string, channelData: Channel) => {
 	}`;
 
 	const response = await core.Got.gql({ url, headers, query, variables });
-	const newEmoteSetId = sevenTvCreateEmoteSetSchema.parse(response.body).data.emoteSets.id;
+	const newEmoteSetId = sevenTvCreateEmoteSetSchema.parse(response.body).data.emoteSets.create.id;
 	const newSetData = {
 		emoteSetId: newEmoteSetId,
 		emotes: []
