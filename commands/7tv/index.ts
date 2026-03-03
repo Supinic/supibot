@@ -81,11 +81,13 @@ const fetchEmoteSet = async (token: string, channelData: Channel) => {
 
 	const response = await core.Got.gql({ url, headers, query, variables });
 	const newEmoteSetId = sevenTvCreateEmoteSetSchema.parse(response.body).data.emoteSets.id;
-
-	return {
+	const newSetData = {
 		emoteSetId: newEmoteSetId,
 		emotes: []
 	};
+
+	await channelData.setDataProperty("sevenTvRotatingEmotes", newSetData);
+	return newSetData;
 };
 
 const getEmotesInSet = async (setId: string) => {
