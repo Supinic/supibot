@@ -68,6 +68,7 @@ export default declare({
 		const excerpt = (item.excerpt !== false) ? item.excerpt : "";
 
 		return {
+			success: true,
 			reply: `${typeName} is ${item.name}: ${core.Utils.fixHTML(excerpt)} ${item.url}`
 		};
 	}),
