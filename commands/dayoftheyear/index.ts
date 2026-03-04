@@ -65,7 +65,7 @@ export default declare({
 
 		const item = core.Utils.randArray(data);
 		const typeName = (type === "day") ? "Today" : "This month";
-		const excerpt = (item.excerpt !== false) ? item.excerpt : "(no description available)";
+		const excerpt = (item.excerpt !== false) ? item.excerpt : "";
 
 		return {
 			reply: `${typeName} is ${item.name}: ${core.Utils.fixHTML(excerpt)} ${item.url}`
