@@ -6,7 +6,7 @@ const responseSchema = z.object({
 	data: z.array(z.object({
 		name: z.string(),
 		type: z.string(), // "day", "other"
-		excerpt: z.string(),
+		excerpt: z.union([z.string(), z.literal(false)]),
 		url: z.string()
 	}))
 });
@@ -65,8 +65,10 @@ export default declare({
 
 		const item = core.Utils.randArray(data);
 		const typeName = (type === "day") ? "Today" : "This month";
+		const excerpt = (item.excerpt !== false) ? item.excerpt : "(no description available)";
+
 		return {
-			reply: `${typeName} is ${item.name}: ${core.Utils.fixHTML(item.excerpt)} ${item.url}`
+			reply: `${typeName} is ${item.name}: ${core.Utils.fixHTML(excerpt)} ${item.url}`
 		};
 	}),
 	Dynamic_Description: (prefix) => [
