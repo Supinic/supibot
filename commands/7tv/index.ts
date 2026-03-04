@@ -48,6 +48,8 @@ const sevenTvRemoveEmoteSchema = z.object({
 });
 
 const url = "https://7tv.io/v4/gql";
+const sevenTvIdRegex = /([A-Z0-9]{26})/;
+
 const getSevenTvUserData = async (twitchUserId: string) => {
 	const response = await core.Got.get("GenericAPI")({
 		url: `https://7tv.io/v3/users/twitch/${twitchUserId}`
@@ -134,8 +136,6 @@ const removeEmote = async (token: string, emoteId: string, setId: string) => {
 	sevenTvRemoveEmoteSchema.parse(response.body);
 };
 
-const sevenTvIdRegex = /([A-Z0-9]{26})/;
-
 export default declare({
 	Name: "7tv",
 	Aliases: null,
@@ -203,7 +203,7 @@ export default declare({
 		combinedEmoteData.push({ id: emoteId, added: SupiDate.now() });
 
 		await context.channel.setDataProperty("sevenTvRotatingEmotes", {
-			emoteSetId: localData.emoteSetId,
+			...localData,
 			emotes: combinedEmoteData
 		});
 
