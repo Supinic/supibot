@@ -209,7 +209,7 @@ export default declare({
 
 		return {
 			success: true,
-			reply: "Works pog"
+			reply: "Emote successfully added."
 		};
 	},
 	Dynamic_Description: (prefix) => []
