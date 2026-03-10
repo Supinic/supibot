@@ -264,6 +264,27 @@ const modeSchema = z.object({
 	queueSize: z.int().positive().optional(),
 	cooldown: z.int().positive().optional()
 });
+const channelPointsSchema = z.array(z.object({
+	data: z.object({
+		community: z.object({
+			channel: z.object({
+				communityPointsSettings: z.object({
+					name: z.string().nullable(),
+					customRewards: z.array(z.object({
+						id: z.string(),
+						title: z.string(),
+						isEnabled: z.boolean(),
+						isPaused: z.boolean(),
+						isUserInputRequired: z.boolean(),
+						pricingType: z.string()
+					}))
+				})
+			})
+		}).nullable()
+	})
+}));
+type ChannelPointsData = NonNullable<z.infer<typeof channelPointsSchema>[number]["data"]["community"]>["channel"]["communityPointsSettings"];
+
 export const TwitchConfigSchema = BasePlatformConfigSchema.extend({
 	selfId: z.string().regex(/\d+/),
 	logging: z.object({
@@ -1444,6 +1465,32 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			...((ffz.status === "fulfilled") ? ffz.value : []),
 			...((sevenTv.status === "fulfilled") ? sevenTv.value : [])
 		];
+	}
+
+	async fetchChannelPointsData (channelLogin: string): Promise<ChannelPointsData | null> {
+		const response = await core.Got.get("TwitchGQL")({
+			responseType: "json",
+			headers: {
+				Referer: "https://www.twitch.tv/"
+			},
+			body: JSON.stringify([{
+				operationName: "ChannelPointsContext",
+				extensions: {
+					persistedQuery: {
+						version: 1,
+						sha256Hash: "7fe050e3761eb2cf258d70ee1a21cbd76fa8cf3d7e7b12fc437e7029d446b5e3"
+					}
+				},
+				variables: { channelLogin }
+			}])
+		});
+
+		const [{ data }] = channelPointsSchema.parse(response.body);
+		if (!data.community) {
+			return null;
+		}
+
+		return data.community.channel.communityPointsSettings;
 	}
 
 	async populateUserList (channelData: Channel) {

@@ -5,10 +5,13 @@ import { SubcommandCollection, type SubcommandDefinition } from "../../../classe
 
 import AddSubcommand from "./add.js";
 import CheckSubcommand from "./check.js";
+import SetSubcommand from "./set.js";
+import type { SevenTvRotatingEmotesData } from "../../../classes/custom-data-properties.js";
 
 const subcommands: SubcommandDefinition[] = [
 	AddSubcommand,
-	CheckSubcommand
+	CheckSubcommand,
+	SetSubcommand
 ];
 
 export const SevenTvSubcommands = new SubcommandCollection("7tv", subcommands);
@@ -97,10 +100,9 @@ export const fetchSevenTvChannelData = async (channelData: Channel) => {
 	}
 
 	const { id: ownerId } = await getSevenTvUserData(channelTwitchId);
-	const newSetData = {
+	const newSetData: SevenTvRotatingEmotesData = {
 		emoteSetId: ownerId,
-		emotes: [],
-		limit: SEVEN_TV_DEFAULT_LIMIT
+		emotes: []
 	};
 
 	await channelData.setDataProperty("sevenTvRotatingEmotes", newSetData);

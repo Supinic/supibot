@@ -5,14 +5,20 @@ import type { Query } from "supi-core";
 
 import type { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
 type TwitchLottoFlagName = typeof twitchLottoFlags[number]["name"];
-type SevenTvRotatingEmotesData = {
-	limit?: number;
+export type SevenTvRotatingEmotesData = {
 	emoteSetId: string;
 	emotes: {
 		id: string;
 		name: string;
 		added: number;
 	}[];
+	// Twitch Redemption ID for the operation of adding new emotes - if setup, will only allow execution through a redemption
+	addRedemption?: {
+		id: string;
+		active: boolean;
+		name: string;
+	};
+	limit?: number;
 };
 
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;

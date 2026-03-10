@@ -11,6 +11,7 @@ import {
 	sevenTvEmoteIdRegex
 } from "./index.js";
 import type { SevenTvSubcommandDefinition } from "../index.js";
+import { type MessageData as TwitchMessageData } from "../../../platforms/twitch.js";
 
 export default {
 	name: "add",
@@ -30,6 +31,18 @@ export default {
 			};
 		}
 
+		const localData = await fetchSevenTvChannelData(context.channel);
+		if ("addRedemption" in localData && localData.addRedemption) {
+			const { id, active, name } = localData.addRedemption;
+			const data = context.platformSpecificData as TwitchMessageData; // @todo fix with proper inferring from TwitchPlatform
+			if (active && data.rewardId !== id) {
+				return {
+					success: false,
+					reply: `You can only add emotes when using the "${name}" channel points reward!`
+				};
+			}
+		}
+
 		const match = args.join(" ").match(sevenTvEmoteIdRegex);
 		if (!match) {
 			return {
@@ -39,8 +52,6 @@ export default {
 		}
 
 		const emoteId = match[1];
-		const localData = await fetchSevenTvChannelData(context.channel);
-
 		const globalEmotes = await getGlobalEmotes();
 		const globalCollision = globalEmotes.find(i => i.ID === emoteId);
 		if (globalCollision) {
