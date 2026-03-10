@@ -6,9 +6,11 @@ import type { Query } from "supi-core";
 import type { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
 type TwitchLottoFlagName = typeof twitchLottoFlags[number]["name"];
 type SevenTvRotatingEmotesData = {
+	limit?: number;
 	emoteSetId: string;
 	emotes: {
 		id: string;
+		name: string;
 		added: number;
 	}[];
 };
