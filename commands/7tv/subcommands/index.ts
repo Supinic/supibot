@@ -163,7 +163,7 @@ export const addEmote = async (token: string, emoteId: string, setId: string) =>
 		}
 	}`;
 
-	const response = await core.Got.gql({ url, query, headers, variables });
+	const response = await core.Got.gql({ url, query, headers, variables, throwHttpErrors: false });
 	if (!response.ok) {
 		return {
 			success: false,
@@ -188,7 +188,7 @@ export const removeEmote = async (token: string, emoteId: string, setId: string)
 		}
 	}`;
 
-	const response = await core.Got.gql({ url, query, headers, variables });
+	const response = await core.Got.gql({ url, query, headers, variables, throwHttpErrors: false });
 	if (!response.ok) {
 		return {
 			success: false,
