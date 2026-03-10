@@ -47,7 +47,7 @@ export default {
 		if (!match) {
 			return {
 				success: false,
-				reply: "Could not extract the emote ID from your message! Try posting a 7TV website emote link."
+				reply: "You didn't provide a proper emote ID! Post a 7TV website emote link."
 			};
 		}
 
@@ -57,7 +57,7 @@ export default {
 		if (globalCollision) {
 			return {
 				success: false,
-				reply: `${globalCollision.name} is a 7TV global emote, and cannot be used in this command!`
+				reply: `Can't add ${globalCollision.name} because it's a global emote!`
 			};
 		}
 
@@ -66,7 +66,7 @@ export default {
 		if (existing) {
 			return {
 				success: false,
-				reply: "This emote is already present in the list of emotes!"
+				reply: "Emote is already present in the list of emotes!"
 			};
 		}
 
@@ -74,7 +74,7 @@ export default {
 		if (!emoteData || emoteData.deleted) {
 			return {
 				success: false,
-				reply: "That emote either doesn't exist or was deleted!"
+				reply: "Emote either doesn't exist or was deleted!"
 			};
 		}
 
@@ -117,7 +117,7 @@ export default {
 
 		return {
 			success: true,
-			reply: `Emote ${emoteData.defaultName} successfully added.${removedEmoteString}`
+			reply: `Added ${emoteData.defaultName} to the list.${removedEmoteString}`
 		};
 	}
 } satisfies SevenTvSubcommandDefinition;

@@ -29,7 +29,7 @@ export default {
 		const names = emotes.sort((a, b) => a.added - b.added).map(i => i.name).join(" ");
 		return {
 			success: true,
-			reply: `Current rotating emotes (oldest to newest): ${names}`
+			reply: `Current emotes (oldest to newest): ${names}`
 		};
 	}
 } satisfies SevenTvSubcommandDefinition;
