@@ -96,13 +96,25 @@ export default {
 			}
 
 			const candidate = combinedEmoteData[index];
-			await removeEmote(token, candidate.id, localData.emoteSetId);
+			const result = await removeEmote(token, candidate.id, localData.emoteSetId);
+			if (!result.success) {
+				return {
+					success: false,
+					reply: `Could not add emote! Check if I am set up as the 7TV editor for this channel (error code ${result.statusCode})`
+				};
+			}
 
 			const [removedEmote] = combinedEmoteData.splice(index, 1);
 			removedEmoteString = ` Removed ${removedEmote.name} to make space.`;
 		}
 
-		await addEmote(token, emoteId, localData.emoteSetId);
+		const addResult = await addEmote(token, emoteId, localData.emoteSetId);
+		if (!addResult.success) {
+			return {
+				success: false,
+				reply: `Could not add emote! Check if I am set up as the 7TV editor for this channel (error code ${addResult.statusCode})`
+			};
+		}
 
 		combinedEmoteData.push({
 			id: emoteId,

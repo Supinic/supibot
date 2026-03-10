@@ -164,7 +164,17 @@ export const addEmote = async (token: string, emoteId: string, setId: string) =>
 	}`;
 
 	const response = await core.Got.gql({ url, query, headers, variables });
+	if (!response.ok) {
+		return {
+			success: false,
+			statusCode: response.statusCode
+		};
+	}
+
 	sevenTvAddEmoteSchema.parse(response.body);
+	return {
+		success: true
+	};
 };
 
 export const removeEmote = async (token: string, emoteId: string, setId: string) => {
@@ -179,7 +189,17 @@ export const removeEmote = async (token: string, emoteId: string, setId: string)
 	}`;
 
 	const response = await core.Got.gql({ url, query, headers, variables });
+	if (!response.ok) {
+		return {
+			success: false,
+			statusCode: response.statusCode
+		};
+	}
+
 	sevenTvRemoveEmoteSchema.parse(response.body);
+	return {
+		success: true
+	};
 };
 
 export const fetchSevenTvToken = (): string => {
