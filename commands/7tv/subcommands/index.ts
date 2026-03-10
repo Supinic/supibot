@@ -144,6 +144,12 @@ export const getEmoteData = async (emoteId: string) => {
 	return emote;
 };
 
+export const getGlobalEmotes = async () => {
+	const twitch = sb.Platform.getAsserted("twitch");
+	const emotes = await twitch.fetchGlobalEmotes();
+	return emotes.filter(i => i.type === "7tv");
+};
+
 export const addEmote = async (token: string, emoteId: string, setId: string) => {
 	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };

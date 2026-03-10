@@ -2,14 +2,15 @@ import { SupiDate } from "supi-core";
 import {
 	addEmote,
 	fetchSevenTvChannelData,
-	fetchSevenTvToken, getEmoteData,
+	fetchSevenTvToken,
+	getEmoteData,
 	getEmotesInSet,
+	getGlobalEmotes,
 	removeEmote,
 	SEVEN_TV_DEFAULT_LIMIT,
 	sevenTvEmoteIdRegex
 } from "./index.js";
 import type { SevenTvSubcommandDefinition } from "../index.js";
-import { getEmote } from "../../fish/subcommands/fishing-utils.js";
 
 export default {
 	name: "add",
@@ -39,8 +40,17 @@ export default {
 
 		const emoteId = match[1];
 		const localData = await fetchSevenTvChannelData(context.channel);
-		const apiEmotes = await getEmotesInSet(localData.emoteSetId);
 
+		const globalEmotes = await getGlobalEmotes();
+		const globalCollision = globalEmotes.find(i => i.ID === emoteId);
+		if (globalCollision) {
+			return {
+				success: false,
+				reply: `${globalCollision.name} is a 7TV global emote, and cannot be used in this command!`
+			};
+		}
+
+		const apiEmotes = await getEmotesInSet(localData.emoteSetId);
 		const existing = apiEmotes.some(i => i.id === emoteId);
 		if (existing) {
 			return {
