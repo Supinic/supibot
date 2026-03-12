@@ -15,7 +15,6 @@ import SubscriptionReactionModule from "./subscription-react/index.js";
 import SilencePreventionTriggerModule from "./supinic-silence-prevention-trigger/index.js";
 import StreamDatabaseUpdaterModule from "./supinic-stream-db/index.js";
 import SuspiciousUserAutoCheckerModule from "./suspicious-user-auto-check/index.js";
-import TwitchBotScopeReminderModule from "./twitch-bot-scope-reminder/index.js";
 import WannaBecomeFamousModule from "./wanna-become-famous/index.js";
 
 export default [
@@ -37,6 +36,5 @@ export default [
 	SilencePreventionTriggerModule,
 	StreamDatabaseUpdaterModule,
 	SuspiciousUserAutoCheckerModule,
-	TwitchBotScopeReminderModule,
 	WannaBecomeFamousModule
 ];
