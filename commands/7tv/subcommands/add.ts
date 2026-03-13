@@ -54,7 +54,7 @@ export default {
 		if (!match) {
 			return {
 				success: false,
-				reply: "You didn't provide a proper emote ID! Post a 7TV website emote link."
+				reply: "You didn't provide a proper emote ID! Post a 7TV website emote link if you're unsure."
 			};
 		}
 
@@ -73,15 +73,16 @@ export default {
 		if (existing) {
 			return {
 				success: false,
-				reply: "Emote is already present in the list of emotes!"
+				reply: "Your provided emote is already added! "
 			};
 		}
 
 		const emoteData = await getEmoteData(emoteId);
 		if (!emoteData || emoteData.deleted) {
+			const reason = (!emoteData) ? "doesn't exist" : "was deleted";
 			return {
 				success: false,
-				reply: "Emote either doesn't exist or was deleted!"
+				reply: `Your provided emote ${reason}!`
 			};
 		}
 

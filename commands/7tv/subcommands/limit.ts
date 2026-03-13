@@ -2,6 +2,7 @@ import { fetchSevenTvChannelData } from "./index.js";
 import type { SevenTvSubcommandDefinition } from "../index.js";
 
 const MAX_EMOTE_LIMIT = 250;
+
 export default {
 	name: "limit",
 	title: "Changes the amount of rotating 7TV emotes.",
