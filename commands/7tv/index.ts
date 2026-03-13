@@ -26,7 +26,16 @@ const aliasCommandDefinition = declare({
 
 		return await subcommand.execute.call(this, context, ...args);
 	},
-	Dynamic_Description: (prefix) => []
+	Dynamic_Description: async () => {
+		const descriptions = await SevenTvSubcommands.createDescription();
+		return [
+			"This command lets you manage a so-called rotating list of 7TV emotes, where users can add a 7TV emote of their choosing to the channel's emotes.",
+			"The list of emotes is capped by a limit, and any emotes above that limit will cause the oldest added emote to be removed.",
+			"",
+
+			...descriptions
+		];
+	}
 });
 
 export default aliasCommandDefinition;

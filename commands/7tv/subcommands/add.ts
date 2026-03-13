@@ -24,9 +24,11 @@ export default {
 		"If the emote would exceed the current limit, then the oldest one will be removed.",
 		"",
 
+		`<code>${prefix}7tv (emote link or ID)</code>`,
 		`<code>${prefix}7tv add (emote link or ID)</code>`,
 		"Adds the selected emote to the list of rotating emotes.",
-		"If the amount of emotes would bypass the limit, the oldest added one will be removed automatically."
+		"If the amount of emotes would bypass the limit, the oldest added one will be removed automatically.",
+		`You can use this command directly, without using the "add" operation.`
 	],
 	execute: async (context, ...args) => {
 		if (!context.channel) {
