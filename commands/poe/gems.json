@@ -1,2017 +1,2579 @@
 [
   {
     "name": "Absolution",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion", "duration", "physical", "lightning", "area"]
   },
   {
     "name": "Ambush",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["critical", "spell", "movement", "duration", "travel"]
   },
   {
     "name": "Ancestral Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "area", "duration"]
   },
   {
     "name": "Anger",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "fire"]
   },
   {
     "name": "Animate Guardian",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion"]
   },
   {
     "name": "Arc",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "chaining", "lightning"]
   },
   {
     "name": "Arcane Cloak",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "guard", "lightning", "arcane"]
   },
   {
     "name": "Arcanist Brand",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["trigger", "spell", "duration", "brand"]
   },
   {
     "name": "Arctic Armour",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "cold"]
   },
   {
     "name": "Armageddon Brand",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire", "duration", "brand"]
   },
   {
     "name": "Artillery Ballista",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "totem", "area", "fire", "projectile", "bow"]
   },
   {
     "name": "Assassin's Mark",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["critical", "spell", "curse", "mark"]
   },
   {
     "name": "Ball Lightning",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "area", "lightning"]
   },
   {
     "name": "Bane",
-    "type": "main"
+    "type": "main",
+    "tags": ["chaos", "trigger", "spell", "area", "duration", "hex"]
   },
   {
     "name": "Barrage",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "bow"]
   },
   {
     "name": "Battlemage's Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "critical", "trigger", "area", "duration"]
   },
   {
     "name": "Bear Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "duration", "physical"]
   },
   {
     "name": "Berserk",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell"]
   },
   {
     "name": "Blade Blast",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "physical"]
   },
   {
     "name": "Blade Flurry",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "channelling", "melee"]
   },
   {
     "name": "Blade Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "attack", "area"]
   },
   {
     "name": "Blade Vortex",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "spell", "area", "duration", "physical"]
   },
   {
     "name": "Bladefall",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "spell", "area", "physical", "duration"]
   },
   {
     "name": "Bladestorm",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "area", "duration"]
   },
   {
     "name": "Blast Rain",
-    "type": "main"
+    "type": "main",
+    "tags": ["fire", "attack", "area", "projectile", "bow"]
   },
   {
     "name": "Blight",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "chaos", "area", "channelling", "duration"]
   },
   {
     "name": "Blink Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "minion", "duration", "movement", "travel", "bow"]
   },
   {
     "name": "Blood and Sand",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["low_max_level", "spell", "stance"]
   },
   {
     "name": "Blood Rage",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "duration", "physical"]
   },
   {
     "name": "Bodyswap",
-    "type": "main"
+    "type": "main",
+    "tags": ["movement", "spell", "area", "fire", "travel"]
   },
   {
     "name": "Bone Offering",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["minion", "spell", "duration"]
   },
   {
     "name": "Burning Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "fire", "bow"]
   },
   {
     "name": "Caustic Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area", "duration", "chaos", "bow"]
   },
   {
     "name": "Chain Hook",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "movement", "melee"]
   },
   {
     "name": "Charged Dash",
-    "type": "main"
+    "type": "main",
+    "tags": ["movement", "area", "channelling", "attack", "melee", "lightning"]
   },
   {
     "name": "Clarity",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area"]
   },
   {
     "name": "Cleave",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee"]
   },
   {
     "name": "Cobra Lash",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "attack", "projectile", "chaos"]
   },
   {
     "name": "Cold Snap",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "cold", "duration"]
   },
   {
     "name": "Conductivity",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "lightning", "curse", "hex"]
   },
   {
     "name": "Consecrated Path",
-    "type": "main"
+    "type": "main",
+    "tags": ["fire", "melee", "attack", "area", "movement", "duration", "slam"]
   },
   {
     "name": "Contagion",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "chaos"]
   },
   {
     "name": "Conversion Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "duration"]
   },
   {
     "name": "Convocation",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "minion"]
   },
   {
     "name": "Creeping Frost",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "duration", "area", "cold"]
   },
   {
     "name": "Cremation",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire", "duration", "projectile", "orb"]
   },
   {
     "name": "Crushing Fist",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["attack", "melee", "slam", "area", "retaliation"]
   },
   {
     "name": "Cyclone",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "movement", "channelling"]
   },
   {
     "name": "Dark Pact",
-    "type": "main"
+    "type": "main",
+    "tags": ["minion", "spell", "area", "chaining", "chaos", "nova"]
   },
   {
     "name": "Dash",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "movement", "travel", "blink"]
   },
   {
     "name": "Decoy Totem",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["totem", "spell", "area"]
   },
   {
     "name": "Defiance Banner",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["area", "spell", "duration", "aura", "banner"]
   },
   {
     "name": "Desecrate",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "chaos"]
   },
   {
     "name": "Despair",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "chaos", "curse", "hex"]
   },
   {
     "name": "Determination",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "physical"]
   },
   {
     "name": "Detonate Dead",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Devouring Totem",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["totem", "spell"]
   },
   {
     "name": "Discharge",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire", "cold", "lightning", "nova"]
   },
   {
     "name": "Discipline",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area"]
   },
   {
     "name": "Divine Ire",
-    "type": "main"
+    "type": "main",
+    "tags": ["lightning", "spell", "area", "channelling", "physical"]
   },
   {
     "name": "Divine Retribution",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "lightning", "physical", "retaliation"]
   },
   {
     "name": "Dominating Blow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "minion", "duration", "melee", "strike"]
   },
   {
     "name": "Double Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "physical"]
   },
   {
     "name": "Dread Banner",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["area", "spell", "duration", "aura", "banner"]
   },
   {
     "name": "Dual Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "attack", "melee", "strike"]
   },
   {
     "name": "Earthquake",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "duration", "slam"]
   },
   {
     "name": "Earthshatter",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "slam", "duration"]
   },
   {
     "name": "Elemental Hit",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "fire", "cold", "lightning", "area", "random_element"]
   },
   {
     "name": "Elemental Weakness",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "curse", "hex"]
   },
   {
     "name": "Enduring Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "area", "duration"]
   },
   {
     "name": "Enfeeble",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "curse", "hex"]
   },
   {
     "name": "Ensnaring Arrow",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["attack", "projectile", "area", "bow"]
   },
   {
     "name": "Essence Drain",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "duration", "chaos", "area"]
   },
   {
     "name": "Ethereal Knives",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "physical"]
   },
   {
     "name": "Eviscerate",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["attack", "melee", "area", "retaliation", "physical"]
   },
   {
     "name": "Explosive Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area", "duration", "fire", "bow"]
   },
   {
     "name": "Explosive Concoction",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "fire", "cold", "lightning", "projectile"]
   },
   {
     "name": "Explosive Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "area", "fire", "physical"]
   },
   {
     "name": "Exsanguinate",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "chaining", "physical", "duration"]
   },
   {
     "name": "Eye of Winter",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "cold"]
   },
   {
     "name": "Fire Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "duration", "area", "fire"]
   },
   {
     "name": "Fireball",
-    "type": "main"
+    "type": "main",
+    "tags": ["projectile", "spell", "area", "fire"]
   },
   {
     "name": "Firestorm",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "fire"]
   },
   {
     "name": "Flame Dash",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "movement", "duration", "fire", "travel", "blink"]
   },
   {
     "name": "Flame Surge",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire", "duration"]
   },
   {
     "name": "Flameblast",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire", "channelling"]
   },
   {
     "name": "Flamethrower Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "duration", "area", "fire"]
   },
   {
     "name": "Flammability",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "fire", "curse", "hex"]
   },
   {
     "name": "Flesh and Stone",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "aura", "area", "stance", "physical"]
   },
   {
     "name": "Flesh Offering",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["minion", "spell", "duration"]
   },
   {
     "name": "Flicker Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "movement", "duration"]
   },
   {
     "name": "Forbidden Rite",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "chaos", "projectile"]
   },
   {
     "name": "Freezing Pulse",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "cold"]
   },
   {
     "name": "Frenzy",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "bow"]
   },
   {
     "name": "Frost Blades",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "melee", "strike", "cold"]
   },
   {
     "name": "Frost Bomb",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "cold", "orb"]
   },
   {
     "name": "Frost Wall",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "cold"]
   },
   {
     "name": "Frostbite",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "cold", "curse", "hex"]
   },
   {
     "name": "Frostblink",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "movement", "duration", "cold", "travel", "blink", "area"]
   },
   {
     "name": "Frostbolt",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "cold"]
   },
   {
     "name": "Galvanic Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["lightning", "attack", "projectile", "area", "bow"]
   },
   {
     "name": "General's Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "area", "duration"]
   },
   {
     "name": "Glacial Cascade",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "cold", "physical"]
   },
   {
     "name": "Glacial Hammer",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "cold"]
   },
   {
     "name": "Glacial Shield Swipe",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["attack", "melee", "area", "cold", "physical", "retaliation"]
   },
   {
     "name": "Grace",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area"]
   },
   {
     "name": "Ground Slam",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "slam"]
   },
   {
     "name": "Haste",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area"]
   },
   {
     "name": "Hatred",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "cold"]
   },
   {
     "name": "Heavy Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike"]
   },
   {
     "name": "Herald of Agony",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "herald", "minion", "chaos", "physical"]
   },
   {
     "name": "Herald of Ash",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "fire", "herald", "duration"]
   },
   {
     "name": "Herald of Ice",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "cold", "herald"]
   },
   {
     "name": "Herald of Purity",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "herald", "minion", "duration", "physical"]
   },
   {
     "name": "Herald of Thunder",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "lightning", "herald"]
   },
   {
     "name": "Holy Flame Totem",
-    "type": "main"
+    "type": "main",
+    "tags": ["totem", "spell", "projectile", "fire", "channelling", "physical", "area"]
   },
   {
     "name": "Ice Crash",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "cold", "slam"]
   },
   {
     "name": "Ice Nova",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "cold", "nova"]
   },
   {
     "name": "Ice Shot",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area", "cold", "bow"]
   },
   {
     "name": "Ice Spear",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "spell", "projectile", "cold"]
   },
   {
     "name": "Ice Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "area", "cold"]
   },
   {
     "name": "Icicle Mine",
-    "type": "main"
+    "type": "main",
+    "tags": ["mine", "critical", "spell", "projectile", "cold", "aura", "area"]
   },
   {
     "name": "Immortal Call",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "guard"]
   },
   {
     "name": "Incinerate",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "fire", "channelling", "area"]
   },
   {
     "name": "Infernal Blow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "strike", "fire", "duration"]
   },
   {
     "name": "Infernal Cry",
-    "type": "main"
+    "type": "main",
+    "tags": ["warcry", "area", "duration", "fire", "attack", "melee", "trigger"]
   },
   {
     "name": "Intimidating Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "area", "duration", "physical"]
   },
   {
     "name": "Kinetic Blast",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area"]
   },
   {
     "name": "Kinetic Bolt",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile"]
   },
   {
     "name": "Lacerate",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "physical"]
   },
   {
     "name": "Lancing Steel",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "physical"]
   },
   {
     "name": "Leap Slam",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "movement", "travel", "slam"]
   },
   {
     "name": "Lightning Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "projectile", "lightning", "bow"]
   },
   {
     "name": "Lightning Spire Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "critical", "spell", "duration", "area", "lightning"]
   },
   {
     "name": "Lightning Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "melee", "strike", "lightning"]
   },
   {
     "name": "Lightning Tendrils",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "lightning", "channelling"]
   },
   {
     "name": "Lightning Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "critical", "spell", "projectile", "lightning"]
   },
   {
     "name": "Lightning Warp",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "movement", "lightning", "travel"]
   },
   {
-    "name": "Magma Orb",
-    "type": "main"
+    "name": "Rolling Magma",
+    "type": "main",
+    "tags": ["spell", "area", "fire", "projectile", "chaining"]
   },
   {
     "name": "Malevolence",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area"]
   },
   {
     "name": "Manabond",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "lightning", "arcane"]
   },
   {
     "name": "Mirror Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "minion", "duration", "movement", "travel", "bow"]
   },
   {
     "name": "Molten Shell",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "fire", "physical", "guard"]
   },
   {
     "name": "Molten Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area", "melee", "strike", "fire"]
   },
   {
     "name": "Orb of Storms",
-    "type": "main"
+    "type": "main",
+    "tags": ["lightning", "spell", "area", "chaining", "orb"]
   },
   {
     "name": "Penance Brand",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "physical", "lightning", "duration", "brand"]
   },
   {
     "name": "Perforate",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "slam"]
   },
   {
     "name": "Pestilent Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "area", "duration", "chaos"]
   },
   {
     "name": "Phase Run",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "movement", "physical", "travel"]
   },
   {
     "name": "Plague Bearer",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "chaos", "area"]
   },
   {
     "name": "Poacher's Mark",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "curse", "mark"]
   },
   {
     "name": "Power Siphon",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "attack", "projectile"]
   },
   {
     "name": "Precision",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "critical", "spell", "area"]
   },
   {
     "name": "Pride",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "aura", "physical"]
   },
   {
-    "name": "Projectile Weakness",
-    "type": "additional"
+    "name": "Sniper's Mark",
+    "type": "additional",
+    "tags": ["spell", "curse", "mark"]
   },
   {
     "name": "Puncture",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "duration", "physical", "bow"]
   },
   {
     "name": "Punishment",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "curse", "hex"]
   },
   {
     "name": "Purifying Flame",
-    "type": "main"
+    "type": "main",
+    "tags": ["fire", "spell", "area", "duration", "physical"]
   },
   {
     "name": "Purity of Elements",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area"]
   },
   {
     "name": "Purity of Fire",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "fire"]
   },
   {
     "name": "Purity of Ice",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "cold"]
   },
   {
     "name": "Purity of Lightning",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "lightning"]
   },
   {
     "name": "Pyroclast Mine",
-    "type": "main"
+    "type": "main",
+    "tags": ["mine", "spell", "projectile", "fire", "area", "aura", "nova"]
   },
   {
     "name": "Rage Vortex",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "area", "duration"]
   },
   {
     "name": "Rain of Arrows",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "projectile", "bow"]
   },
   {
     "name": "Raise Spectre",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion"]
   },
   {
     "name": "Raise Zombie",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion"]
   },
   {
     "name": "Rallying Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "area", "duration"]
   },
   {
     "name": "Reap",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "physical", "area", "duration"]
   },
   {
     "name": "Reave",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee"]
   },
   {
     "name": "Rejuvenation Totem",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["totem", "aura", "spell", "area"]
   },
   {
     "name": "Righteous Fire",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Scorching Ray",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "fire", "duration", "channelling"]
   },
   {
     "name": "Scourge Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "channelling", "chaos", "bow"]
   },
   {
     "name": "Searing Bond",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "totem", "fire"]
   },
   {
     "name": "Seismic Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "area", "duration"]
   },
   {
     "name": "Seismic Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "duration", "area", "physical"]
   },
   {
     "name": "Shattering Steel",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area", "physical"]
   },
   {
     "name": "Shield Charge",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "area", "movement", "travel", "physical"]
   },
   {
     "name": "Shield Crush",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "area", "physical"]
   },
   {
     "name": "Shock Nova",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "lightning", "nova"]
   },
   {
     "name": "Shockwave Totem",
-    "type": "main"
+    "type": "main",
+    "tags": ["totem", "spell", "area", "physical", "nova"]
   },
   {
     "name": "Shrapnel Ballista",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "totem", "bow"]
   },
   {
     "name": "Siege Ballista",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "totem", "bow"]
   },
   {
     "name": "Siphoning Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "spell", "duration", "area", "cold"]
   },
   {
     "name": "Smite",
-    "type": "main"
+    "type": "main",
+    "tags": ["lightning", "melee", "attack", "area", "duration", "strike", "aura"]
   },
   {
     "name": "Smoke Mine",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["mine", "spell", "area", "duration", "movement", "travel", "blink"]
   },
   {
     "name": "Snipe",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "channelling", "physical", "bow"]
   },
   {
     "name": "Soulrend",
-    "type": "main"
+    "type": "main",
+    "tags": ["chaos", "spell", "area", "duration", "projectile"]
   },
   {
     "name": "Spark",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "duration", "lightning"]
   },
   {
     "name": "Spectral Helix",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile"]
   },
   {
     "name": "Spectral Shield Throw",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "physical"]
   },
   {
     "name": "Spectral Throw",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile"]
   },
   {
     "name": "Spellslinger",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["trigger", "spell"]
   },
   {
     "name": "Spirit Offering",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["minion", "spell", "duration"]
   },
   {
     "name": "Split Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "bow"]
   },
   {
     "name": "Static Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "area", "duration", "lightning", "chaining"]
   },
   {
     "name": "Steelskin",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "guard"]
   },
   {
     "name": "Storm Brand",
-    "type": "main"
+    "type": "main",
+    "tags": ["lightning", "spell", "area", "chaining", "duration", "brand"]
   },
   {
     "name": "Storm Burst",
-    "type": "main"
+    "type": "main",
+    "tags": ["area", "spell", "lightning", "channelling", "duration", "physical"]
   },
   {
     "name": "Storm Call",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "lightning"]
   },
   {
     "name": "Storm Rain",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "lightning", "projectile", "bow"]
   },
   {
     "name": "Stormbind",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "channelling", "lightning", "duration", "arcane"]
   },
   {
     "name": "Stormblast Mine",
-    "type": "main"
+    "type": "main",
+    "tags": ["mine", "spell", "area", "lightning", "aura", "nova"]
   },
   {
     "name": "Summon Carrion Golem",
-    "type": "main"
+    "type": "main",
+    "tags": ["physical", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Chaos Golem",
-    "type": "main"
+    "type": "main",
+    "tags": ["chaos", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Flame Golem",
-    "type": "main"
+    "type": "main",
+    "tags": ["fire", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Holy Relic",
-    "type": "main"
+    "type": "main",
+    "tags": ["minion", "spell"]
   },
   {
     "name": "Summon Ice Golem",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "cold", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Lightning Golem",
-    "type": "main"
+    "type": "main",
+    "tags": ["lightning", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Raging Spirit",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion", "duration", "fire"]
   },
   {
     "name": "Summon Reaper",
-    "type": "main"
+    "type": "main",
+    "tags": ["physical", "minion", "spell"]
   },
   {
     "name": "Summon Skeletons",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion", "duration"]
   },
   {
     "name": "Summon Skitterbots",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["trap", "mine", "spell", "minion", "cold", "lightning", "area", "aura"]
   },
   {
     "name": "Summon Stone Golem",
-    "type": "main"
+    "type": "main",
+    "tags": ["minion", "spell", "golem", "physical"]
   },
   {
     "name": "Sunder",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "slam"]
   },
   {
     "name": "Sweep",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "lightning"]
   },
   {
     "name": "Tectonic Slam",
-    "type": "main"
+    "type": "main",
+    "tags": ["fire", "attack", "area", "melee", "slam"]
   },
   {
     "name": "Tempest Shield",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "lightning", "chaining"]
   },
   {
     "name": "Temporal Chains",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "curse", "hex"]
   },
   {
     "name": "Tornado Shot",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "bow"]
   },
   {
     "name": "Toxic Rain",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "chaos", "duration", "projectile", "bow"]
   },
   {
     "name": "Unearth",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "area", "physical"]
   },
   {
     "name": "Vaal Absolution",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion", "duration", "physical", "lightning", "vaal", "area"]
   },
   {
     "name": "Vaal Ancestral Warchief",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "totem", "melee", "area", "vaal", "slam"]
   },
   {
     "name": "Vaal Animate Weapon",
-    "type": "main"
+    "type": "main",
+    "tags": ["duration", "minion", "spell", "vaal", "physical"]
   },
   {
     "name": "Vaal Arc",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "chaining", "vaal", "lightning", "duration"]
   },
   {
     "name": "Vaal Arctic Armour",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "duration", "cold", "vaal"]
   },
   {
     "name": "Vaal Blade Vortex",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "spell", "area", "duration", "vaal", "physical"]
   },
   {
     "name": "Vaal Blight",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "chaos", "area", "duration", "vaal", "nova", "channelling"]
   },
   {
     "name": "Vaal Burning Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area", "vaal", "fire", "bow"]
   },
   {
     "name": "Vaal Clarity",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "duration", "vaal"]
   },
   {
     "name": "Vaal Cold Snap",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "vaal", "cold"]
   },
   {
     "name": "Vaal Cyclone",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "duration", "vaal", "movement", "channelling"]
   },
   {
     "name": "Vaal Detonate Dead",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "vaal", "fire"]
   },
   {
     "name": "Vaal Discipline",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "duration", "vaal"]
   },
   {
     "name": "Vaal Domination",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion", "duration", "vaal", "attack", "melee", "strike"]
   },
   {
     "name": "Vaal Double Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "duration", "vaal", "physical"]
   },
   {
     "name": "Vaal Earthquake",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "duration", "vaal", "slam"]
   },
   {
     "name": "Vaal Fireball",
-    "type": "main"
+    "type": "main",
+    "tags": ["projectile", "spell", "area", "vaal", "fire"]
   },
   {
     "name": "Vaal Firestorm",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "fire", "vaal"]
   },
   {
     "name": "Vaal Flameblast",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "vaal", "fire", "channelling"]
   },
   {
     "name": "Vaal Glacial Hammer",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "duration", "area", "vaal", "cold"]
   },
   {
     "name": "Vaal Grace",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "duration", "vaal"]
   },
   {
     "name": "Vaal Ground Slam",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "vaal", "slam"]
   },
   {
     "name": "Vaal Haste",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "duration", "vaal"]
   },
   {
     "name": "Vaal Ice Nova",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "vaal", "cold", "nova"]
   },
   {
     "name": "Vaal Ice Shot",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "area", "cold", "vaal", "duration", "bow"]
   },
   {
     "name": "Vaal Impurity of Fire",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "duration", "vaal", "fire"]
   },
   {
     "name": "Vaal Impurity of Ice",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "duration", "vaal", "cold"]
   },
   {
     "name": "Vaal Impurity of Lightning",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "duration", "vaal", "lightning"]
   },
   {
     "name": "Vaal Lightning Arrow",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "projectile", "lightning", "vaal", "bow"]
   },
   {
     "name": "Vaal Lightning Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike", "duration", "vaal", "lightning", "projectile"]
   },
   {
     "name": "Vaal Lightning Trap",
-    "type": "main"
+    "type": "main",
+    "tags": ["trap", "critical", "spell", "projectile", "duration", "vaal", "lightning"]
   },
   {
     "name": "Vaal Molten Shell",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "fire", "physical", "vaal", "guard"]
   },
   {
     "name": "Vaal Power Siphon",
-    "type": "main"
+    "type": "main",
+    "tags": ["critical", "attack", "projectile", "vaal"]
   },
   {
     "name": "Vaal Rain of Arrows",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "projectile", "vaal", "bow"]
   },
   {
     "name": "Vaal Reap",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "physical", "area", "duration", "vaal"]
   },
   {
     "name": "Vaal Reave",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "area", "melee", "vaal"]
   },
   {
     "name": "Vaal Rejuvenation Totem",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["totem", "aura", "spell", "area", "vaal"]
   },
   {
     "name": "Vaal Righteous Fire",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire", "vaal", "duration"]
   },
   {
     "name": "Vaal Spark",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "projectile", "duration", "vaal", "lightning"]
   },
   {
     "name": "Vaal Spectral Throw",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "vaal"]
   },
   {
     "name": "Vaal Storm Call",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "vaal", "lightning"]
   },
   {
     "name": "Vaal Summon Skeletons",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "minion", "duration", "vaal"]
   },
   {
     "name": "Vengeful Cry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["warcry", "area", "duration", "retaliation"]
   },
   {
     "name": "Venom Gyre",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "projectile", "chaos", "duration"]
   },
   {
     "name": "Vigilant Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "strike"]
   },
   {
     "name": "Viper Strike",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "duration", "melee", "strike", "chaos"]
   },
   {
     "name": "Vitality",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area"]
   },
   {
     "name": "Volatile Dead",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Voltaxic Burst",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "chaos", "lightning", "nova", "duration"]
   },
   {
     "name": "Vortex",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "cold", "duration", "nova"]
   },
   {
     "name": "Vulnerability",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "curse", "physical", "hex"]
   },
   {
     "name": "War Banner",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["area", "spell", "duration", "aura", "physical", "banner"]
   },
   {
     "name": "Warlord's Mark",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "curse", "mark"]
   },
   {
     "name": "Wave of Conviction",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "duration", "fire", "lightning", "physical"]
   },
   {
     "name": "Whirling Blades",
-    "type": "main"
+    "type": "main",
+    "tags": ["attack", "melee", "movement", "travel"]
   },
   {
     "name": "Wild Strike",
-    "type": "main"
+    "type": "main",
+    "tags": [
+      "attack",
+      "melee",
+      "strike",
+      "lightning",
+      "cold",
+      "fire",
+      "projectile",
+      "area",
+      "chaining",
+      "random_element"
+    ]
   },
   {
     "name": "Winter Orb",
-    "type": "main"
+    "type": "main",
+    "tags": ["cold", "spell", "channelling", "area", "duration", "projectile", "orb"]
   },
   {
     "name": "Wintertide Brand",
-    "type": "main"
+    "type": "main",
+    "tags": ["spell", "area", "cold", "duration", "brand"]
   },
   {
     "name": "Wither",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["spell", "area", "duration", "chaos", "channelling"]
   },
   {
     "name": "Withering Step",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["travel", "area", "chaos", "movement", "blink", "spell", "duration"]
   },
   {
     "name": "Wrath",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "spell", "area", "lightning"]
   },
   {
     "name": "Zealotry",
-    "type": "additional"
+    "type": "additional",
+    "tags": ["aura", "critical", "spell", "area"]
   },
   {
     "name": "Absolution of Inspiring",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion", "duration", "physical", "lightning", "area"]
   },
   {
     "name": "Animate Guardian of Smiting",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion", "lightning"]
   },
   {
     "name": "Animate Weapon of Ranged Arms",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["duration", "minion", "spell", "physical"]
   },
   {
     "name": "Animate Weapon of Self Reflection",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["duration", "minion", "spell"]
   },
   {
     "name": "Arc of Oscillating",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "chaining", "lightning"]
   },
   {
     "name": "Arc of Surging",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "lightning"]
   },
   {
     "name": "Armageddon Brand of Recall",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "duration", "brand"]
   },
   {
     "name": "Armageddon Brand of Volatility",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "duration", "brand"]
   },
   {
     "name": "Ball Lightning of Orbiting",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "area", "lightning"]
   },
   {
     "name": "Ball Lightning of Static",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "lightning", "orb"]
   },
   {
     "name": "Barrage of Volley Fire",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "bow"]
   },
   {
     "name": "Blade Blast of Dagger Detonation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "physical", "nova"]
   },
   {
     "name": "Blade Blast of Unloading",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "physical", "nova"]
   },
   {
     "name": "Blade Flurry of Incision",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "attack", "area", "channelling", "melee"]
   },
   {
     "name": "Blade Trap of Greatswords",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "attack", "area", "duration"]
   },
   {
     "name": "Blade Trap of Laceration",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "attack", "area", "physical"]
   },
   {
     "name": "Bladefall of Impaling",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "spell", "area", "physical"]
   },
   {
     "name": "Bladefall of Volleys",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "spell", "area", "physical"]
   },
   {
     "name": "Bladestorm of Uncertainty",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "area", "duration"]
   },
   {
     "name": "Blight of Atrophy",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "chaos", "area", "channelling", "duration"]
   },
   {
     "name": "Blight of Contagion",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "chaos", "area", "channelling", "duration"]
   },
   {
     "name": "Blink Arrow of Bombarding Clones",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "minion", "duration", "movement", "travel", "bow"]
   },
   {
     "name": "Blink Arrow of Prismatic Clones",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "minion", "duration", "movement", "travel", "random_element", "bow"]
   },
   {
     "name": "Boneshatter of Carnage",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike", "area"]
   },
   {
     "name": "Boneshatter of Complex Trauma",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike", "area", "duration", "physical"]
   },
   {
     "name": "Burning Arrow of Vigour",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "fire", "bow"]
   },
   {
     "name": "Caustic Arrow of Poison",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "area", "chaos", "bow"]
   },
   {
     "name": "Cleave of Rage",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee"]
   },
   {
     "name": "Cold Snap of Power",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "spell", "area", "cold"]
   },
   {
     "name": "Consecrated Path of Endurance",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["fire", "melee", "attack", "area", "movement", "duration", "slam"]
   },
   {
     "name": "Contagion of Subsiding",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "chaos"]
   },
   {
     "name": "Contagion of Transference",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "chaos"]
   },
   {
     "name": "Crackling Lance of Branching",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "lightning"]
   },
   {
     "name": "Crackling Lance of Disintegration",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "lightning"]
   },
   {
     "name": "Cremation of Exhuming",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "duration", "projectile", "orb"]
   },
   {
     "name": "Cremation of the Volcano",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "duration", "projectile", "orb"]
   },
   {
     "name": "Cyclone of Tumult",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "movement", "channelling"]
   },
   {
     "name": "Detonate Dead of Chain Reaction",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Detonate Dead of Scavenging",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Discharge of Misery",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "cold", "lightning", "nova"]
   },
   {
     "name": "Divine Ire of Disintegration",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["lightning", "spell", "area", "channelling", "physical"]
   },
   {
     "name": "Divine Ire of Holy Lightning",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["lightning", "spell", "area", "channelling", "physical"]
   },
   {
     "name": "Dominating Blow of Inspiring",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "minion", "duration", "melee", "strike"]
   },
   {
     "name": "Double Strike of Impaling",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike", "physical"]
   },
   {
     "name": "Double Strike of Momentum",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike"]
   },
   {
     "name": "Earthquake of Amplification",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "duration", "slam"]
   },
   {
     "name": "Ethereal Knives of Lingering Blades",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "physical", "duration"]
   },
   {
     "name": "Ethereal Knives of the Massacre",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "physical"]
   },
   {
     "name": "Explosive Concoction of Destruction",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "attack", "area", "fire", "cold", "lightning", "projectile"]
   },
   {
     "name": "Explosive Trap of Magnitude",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "area", "physical"]
   },
   {
     "name": "Explosive Trap of Shrapnel",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "area", "fire", "physical"]
   },
   {
     "name": "Exsanguinate of Transmission",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "chaining", "physical", "duration"]
   },
   {
     "name": "Eye of Winter Of Finality",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "cold"]
   },
   {
     "name": "Eye of Winter Of Transience",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "cold"]
   },
   {
     "name": "Fire Trap of Blasting",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "duration", "area", "fire"]
   },
   {
     "name": "Firestorm of Meteors",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Firestorm of Pelting",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "fire"]
   },
   {
     "name": "Flame Dash of Return",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "movement", "duration", "fire"]
   },
   {
     "name": "Flame Surge of Combusting",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "duration"]
   },
   {
     "name": "Flameblast of Celerity",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "channelling"]
   },
   {
     "name": "Flameblast of Contraction",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "channelling"]
   },
   {
     "name": "Flicker Strike of Power",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "attack", "melee", "strike", "movement", "duration"]
   },
   {
     "name": "Forbidden Rite of Soul Sacrifice",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "chaos", "projectile"]
   },
   {
     "name": "Frenzy of Onslaught",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike"]
   },
   {
     "name": "Frost Bomb of Forthcoming",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "cold"]
   },
   {
     "name": "Frost Bomb of Instability",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "cold"]
   },
   {
     "name": "Frostblink of Wintry Blast",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "movement", "cold", "travel", "area"]
   },
   {
     "name": "Frozen Legion of Rallying",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "cold", "attack", "melee", "area"]
   },
   {
     "name": "Glacial Cascade of the Fissure",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "cold", "physical"]
   },
   {
     "name": "Glacial Hammer of Shattering",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "attack", "melee", "strike", "cold"]
   },
   {
     "name": "Ground Slam of Earthshaking",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "slam"]
   },
   {
     "name": "Hexblast of Contradiction",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "chaos", "hex"]
   },
   {
     "name": "Hexblast of Havoc",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "chaos", "hex"]
   },
   {
     "name": "Holy Flame Totem of Ire",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["totem", "spell", "projectile", "fire", "channelling", "physical", "area"]
   },
   {
     "name": "Ice Nova of Deep Freeze",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "cold", "nova"]
   },
   {
     "name": "Ice Nova of Frostbolts",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "cold", "nova"]
   },
   {
     "name": "Ice Spear of Splitting",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "cold"]
   },
   {
     "name": "Ice Trap of Hollowness",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "area", "cold"]
   },
   {
     "name": "Icicle Mine of Fanning",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["mine", "critical", "spell", "projectile", "cold", "aura", "area"]
   },
   {
     "name": "Icicle Mine of Sabotage",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["mine", "critical", "spell", "projectile", "cold", "aura", "area"]
   },
   {
     "name": "Infernal Blow of Immolation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "strike", "fire", "duration"]
   },
   {
     "name": "Lacerate of Butchering",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee"]
   },
   {
     "name": "Lacerate of Haemorrhage",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "physical"]
   },
   {
     "name": "Lancing Steel of Spraying",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile"]
   },
   {
     "name": "Leap Slam of Groundbreaking",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "movement", "travel", "slam"]
   },
   {
     "name": "Lightning Conduit of the Heavens",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "lightning"]
   },
   {
     "name": "Lightning Spire Trap of Overloading",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "duration", "area", "lightning"]
   },
   {
     "name": "Lightning Spire Trap of Zapping",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "duration", "area", "lightning"]
   },
   {
     "name": "Lightning Strike of Arcing",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "melee", "strike", "lightning", "chaining"]
   },
   {
     "name": "Lightning Tendrils of Eccentricity",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["critical", "spell", "area", "lightning", "channelling"]
   },
   {
     "name": "Lightning Tendrils of Escalation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "lightning", "channelling"]
   },
   {
     "name": "Lightning Trap of Sparking",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "critical", "spell", "projectile", "lightning"]
   },
   {
     "name": "Mirror Arrow of Bombarding Clones",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "minion", "duration", "movement", "travel", "bow"]
   },
   {
     "name": "Mirror Arrow of Prismatic Clones",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "minion", "duration", "movement", "travel", "random_element", "bow"]
   },
   {
     "name": "Molten Strike of the Zenith",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "area", "melee", "strike", "fire"]
   },
   {
     "name": "Puncture of Shanking",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike", "duration", "physical"]
   },
   {
     "name": "Purifying Flame of Revelations",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["fire", "spell", "area", "duration", "physical"]
   },
   {
     "name": "Pyroclast Mine of Sabotage",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["mine", "spell", "projectile", "fire", "area", "aura", "nova"]
   },
   {
     "name": "Rage Vortex of Berserking",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "area"]
   },
   {
     "name": "Raise Spectre of Transience",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion", "duration"]
   },
   {
     "name": "Raise Zombie of Falling",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion"]
   },
   {
     "name": "Raise Zombie of Slamming",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion"]
   },
   {
     "name": "Reave of Refraction",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee"]
   },
   {
     "name": "Scorching Ray of Immolation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "fire", "duration", "channelling"]
   },
   {
     "name": "Seismic Trap of Swells",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "area", "physical"]
   },
   {
     "name": "Shattering Steel of Ammunition",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "area", "physical", "duration"]
   },
   {
     "name": "Shield Crush of the Chieftain",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "area", "fire"]
   },
   {
     "name": "Siege Ballista of Splintering",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "totem", "bow"]
   },
   {
     "name": "Smite of Divine Judgement",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["lightning", "melee", "attack", "area", "strike"]
   },
   {
     "name": "Soulrend of Reaping",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["chaos", "spell", "projectile"]
   },
   {
     "name": "Soulrend of the Spiral",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["chaos", "spell", "area", "duration", "projectile"]
   },
   {
     "name": "Spark of the Nova",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "duration", "lightning"]
   },
   {
     "name": "Spark of Unpredictability",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "duration", "lightning"]
   },
   {
     "name": "Spectral Shield Throw of Shattering",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "cold"]
   },
   {
     "name": "Spectral Throw of Materialising",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile"]
   },
   {
     "name": "Split Arrow of Splitting",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "bow"]
   },
   {
     "name": "Splitting Steel of Ammunition",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "area", "physical"]
   },
   {
     "name": "Storm Brand of Indecision",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["lightning", "spell", "area", "chaining", "duration", "brand"]
   },
   {
     "name": "Stormbind of Teleportation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "channelling", "lightning", "duration", "arcane", "movement", "travel", "blink"]
   },
   {
     "name": "Summon Chaos Golem of Hordes",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["chaos", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Chaos Golem of the Maelström",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["chaos", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Flame Golem of Hordes",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["fire", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Flame Golem of the Meteor",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["fire", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Ice Golem of Hordes",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["cold", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Ice Golem of Shattering",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["cold", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Raging Spirit of Enormity",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion", "duration", "fire"]
   },
   {
     "name": "Summon Reaper of Eviscerating",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["physical", "minion", "spell"]
   },
   {
     "name": "Summon Reaper of Revenants",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["minion", "spell"]
   },
   {
     "name": "Summon Skeletons of Archers",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion", "duration"]
   },
   {
     "name": "Summon Skeletons of Mages",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "minion", "duration", "random_element"]
   },
   {
     "name": "Sunder of Earthbreaking",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "slam"]
   },
   {
     "name": "Void Sphere of Rending",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "physical", "chaos", "orb"]
   },
   {
     "name": "Volatile Dead of Confinement",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire", "duration"]
   },
   {
     "name": "Volatile Dead of Seething",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Volcanic Fissure of Snaking",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["melee", "attack", "area", "slam", "fire"]
   },
   {
     "name": "Vortex of Projection",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "cold", "duration", "nova"]
   },
   {
     "name": "Wild Strike of Extremes",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": [
+      "attack",
+      "melee",
+      "strike",
+      "lightning",
+      "cold",
+      "fire",
+      "projectile",
+      "area",
+      "chaining",
+      "random_element"
+    ]
   },
   {
     "name": "Bane of Condemnation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["chaos", "trigger", "spell", "area", "duration", "hex"]
   },
   {
     "name": "Bear Trap of Skewers",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["trap", "spell", "duration", "physical"]
   },
   {
     "name": "Blade Vortex of the Scythe",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "physical"]
   },
   {
     "name": "Bodyswap of Sacrifice",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["movement", "spell", "area", "fire", "travel", "minion"]
   },
   {
     "name": "Dual Strike of Ambidexterity",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike"]
   },
   {
     "name": "Earthshatter of Fragility",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "slam", "duration"]
   },
   {
     "name": "Earthshatter of Prominence",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "slam", "duration"]
   },
   {
     "name": "Essence Drain of Desperation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "duration", "chaos", "area"]
   },
   {
     "name": "Essence Drain of Wickedness",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "projectile", "duration", "chaos", "area"]
   },
   {
     "name": "Frost Blades of Katabasis",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike", "cold", "area", "duration"]
   },
   {
     "name": "Galvanic Arrow of Energy",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["lightning", "attack", "area", "bow"]
   },
   {
     "name": "Galvanic Arrow of Surging",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["lightning", "attack", "projectile", "area", "bow"]
   },
   {
     "name": "Galvanic Field of Intensity",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "duration", "lightning", "chaining", "orb"]
   },
   {
     "name": "Ice Crash of Cadence",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "cold", "slam"]
   },
   {
     "name": "Kinetic Bolt of Fragmentation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile"]
   },
   {
     "name": "Lightning Arrow of Electrocution",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "lightning", "bow"]
   },
   {
     "name": "Penance Brand of Conduction",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "physical", "lightning", "duration", "brand"]
   },
   {
     "name": "Penance Brand of Dissipation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "physical", "lightning", "duration", "brand"]
   },
   {
     "name": "Perforate of Bloodshed",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["physical", "attack", "area", "melee", "slam"]
   },
   {
     "name": "Perforate of Duality",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "melee", "slam"]
   },
   {
     "name": "Power Siphon of the Archmage",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "lightning"]
   },
   {
     "name": "Rain of Arrows Of Artillery",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "projectile", "bow"]
   },
   {
     "name": "Rain of Arrows Of Saturation",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "projectile", "bow"]
   },
   {
     "name": "Righteous Fire of Arcane Devotion",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["spell", "area", "fire"]
   },
   {
     "name": "Scourge Arrow of Menace",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "chaos", "bow"]
   },
   {
     "name": "Shrapnel Ballista of Steel",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "totem", "physical", "bow"]
   },
   {
     "name": "Storm Rain of the Conduit",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "lightning", "projectile", "bow"]
   },
   {
     "name": "Storm Rain of the Fence",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "lightning", "projectile", "bow"]
   },
   {
     "name": "Summon Carrion Golem of Hordes",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["physical", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Carrion Golem of Scavenging",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["physical", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Lightning Golem of Hordes",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["lightning", "minion", "spell", "golem"]
   },
   {
     "name": "Summon Stone Golem of Hordes",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["minion", "spell", "golem", "physical"]
   },
   {
     "name": "Summon Stone Golem of Safeguarding",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["minion", "spell", "golem", "physical"]
   },
   {
     "name": "Tectonic Slam of Cataclysm",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["fire", "attack", "area", "melee", "slam"]
   },
   {
     "name": "Tornado Shot of Cloudburst",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "projectile", "bow"]
   },
   {
     "name": "Toxic Rain of Sporeburst",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "chaos", "duration", "projectile", "bow"]
   },
   {
     "name": "Toxic Rain of Withering",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "area", "chaos", "duration", "projectile", "bow"]
   },
   {
     "name": "Viper Strike of the Mamba",
     "type": "main",
-    "transfigured": true
+    "transfigured": true,
+    "tags": ["attack", "duration", "melee", "strike", "chaos"]
+  },
+  {
+    "name": "Divine Blast",
+    "type": "main",
+    "tags": ["aoe", "attack", "physical", "duration", "fire"]
+  },
+  {
+    "name": "Holy Hammers",
+    "type": "main",
+    "tags": ["attack", "slam", "melee", "aoe", "lightning"]
+  },
+  {
+    "name": "Holy Strike",
+    "type": "main",
+    "tags": ["minion", "attack", "melee", "strike", "lightning", "duration"]
+  },
+  {
+    "name": "Shield of Light",
+    "type": "main",
+    "tags": ["attack", "melee", "aoe", "lightning", "physical", "retaliation"]
+  },
+  {
+    "name": "Shockwave Totem of Authority",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["totem", "spell", "aoe", "physical", "nova"]
+  },
+  {
+    "name": "Static Strike of Gathering Lightning",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["attack", "melee", "strike", "duration", "lightning", "chaining"]
+  },
+  {
+    "name": "Searing Bond of Detonation",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["spell", "totem", "fire", "aoe", "duration"]
+  },
+  {
+    "name": "Charged Dash of Projection",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["aoe", "channelling", "attack", "melee", "lightning"]
+  },
+  {
+    "name": "Flamethrower Trap of Stability",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["trap", "spell", "duration", "aoe", "fire"]
+  },
+  {
+    "name": "Kinetic Fusillade of Detonation",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["attack", "projectile", "duration", "aoe"]
+  },
+  {
+    "name": "Orb of Storms of Squalls",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["lightning", "spell", "aoe", "chaining", "orb"]
+  },
+  {
+    "name": "Shock Nova of Procession",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["spell", "aoe", "lightning", "nova"]
+  },
+  {
+    "name": "Storm Burst of Repulsion",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["aoe", "spell", "lightning", "channelling", "duration", "physical"]
+  },
+  {
+    "name": "Siphoning Trap of Pain",
+    "type": "main",
+    "transfigured": true,
+    "tags": ["trap", "spell", "duration", "aoe", "cold"]
   }
 ]

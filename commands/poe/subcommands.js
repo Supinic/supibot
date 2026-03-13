@@ -169,7 +169,7 @@ export default [
 		name: "roll",
 		aliases: ["randombuild", "rb"],
 		description: "Generates a build by taking a random skill gem and a random ascendancy and putting them together.",
-		execute: async () => {
+		execute: async (context) => {
 			const additional = core.Utils.randArray(additionalGems);
 			const skill = core.Utils.randArray(skillGems);
 			const ascendancy = core.Utils.randArray(ascendancies);
