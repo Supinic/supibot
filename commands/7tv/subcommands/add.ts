@@ -19,9 +19,14 @@ export default {
 	aliases: [],
 	description: [],
 	default: true,
-	getDescription: () => [
+	getDescription: (prefix) => [
 		"Adds an emote to the current channel's rotating list.",
-		"If the emote would exceed the current limit, then the oldest one will be removed."
+		"If the emote would exceed the current limit, then the oldest one will be removed.",
+		"",
+
+		`<code>${prefix}7tv add (emote link or ID)</code>`,
+		"Adds the selected emote to the list of rotating emotes.",
+		"If the amount of emotes would bypass the limit, the oldest added one will be removed automatically."
 	],
 	execute: async (context, ...args) => {
 		if (!context.channel) {

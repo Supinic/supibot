@@ -12,6 +12,13 @@ const aliasCommandDefinition = declare({
 	Params: [],
 	Whitelist_Response: null,
 	Code: async function sevenTv (context, type, ...args) {
+		if (context.platform.name !== "twitch") {
+			return {
+				success: false,
+				reply: "This command is only usable on Twitch!"
+			};
+		}
+
 		const subcommand = SevenTvSubcommands.get(type);
 		if (!subcommand) {
 			return await SevenTvSubcommands.default.execute.call(this, context, type, ...args);

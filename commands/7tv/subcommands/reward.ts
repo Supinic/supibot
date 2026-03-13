@@ -72,8 +72,19 @@ export default {
 	aliases: [],
 	default: false,
 	description: [],
-	getDescription: () => [
-		"Links or unlinks the <code>add</code> command from being usable only via a given Twitch channel point reward."
+	getDescription: (prefix) => [
+		"Links or unlinks the <code>add</code> command from being usable only via a given Twitch channel point reward.",
+		`When linked, the <code>${prefix}7tv add</code> command will only be usable when the given points reward is used alongside the command.`,
+		"",
+
+		`<code>${prefix}7tv reward add Name of points reward`,
+		`Links the <code>add</code> command in the current channel to the given points reward.`,
+		`You can also use "link" or "set" instead of "add".`,
+		"",
+
+		`<code>${prefix}7tv reward remove`,
+		"If the command is currently linked to a reward, this will disable the link.",
+		`You can also use "unlink" or "unset" instead of "remove".`
 	],
 	execute: async (context, type, ...args) => {
 		if (!context.channel) {

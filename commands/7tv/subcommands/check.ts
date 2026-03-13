@@ -7,8 +7,13 @@ export default {
 	aliases: ["list"],
 	default: false,
 	description: [],
-	getDescription: () => [
-		"Posts the list of the rotating 7TV emotes in the current channel."
+	getDescription: (prefix) => [
+		"Posts the list of the rotating 7TV emotes in the current channel.",
+		"The emotes will be posted oldest to newest.",
+		"",
+
+		`<code>${prefix}7tv check</code>`,
+		"Posts the list of current rotating emotes."
 	],
 	execute: async (context) => {
 		if (!context.channel) {

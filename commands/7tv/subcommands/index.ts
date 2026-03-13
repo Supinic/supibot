@@ -1,17 +1,17 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { type Channel } from "../../../classes/channel.js";
 import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import type { Channel } from "../../../classes/channel.js";
+import type { SevenTvRotatingEmotesData } from "../../../classes/custom-data-properties.js";
 
 import AddSubcommand from "./add.js";
 import CheckSubcommand from "./check.js";
-import SetSubcommand from "./set.js";
-import type { SevenTvRotatingEmotesData } from "../../../classes/custom-data-properties.js";
+import RewardSubcommand from "./reward.js";
 
 const subcommands: SubcommandDefinition[] = [
 	AddSubcommand,
 	CheckSubcommand,
-	SetSubcommand
+	RewardSubcommand
 ];
 
 export const SevenTvSubcommands = new SubcommandCollection("7tv", subcommands);
