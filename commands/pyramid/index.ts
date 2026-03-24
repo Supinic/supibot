@@ -45,7 +45,7 @@ export default declare({
 			    reply: "You must provide the size as the last parameter!"
 			};
 		}
-		else if (!core.Utils.isValidInteger(size, 0) || size >= REASONABLE_PYRAMID_MAXIMUM) {
+		else if (!core.Utils.isValidInteger(size, 0) || size > REASONABLE_PYRAMID_MAXIMUM) {
 			return {
 				success: false,
 				reply: `Your provided pyramid height is not a positive integer, or is larger than the maximum of (${REASONABLE_PYRAMID_MAXIMUM})!`
