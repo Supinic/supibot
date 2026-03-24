@@ -317,7 +317,7 @@ type CooldownObject = {
 };
 type CooldownDefinition = number | null | CooldownObject;
 
-export type ExtractContext <T extends CommandDefinition> = Context<T["Params"]>;
+export type ExtractContext <T extends CommandDefinition> = Parameters<T["Code"]>[0];
 
 export interface SubcommandDefinition<T extends CommandDefinition = CommandDefinition> {
 	name: string;
@@ -327,7 +327,7 @@ export interface SubcommandDefinition<T extends CommandDefinition = CommandDefin
 	getDescription?: (prefix: string) => string[] | Promise<string[]>;
 	default?: boolean;
 	flags?: Record<string, boolean>;
-	execute: (this: Command, context: Context<T["Params"]>, ...args: string[]) => StrictResult | Promise<StrictResult>;
+	execute: (this: Command, context: ExtractContext<T>, ...args: string[]) => StrictResult | Promise<StrictResult>;
 }
 
 export class SubcommandCollection {

@@ -56,9 +56,9 @@ export default async function validateHastebinServer (command: Command, server: 
 	}
 
 	if (typeof isValid === "boolean") {
-		await command.setCacheData(cacheKey, isValid, {
-			expiry: 7 * 864e5 // 7 days
-		});
+		// Cache successes for 7 days, cache failures for 6 hours - allowing for a faster "recovery"
+		const expiry = (isValid) ? (7 * 864e5) : (6 * 36e5);
+		await command.setCacheData(cacheKey, isValid, { expiry });
 	}
 
 	return isValid;

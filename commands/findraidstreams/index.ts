@@ -69,7 +69,7 @@ export default declare({
 
 		return {
 			success: true,
-			reply: `https://haste.zneix.eu/raw/${hasteResult.link}`
+			reply: hasteResult.link
 		};
 	}),
 	Dynamic_Description: null

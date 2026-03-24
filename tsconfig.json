@@ -2,6 +2,11 @@
   "include": ["./**/*.js", "./**/*.ts", "./**/*.json"],
   "exclude": ["build/**", "tests/**", "node_modules/**"],
   "compilerOptions": {
+    "types": ["node"],
+    "rootDir": ".",
+    "noUncheckedSideEffectImports": true,
+    "libReplacement": false,
+
     "target": "esnext",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "module": "nodenext",                                /* Specify what module code is generated. */
     "resolveJsonModule": true,                           /* Enable importing .json files. */

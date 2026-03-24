@@ -2,6 +2,7 @@ import { parseUserIdentifier, getLeagueEntries } from "./utils.js";
 import { type MobaSubcommandDefinition } from "../index.js";
 
 const TARGET_LEAGUE = "RANKED_SOLO_5x5";
+const RANKLESS_TIERS = new Set(["MASTER", "GRANDMASTER", "CHALLENGER"]);
 
 export default {
 	name: "rank",
@@ -35,13 +36,18 @@ export default {
 			};
 		}
 
-		const tier = core.Utils.capitalize(data.tier.toLowerCase());
+		const { tier, wins, losses, rank, leaguePoints } = data;
+		const tierName = core.Utils.capitalize(tier.toLowerCase());
+		const rankString = (RANKLESS_TIERS.has(tier.toUpperCase()))
+			? tierName
+			: `${tierName} ${rank}`;
+
 		const winRate = core.Utils.round(data.wins / (data.wins + data.losses) * 100, 0);
 
 		return {
 			reply: core.Utils.tag.trim `
-				${gameName} is currently ${tier} ${data.rank} (${data.leaguePoints} LP),
-				with a win/loss of ${data.wins}:${data.losses} (${winRate}% winrate).
+				${gameName} is currently ${rankString} ${leaguePoints} LP,
+				with a win/loss of ${wins}:${losses} (${winRate}% winrate).
 			`
 		};
 	}
