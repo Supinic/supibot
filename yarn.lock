@@ -1624,9 +1624,9 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
-"ioredis@npm:^5.9.3":
-  version: 5.10.0
-  resolution: "ioredis@npm:5.10.0"
+"ioredis@npm:^5.10.1":
+  version: 5.10.1
+  resolution: "ioredis@npm:5.10.1"
   dependencies:
     "@ioredis/commands": "npm:1.5.1"
     cluster-key-slot: "npm:^1.1.0"
@@ -1637,7 +1637,7 @@ duration-parser@supinic/duration-parser:
     redis-errors: "npm:^1.2.0"
     redis-parser: "npm:^3.0.0"
     standard-as-callback: "npm:^2.1.0"
-  checksum: 10c0/294e8cdef963f922b04ad023d4165f1d399b27279b9890f3e1311da57fb2a082c8dca52d18bd14a54acd6fb82853783641a0c47ff18661a8756221049f807e88
+  checksum: 10c0/d0507b52520d3bdd5dacaa33aed9dd3133794d8633b43a6b7fc3199a5e73f92cb77409f6904abe68e3221a95a630d97073b8c1c9e2c0c7613124db67e97c0eb0
   languageName: node
   linkType: hard
 
@@ -1899,20 +1899,7 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.0.0":
-  version: 3.4.5
-  resolution: "mariadb@npm:3.4.5"
-  dependencies:
-    "@types/geojson": "npm:^7946.0.16"
-    "@types/node": "npm:^24.0.13"
-    denque: "npm:^2.1.0"
-    iconv-lite: "npm:^0.6.3"
-    lru-cache: "npm:^10.4.3"
-  checksum: 10c0/2b007083f992c1543e73ec9c4113528deeb418502dfee791bb2902c7c2e228d9e46c3ed7415c27f7d03850e34189ee4a8b5c54ef7d262abcfd5eb1848e8ca76e
-  languageName: node
-  linkType: hard
-
-"mariadb@npm:^3.5.1":
+"mariadb@npm:3.5.1":
   version: 3.5.1
   resolution: "mariadb@npm:3.5.1"
   dependencies:
@@ -1928,6 +1915,19 @@ duration-parser@supinic/duration-parser:
     "@types/node":
       optional: true
   checksum: 10c0/363fa79ded684c4786b14b5db7c517ad7cae1d3529ed3da6f6e2c671d82ba56d769052f98acf1a936e599e811eec91f4acc9daae3df0afc4f6745ed326fde7e8
+  languageName: node
+  linkType: hard
+
+"mariadb@npm:^3.0.0":
+  version: 3.4.5
+  resolution: "mariadb@npm:3.4.5"
+  dependencies:
+    "@types/geojson": "npm:^7946.0.16"
+    "@types/node": "npm:^24.0.13"
+    denque: "npm:^2.1.0"
+    iconv-lite: "npm:^0.6.3"
+    lru-cache: "npm:^10.4.3"
+  checksum: 10c0/2b007083f992c1543e73ec9c4113528deeb418502dfee791bb2902c7c2e228d9e46c3ed7415c27f7d03850e34189ee4a8b5c54ef7d262abcfd5eb1848e8ca76e
   languageName: node
   linkType: hard
 
@@ -2370,16 +2370,16 @@ duration-parser@supinic/duration-parser:
 
 supi-core@supinic/supi-core:
   version: 3.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=f20cc2c35ec6f1232d2450e938331ba9ea6ba358"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=809f3fbc9061c52b658094aae215a6264fcc3717"
   dependencies:
     cheerio: "npm:^1.2.0"
     duration-parser: supinic/duration-parser
     got: "npm:^14.6.6"
-    ioredis: "npm:^5.9.3"
-    mariadb: "npm:^3.5.1"
+    ioredis: "npm:^5.10.1"
+    mariadb: "npm:3.5.1"
     prom-client: "npm:^15.1.3"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/38366c584de25b53c9223cc229882c5479aacce62971d1847a755c14cfcd75faeffcfce6da2fa0ae5c23bc557b0cb03b19a04b6681465af94fa135da079e2af1
+  checksum: 10c0/8ccd67579990c314e7c90522dde98c44d46909f4e5d6ad367219b9b1fd4cf7ea26c0164d9a9fd2a32a21c5d0dbda2f26ae2197cf7cbffe2b2669b1007ae7fd4e
   languageName: node
   linkType: hard
 
@@ -2553,9 +2553,9 @@ track-link-parser@supinic/track-link-parser:
   linkType: hard
 
 "undici@npm:^7.19.0":
-  version: 7.22.0
-  resolution: "undici@npm:7.22.0"
-  checksum: 10c0/09777c06f3f18f761f03e3a4c9c04fd9fcca8ad02ccea43602ee4adf73fcba082806f1afb637f6ea714ef6279c5323c25b16d435814c63db720f63bfc20d316b
+  version: 7.24.5
+  resolution: "undici@npm:7.24.5"
+  checksum: 10c0/2a836f1f6ab078fde3eeb4cc8fd5b34eeaf52cfbdf16a9bab61b7223f43f7847bcd2125d1da7c4e3f5996c528bf9f7940015d39909bab80cfbd71b855470cf21
   languageName: node
   linkType: hard
 
