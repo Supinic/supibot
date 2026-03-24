@@ -16,7 +16,7 @@
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.6.1",
     "vm2": "^3.10.5",
-    "ws": "^8.19.0",
+    "ws": "^8.20.0",
     "zod": "^4.3.6"
   },
   "engines": {
@@ -44,12 +44,12 @@
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.0.0",
+    "eslint": "^10.1.0",
     "eslint-plugin-unicorn": "^63.0.0",
-    "globals": "^17.3.0",
+    "globals": "^17.4.0",
     "supi-db-init": "supinic/supi-db-init",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.0"
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.57.2"
   },
   "nyc": {
     "all": false,
