@@ -5,6 +5,22 @@ import type { Query } from "supi-core";
 
 import type { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
 type TwitchLottoFlagName = typeof twitchLottoFlags[number]["name"];
+export type SevenTvRotatingEmotesData = {
+	emoteSetId: string;
+	emotes: {
+		id: string;
+		name: string;
+		added: number;
+		requester: string;
+	}[];
+	// Twitch Redemption ID for the operation of adding new emotes - if setup, will only allow execution through a redemption
+	addRedemption?: {
+		id: string;
+		active: boolean;
+		name: string;
+	};
+	limit?: number;
+};
 
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
 export type GenericFetchData = {
@@ -66,6 +82,7 @@ const channelDataSchema = {
 	offlineOnlyMirror: "boolean",
 	redditNSFW: "boolean",
 	removeReason: "string",
+	sevenTvRotatingEmotes: {} as SevenTvRotatingEmotesData,
 	sharedCustomData: {} as SimpleGenericData,
 	showFullCommandErrorMessage: "boolean",
 	stalkPrevention: "boolean",
