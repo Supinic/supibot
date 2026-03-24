@@ -11,6 +11,7 @@ export type SevenTvRotatingEmotesData = {
 		id: string;
 		name: string;
 		added: number;
+		requester: string;
 	}[];
 	// Twitch Redemption ID for the operation of adding new emotes - if setup, will only allow execution through a redemption
 	addRedemption?: {

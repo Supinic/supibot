@@ -127,7 +127,8 @@ export default {
 		combinedEmoteData.push({
 			id: emoteId,
 			added: SupiDate.now(),
-			name: emoteData.defaultName
+			name: emoteData.defaultName,
+			requester: context.user.Name
 		});
 
 		await context.channel.setDataProperty("sevenTvRotatingEmotes", {
