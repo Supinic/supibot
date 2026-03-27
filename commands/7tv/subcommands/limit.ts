@@ -5,7 +5,7 @@ const MAX_EMOTE_LIMIT = 250;
 
 export default {
 	name: "limit",
-	title: "Changes the amount of rotating 7TV emotes.",
+	title: "Change the amount of emotes",
 	aliases: ["amount"],
 	default: false,
 	description: [],
