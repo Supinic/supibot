@@ -13,9 +13,9 @@ export default {
 		"Adjusts the amount (or limit) of emotes in the rotating list.",
 		"",
 
-		`<code>${prefix}7tv limit (number)`,
-		`<code>${prefix}7tv limit 10`,
-		`<code>${prefix}7tv amount 10`,
+		`<code>${prefix}7tv limit (number)</code>`,
+		`<code>${prefix}7tv limit 10</code>`,
+		`<code>${prefix}7tv amount 10</code>`,
 		"Sets the amount of emotes in the list."
 	],
 	execute: async (context, rawLimit) => {
