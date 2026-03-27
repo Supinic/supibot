@@ -219,8 +219,8 @@ const UPLOAD_MAP = {
 } as const;
 const DEFAULT_ORDER = ["nuuls", "kappa", "imgur"] as const;
 
-export const uploadFile = async (fileData: Buffer, options: SmartUploadOptions): Promise<ImageUploadResult> => {
-	const uploadOptions = { type: options.type };
+export const uploadFile = async (fileData: Buffer, options: SmartUploadOptions = {}): Promise<ImageUploadResult> => {
+	const uploadOptions = { type: options.type ?? "image" };
 	for (const item of options.order ?? DEFAULT_ORDER) {
 		const result = await UPLOAD_MAP[item](fileData, uploadOptions);
 		if (result.link) {

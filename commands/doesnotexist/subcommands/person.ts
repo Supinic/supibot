@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
 import type { DoesNotExistSubcommandDefinition } from "../index.js";
-import { uploadToImgur } from "../../../utils/command-utils.js";
+import { uploadFile } from "../../../utils/command-utils.js";
 
 type PersonDoesNotExistResponse = {
 	src: string;
@@ -48,7 +48,7 @@ export default {
 
 		// rawBody might not exist? fall back to `body` just in case, honestly
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		const { statusCode, link } = await uploadToImgur(imageResponse.rawBody ?? imageResponse.body, { type: "image" });
+		const { statusCode, link } = await uploadFile(imageResponse.rawBody ?? imageResponse.body, { type: "image" });
 		if (statusCode !== 200 || !link) {
 			return {
 				success: false,

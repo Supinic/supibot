@@ -1,5 +1,5 @@
 import type { DoesNotExistSubcommandDefinition } from "../index.js";
-import { uploadToImgur } from "../../../utils/command-utils.js";
+import { uploadFile } from "../../../utils/command-utils.js";
 
 export default {
 	name: "automobile",
@@ -27,7 +27,7 @@ export default {
 		const cleanSource = imageSource.replace("data:image/png;base64,", "");
 		const imageBuffer = Buffer.from(cleanSource, "base64");
 
-		const { statusCode, link } = await uploadToImgur(imageBuffer);
+		const { statusCode, link } = await uploadFile(imageBuffer, { type: "image" });
 		if (statusCode !== 200 || !link) {
 			return {
 				success: false,

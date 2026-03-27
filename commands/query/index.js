@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import { uploadToImgur } from "../../utils/command-utils.js";
+import { uploadFile } from "../../utils/command-utils.js";
 
 export default {
 	Name: "query",
@@ -49,7 +49,7 @@ export default {
 				};
 			}
 
-			const uploadResult = await uploadToImgur(response.body);
+			const uploadResult = await uploadFile(response.body, { type: "image" });
 			if (!uploadResult.link) {
 				return {
 					success: false,
