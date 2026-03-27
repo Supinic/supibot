@@ -77,12 +77,12 @@ export default {
 		`When linked, the <code>${prefix}7tv add</code> command will only be usable when the given points reward is used alongside the command.`,
 		"",
 
-		`<code>${prefix}7tv reward add Name of points reward`,
+		`<code>${prefix}7tv reward add (full name or ID of points reward)</code>`,
 		`Links the <code>add</code> command in the current channel to the given points reward.`,
 		`You can also use "link" or "set" instead of "add".`,
 		"",
 
-		`<code>${prefix}7tv reward remove`,
+		`<code>${prefix}7tv reward remove</code>`,
 		"If the command is currently linked to a reward, this will disable the link.",
 		`You can also use "unlink" or "unset" instead of "remove".`
 	],
