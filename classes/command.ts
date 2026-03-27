@@ -370,9 +370,8 @@ export class SubcommandCollection {
 				: subcommand.description;
 
 			result.push(
-				`<h6>${subcommand.title}</h6>`,
-				...description,
-				"",
+				`<h5>${subcommand.title}</h5>${description[0]}`,
+				...description.slice(1),
 				""
 			);
 		}
