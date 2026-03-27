@@ -10,45 +10,53 @@ export default declare({
 	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function downloadClip (context, input) {
-		if (!input) {
+	Code: (async function downloadClip (context, ...args) {
+		if (args.length === 0) {
 			return {
 				success: false,
-				reply: "No clip provided!"
+				reply: "No clip link provided!"
 			};
 		}
 
-		const rawSlug = getPathFromURL(input);
-		if (!rawSlug) {
-			return {
-				success: false,
-				reply: `No proper link provided!`
-			};
-		}
-
+		let resultSlug;
 		const legacyClipRegex = /[a-z0-9]+/i;
 		const modernClipRegex = /[a-z0-9]+-[-\w]{16}/i;
+		for (const arg of args) {
+			const rawSlug = getPathFromURL(arg);
+			if (!rawSlug) {
+				continue;
+			}
 
-		const match = rawSlug.match(modernClipRegex) ?? rawSlug.match(legacyClipRegex);
-		if (!match) {
+			const match = rawSlug.match(modernClipRegex) ?? rawSlug.match(legacyClipRegex);
+			if (!match) {
+				return {
+					success: false,
+					reply: "Invalid clip slug provided! Only letters are allowed."
+				};
+			}
+
+			resultSlug = match[0];
+			break;
+		}
+
+		if (resultSlug) {
 			return {
 				success: false,
-				reply: "Invalid clip slug provided! Only letters are allowed."
+				reply: `No proper clip link provided!`
 			};
 		}
 
-		const [slug] = match;
-		const response = await core.Got.get("IVR")({ url: `v2/twitch/clip/${slug}` });
+		const response = await core.Got.get("IVR")({ url: `v2/twitch/clip/${resultSlug}` });
 		if (response.statusCode === 400) {
 			return {
 				success: false,
-				reply: "Invalid slug format provided!"
+				reply: "Invalid slug format provided! Check if you included the entire link."
 			};
 		}
 		else if (!response.ok) {
 			return {
 				success: false,
-				reply: "No data found for given slug!"
+				reply: "No data found for given slug! Perhaps try again in a couple of minutes."
 			};
 		}
 
@@ -62,6 +70,7 @@ export default declare({
 			);
 
 			return {
+				success: true,
 				reply: "I whispered you the download link 🤫"
 			};
 		}
@@ -72,7 +81,7 @@ export default declare({
 			if (!previewUrl) {
 				return {
 					success: false,
-					reply: `Streamer is banned! Couldn't reconstruct clip URL (preview url)`
+					reply: `The streamer this clip is from is banned! Couldn't reconstruct clip URL (preview url)`
 				};
 			}
 
@@ -81,7 +90,7 @@ export default declare({
 			if (!match) {
 				return {
 					success: false,
-					reply: `Streamer is banned! Couldn't reconstruct clip URL (no match)`
+					reply: `The streamer this clip is from is banned! Couldn't reconstruct clip URL (no match)`
 				};
 			}
 
@@ -94,7 +103,8 @@ export default declare({
 			);
 
 			return {
-				reply: "The streamer is banned... but I whispered you an experimental download link that might work 🤫"
+				success: true,
+				reply: "The streamer is banned. But I whispered you an experimental download link that might just work 🤫"
 			};
 		}
 	}),
