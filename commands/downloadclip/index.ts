@@ -6,7 +6,7 @@ export default declare({
 	Name: "downloadclip",
 	Aliases: ["dlclip"],
 	Cooldown: 30000,
-	Description: "Takes a Twitch clip name or link, and sends a download link to it into private messages.",
+	Description: "Takes a Twitch clip link, and sends a direct download link to it into your private messages.",
 	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
