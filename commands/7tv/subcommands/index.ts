@@ -6,11 +6,13 @@ import type { SevenTvRotatingEmotesData } from "../../../classes/custom-data-pro
 
 import AddSubcommand from "./add.js";
 import CheckSubcommand from "./check.js";
+import LimitSubcommand from "./limit.js";
 import RewardSubcommand from "./reward.js";
 
 const subcommands: SubcommandDefinition[] = [
 	AddSubcommand,
 	CheckSubcommand,
+	LimitSubcommand,
 	RewardSubcommand
 ];
 
