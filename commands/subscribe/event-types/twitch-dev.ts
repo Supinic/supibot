@@ -13,5 +13,5 @@ export default {
 	subName: "Twitch Developer Changelog",
 	type: "rss",
 	cacheKey: "twitch-dev-last-publish-date",
-	url: "https://chillymosh.com/rss/twitch-dev-changelog.xml"
+	url: "https://dev.twitch.tv/docs/rss/change-log.xml"
 } satisfies RssEventDefinition;
