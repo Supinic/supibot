@@ -5,7 +5,13 @@ import { declare } from "../../classes/command.js";
 const HLTB_TOKEN_CACHE_KEY = "hltb-token-cache";
 const HLTB_ENDPOINT_CACHE_KEY = "hltb-api-endpoint";
 
-const initSchema = z.object({ token: z.string() });
+const initSchema = z.object({
+	token: z.string(),
+	hpKey: z.string(),
+	hpVal: z.string()
+});
+type InitObject = z.infer<typeof initSchema>;
+
 const hltbGameSchema = z.object({
 	comp_100: z.number(),
 	comp_100_count: z.number(),
@@ -116,7 +122,7 @@ const fetchEndpoint = async (force?: boolean) => {
  * Fetches the "authentication token" - either from cache, or refreshes it.
  */
 const fetchToken = async (endpoint: string) => {
-	const existing = await core.Cache.getByPrefix(HLTB_TOKEN_CACHE_KEY) as string | undefined;
+	const existing = await core.Cache.getByPrefix(HLTB_TOKEN_CACHE_KEY) as InitObject | undefined;
 	if (existing) {
 		return existing;
 	}
@@ -134,37 +140,43 @@ const fetchToken = async (endpoint: string) => {
 		return null;
 	}
 
-	const { token } = initSchema.parse(response.body);
-	await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, token, {
+	const { token, hpKey, hpVal } = initSchema.parse(response.body);
+	const tokenData = { token, hpKey, hpVal };
+
+	await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, tokenData, {
 		expiry: 864e5 // 1 day
 	});
 
-	return token;
+	return tokenData;
 };
 
 /**
  * Fetches the search data for a provided game query.
  */
 const fetchData = async (endpoint: string, query: string[]) => {
-	const token = await fetchToken(endpoint);
-	if (!token) {
+	const tokenData = await fetchToken(endpoint);
+	if (!tokenData) {
 		return {
 			success: false,
 			reply: "Could not fetch game data! The API has likely changed (again?!)"
 		} as const;
 	}
 
+	const { token, hpKey, hpVal } = tokenData;
 	const response = await core.Got.get("FakeAgent")({
 		url: `https://howlongtobeat.com/api/${endpoint}`,
 		method: "POST",
 		throwHttpErrors: false,
 		headers: {
 			Referer: "https://howlongtobeat.com",
-			"X-Auth-Token": token
+			"X-Auth-Token": token,
+			"X-Hp-Key": hpKey,
+			"X-Hp-Val": hpVal
 		},
 		// All the default values (e.g. empty strings, nulls, zeroes) must be filled,
 		// else the API fails with 500 Internal Server Error.
 		json: {
+			[hpKey]: hpVal,
 			searchType: "games",
 			searchTerms: [...query],
 			searchPage: 1,
