@@ -314,11 +314,11 @@ export default async function createDebugSandbox (context, scriptArgs) {
 
 				return totalResult;
 			},
-			execute: async (command, ...args) => {
+			execute: async (command, ...rawArgs) => {
 				if (typeof command !== "string") {
 					throw new Error("Provided command name must be a string");
 				}
-				else if (args.some(i => typeof i !== "string")) {
+				else if (rawArgs.some(i => typeof i !== "string")) {
 					throw new Error("Provided command arguments must all be strings");
 				}
 				else if (commandExecutionCounter > commandExecutionCountThreshold) {
@@ -342,6 +342,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 				commandExecutionPending = true;
 				commandExecutionCounter++;
 
+				const args = rawArgs.join(" ").split(/\s+/);
 				const execution = await sb.Command.checkAndExecute({
 					command,
 					args,
