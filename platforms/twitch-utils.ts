@@ -568,7 +568,6 @@ const createSubscription = async (data: CreateSubscriptionData) => {
 		else {
 			console.warn("Could not subscribe", {
 				subscription,
-				selfId,
 				channelId,
 				response: response.body
 			});
