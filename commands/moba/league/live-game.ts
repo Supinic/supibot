@@ -6,12 +6,14 @@ import {
 	getQueueDescription,
 	getLiveMatchData,
 	getChampionData,
+	invalidateChampionCache,
 	type ChampionData
 } from "./utils.js";
 
 const getChampionName = (data: ChampionData[], id: number): string => {
-	const champion = data.find(i => i.id === id);
+	const champion = data.find(i => i.key === id);
 	if (!champion) {
+		void invalidateChampionCache();
 		throw new SupiError({
 			message: `Assert error: Champion ID ${id} does not exist`
 		});

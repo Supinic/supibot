@@ -95,18 +95,21 @@ const championsDataSchema = z.object({
 	data: z.record(z.string(), z.object({
 		id: z.string(),
 		key: z.string(),
-		title: z.string()
+		name: z.string()
 	}))
 }).transform(({ data }) => Object.values(data).map(i => ({
-	id: Number(i.key),
-	name: i.id,
-	title: i.title
+	key: Number(i.key),
+	id: i.id,
+	name: i.name
 })));
 
 export const getChampionData = async (): Promise<ChampionData[]> => {
-	const cachedPatch = await core.Cache.get(LATEST_PATCH_NUMBER_KEY) as string | null;
-	const cachedPatchData = await core.Cache.get(LATEST_PATCH_CONTENT_KEY) as ChampionData[] | null;
-	const checkedRecently = await core.Cache.get(LATEST_PATCH_CHECKED_RECENTLY_KEY) as true | null;
+	const [cachedPatch, cachedPatchData, checkedRecently] = await Promise.all([
+		core.Cache.getByPrefix(LATEST_PATCH_NUMBER_KEY) as Promise<string | null>,
+		core.Cache.getByPrefix(LATEST_PATCH_CONTENT_KEY) as Promise<ChampionData[] | null>,
+		core.Cache.getByPrefix(LATEST_PATCH_CHECKED_RECENTLY_KEY) as Promise<true | null>
+	]);
+
 	if (checkedRecently && cachedPatchData) {
 		return cachedPatchData;
 	}
@@ -132,6 +135,13 @@ export const getChampionData = async (): Promise<ChampionData[]> => {
 	]);
 
 	return championsData;
+};
+export const invalidateChampionCache = async () => {
+	await Promise.all([
+		core.Cache.setByPrefix(LATEST_PATCH_NUMBER_KEY, null),
+		core.Cache.setByPrefix(LATEST_PATCH_CONTENT_KEY, null),
+		core.Cache.setByPrefix(LATEST_PATCH_CHECKED_RECENTLY_KEY, null)
+	]);
 };
 
 const queueSchema = z.array(
