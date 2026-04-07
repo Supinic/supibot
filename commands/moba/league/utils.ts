@@ -46,28 +46,6 @@ export const GAME_RESULT = {
 	END: "GameComplete"
 };
 
-export const NON_STANDARD_CHAMPION_NAMES: Record<string, string> = {
-	AurelionSol: "Aurelion Sol",
-	Belveth: "Bel'Veth",
-	Chogath: "Cho'Gath",
-	DrMundo: "Dr. Mundo",
-	JarvanIV: "Jarvan IV",
-	Kaisa: "Kai'Sa",
-	Khazix: "Kha'Zix",
-	KogMaw: "Kog'Maw",
-	KSante: "K'Sante",
-	LeeSin: "Lee Sin",
-	MasterYi: "Master Yi",
-	MissFortune: "Miss Fortune",
-	Nunu: "Nunu & Willump",
-	RekSai: "Rek'Sai",
-	Renata: "Renata Glasc",
-	TahmKench: "Tahm Kench",
-	TwistedFate: "Twisted Fate",
-	Velkoz: "Vel'Koz",
-	XinZhao: "Xin Zhao"
-};
-
 export const DEFAULT_USER_IDENTIFIER_KEY = "leagueDefaultUserIdentifier";
 export const DEFAULT_REGION_KEY = "leagueDefaultRegion";
 export const QUEUE_DATA_CACHE_KEY = "league-queues-data";
@@ -142,6 +120,20 @@ export const invalidateChampionCache = async () => {
 		core.Cache.setByPrefix(LATEST_PATCH_CONTENT_KEY, null),
 		core.Cache.setByPrefix(LATEST_PATCH_CHECKED_RECENTLY_KEY, null)
 	]);
+};
+export const getChampionName = (data: ChampionData[], identifier: number | string): string => {
+	const champion = (typeof identifier === "number")
+		? data.find(i => i.key === identifier)
+		: data.find(i => i.id === identifier);
+
+	if (!champion) {
+		void invalidateChampionCache();
+		throw new SupiError({
+			message: `Assert error: Champion id/key ${identifier} does not exist`
+		});
+	}
+
+	return champion.name;
 };
 
 const queueSchema = z.array(
@@ -505,19 +497,4 @@ export const getLiveMatchData = async (platform: keyof typeof REGIONS, puuid: st
 		success: true,
 		data: liveMatchSchema.parse(response.body)
 	} as const;
-};
-
-export default {
-	NON_STANDARD_CHAMPION_NAMES, // @todo replace by a DataDragon API call in production: https://ddragon.leagueoflegends.com/cdn/14.11.1/data/en_US/champion.json
-	DEFAULT_USER_IDENTIFIER_KEY,
-	DEFAULT_REGION_KEY,
-	GAME_RESULT,
-	TEAM_POSITIONS_MAP,
-	getQueueDescription,
-	getPlatform,
-	getPUUIDByName,
-	getLeagueEntries,
-	getMatchIds,
-	getMatchData,
-	parseUserIdentifier
 };

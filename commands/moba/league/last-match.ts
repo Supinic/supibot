@@ -2,12 +2,13 @@ import { SupiDate, SupiError } from "supi-core";
 
 import { type MobaSubcommandDefinition } from "../index.js";
 import {
-	NON_STANDARD_CHAMPION_NAMES,
 	TEAM_POSITIONS_MAP,
 	parseUserIdentifier,
 	getMatchIds,
 	getMatchData,
-	getQueueDescription
+	getQueueDescription,
+	getChampionData,
+	getChampionName
 } from "./utils.js";
 
 export default {
@@ -78,7 +79,8 @@ export default {
 		// The ?? operator is probably not necessary here, but just "in case" Riot API receives a new key.
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
-		const champName = NON_STANDARD_CHAMPION_NAMES[player.championName] ?? player.championName;
+		const championsData = await getChampionData();
+		const champName = getChampionName(championsData, player.championName);
 
 		return {
 			reply: core.Utils.tag.trim `

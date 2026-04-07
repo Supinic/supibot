@@ -1,4 +1,4 @@
-import { SupiDate, SupiError } from "supi-core";
+import { SupiDate } from "supi-core";
 
 import { type MobaSubcommandDefinition } from "../index.js";
 import {
@@ -6,21 +6,8 @@ import {
 	getQueueDescription,
 	getLiveMatchData,
 	getChampionData,
-	invalidateChampionCache,
-	type ChampionData
+	getChampionName
 } from "./utils.js";
-
-const getChampionName = (data: ChampionData[], id: number): string => {
-	const champion = data.find(i => i.key === id);
-	if (!champion) {
-		void invalidateChampionCache();
-		throw new SupiError({
-			message: `Assert error: Champion ID ${id} does not exist`
-		});
-	}
-
-	return champion.name;
-};
 
 export default {
 	name: "liveGame",
