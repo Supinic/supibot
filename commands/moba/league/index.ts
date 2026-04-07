@@ -2,10 +2,12 @@ import { SubcommandCollection } from "../../../classes/command.js";
 import type { MobaSubcommandDefinition, MobaGameDefinition } from "../index.js";
 
 import LastMatchCommand from "./last-match.js";
+import LiveGameCommand from "./live-game.js";
 import RankCommand from "./rank.js";
 
 const subcommands = [
 	LastMatchCommand,
+	LiveGameCommand,
 	RankCommand
 ] satisfies MobaSubcommandDefinition[];
 

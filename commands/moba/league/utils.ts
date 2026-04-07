@@ -85,6 +85,55 @@ const getLeagueEntriesCacheKey = (platform: string, puuid: string) => `moba-leag
 const getMatchIdsKey = (summonerId: string) => `moba-league-match-ids-${summonerId}`;
 const getMatchDataKey = (matchId: string) => `moba-league-match-data-${matchId}`;
 
+const LATEST_PATCH_NUMBER_KEY = "league-latest-patch-key";
+const LATEST_PATCH_CONTENT_KEY = "league-latest-patch-content";
+const LATEST_PATCH_CHECKED_RECENTLY_KEY = "league-latest-patch-checked";
+const CHECKED_RECENTLY_INTERVAL = 6 * 36e5; // 6 hours
+
+export type ChampionData = z.infer<typeof championsDataSchema>[number];
+const championsDataSchema = z.object({
+	data: z.record(z.string(), z.object({
+		id: z.string(),
+		key: z.string(),
+		title: z.string()
+	}))
+}).transform(({ data }) => Object.values(data).map(i => ({
+	id: Number(i.key),
+	name: i.id,
+	title: i.title
+})));
+
+export const getChampionData = async (): Promise<ChampionData[]> => {
+	const cachedPatch = await core.Cache.get(LATEST_PATCH_NUMBER_KEY) as string | null;
+	const cachedPatchData = await core.Cache.get(LATEST_PATCH_CONTENT_KEY) as ChampionData[] | null;
+	const checkedRecently = await core.Cache.get(LATEST_PATCH_CHECKED_RECENTLY_KEY) as true | null;
+	if (checkedRecently && cachedPatchData) {
+		return cachedPatchData;
+	}
+
+	const patchResponse = await core.Got.get("GenericAPI")({
+		url: "https://ddragon.leagueoflegends.com/api/versions.json"
+	});
+
+	const [latestPatch] = z.array(z.string()).parse(patchResponse.body);
+	if (cachedPatchData && latestPatch === cachedPatch) {
+		await core.Cache.setByPrefix(LATEST_PATCH_CHECKED_RECENTLY_KEY, true, { expiry: CHECKED_RECENTLY_INTERVAL });
+		return cachedPatchData;
+	}
+
+	const dataResponse = await core.Got.get("GenericAPI")({
+		url: `https://ddragon.leagueoflegends.com/cdn/${latestPatch}/data/en_US/champion.json`
+	});
+
+	const championsData = championsDataSchema.parse(dataResponse.body);
+	await Promise.all([
+		core.Cache.setByPrefix(LATEST_PATCH_NUMBER_KEY, latestPatch),
+		core.Cache.setByPrefix(LATEST_PATCH_CONTENT_KEY, championsData)
+	]);
+
+	return championsData;
+};
+
 const queueSchema = z.array(
 	z.object({
 		queueId: z.int(),
@@ -404,6 +453,48 @@ export const getMatchData = async (platform: keyof typeof REGIONS, matchId: stri
 	}
 
 	return matchData;
+};
+
+const liveMatchSchema = z.object({
+	gameType: z.string(),
+	gameStartTime: z.int(),
+	gameMode: z.string(),
+	gameQueueConfigId: z.int(),
+	participants: z.array(z.object({
+		championId: z.int(),
+		puuid: z.string().nullable(),
+		teamId: z.int()
+	}))
+});
+export const getLiveMatchData = async (platform: keyof typeof REGIONS, puuid: string) => {
+	const response = await core.Got.get("GenericAPI")({
+		url: `https://${platform}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}`,
+		throwHttpErrors: false,
+		headers: {
+			"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
+		}
+	});
+
+	if (!response.ok) {
+		if (response.statusCode === 404) {
+			return {
+				success: false,
+				reply: "That user is not currently in game!"
+			} as const;
+		}
+
+		throw new SupiError({
+			message: "Could not fetch live match data",
+			args: {
+				statusCode: response.statusCode
+			}
+		});
+	}
+
+	return {
+		success: true,
+		data: liveMatchSchema.parse(response.body)
+	} as const;
 };
 
 export default {
