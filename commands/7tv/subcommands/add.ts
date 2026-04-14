@@ -126,9 +126,9 @@ export default {
 		const token = fetchSevenTvToken();
 
 		let removedEmoteString = "";
-		if (combinedEmoteData.length >= limit) {
+		if (combinedEmoteData.length >= limit || emoteIndexToReplace !== null) {
 			let index = 0;
-			if (type === "replace" && emoteIndexToReplace !== null) {
+			if (emoteIndexToReplace !== null) {
 				index = emoteIndexToReplace;
 			}
 			else {
