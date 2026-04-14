@@ -30,7 +30,7 @@ export default {
 		if (typeof rawLimit !== "string") {
 			return {
 				success: true,
-				reply: `Current limit: ${localData.limit ?? SEVEN_TV_DEFAULT_LIMIT} emotes.`
+				reply: `Current amount: ${localData.limit ?? SEVEN_TV_DEFAULT_LIMIT} emotes.`
 			};
 		}
 
@@ -38,21 +38,15 @@ export default {
 		if (permissions.flag < sb.User.permissions.ambassador) {
 			return {
 				success: false,
-				reply: "You can't use this command here! Only ambassadors and channel owners can."
+				reply: "You can't change the amount! Only ambassadors and channel owners can."
 			};
 		}
 
 		const limit = Number(rawLimit);
-		if (!core.Utils.isValidInteger(limit, 1)) {
+		if (!core.Utils.isValidInteger(limit, 1) || limit > MAX_EMOTE_LIMIT) {
 			return {
 				success: false,
-				reply: "Your provided amount is not valid! It must be a positive integer."
-			};
-		}
-		else if (limit >= MAX_EMOTE_LIMIT) {
-			return {
-				success: false,
-				reply: `Your provided amount is too large! It should be at most ${MAX_EMOTE_LIMIT}.`
+				reply: `Your provided amount is not valid! It should an integer value between 1 and ${MAX_EMOTE_LIMIT} (inclusive).`
 			};
 		}
 
