@@ -15,7 +15,7 @@ export default {
 		`<code>${prefix}7tv check</code>`,
 		"Posts the list of current rotating emotes."
 	],
-	execute: async (context) => {
+	execute: async (context, emote) => {
 		if (!context.channel) {
 			return {
 				success: false,
@@ -31,10 +31,26 @@ export default {
 			};
 		}
 
-		const names = emotes.sort((a, b) => a.added - b.added).map(i => i.name).join(" ");
-		return {
-			success: true,
-			reply: `Current emotes (oldest to newest): ${names}`
-		};
+		const targetEmote = (emote)
+			? emotes.find(i => i.name === emote)
+			: null;
+
+		if (targetEmote) {
+			const { requester, added, name } = targetEmote;
+			const delta = core.Utils.timeDelta(added);
+			const who = (requester === context.user.Name) ? "you" : requester;
+			return {
+				success: true,
+				reply: `${name} added by ${who} ${delta}.`
+			};
+		}
+		else {
+			const prefix = (emote) ? "Could not find your emote, so here's a list: " : "";
+			const names = emotes.sort((a, b) => a.added - b.added).map(i => i.name).join(" ");
+			return {
+				success: true,
+				reply: `${prefix}Current emotes (oldest to newest): ${names}`
+			};
+		}
 	}
 } satisfies SevenTvSubcommandDefinition;
