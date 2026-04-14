@@ -1,4 +1,4 @@
-import { fetchSevenTvChannelData } from "./index.js";
+import { fetchSevenTvChannelData, SEVEN_TV_DEFAULT_LIMIT } from "./index.js";
 import type { SevenTvSubcommandDefinition } from "../index.js";
 
 const MAX_EMOTE_LIMIT = 250;
@@ -26,6 +26,14 @@ export default {
 			};
 		}
 
+		const localData = await fetchSevenTvChannelData(context.channel);
+		if (typeof rawLimit !== "string") {
+			return {
+				success: true,
+				reply: `Current limit: ${localData.limit ?? SEVEN_TV_DEFAULT_LIMIT} emotes.`
+			};
+		}
+
 		const permissions = await context.getUserPermissions();
 		if (permissions.flag < sb.User.permissions.ambassador) {
 			return {
@@ -48,7 +56,6 @@ export default {
 			};
 		}
 
-		const localData = await fetchSevenTvChannelData(context.channel);
 		localData.limit = limit;
 		await context.channel.setDataProperty("sevenTvRotatingEmotes", localData);
 
