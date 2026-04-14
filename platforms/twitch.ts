@@ -587,6 +587,26 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!response.ok) {
 			const errorResponse = response.body as unknown as { message: string; error: string; }; // @todo type error case properly
+			if (response.statusCode === 401 && errorResponse.message.includes("channel:bot scope")) {
+				const users = [await sb.User.getAsserted(channelData.Name)];
+				const ambassadors = await channelData.getDataProperty("ambassadors");
+				if (ambassadors) {
+					const extraUsers = await sb.User.getMultiple(ambassadors);
+					for (const extraUser of extraUsers) {
+						users.push(extraUser);
+					}
+				}
+
+				const message = core.Utils.tag.trim `
+					I was modded in channel ${channelData.Name} before, but now I'm unmodded and I cannot send messages there anymore because of this.
+					You can fix this by re-modding me and then whispering the command "$bot rejoin channel:${channelData.Name}" to me here.
+					You got this message because you are the owner or ambassador of this channel.
+				`;
+
+				await Promise.all(users.map(user => this.pm(message, user)));
+				await channelData.saveProperty("Mode", "Inactive");
+			}
+
 			void logMessageRejection({
 				Channel: channelData.ID,
 				Chat_Message: message,
