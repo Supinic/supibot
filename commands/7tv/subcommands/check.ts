@@ -15,7 +15,7 @@ export default {
 		`<code>${prefix}7tv check</code>`,
 		"Posts the list of current rotating emotes."
 	],
-	execute: async (context, emote) => {
+	execute: async (context, type, emote) => {
 		if (!context.channel) {
 			return {
 				success: false,

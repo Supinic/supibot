@@ -1,4 +1,5 @@
 import { SupiDate } from "supi-core";
+import { ok } from "node:assert";
 import {
 	addEmote,
 	fetchSevenTvChannelData,
@@ -16,21 +17,26 @@ import { type MessageData as TwitchMessageData } from "../../../platforms/twitch
 export default {
 	name: "add",
 	title: "Add emote",
-	aliases: [],
+	aliases: ["replace"],
 	description: [],
 	default: true,
 	getDescription: (prefix) => [
-		"Adds an emote to the current channel's rotating list.",
-		"If the emote would exceed the current limit, then the oldest one will be removed.",
+		"Adds or replaces an emote to the current channel's rotating list.",
+		"If the emote would exceed the current limit, then the oldest one (or a specific one) will be removed to make space.",
 		"",
 
 		`<code>${prefix}7tv (emote link or ID)</code>`,
 		`<code>${prefix}7tv add (emote link or ID)</code>`,
 		"Adds the selected emote to the list of rotating emotes.",
 		"If the amount of emotes would bypass the limit, the oldest added one will be removed automatically.",
-		`You can use this command directly, without using the "add" operation.`
+		`You can use this command directly, without using the "add" operation.`,
+		"",
+
+		`<code>${prefix}7tv replace (old emote) (new emote link or ID)</code>`,
+		"Replaces an already added emote with a new one.",
+		"This will only work if the old emote has been added by you specifically."
 	],
-	execute: async (context, ...args) => {
+	execute: async (context, type, ...args) => {
 		if (!context.channel) {
 			return {
 				success: false,
@@ -48,6 +54,34 @@ export default {
 					reply: `You can only add emotes when using the "${name}" channel points reward!`
 				};
 			}
+		}
+
+		let emoteIndexToReplace: number | null = null;
+		if (type === "replace") {
+			const [emoteName] = args.splice(0, 1);
+			if (!emoteName || args.length === 0) {
+				return {
+					success: false,
+					reply: "You didn't provide an emote to replace!"
+				};
+			}
+
+			const emoteToReplace = localData.emotes.find(i => i.name === emoteName);
+			if (!emoteToReplace) {
+				return {
+					success: false,
+					reply: "That emote is not currently in the list!"
+				};
+			}
+			else if (emoteToReplace.requester !== context.user.Name) {
+				return {
+					success: false,
+					reply: "That emote has not been added by you!"
+				};
+			}
+
+			emoteIndexToReplace = localData.emotes.indexOf(emoteToReplace);
+			ok(emoteIndexToReplace !== -1);
 		}
 
 		const match = args.join(" ").match(sevenTvEmoteIdRegex);
@@ -73,7 +107,7 @@ export default {
 		if (existing) {
 			return {
 				success: false,
-				reply: "Your provided emote is already added! "
+				reply: "Your provided emote is already added!"
 			};
 		}
 
@@ -94,12 +128,17 @@ export default {
 		let removedEmoteString = "";
 		if (combinedEmoteData.length >= limit) {
 			let index = 0;
-			let added = Infinity;
-			for (let i = 0; i < combinedEmoteData.length; i++) {
-				const emote = combinedEmoteData[i];
-				if (emote.added < added) {
-					index = i;
-					added = emote.added;
+			if (type === "replace" && emoteIndexToReplace !== null) {
+				index = emoteIndexToReplace;
+			}
+			else {
+				let added = Infinity;
+				for (let i = 0; i < combinedEmoteData.length; i++) {
+					const emote = combinedEmoteData[i];
+					if (emote.added < added) {
+						index = i;
+						added = emote.added;
+					}
 				}
 			}
 

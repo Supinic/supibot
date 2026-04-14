@@ -24,7 +24,7 @@ const aliasCommandDefinition = declare({
 			return await SevenTvSubcommands.default.execute.call(this, context, type, ...args);
 		}
 
-		return await subcommand.execute.call(this, context, ...args);
+		return await subcommand.execute.call(this, context, type, ...args);
 	},
 	Dynamic_Description: async () => {
 		const descriptions = await SevenTvSubcommands.createDescription();
