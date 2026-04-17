@@ -92,15 +92,17 @@ type FetchUserSuccess = {
 
 export const flagEmojis = {
 	Australia: "🇦🇺",
+	Brazil: "🇧🇷",
 	Germany: "🇩🇪",
 	"United Kingdom": "🇬🇧",
 	"United States": "🇺🇸"
 };
+const hasFlagEmoji = (input: string): input is keyof typeof flagEmojis => Object.keys(flagEmojis).includes(input);
+const createFlagEmoji = (name: string) => (hasFlagEmoji(name)) ? flagEmojis[name] : `(${name})`;
 
-type GameCountry = keyof typeof flagEmojis;
 type GameWorldResult = { ok: false } | { ok: true; body: string; };
 type GameWorld = {
-	country: GameCountry;
+	country: string;
 	type: "free" | "members";
 	activity: string | null;
 	flagEmoji: string;
@@ -226,7 +228,7 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 				continue;
 			}
 
-			const country = $(countryEl).text() as GameCountry;
+			const country = $(countryEl).text();
 			const type = $(typeEl).text().toLowerCase() as "free" | "members";
 			const activity = $(activityEl).text();
 
@@ -234,7 +236,7 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 				country,
 				type,
 				activity: (activity !== "-") ? activity : null,
-				flagEmoji: flagEmojis[country]
+				flagEmoji: createFlagEmoji(country)
 			};
 		}
 
