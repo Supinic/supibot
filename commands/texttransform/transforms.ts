@@ -5,6 +5,7 @@ import { randomInt, TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.
 import textCaseCode from "./text-case-code.js";
 import officialCharactersMap from "./definitions/official-characters.json" with { type: "json" };
 
+import AlienDefinition from "./definitions/alien.json" with { type: "json" };
 import BubbleDefinition from "./definitions/bubble.json" with { type: "json" };
 import FancyDefinition from "./definitions/fancy.json" with { type: "json" };
 import UpsideDownDefinition from "./definitions/upside-down.json" with { type: "json" };
@@ -87,6 +88,13 @@ const convert = {
 };
 
 const definitions: TextTransformDefinition[] = [
+	{
+		name: "alien",
+		type: "map",
+		aliases: ["AlienPls", "AlienDance"],
+		data: (message: string) => convert.map(message, AlienDefinition),
+		reverseData: (message: string) => convert.unmap(message, AlienDefinition)
+	},
 	{
 		name: "bubble",
 		type: "map",
