@@ -1,7 +1,9 @@
 /* eslint-disable no-bitwise */
+import { SupiError } from "supi-core";
+
 const DIAERESIS = "\u{0308}";
 
-const encode = (input, codeWord) => {
+const encode = (input: string, codeWord: string) => {
 	if (!codeWord) {
 		throw new Error("Code word not provided");
 	}
@@ -9,19 +11,29 @@ const encode = (input, codeWord) => {
 		throw new Error("Code word not long enough, at least 6 characters are required");
 	}
 
+	let buffer = "";
 	const output = [];
 	const max = Math.max(127, (1 << codeWord.length) - 1);
 
 	for (let i = 0; i < input.length; i++) {
 		const value = input.codePointAt(i);
-		if (value > max) {
-			output.push(input[i]);
+		if (typeof value !== "number") {
+			throw new SupiError({
+				message: "Assert error: No code point available"
+			});
+		}
+		else if (value > max) {
+			buffer += input[i];
 			continue;
+		}
+
+		if (buffer.length !== 0) {
+			output.push(buffer);
+			buffer = "";
 		}
 
 		let bit = (1 << codeWord.length);
 		const result = [];
-
 		for (const codeChar of codeWord) {
 			if (codeWord.length === 6 && bit === 32) {
 				let diaeresis = "";
@@ -46,17 +58,16 @@ const encode = (input, codeWord) => {
 	return output;
 };
 
-const decode = (input, codeWord) => {
+const decode = (input: string, codeWord: string) => {
 	if (!codeWord) {
-		throw new Error("Code word not provided");
+		throw new SupiError({ message: "Code word not provided" });
 	}
 	else if (codeWord.length < 6) {
-		throw new Error("Code word not long enough, at least 6 characters are required");
+		throw new SupiError({ message: "Code word not long enough, at least 6 characters are required" });
 	}
 
 	const words = input.split(/\s/);
 	const output = [];
-
 	for (const rawWord of words) {
 		let appendix = "";
 		const normalized = rawWord.normalize("NFKD").replaceAll(DIAERESIS, "").toLowerCase();
@@ -82,7 +93,7 @@ const decode = (input, codeWord) => {
 		for (let i = 0; i < word.length; i++) {
 			const isUpperCase = (word[i] === word[i].toUpperCase());
 			if (codeWord.length === 6 && bit === 32) {
-				const normalizedStringArray = [...word[i].normalize("NFKD")];
+				const normalizedStringArray = word[i].normalize("NFKD").split("");
 				const hasDiaeresis = (normalizedStringArray[1] === DIAERESIS);
 				if (!hasDiaeresis) {
 					value += bit;
@@ -111,7 +122,4 @@ const decode = (input, codeWord) => {
 	return output;
 };
 
-export default {
-	encode,
-	decode
-};
+export default { encode, decode };

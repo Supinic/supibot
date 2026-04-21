@@ -1,7 +1,11 @@
 import transforms from "./transforms.js";
+import { declare } from "../../classes/command.js";
+import { SupiError } from "supi-core";
+const sortedDefinitions = transforms.definitions.toSorted((a, b) => a.name.localeCompare(b.name));
+
 const LOREM_IPSUM = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 
-export default {
+export default declare({
 	Name: "texttransform",
 	Aliases: ["tt","reversetexttransform","rtt"],
 	Author: "supinic",
@@ -10,7 +14,7 @@ export default {
 	Flags: ["external-input","non-nullable","pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function textTransform (context, name, ...args) {
+	Code: function textTransform (context, name, ...args) {
 		if (!name) {
 			return {
 				success: false,
@@ -25,10 +29,7 @@ export default {
 		}
 
 		const message = args.join(" ");
-		const transformation = transforms.types.find(i => (
-			i.name === name || (i.aliases && i.aliases.includes(name))
-		));
-
+		const transformation = transforms.definitions.find(i => i.name === name || i.aliases.includes(name));
 		if (!transformation) {
 			return {
 				success: false,
@@ -36,14 +37,11 @@ export default {
 			};
 		}
 
-		let { type, data } = transformation;
-
+		const { data, reverseData } = transformation;
+		let method = data;
 		if (context.invocation === "rtt") {
-			if (type === "map") {
-				type = "unmap";
-			}
-			else if (type === "method" && transformation.reverseData) {
-				data = transformation.reverseData;
+			if (typeof reverseData === "function") {
+				method = reverseData;
 			}
 			else {
 				return {
@@ -53,14 +51,14 @@ export default {
 			}
 		}
 
-		const result = transforms.convert[type](message, data, context);
+		const result = method(message);
 		if (!result) {
 			return {
 				success: false,
 				reply: "No result has been created?!"
 			};
 		}
-		else if (result.success === false) {
+		else if (typeof result === "object") {
 			return result;
 		}
 
@@ -73,26 +71,29 @@ export default {
 				length: (context.append.pipe) ? null : this.Cooldown
 			}
 		};
-	}),
-	Dynamic_Description: (async function (prefix) {
-		const { types, convert } = transforms;
-		const sortedTypes = [...types].sort((a, b) => a.name.localeCompare(b.name));
+	},
+	Dynamic_Description: (prefix) => {
+		const examples = sortedDefinitions.map(definition => {
+			const transformedMessage = definition.data(LOREM_IPSUM);
+			if (typeof transformedMessage !== "string") {
+				throw new SupiError({
+					message: `Assert error: Text transform ${definition.name} cannot process a Lorem Ipsum`
+				});
+			}
 
-		const examples = sortedTypes.map(transform => {
-			const description = transform.description ?? "(no description)";
-			const message = convert[transform.type](LOREM_IPSUM, transform.data ?? null);
-			const aliases = (transform.aliases.length === 0)
+			const description = definition.description ?? "(no description)";
+			const aliases = (definition.aliases.length === 0)
 				? ""
-				: ` (${transform.aliases.join(", ")})`;
+				: ` (${definition.aliases.join(", ")})`;
 
-			const reversible = (transform.type === "map" || transform.reverseData) ? "Yes" : "No";
+			const reversible = (definition.type === "map" || definition.reverseData) ? "Yes" : "No";
 			return core.Utils.tag.trim `
 				<li>
-					<code>${transform.name}${aliases}</code>
+					<code>${definition.name}${aliases}</code>
 					<ul>
 						<li>Reversible: ${reversible}</li>
 						<li>${description}</li>
-						<li>${message}</li>
+						<li>${transformedMessage}</li>
 					</ul>
 				</li>
 			`;
@@ -115,5 +116,5 @@ export default {
 
 			`<ul>${examples.join("<br>")}</ul>`
 		];
-	})
-};
+	}
+});

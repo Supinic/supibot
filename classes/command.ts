@@ -62,7 +62,7 @@ type ParamFromDefinition<T extends ParameterDefinitions> = {
 };
 
 type AppendedParameters = Record<string, ParameterValue>;
-type ResultFailure = { success: false; reply: string; };
+export type ResultFailure = { success: false; reply: string; };
 
 export type StrictResult = {
 	success?: boolean;
