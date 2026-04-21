@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-misused-spread */
+import * as z from "zod";
 import { randomInt, TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 
 import textCaseCode from "./text-case-code.js";
 import officialCharactersMap from "./definitions/official-characters.json" with { type: "json" };
 
+import AlienDefinition from "./definitions/alien.json" with { type: "json" };
 import BubbleDefinition from "./definitions/bubble.json" with { type: "json" };
 import FancyDefinition from "./definitions/fancy.json" with { type: "json" };
 import UpsideDownDefinition from "./definitions/upside-down.json" with { type: "json" };
@@ -17,18 +20,43 @@ import MorseData from "./definitions/morse.json" with { type: "json" };
 import LingoCockneyDefinition from "./lingo-translations/cockney.json" with { type: "json" };
 import LingoCowboyDefinition from "./lingo-translations/cowboy.json" with { type: "json" };
 import LingoOutbackDefinition from "./lingo-translations/outback.json" with { type: "json" };
+import type { ResultFailure } from "../../classes/command.js";
+import { SupiError } from "supi-core";
+
+const lingoSchema = z.object({
+	phrasesWords: z.array(z.tuple([z.string(), z.string()])),
+	suffixes: z.array(z.tuple([z.string(), z.string()])),
+	prefixes: z.array(z.tuple([z.string(), z.string()])),
+	intrawords: z.array(z.tuple([z.string(), z.string()])),
+	endings: z.array(z.string()).optional()
+});
+const parsedCockneyDefinition = lingoSchema.parse(LingoCockneyDefinition);
+const parsedCowboyDefinition = lingoSchema.parse(LingoCowboyDefinition);
+const parsedOutbackDefinition = lingoSchema.parse(LingoOutbackDefinition);
+
+type TextTransformMap = Record<string, string>;
+type TextTransformDictionary = z.infer<typeof lingoSchema>;
+type TextTransformFunction = (message: string) => string;
+type TextTransformDefinition = {
+	name: string;
+	type: string;
+	description?: string;
+	aliases: string[];
+	data: (message: string) => string | ResultFailure;
+	reverseData?: (message: string) => string | ResultFailure;
+};
 
 const convert = {
-	method: (string, fn, context) => fn(string, context),
-	map: (string, map) => [...string].map(i => map[i] || i).join(""),
-	unmap: (string, map) => {
-		const reverseMap = {};
+	method: (string: string, fn: TextTransformFunction) => fn(string),
+	map: (string: string, map: TextTransformMap) => [...string].map(i => map[i] || i).join(""),
+	unmap: (string: string, map: TextTransformMap) => {
+		const reverseMap: TextTransformMap = {};
 		for (const [key, value] of Object.entries(map)) {
 			reverseMap[value] = key;
 		}
 		return convert.map(string, reverseMap);
 	},
-	translate: (string, dictionary) => {
+	translate: (string: string, dictionary: TextTransformDictionary) => {
 		for (const [from, to] of dictionary.phrasesWords) {
 			const r = new RegExp(`\\b${from}\\b`, "gi");
 			string = string.replace(r, `_${to}_`);
@@ -59,103 +87,87 @@ const convert = {
 	}
 };
 
-
-/**
- * @typedef {Record<string, string>} TextTransformMap
- */
-
-/**
- * @typedef {Object} TextTransformDictionary
- * @property {[string, string]} phrasesWords
- * @property {[string, string]} suffixes
- * @property {[string, string]} prefixes
- * @property {[string, string]} intraWords
- * @property {[string, string]} [endings]
- */
-
-/**
- * @typedef {Function} TextTransformFunction
- * @param {string} message
- * @returns {string}
- */
-
-/**
- * @typedef {Object} TextTransformDefinition
- * @property {string} name
- * @property {string} type
- * @property {string[]} aliases
- * @property {TextTransformMap | TextTransformDictionary | TextTransformFunction} data
- */
-
-/**
- * @type {TextTransformDefinition[]}
- */
-const types = [
+const definitions: TextTransformDefinition[] = [
+	{
+		name: "alien",
+		type: "map",
+		aliases: ["AlienPls", "AlienDance"],
+		data: (message: string) => convert.map(message, AlienDefinition),
+		reverseData: (message: string) => convert.unmap(message, AlienDefinition)
+	},
 	{
 		name: "bubble",
 		type: "map",
 		aliases: [],
-		data: BubbleDefinition
+		data: (message: string) => convert.map(message, BubbleDefinition),
+		reverseData: (message: string) => convert.unmap(message, BubbleDefinition)
 	},
 	{
 		name: "fancy",
 		type: "map",
 		aliases: [],
-		data: FancyDefinition
+		data: (message: string) => convert.map(message, FancyDefinition),
+		reverseData: (message: string) => convert.unmap(message, FancyDefinition)
 	},
 	{
 		name: "upside-down",
 		type: "map",
 		aliases: ["flipped", "ud", "upsidedown"],
-		data: UpsideDownDefinition
+		data: (message: string) => convert.map(message, UpsideDownDefinition),
+		reverseData: (message: string) => convert.unmap(message, UpsideDownDefinition)
 	},
 	{
 		name: "elite",
 		type: "map",
 		aliases: ["leet", "l33t", "1337"],
-		data: LeetDefinition
+		data: (message: string) => convert.map(message, LeetDefinition),
+		reverseData: (message: string) => convert.unmap(message, LeetDefinition)
 	},
 	{
 		name: "medieval",
 		type: "map",
 		aliases: [],
-		data: MedievalDefinition
+		data: (message: string) => convert.map(message, MedievalDefinition),
+		reverseData: (message: string) => convert.unmap(message, MedievalDefinition)
 	},
 	{
 		name: "runic",
 		type: "map",
 		aliases: ["runes"],
-		data: RunicDefinition
+		data: (message: string) => convert.map(message, RunicDefinition),
+		reverseData: (message: string) => convert.unmap(message, RunicDefinition)
 	},
 	{
 		name: "superscript",
 		type: "map",
 		aliases: ["small", "smol", "super", "tiny"],
-		data: SuperscriptDefinition
+		data: (message: string) => convert.map(message, SuperscriptDefinition),
+		reverseData: (message: string) => convert.unmap(message, SuperscriptDefinition)
 	},
 	{
 		name: "vaporwave",
 		type: "map",
 		aliases: ["vw", "vapor"],
-		data: VaporwaveDefinition
+		data: (message: string) => convert.map(message, VaporwaveDefinition),
+		reverseData: (message: string) => convert.unmap(message, VaporwaveDefinition)
 	},
 	{
 		name: "cockney",
 		type: "translate",
 		aliases: ["3Head"],
-		data: LingoCockneyDefinition
+		data: (message: string) => convert.translate(message, parsedCockneyDefinition)
 	},
 	{
 		name: "cowboy",
 		type: "translate",
 		aliases: ["KKona", "KKonaW"],
-		data: LingoCowboyDefinition
+		data: (message: string) => convert.translate(message, parsedCowboyDefinition)
 	},
 	{
 		name: "outback",
 		type: "translate",
 		aliases: ["KKrikey", "australian"],
-		data: LingoOutbackDefinition
+		data: (message: string) => convert.translate(message, parsedOutbackDefinition)
 	},
 	{
 		name: "capitalize",
@@ -211,7 +223,7 @@ const types = [
 		type: "method",
 		aliases: [],
 		data: (message) => [...message]
-			.reverse()
+			.toReversed()
 			.join("")
 			.replaceAll(/[()]/g, (char) => (char === ")") ? "(" : ")")
 	},
@@ -221,8 +233,9 @@ const types = [
 		aliases: [],
 		description: "Picks a random different text transform and applies it",
 		data: (message) => {
-			const random = core.Utils.randArray(types.filter(i => i.name !== "random"));
-			return convert[random.type](message, random.data);
+			const def = definitions.filter(i => i.name !== "random");
+			const random = core.Utils.randArray(def);
+			return random.data(message);
 		}
 	},
 	{
@@ -230,15 +243,14 @@ const types = [
 		type: "method",
 		aliases: ["unping"],
 		description: "Every word will have an invisible character added, so that it does not mention users in e.g. Chatterino.",
-		data: (message) => message.split(" ").map(word => {
-			if (/^\w+$/.test(word)) {
-				return `${word[0]}\u{34f}${word.slice(1)}`;
-			}
-			else {
-				return word;
-			}
-		}).join(" "),
-		reverseData: (message) => message.split(" ").map(word => word.replaceAll(TWITCH_ANTIPING_CHARACTER, "")).join(" ")
+		data: (message) => message
+			.split(" ")
+			.map(word => /^\w+$/.test(word) ? `${word[0]}\u{34F}${word.slice(1)}` : word)
+			.join(" "),
+		reverseData: (message) => message
+			.split(" ")
+			.map(word => word.replaceAll(TWITCH_ANTIPING_CHARACTER, ""))
+			.join(" ")
 	},
 	{
 		name: "trim",
@@ -260,7 +272,22 @@ const types = [
 		name: "binary",
 		type: "method",
 		aliases: ["bin"],
-		data: (message) => [...message].map(i => ("0".repeat(8) + i.codePointAt(0).toString(2)).slice(-8)).join(" "),
+		data: (message) => {
+			const result = [];
+			for (let i = 0; i < message.length; i++) {
+				const point = message.codePointAt(i);
+				if (typeof point !== "number") {
+					throw new SupiError({
+						message: "Assert error: No code point found"
+					});
+				}
+
+				const char = ("0".repeat(8) + point.toString(2)).slice(-8);
+				result.push(char);
+			}
+
+			return result.join(" ");
+		},
 		reverseData: (message) => {
 			const list = [...message];
 			let word = "";
@@ -297,8 +324,8 @@ const types = [
 				if (character === " ") {
 					arr.push("/");
 				}
-				else if (MorseData[character]) {
-					arr.push(MorseData[character]);
+				else if (character in MorseData) { // @todo figure out a cleaner way without making a type guard fn
+					arr.push(MorseData[character as keyof typeof MorseData]);
 				}
 			}
 
@@ -456,7 +483,4 @@ const types = [
 	}
 ];
 
-export default {
-	convert,
-	types
-};
+export default { convert, definitions };
