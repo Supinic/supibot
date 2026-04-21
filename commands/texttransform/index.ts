@@ -9,7 +9,7 @@ export default declare({
 	Name: "texttransform",
 	Aliases: ["tt","reversetexttransform","rtt"],
 	Author: "supinic",
-	Cooldown: 10000,
+	Cooldown: 5000,
 	Description: "Transforms provided text into one of the provided types, such as \"vaporwave\", for example.",
 	Flags: ["external-input","non-nullable","pipe"],
 	Params: [],

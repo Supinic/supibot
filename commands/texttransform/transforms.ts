@@ -278,7 +278,7 @@ const definitions: TextTransformDefinition[] = [
 				result.push(char);
 			}
 
-			return result.join("");
+			return result.join(" ");
 		},
 		reverseData: (message) => {
 			const list = [...message];
