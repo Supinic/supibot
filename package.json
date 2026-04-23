@@ -9,7 +9,7 @@
     "chrono-node": "^2.9.0",
     "cron": "^4.4.0",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "^14.26.2",
+    "discord.js": "^14.26.1",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
