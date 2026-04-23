@@ -3,6 +3,7 @@ import { SupiDate } from "supi-core";
 import { domainToASCII } from "node:url";
 import { declare } from "../../classes/command.js";
 
+const cachingSites = ["shouldiblamecach.ing", "shouldiblamecaching.com"];
 const querySchema = z.object({
 	scan: z.object({
 		last_scan: z.iso.datetime().optional(),
@@ -26,8 +27,9 @@ export default declare({
 	Whitelist_Response: null,
 	Code: (async function isDown (context, input) {
 		const fixedInput = domainToASCII(input) || input; // domainToASCII returns empty string for invalid input - hence ||
-		if (fixedInput.includes("shouldiblamecaching.com")) {
+		if (cachingSites.some(i => fixedInput.includes(i))) {
 			return {
+				success: true,
 				reply: `That website is currently up and available. However, this result may be invalid due to caching.`
 			};
 		}
