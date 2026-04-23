@@ -923,9 +923,9 @@ cytube-connector@supinic/cytube-connector:
   languageName: node
   linkType: hard
 
-"discord.js@npm:^14.26.2":
-  version: 14.26.2
-  resolution: "discord.js@npm:14.26.2"
+"discord.js@npm:14.26.1":
+  version: 14.26.1
+  resolution: "discord.js@npm:14.26.1"
   dependencies:
     "@discordjs/builders": "npm:^1.14.1"
     "@discordjs/collection": "npm:1.5.3"
@@ -940,7 +940,7 @@ cytube-connector@supinic/cytube-connector:
     magic-bytes.js: "npm:^1.13.0"
     tslib: "npm:^2.6.3"
     undici: "npm:6.24.1"
-  checksum: 10c0/08592dad347cf9c6b1db4ebfd6f34d51eb0bd33ffbd9288b54981fc80255154194de306ca37d62b60646c785c329ecb285dc762a4ba3ce2cf8cf2ecf2bff6e68
+  checksum: 10c0/5b7a08e8df5e487a76739e64afc96d72dd16d1f0e5f38a3622c998649d32d5d773d6b23528e61760bd751abfd79c3c332483c13f3465f77934a49f4d2fefe603
   languageName: node
   linkType: hard
 
@@ -2353,7 +2353,7 @@ supi-db-init@supinic/supi-db-init:
     chrono-node: "npm:^2.9.0"
     cron: "npm:^4.4.0"
     cytube-connector: supinic/cytube-connector
-    discord.js: "npm:^14.26.2"
+    discord.js: "npm:14.26.1"
     eslint: "npm:^10.2.0"
     eslint-plugin-unicorn: "npm:^64.0.0"
     globals: "npm:^17.4.0"
