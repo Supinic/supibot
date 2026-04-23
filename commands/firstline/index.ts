@@ -29,13 +29,13 @@ export default declare({
 		if (!targetChannel) {
 			return {
 				success: false,
-				reply: "Provided channel not found in the database!"
+				reply: "Couldn't find that channel in my database!"
 			};
 		}
 		else if (targetChannel.Mode === "Inactive") {
 			return {
 				success: false,
-				reply: `Cannot retrieve lines from an inactive channel!`
+				reply: `I'm not currently active in that channel!`
 			};
 		}
 
@@ -47,7 +47,7 @@ export default declare({
 		if (!targetUser) {
 			return {
 				success: false,
-				reply: "Provided user not found in the database!"
+				reply: "Couldn't find that user in my database!"
 			};
 		}
 
@@ -122,7 +122,7 @@ export default declare({
 			partialReplies: [
 				{
 					bancheck: false,
-					message: `${prefix} first message in ${channelArticle} channel was (${core.Utils.timeDelta(posted)}):`
+					message: `${prefix} first message in ${channelArticle} channel according to my data was (${core.Utils.timeDelta(posted)}):`
 				},
 				{
 					bancheck: true,
@@ -132,7 +132,7 @@ export default declare({
 		};
 	}),
 	Dynamic_Description: (prefix) => [
-		"Posts the target user's first chat line.",
+		"Posts the target user's first chat line, according to Supibot's data - this might not always be 100% accurate.",
 		"",
 
 		"You can specify a channel as context with the channel parameter (see examples below).",
@@ -141,22 +141,25 @@ export default declare({
 		"",
 
 		`<code>${prefix}firstline</code>`,
-		"Your first message in this channel was...",
+		`<code>${prefix}fl</code>`,
+		"Posts your first message in the current channel.",
 		"",
 
 		`<code>${prefix}fl (user)</code>`,
-		"That user's first message in this channel was...",
+		"Posts the first message for another user in the current channel.",
 		"",
 
 		`<code>${prefix}fl channel:(channel)</code>`,
-		"Your first message in the specified channel was...",
+		"Posts your first message in another channel.",
 		"",
 
 		`<code>${prefix}fl (user) channel:(channel)</code>`,
-		"That user's first message in the specified channel was...",
+		"Posts the first message for another user in another channel.",
 		"",
 
 		`<code>${prefix}fl textOnly:true</code>`,
-		"(first message text here)"
+		"Posts only the first message, without the date and the command's text.",
+		`E.g. instead of "Your first message was X", the result would just be "X".`,
+		"Can be combined with other parameters and arguments as shown above."
 	]
 });

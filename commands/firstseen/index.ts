@@ -96,24 +96,34 @@ export default declare({
 			return {
 				success: true,
 				reply: core.Utils.tag.trim `
-					That user is in the database, but never showed up in chat.
-					They were first spotted ${core.Utils.timeDelta(userData.Started_Using)}.
+					I recognize that user, but they have never said anything in chat.
+					I first spotted them ${core.Utils.timeDelta(userData.Started_Using)}.
 				`
 			};
 		}
 
 		const channelData = sb.Channel.getAsserted(data.Channel);
-		const who = (userData === context.user) ? "You were" : "That user was";
+		const who = (userData === context.user) ? "you" : "that user";
 		const belongsTo = (userData === context.user) ? "your" : "their";
 		return {
 			success: true,
 			reply: core.Utils.tag.trim `
-				${who}
-				first seen in chat ${core.Utils.timeDelta(data.Date)},
+				I first saw ${who} in chat ${core.Utils.timeDelta(data.Date)},
 				(${channelData.getFullName()})
 				${belongsTo} message: ${data.Message}
 			`
 		};
 	},
-	Dynamic_Description: null
+	Dynamic_Description: (prefix) => [
+		"Posts your (or someone else's) first ever chat line across all channels Supibot is active in, according to its data.",
+		"",
+
+		`<code>${prefix}firstseen</code>`,
+		`<code>${prefix}fs</code>`,
+		"Posts your earliest message, across all active channels.",
+		"",
+
+		`<code>${prefix}fs (user)</code>`,
+		"Posts the earliest message for another user, across all active channels."
+	]
 });
