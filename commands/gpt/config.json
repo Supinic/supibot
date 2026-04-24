@@ -24,9 +24,9 @@
     "base": {
       "url": "gpt-5.4",
       "type": "openai",
-      "default": false,
+      "default": true,
       "inputLimit": 1500,
-      "pricePerMtoken": 4.00,
+      "pricePerMtoken": 1.00,
       "usesCompletionTokens": true,
       "flexProcessing": true,
       "noTemperature": true
@@ -36,7 +36,7 @@
       "type": "openai",
       "default": false,
       "inputLimit": 1500,
-      "pricePerMtoken": 1.15,
+      "pricePerMtoken": 0.50,
       "usesCompletionTokens": true,
       "flexProcessing": true,
       "noTemperature": true
@@ -44,9 +44,9 @@
     "nano": {
       "url": "gpt-5.4-nano",
       "type": "openai",
-      "default": true,
+      "default": false,
       "inputLimit": 1500,
-      "pricePerMtoken": 0.50,
+      "pricePerMtoken": 0.25,
       "usesCompletionTokens": true,
       "flexProcessing": false,
       "noTemperature": true
