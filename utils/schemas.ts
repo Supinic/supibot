@@ -92,6 +92,15 @@ export const twitchScheduleSchema = z.object({
 	})
 });
 
+export const twitchVodSchema = z.object({
+	data: z.array(z.object({
+		created_at: z.string(), // RFC 3339
+		duration: z.string(), // ISO 8601
+		title: z.string(),
+		url: z.string()
+	}))
+});
+
 export const ivrErrorSchema = z.object({
 	statusCode: z.int().min(400).max(599),
 	error: z.object({

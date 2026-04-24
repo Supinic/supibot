@@ -1,33 +1,10 @@
-import * as z from "zod";
+import type * as z from "zod";
 import { declare } from "../../classes/command.js";
 import { SupiDate } from "supi-core";
-import { ivrUserDataSchema } from "../../utils/schemas.js";
+import { ivrUserDataSchema, twitchStreamSchema, twitchVodSchema } from "../../utils/schemas.js";
 
-const streamSchema = z.object({
-	data: z.array(z.object({
-		game_id: z.string(),
-		game_name: z.string(),
-		id: z.string(),
-		is_mature: z.boolean(),
-		language: z.string(),
-		started_at: z.string(),
-		title: z.string().nullable(), // empty string only on error
-		type: z.enum(["live", ""]),
-		viewer_count: z.int().min(0)
-	}))
-});
-
-const vodSchema = z.object({
-	data: z.array(z.object({
-		created_at: z.string(), // RFC 3339
-		duration: z.string(), // ISO 8601
-		title: z.string(),
-		url: z.string()
-	}))
-});
-
-type StreamData = z.infer<typeof streamSchema>["data"][number];
-type VodData = z.infer<typeof vodSchema>["data"][number];
+type StreamData = z.infer<typeof twitchStreamSchema>["data"][number];
+type VodData = z.infer<typeof twitchVodSchema>["data"][number];
 
 export default declare({
 	Name: "streaminfo",
@@ -85,7 +62,7 @@ export default declare({
 
 		let vodString = "";
 		let vodEnd;
-		const stream = streamSchema.parse(streamResponse.body).data.at(0);
+		const stream = twitchStreamSchema.parse(streamResponse.body).data.at(0);
 
 		const vodResponse = await core.Got.get("Helix")({
 			url: "videos",
@@ -95,7 +72,7 @@ export default declare({
 		});
 
 		let vodTitle: string | undefined;
-		const vod = vodSchema.parse(vodResponse.body);
+		const vod = twitchVodSchema.parse(vodResponse.body);
 		const rawData: { vod: VodData | null; stream: StreamData | undefined } = { vod: null, stream };
 
 		if (vod.data.length !== 0) {
