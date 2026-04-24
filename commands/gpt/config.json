@@ -28,7 +28,7 @@
       "inputLimit": 1500,
       "pricePerMtoken": 1.00,
       "usesCompletionTokens": true,
-      "flexProcessing": true,
+      "flexProcessing": false,
       "noTemperature": true
     },
     "mini": {
@@ -38,7 +38,7 @@
       "inputLimit": 1500,
       "pricePerMtoken": 0.50,
       "usesCompletionTokens": true,
-      "flexProcessing": true,
+      "flexProcessing": false,
       "noTemperature": true
     },
     "nano": {
