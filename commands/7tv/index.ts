@@ -21,7 +21,8 @@ const aliasCommandDefinition = declare({
 
 		const subcommand = SevenTvSubcommands.get(type);
 		if (!subcommand) {
-			return await SevenTvSubcommands.default.execute.call(this, context, type, ...args);
+			const defaultSubcommand = SevenTvSubcommands.default;
+			return await defaultSubcommand.execute.call(this, context, defaultSubcommand.name, type, ...args);
 		}
 
 		return await subcommand.execute.call(this, context, type, ...args);
