@@ -172,12 +172,13 @@ export default declare({
 				? `playing ${stream.game_name}`
 				: `streaming under no category`;
 
+			const streamTitle = stream.title || "(no title)"; // Stream title is empty string if not set
 			return {
 				reply: core.Utils.tag.trim `
 					${targetChannel} is ${broadcast}, 
 					since ${started} 
 					for ${core.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
-					Title: ${stream.title ?? "(no title)"} 
+					Title: ${streamTitle} 
 					https://twitch.tv/${targetChannel.toLowerCase()}
 					${vodString}
 				`
