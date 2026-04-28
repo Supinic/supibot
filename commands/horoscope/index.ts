@@ -1,13 +1,14 @@
 import { SupiDate } from "supi-core";
-import zodiacData from "./zodiac.json" with { type: "json" };
+import { declare } from "../../classes/command.js";
+import zodiacData from "./zodiac-signs.js";
 
-export default {
+export default declare({
 	Name: "horoscope",
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Checks a specific zodiac sign's horoscope. Can also check your horoscope, if you have set your birthday (day/month, not year) within Supibot.",
-	Flags: ["mention","non-nullable","pipe"],
+	Description: "Checks a specific zodiac sign's horoscope. Can also check your horoscope, if you have set your birthday (just day/month, year is not required) within Supibot.",
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function horoscope (context, inputZodiacName) {
@@ -64,8 +65,7 @@ export default {
 			url: `https://www.astrology.com/horoscope/daily/${zodiacName}.html`
 		});
 
-		const html = response.body;
-		const $ = core.Utils.cheerio(html);
+		const $ = core.Utils.cheerio(response.body);
 		const node = $(".horoscope-content-wrapper > #content");
 
 		if (node.length === 0) {
@@ -89,12 +89,13 @@ export default {
 			: fullTextArray;
 
 		const trimmedText = trimmedArray.join(". ");
-		const prefix = (own) ? "Your" : "";
+		const prefix = (own) ? "Your " : "";
 		return {
-			reply: `${prefix} ${core.Utils.capitalize(zodiacName)} horoscope for today: ${trimmedText}.`
+			success: true,
+			reply: `${prefix}${core.Utils.capitalize(zodiacName)} horoscope for today: ${trimmedText}.`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (prefix) => {
 		const zodiacSignList = zodiacData.map(i => {
 			const { start, end, name } = i;
 			const startString = new SupiDate(2022, ...start).format("F jS");
@@ -105,22 +106,22 @@ export default {
 
 		return [
 			"Fetches a horoscope for either your zodiac sign, or one that you provide.",
-			`To automatically use your horoscope, you should set your birthdate (only month + day) via the <a href="/bot/command/detail/set">set birthday</a> command`,
+			`To automatically use your horoscope, you should set your birthdate (just month/day) via the <a href="/bot/command/detail/set">set birthday</a> command`,
 			"",
 
 			`<code>${prefix}horoscope</code>`,
 			"Uses your birthday's zodiac sign automatically.",
-			"If you don't have one set up, this will not work - Supibot will ask you to fill out your birth date.",
+			"If you don't have one set up, Supibot will ask you to fill out your birth date.",
 			"",
 
 			`<code>${prefix}horoscope (zodiac sign)</code>`,
 			`<code>${prefix}horoscope aquarius</code>`,
 			"Fetches today's horoscope for a provided zodiac sign.",
-			"If you provide something that isn't a zodiac sign, this will not work - Supibot will post a list of properly spelled zodiac sign names.",
+			"If you provide something that isn't a zodiac sign, Supibot will post a list of properly spelled zodiac sign names.",
 			"",
 
 			"Zodiac sign list:",
 			`<ul>${zodiacSignList}</ul>`
 		];
-	})
-};
+	}
+});
