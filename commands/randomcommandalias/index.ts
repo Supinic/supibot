@@ -1,6 +1,14 @@
 import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.js";
+import type { User } from "../../classes/user.js";
 
-export default {
+type AliasData = {
+	ID: number;
+	User_Alias: User["ID"];
+	Name: string;
+};
+
+export default declare({
 	Name: "randomcommandalias",
 	Aliases: ["rca"],
 	Author: "supinic",
@@ -29,23 +37,39 @@ export default {
 			};
 		}
 
-		const randomAlias = await core.Query.getRecordset(rs => rs
-			.select("ID", "User_Alias", "Name")
-			.from("data", "Custom_Command_Alias")
-			.where({ condition: Boolean(context.params.body) }, "Arguments %*like*", context.params.body)
-			.where({ condition: Boolean(context.params.command) }, "Command = %s", context.params.command)
-			.where({ condition: Boolean(context.params.createdAfter) }, "Created > %d", context.params.createdAfter)
-			.where({ condition: Boolean(context.params.createdBefore) }, "Created < %d", context.params.createdBefore)
-			.where({ condition: Boolean(context.params.description) }, "Description %*like*", context.params.description)
-			.where({ condition: Boolean(context.params.name) }, "Name = %s", context.params.name)
-			.where({ condition: Boolean(targetUserAlias) }, "User_Alias = %n", targetUserAlias?.ID)
-			.where("Command IS NOT NULL")
-			.where("Parent IS NULL OR Edited IS NOT NULL") // either an original alias or an edited copy
-			.orderBy("RAND()")
-			.limit(1)
-			.single()
-		);
+		const randomAlias = await core.Query.getRecordset<AliasData | undefined>(rs => {
+			rs.select("ID", "User_Alias", "Name")
+				.from("data", "Custom_Command_Alias")
+				.where("Command IS NOT NULL")
+				.where("Parent IS NULL OR Edited IS NOT NULL") // either an original alias or an edited copy
+				.orderBy("RAND()")
+				.limit(1)
+				.single();
 
+			if (context.params.body) {
+				rs.where("Arguments %*like*", context.params.body);
+			}
+			if (context.params.command) {
+				rs.where("Command = %s", context.params.command);
+			}
+			if (context.params.createdAfter) {
+				rs.where("Created > %d", context.params.createdAfter);
+			}
+			if (context.params.createdBefore) {
+				rs.where("Created < %d", context.params.createdBefore);
+			}
+			if (context.params.description) {
+				rs.where("Description %*like*", context.params.description);
+			}
+			if (context.params.name) {
+				rs.where("Name = %s", context.params.name);
+			}
+			if (targetUserAlias) {
+				rs.where("User_Alias = %n", targetUserAlias.ID);
+			}
+
+			return rs;
+		});
 		if (!randomAlias) {
 			return {
 				success: false,
@@ -53,16 +77,17 @@ export default {
 			};
 		}
 
-		const authorData = await sb.User.get(randomAlias.User_Alias);
+		const authorData = await sb.User.getAsserted(randomAlias.User_Alias);
 		const unpingedAuthorName = `${authorData.Name[0]}${TWITCH_ANTIPING_CHARACTER}${authorData.Name.slice(1)}`;
 		return {
-			reply: `
+			success: true,
+			reply: core.Utils.tag.trim `
 				Random alias "${randomAlias.Name}" made by ${unpingedAuthorName} for your query:
 				https://supinic.com/bot/user/alias/detail/${randomAlias.ID}				
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Posts a random command alias -- either completely random or filtered by parameters",
 		"Unchanged alias copies and linked aliases will not be rolled - as they are identical to their parent aliases.",
 		`For more info about aliases, check the <a href="/bot/command/detail/alias">${prefix}alias command</a>.`,
@@ -96,5 +121,5 @@ export default {
 		`<code>${prefix}rca user:(user name)</code>`,
 		"Filters aliases by their owners.",
 		""
-	])
-};
+	]
+});
