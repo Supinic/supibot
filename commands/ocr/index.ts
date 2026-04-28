@@ -1,9 +1,33 @@
+import * as z from "zod";
 import { SupiError } from "supi-core";
 import { getCode, getName } from "../../utils/languages.js";
-import OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
-const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => getName(i));
+import { declare } from "../../classes/command.js";
+import RAW_OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
 
-export default {
+type CacheData = { statusCode: number; text: string | null; };
+const ocrLanguageSchema = z.array(z.tuple([
+	z.string(),
+	z.object({
+		engines: z.array(z.number()),
+		nonStandardLanguageCode: z.string().optional()
+	})
+]));
+const ocrRequestSchema = z.object({
+	ErrorMessage: z.array(z.string()).optional(),
+	OCRExitCode: z.number(),
+	ParsedResults: z.array(z.object({
+		ErrorMessage: z.string(), // empty string on success
+		ParsedText: z.string()
+	})).optional()
+});
+
+const OCR_LANGUAGES = ocrLanguageSchema.parse(RAW_OCR_LANGUAGES);
+const ocrLanguages = new Map(OCR_LANGUAGES);
+const ocrLanguageNames = OCR_LANGUAGES.map(([code]) => getName(code) ?? "(N/A)");
+
+const getCacheKey = (link: string) => `ocr-cache-link-${link}`;
+
+export default declare({
 	Name: "ocr",
 	Aliases: null,
 	Author: "supinic",
@@ -16,29 +40,30 @@ export default {
 		{ name: "lang", type: "string" }
 	],
 	Whitelist_Response: null,
-	Code: (async function ocr (context, ...args) {
+	Code: async function ocr (context, ...args) {
 		if (!process.env.API_OCR_SPACE) {
 			throw new SupiError({
 				message: "No OCR Space key configured (API_OCR_SPACE)"
 			});
 		}
 
-		let languageCode = "eng";
+		let languageCode: string | null = "eng";
 		if (context.params.lang) {
 			languageCode = getCode(context.params.lang, "iso6393");
-			if (!languageCode) {
-				return {
-					success: false,
-					reply: "Provided language could not be parsed!"
-				};
-			}
 		}
 
-		const language = OCR_LANGUAGES[languageCode];
+		if (!languageCode) {
+			return {
+				success: false,
+				reply: "Provided language could not be parsed!"
+			};
+		}
+
+		const language = ocrLanguages.get(languageCode);
 		if (!language) {
 			return {
 				success: false,
-				reply: `Language is not supported! Use one of these: ${OCR_LANGUAGE_NAMES.join(", ")}`,
+				reply: `Language is not supported! Use one of these: ${ocrLanguageNames.join(", ")}`,
 				cooldown: 2500
 			};
 		}
@@ -83,57 +108,55 @@ export default {
 			engine = Math.min(...language.engines);
 		}
 
-		let data;
-		let statusCode;
-		const key = { language: languageCode, link };
+		const key = getCacheKey(link);
+		const existingCacheData = (context.params.force)
+			? null
+			: (await this.getCacheData(key) as CacheData | null);
 
-		// If force is true, don't even bother fetching the cache data
-		const cacheData = (context.params.force) ? null : await this.getCacheData(key);
-		if (cacheData) {
-			data = cacheData.data;
-			statusCode = cacheData.statusCode;
-		}
-		else {
-			const response = await core.Got.get("GenericAPI")({
-				method: "GET",
-				responseType: "json",
-				throwHttpErrors: false,
-				url: "https://api.ocr.space/parse/imageurl",
-				headers: {
-					apikey: process.env.API_OCR_SPACE
-				},
-				searchParams: {
-					url: link,
-					language: language.nonStandardLanguageCode ?? languageCode,
-					scale: "true",
-					isTable: "true",
-					OCREngine: String(engine),
-					isOverlayRequired: "false"
-				}
-			});
-
-			statusCode = response.statusCode;
-			data = response.body;
-
-			// set cache with no expiration - only if request didn't time out
-			if (!data.ErrorMessage || !data.ErrorMessage.some(i => i.includes("Timed out"))) {
-				await this.setCacheData(key, { data, statusCode }, {
-					expiry: 30 * 864e5
-				});
-			}
-		}
-
-		if (statusCode !== 200 || data?.OCRExitCode !== 1) {
+		if (existingCacheData) {
 			return {
-				success: false,
-				reply: (data?.ErrorMessage)
-					? data.ErrorMessage.join(" ")
-					: data
+				success: true,
+				keepWhitespace: true,
+				reply: existingCacheData.text
 			};
 		}
 
-		const result = data.ParsedResults[0].ParsedText;
-		if (result.length === 0) {
+		const response = await core.Got.get("GenericAPI")({
+			method: "GET",
+			responseType: "json",
+			throwHttpErrors: false,
+			url: "https://api.ocr.space/parse/imageurl",
+			headers: {
+				apikey: process.env.API_OCR_SPACE
+			},
+			searchParams: {
+				apikey: process.env.API_OCR_SPACE,
+				url: link,
+				language: language.nonStandardLanguageCode ?? languageCode,
+				scale: "true",
+				isTable: "true",
+				OCREngine: String(engine),
+				isOverlayRequired: "false"
+			}
+		});
+
+		const statusCode = response.statusCode;
+		const data = ocrRequestSchema.parse(response.body);
+		if (!response.ok || data.OCRExitCode !== 1 || data.ErrorMessage || !data.ParsedResults) {
+			const errorMessage = (data.ErrorMessage) ? data.ErrorMessage[0] : "(N/A)";
+			return {
+				success: false,
+				reply: `Couldn't run OCR on your link! Error message: ${errorMessage}`
+			};
+		}
+
+		const text = data.ParsedResults[0].ParsedText;
+		const newCacheData = { text, statusCode } satisfies CacheData;
+		await this.setCacheData(key, newCacheData, {
+			expiry: 30 * 864e5
+		});
+
+		if (text.length === 0) {
 			return {
 				success: false,
 				reply: `No text found.`
@@ -142,16 +165,18 @@ export default {
 		else {
 			return {
 				keepWhitespace: true,
-				reply: result
+				reply: text
 			};
 		}
-	}),
-	Dynamic_Description: (async function (prefix) {
-		const tableBody = Object.entries(OCR_LANGUAGES).map(([code, definition]) => {
-			const name = getName(code);
-			const engines = definition.engines.join(", ");
-			return `<tr><td>${name}</td><td>${code}</td><td>${engines}</td></tr>`;
-		}).join("");
+	},
+	Dynamic_Description: function (prefix) {
+		const tableBody = [];
+		for (const [code, def] of ocrLanguages.entries()) {
+			const name = getName(code) ?? "(N/A)";
+			const engines = def.engines.join(", ");
+
+			tableBody.push(`<tr><td>${name}</td><td>${code}</td><td>${engines}</td></tr>`);
+		}
 
 		const tableHTML = `
 			<table>
@@ -163,7 +188,7 @@ export default {
 					</tr>
 				</thead>
 				<tbody>
-					${tableBody}
+					${tableBody.join("")}
 				</tbody>
 			</table>
 		`;
@@ -195,5 +220,5 @@ export default {
 			"List of supported languages + engine versions:",
 			tableHTML
 		];
-	})
-};
+	}
+});
