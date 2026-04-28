@@ -83,7 +83,6 @@ import LiveUamapCommand from "./liveuamap/index.js";
 import MarkovCommand from "./markov/index.js";
 import MathCommand from "./math/index.js";
 import MeCommand from "./me/index.js";
-import MetricsCommand from "./metrics/index.js";
 import MobaCommand from "./moba/index.js";
 import NewsCommand from "./news/index.js";
 import NutrientsCommand from "./nutrients/index.js";
@@ -266,7 +265,6 @@ export default [
 	MarkovCommand,
 	MathCommand,
 	MeCommand,
-	MetricsCommand,
 	MobaCommand,
 	NewsCommand,
 	NutrientsCommand,
