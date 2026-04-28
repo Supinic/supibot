@@ -20,7 +20,7 @@ type Track = {
 };
 type Author = {
 	ID: number;
-}
+};
 type TrackAuthor = {
 	Track: Track["ID"];
 	Author: Author["ID"];

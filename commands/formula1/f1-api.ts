@@ -164,7 +164,7 @@ export async function fetchRace (year: number, searchType: string, searchValue?:
 			args: { searchType, searchValue }
 		});
 	}
-};
+}
 
 type Driver = {
 	driverId: string;
@@ -191,7 +191,7 @@ type QualifyingResult = {
 	Q1: string;
 	Q2?: string;
 	Q3?: string;
-}
+};
 type QualifyingResponse = YearResponse & {
 	MRData: {
 		RaceTable: {

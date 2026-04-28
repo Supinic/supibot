@@ -35,7 +35,7 @@ export type EnabledSubscription = Subscription & {
 };
 export type RevokedSubscription = Subscription & {
 	status: "user_removed" | "authorization_revoked" | "version_removed";
-}
+};
 export type SubscriptionTier = "1000" | "2000" | "3000" | "Prime";
 
 export interface BaseWebsocketMessage {

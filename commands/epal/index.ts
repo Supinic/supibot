@@ -34,7 +34,7 @@ type ItemData = {
 		regular: number;
 		unit: string;
 	}
-}
+};
 
 const { TTS_ENABLED } = cacheKeys;
 const { listenerAddress, listenerPort } = getConfig().local ?? {};

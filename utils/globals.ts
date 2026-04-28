@@ -7,7 +7,7 @@ type BaseEmote = {
 export type ThirdPartyEmote = BaseEmote & {
 	type: "ffz" | "bttv" | "7tv" | "cytube";
 	zeroWidth: boolean;
-}
+};
 export type TwitchEmote = BaseEmote & {
 	type: "twitch-subscriber" | "twitch-global" | "twitch-follower";
 	channel: string;

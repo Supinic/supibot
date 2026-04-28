@@ -43,7 +43,7 @@ type ClassicAliasData = AliasData & {
 	Command: Command["Name"];
 	Invocation: Command["Name"];
 	Arguments: string | null;
-}
+};
 type LinkedAliasData = AliasData & {
 	User_Alias: User["ID"];
 	Channel: null;

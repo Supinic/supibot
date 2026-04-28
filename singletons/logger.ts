@@ -474,6 +474,6 @@ export class LoggerSingleton {
 		}
 		this.batches.clear();
 	}
-};
+}
 
 export const logger = new LoggerSingleton();

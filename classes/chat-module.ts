@@ -62,10 +62,10 @@ type EventData = GenericMessageEventData | TwitchMessageEventData; // @todo expa
 type PlatformLike = number | string | Platform; // @todo move to Platform
 type PlatformOption = {
 	platform: PlatformLike | PlatformLike[];
-}
+};
 type ChannelOption = {
 	channel: ChannelLike | ChannelLike[];
-}
+};
 type AttachOptions = XOR<PlatformOption, ChannelOption> & { args?: EventArgument[]; };
 type DetachOptions = AttachOptions & {
 	remove: boolean;

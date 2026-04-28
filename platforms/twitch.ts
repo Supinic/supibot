@@ -208,7 +208,7 @@ type FfzEmote = {
 	usage_count: number;
 	created_at: string;
 	last_updated: string;
-}
+};
 type FfzEmoteResponse = {
 	sets: Record<string, {
 		id: string;

@@ -4,7 +4,7 @@ import { OsrsSubcommands } from "./subcommands/index.js";
 import gameData from "./subcommands/game-data.json" with { type: "json" };
 const { activities, activityAliases, skills } = gameData;
 
-export type OsrsSubcommandDefinition = SubcommandDefinition<typeof osrsCommandDefinition>
+export type OsrsSubcommandDefinition = SubcommandDefinition<typeof osrsCommandDefinition>;
 
 const osrsCommandDefinition = declare({
 	Name: "osrs",

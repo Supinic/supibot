@@ -246,7 +246,10 @@ export default tseslint.config(
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error",
 
-			"@stylistic/indent": ["warn", "tab"]
+			"@stylistic/brace-style": ["warn", "stroustrup", { allowSingleLine: true }],
+			"@stylistic/indent": ["warn", "tab"],
+			"@stylistic/no-extra-semi": "warn",
+			"@stylistic/semi": "warn",
 		}
 	},
 	{

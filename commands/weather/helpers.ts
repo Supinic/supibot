@@ -50,7 +50,7 @@ type DailyWeatherDataItem = BaseWeatherDataItem & {
 		min: number;
 		max: number;
 	};
-}
+};
 type HourlyWeatherDataItem = BaseWeatherDataItem & {
 	feels_like: number;
 	temp: number;

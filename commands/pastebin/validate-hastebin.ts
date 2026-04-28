@@ -62,4 +62,4 @@ export default async function validateHastebinServer (command: Command, server: 
 	}
 
 	return isValid;
-};
+}

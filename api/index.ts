@@ -115,4 +115,4 @@ export default function initialize () {
 	server.listen(port);
 
 	return { server, routeDefinitions, port };
-};
+}

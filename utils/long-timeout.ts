@@ -58,4 +58,4 @@ export default class LongTimeout {
 
 		this.timeout = null;
 	}
-};
+}

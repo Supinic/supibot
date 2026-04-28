@@ -374,7 +374,7 @@ type YoutubeThumbnailDetail = {
 	height: number;
 	width: number;
 	url: string;
-}
+};
 type YoutubeSearchItem = {
 	etag: string;
 	id: {

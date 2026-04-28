@@ -29,7 +29,7 @@ type DeeplTranslateResponse = {
 		text: string;
 		detected_source_language: string;
 	}[];
-}
+};
 
 let formalitySupportedLanguageNames: string[] | undefined;
 export default {
