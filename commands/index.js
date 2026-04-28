@@ -85,7 +85,6 @@ import MathCommand from "./math/index.js";
 import MeCommand from "./me/index.js";
 import MetricsCommand from "./metrics/index.js";
 import MobaCommand from "./moba/index.js";
-import NecroDancerCommand from "./necrodancer/index.js";
 import NewsCommand from "./news/index.js";
 import NutrientsCommand from "./nutrients/index.js";
 import OcrCommand from "./ocr/index.js";
@@ -269,7 +268,6 @@ export default [
 	MeCommand,
 	MetricsCommand,
 	MobaCommand,
-	NecroDancerCommand,
 	NewsCommand,
 	NutrientsCommand,
 	OcrCommand,
