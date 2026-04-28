@@ -51,13 +51,13 @@ function parsePrimitiveTag (input: string, type: PrimitiveTag): number | string 
 
 type BaseType <T extends PrimitiveTag> =
 	T extends "boolean" ? boolean :
-	T extends "number" ? number :
-	T extends "string" ? string
-	: never;
+		T extends "number" ? number :
+			T extends "string" ? string
+				: never;
 
 type ConvertSchemaToType<T> = {
 	[K in keyof T]:
-		T[K] extends PrimitiveTag ? BaseType<T[K]> | null : // converts primitives into types, `"string"` => `string`
+	T[K] extends PrimitiveTag ? BaseType<T[K]> | null : // converts primitives into types, `"string"` => `string`
 		T[K] | null // uses the defined type itself, `{} as { XYZ: unknown; }` => `{ XYZ: unknown; }`
 };
 

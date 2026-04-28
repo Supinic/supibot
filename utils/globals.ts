@@ -1,20 +1,20 @@
 type BaseEmote = {
-    ID: string | number;
-    name: string;
-    global: boolean;
-    animated: boolean | null;
+	ID: string | number;
+	name: string;
+	global: boolean;
+	animated: boolean | null;
 };
 export type ThirdPartyEmote = BaseEmote & {
-    type: "ffz" | "bttv" | "7tv" | "cytube";
-    zeroWidth: boolean;
+	type: "ffz" | "bttv" | "7tv" | "cytube";
+	zeroWidth: boolean;
 }
 export type TwitchEmote = BaseEmote & {
-    type: "twitch-subscriber" | "twitch-global" | "twitch-follower";
-    channel: string;
+	type: "twitch-subscriber" | "twitch-global" | "twitch-follower";
+	channel: string;
 };
 export type DiscordEmote = BaseEmote & {
-    type: "discord";
-    guild: string;
+	type: "discord";
+	guild: string;
 };
 export type Emote = TwitchEmote | DiscordEmote | ThirdPartyEmote;
 
@@ -26,17 +26,17 @@ export type Stringifiable = boolean | number | string;
 export type JSONifiable = null | boolean | number | string | { [P: string]: JSONifiable } | readonly JSONifiable[];
 export type SimpleGenericData = Record<string, JSONifiable>;
 export interface GenericFlagsObject {
-    [key: string]: boolean
+	[key: string]: boolean
 }
 export type Without<T, U> = {
-    [P in Exclude<keyof T, keyof U>]?: never
+	[P in Exclude<keyof T, keyof U>]?: never
 };
 export type XOR<T, U> = (T | U) extends object
-    ? (Without<T, U> & U) | (Without<U, T> & T)
-    : T | U;
+	? (Without<T, U> & U) | (Without<U, T> & T)
+	: T | U;
 export type OnlyKeysOfType<T, U> = {
-    [P in keyof T]: T[P] extends U ? P : never
+	[P in keyof T]: T[P] extends U ? P : never
 }[keyof T];
 export type TypeExtract<T, U> = {
-    [P in OnlyKeysOfType<T, U>]: U;
+	[P in OnlyKeysOfType<T, U>]: U;
 };

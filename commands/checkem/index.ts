@@ -33,8 +33,8 @@ export default declare({
 	Code: function checkEm (context) {
 		if (!context.channel) {
 			return {
-			    success: false,
-			    reply: "This command is not available in private messages!"
+				success: false,
+				reply: "This command is not available in private messages!"
 			};
 		}
 

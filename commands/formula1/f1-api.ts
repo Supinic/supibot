@@ -112,7 +112,7 @@ export async function fetchRace (year: number, searchType: string, searchValue?:
 	const races = response.body.MRData.RaceTable.Races;
 	if (races.length === 0) {
 		throw new SupiError({
-		    message: "Assert error: Formula 1 season has no races!"
+			message: "Assert error: Formula 1 season has no races!"
 		});
 	}
 
@@ -317,7 +317,7 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 	}
 	else {
 		throw new SupiError({
-		    message: "Assert error: Unknown F1 race status",
+			message: "Assert error: Unknown F1 race status",
 			args: { raceStart, raceEnd }
 		});
 	}

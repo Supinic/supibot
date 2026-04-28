@@ -107,15 +107,15 @@ export default declare({
 				const ids = rest.map(Number).filter(i => !Number.isNaN(i));
 				if (ids.length === 0) {
 					return {
-					    success: false,
-					    reply: "No valid Filter IDs provided!"
+						success: false,
+						reply: "No valid Filter IDs provided!"
 					};
 				}
 
 				await sb.Filter.reloadSpecific(...ids);
 				return {
-				    success: true,
-				    reply: `Reloaded ${ids.length} filters.`
+					success: true,
+					reply: `Reloaded ${ids.length} filters.`
 				};
 			}
 			case "filters": {
@@ -139,8 +139,8 @@ export default declare({
 				}
 
 				return {
-				    success: true,
-				    reply: `Reloaded ${counter} users.`
+					success: true,
+					reply: `Reloaded ${counter} users.`
 				};
 			}
 			case "users": {

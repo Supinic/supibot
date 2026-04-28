@@ -21,8 +21,8 @@ export default {
 		if (!playerCount) {
 			// const appendix = (previousPlayerCount) ? ` Last recorded number: ${previousPlayerCount}` : "";
 			return {
-			    success: false,
-			    reply: `The number of players online is not currently available!`
+				success: false,
+				reply: `The number of players online is not currently available!`
 			};
 		}
 
@@ -38,8 +38,8 @@ export default {
 
 		const formattedCount = core.Utils.groupDigits(playerCount);
 		return {
-		    success: true,
-		    reply: `Currently online players: ${formattedCount}.`
+			success: true,
+			reply: `Currently online players: ${formattedCount}.`
 		};
 	}
 } satisfies OsrsSubcommandDefinition;

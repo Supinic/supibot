@@ -101,7 +101,7 @@ export default {
 				let level = String(found.level);
 				if (context.params.virtual) {
 					level = (name === "overall")
-					 	? `${found.level} (virtual: ${found.virtualLevel})`
+						? `${found.level} (virtual: ${found.virtualLevel})`
 						: String(found.virtualLevel ?? found.level);
 				}
 
@@ -118,7 +118,7 @@ export default {
 			const total = data.skills.find(i => i.name.toLowerCase() === "overall");
 			if (!total) {
 				throw new SupiError({
-				    message: "Assert error: Missing Total values",
+					message: "Assert error: Missing Total values",
 					args: { data }
 				});
 			}

@@ -83,8 +83,8 @@ export default {
 				case "race": {
 					if (!previousRadio.race) {
 						return {
-						    success: false,
-						    reply: "The last radio has no race associated with it (yet)!"
+							success: false,
+							reply: "The last radio has no race associated with it (yet)!"
 						};
 					}
 
@@ -94,8 +94,8 @@ export default {
 			}
 
 			return {
-			    success: true,
-			    reply: result
+				success: true,
+				reply: result
 			};
 		}
 

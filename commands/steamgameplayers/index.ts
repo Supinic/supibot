@@ -192,7 +192,7 @@ export default declare({
 				});
 				if (!matchResult || matchResult.length === 0) {
 					throw new SupiError({
-					    message: "Assert error: Queried Steam game not found by string"
+						message: "Assert error: Queried Steam game not found by string"
 					});
 				}
 

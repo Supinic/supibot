@@ -96,8 +96,8 @@ export default declare({
 			if (userDefaultModel) {
 				if (!isModelName(userDefaultModel)) {
 					return {
-					    success: false,
-					    reply: `Your saved model ${userDefaultModel} is no longer valid! Change it to a currently available one.`
+						success: false,
+						reply: `Your saved model ${userDefaultModel} is no longer valid! Change it to a currently available one.`
 					};
 				}
 
@@ -127,8 +127,8 @@ export default declare({
 		}
 		else if (modelData.noTemperature && typeof context.params.temperature === "number") {
 			return {
-			    success: false,
-			    reply: "This model does not support setting a custom temperature!"
+				success: false,
+				reply: "This model does not support setting a custom temperature!"
 			};
 		}
 

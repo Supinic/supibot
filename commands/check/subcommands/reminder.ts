@@ -97,7 +97,7 @@ export default {
 
 			if (!reminderUser) {
 				throw new SupiError({
-				    message: "Assert error: Reminder owner does not exist",
+					message: "Assert error: Reminder owner does not exist",
 					args: { reminder }
 				});
 			}

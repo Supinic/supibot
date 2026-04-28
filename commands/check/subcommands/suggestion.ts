@@ -92,7 +92,7 @@ export default {
 		const userData = await sb.User.get(user, true);
 		if (!userData) {
 			throw new SupiError({
-			    message: "Assert error: Suggestion author does not exist",
+				message: "Assert error: Suggestion author does not exist",
 				args: { user }
 			});
 		}

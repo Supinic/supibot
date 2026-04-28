@@ -123,7 +123,7 @@ export default declare({
 			}
 			else {
 				throw new SupiError({
-				    message: "Assert error: Unexpected emote type + data combination",
+					message: "Assert error: Unexpected emote type + data combination",
 					args: { data: response.body }
 				});
 			}

@@ -284,8 +284,8 @@ export default declare({
 		const totalCheck = Object.values(hours).reduce((acc, cur) => acc + cur, 0);
 		if (totalCheck === 0) {
 			return {
-			    success: true,
-			    reply: core.Utils.tag.trim `
+				success: true,
+				reply: core.Utils.tag.trim `
 					${gameData.game_name} (${gameData.release_world})
 					currently does not have any data about completion times. 
 					${url}

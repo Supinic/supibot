@@ -138,7 +138,7 @@ export default {
 
 			if (!userId) {
 				throw new SupiError({
-				    message: "Assert error: Suspicious-checked user ID does not exist",
+					message: "Assert error: Suspicious-checked user ID does not exist",
 					args: { raw }
 				});
 			}

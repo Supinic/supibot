@@ -78,7 +78,7 @@ export default declare({
 			const currentCommand = sb.Command.get("current");
 			if (!currentCommand) {
 				throw new SupiError({
-				    message: "No link to $current available"
+					message: "No link to $current available"
 				});
 			}
 
@@ -144,8 +144,8 @@ export default declare({
 			const matchSongId = parsedURL.pathname.match(/(\d+)/);
 			if (!matchSongId) {
 				return {
-				    success: false,
-				    reply: "Invalid supinic.com track link provided!"
+					success: false,
+					reply: "Invalid supinic.com track link provided!"
 				};
 			}
 
@@ -234,8 +234,8 @@ export default declare({
 				const slug = parsedURL.pathname.split("/").find(Boolean);
 				if (!slug) {
 					return {
-					    success: false,
-					    reply: "Invalid Twitch clip link provided!"
+						success: false,
+						reply: "Invalid Twitch clip link provided!"
 					};
 				}
 
@@ -264,8 +264,8 @@ export default declare({
 				const lastPathSegment = parsedURL.pathname.split("/").at(-1);
 				if (!lastPathSegment) {
 					return {
-					    success: false,
-					    reply: "Could not parse provided URL!"
+						success: false,
+						reply: "Could not parse provided URL!"
 					};
 				}
 
@@ -309,7 +309,7 @@ export default declare({
 				const youtubeData = await linkParser.fetchData(lookup.link, type);
 				if (!youtubeData) {
 					throw new SupiError({
-					    message: "Assert error: Searched Youtube video ID is not fetchable"
+						message: "Assert error: Searched Youtube video ID is not fetchable"
 					});
 				}
 
@@ -380,8 +380,8 @@ export default declare({
 
 		if (!addResult.success) {
 			return {
-			    success: false,
-			    reply: `Could not request: ${addResult.reason}`
+				success: false,
+				reply: `Could not request: ${addResult.reason}`
 			};
 		}
 

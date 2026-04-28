@@ -29,16 +29,16 @@ export default declare({
 		const status = await sb.MpvClient.getUpdatedStatus();
 		if (!status.current) {
 			return {
-			    success: false,
-			    reply: "No videos are currently queued!"
+				success: false,
+				reply: "No videos are currently queued!"
 			};
 		}
 
 		const { current } = status;
 		if (context.params.linkOnly) {
 			return {
-			    success: true,
-			    reply: current.url
+				success: true,
+				reply: current.url
 			};
 		}
 

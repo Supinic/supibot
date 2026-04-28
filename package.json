@@ -44,6 +44,7 @@
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "eslint": "^10.2.0",
     "eslint-plugin-unicorn": "^64.0.0",
     "globals": "^17.4.0",

@@ -26,7 +26,7 @@ const getLocalLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT)
 	const channelData = sb.Channel.get(channel, twitch);
 	if (!channelData) {
 		throw new SupiError({
-		    message: "Assert error: Local channel does not exist",
+			message: "Assert error: Local channel does not exist",
 			args: { channel }
 		});
 	}
@@ -153,8 +153,8 @@ export default declare({
 	Code: async function chatSummary (context, channelInput) {
 		if (!context.channel) {
 			return {
-			    success: false,
-			    reply: "This command is not available in private messages!"
+				success: false,
+				reply: "This command is not available in private messages!"
 			};
 		}
 

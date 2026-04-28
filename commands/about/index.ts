@@ -17,7 +17,7 @@ export default declare({
 			const botData = await sb.User.get(context.platform.Self_Name);
 			if (!botData) {
 				throw new SupiError({
-				    message: "Assert error: Self-bot user data is not available"
+					message: "Assert error: Self-bot user data is not available"
 				});
 			}
 

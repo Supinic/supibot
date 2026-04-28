@@ -12,7 +12,7 @@ import { typedEntries } from "../../../utils/ts-helpers.js";
 for (const item of GameData.activities) {
 	if (item.toLowerCase() !== item) {
 		throw new SupiError({
-		    message: "Assert error: Non-lowercase activity found",
+			message: "Assert error: Non-lowercase activity found",
 			args: { item }
 		});
 	}
@@ -20,7 +20,7 @@ for (const item of GameData.activities) {
 for (const [alias, activity] of typedEntries(GameData.activityAliases)) {
 	if (alias.toLowerCase() !== alias || activity.toLowerCase() !== activity) {
 		throw new SupiError({
-		    message: "Assert error: Non-lowercase activity alias found",
+			message: "Assert error: Non-lowercase activity alias found",
 			args: { alias, activity }
 		});
 	}

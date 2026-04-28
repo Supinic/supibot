@@ -318,7 +318,7 @@ export const parseUserIdentifier = async (context: Context, regionName?: string,
 
 	if (!regionName) {
 		throw new SupiError({
-		    message: "Assert error: Region name not obtained"
+			message: "Assert error: Region name not obtained"
 		});
 	}
 

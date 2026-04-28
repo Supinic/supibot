@@ -36,7 +36,7 @@ export default declare({
 		const target = invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
 		if (!target) {
 			throw new SupiError({
-			    message: "Assert error: AFK invocation does not match",
+				message: "Assert error: AFK invocation does not match",
 				args: { invocation }
 			});
 		}

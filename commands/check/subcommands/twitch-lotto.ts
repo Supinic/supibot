@@ -109,7 +109,7 @@ export const TwitchLottoDescriptionSubcommand = {
 		const authorData = await sb.User.get(item.User_Alias);
 		if (!authorData) {
 			throw new SupiError({
-			    message: "Assert error: TL description author does not exist"
+				message: "Assert error: TL description author does not exist"
 			});
 		}
 

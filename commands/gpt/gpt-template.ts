@@ -36,7 +36,7 @@ export const determineOutputLimit = (context: GptContext, modelData: ModelData):
 	if (typeof limit === "number") {
 		if (outputLimit === null) {
 			return {
-			    success: false,
+				success: false,
 				reply: "Your selected model does not support setting an output limit!",
 				cooldown: 2500
 			};

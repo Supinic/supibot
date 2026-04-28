@@ -47,8 +47,8 @@ export default declare({
 			else if (error.message.startsWith("Specified user")) {
 				// "Specified user has no founders" and "Specified user does not exist"
 				return {
-				    success: false,
-				    reply: `${error.message}!`
+					success: false,
+					reply: `${error.message}!`
 				};
 			}
 			else {

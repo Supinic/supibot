@@ -260,7 +260,7 @@ export class User extends TemplateWithIdString {
 		const userData = await User.get(identifier, true);
 		if (!userData) {
 			throw new SupiError({
-			    message: "Assert error: User.getAsserted did not find User",
+				message: "Assert error: User.getAsserted did not find User",
 				args: { identifier }
 			});
 		}

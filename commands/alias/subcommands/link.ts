@@ -83,7 +83,7 @@ export default {
 			const linkedAlias = await getParentAlias(targetAlias);
 			if (!linkedAlias) {
 				return {
-				    success: false,
+					success: false,
 					reply: "You cannot link to this alias because the original it links to has been deleted!"
 				};
 			}

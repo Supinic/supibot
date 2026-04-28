@@ -1,5 +1,6 @@
 import tseslint from "typescript-eslint";
 import eslintJs from "@eslint/js";
+import stylistic from "@stylistic/eslint-plugin";
 import unicornPlugin from "eslint-plugin-unicorn";
 import globals from "globals";
 
@@ -11,6 +12,9 @@ export default tseslint.config(
 		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
 	},
 	{
+		plugins: {
+			"@stylistic": stylistic
+		},
 		languageOptions: {
 			parserOptions: {
 				projectService: true,
@@ -239,9 +243,10 @@ export default tseslint.config(
 			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
 			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
 			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
-
 			"wrap-iife": ["warn", "inside"],
-			yoda: "error"
+			yoda: "error",
+
+			"@stylistic/indent": ["warn", "tab"]
 		}
 	},
 	{

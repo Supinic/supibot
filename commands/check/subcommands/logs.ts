@@ -42,7 +42,7 @@ export default {
 			const platformId = context.channel.Specific_ID;
 			if (!platformId) {
 				throw new SupiError({
-				    message: "Assert error: Twitch channel does not have a platform ID set up",
+					message: "Assert error: Twitch channel does not have a platform ID set up",
 					args: { channelId: context.channel.ID }
 				});
 			}

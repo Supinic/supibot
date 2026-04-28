@@ -19,8 +19,8 @@ export default {
 		}
 		else if (!isGptModelName(identifier)) {
 			return {
-			    success: false,
-			    reply: "Invalid model name provided!"
+				success: false,
+				reply: "Invalid model name provided!"
 			};
 		}
 

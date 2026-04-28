@@ -280,6 +280,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stylistic/eslint-plugin@npm:^5.10.0":
+  version: 5.10.0
+  resolution: "@stylistic/eslint-plugin@npm:5.10.0"
+  dependencies:
+    "@eslint-community/eslint-utils": "npm:^4.9.1"
+    "@typescript-eslint/types": "npm:^8.56.0"
+    eslint-visitor-keys: "npm:^4.2.1"
+    espree: "npm:^10.4.0"
+    estraverse: "npm:^5.3.0"
+    picomatch: "npm:^4.0.3"
+  peerDependencies:
+    eslint: ^9.0.0 || ^10.0.0
+  checksum: 10c0/2cc6e592d5b2ab691290cc39ed377c0f6226667b367ffc6a0bf3a4bf6dd36b011d17c83f377600a48946f6bb037390b35a8b3c273b3c40d161c00b44512a129e
+  languageName: node
+  linkType: hard
+
 "@types/esrecurse@npm:^4.3.1":
   version: 4.3.1
   resolution: "@types/esrecurse@npm:4.3.1"
@@ -437,6 +453,13 @@ __metadata:
   version: 8.58.0
   resolution: "@typescript-eslint/types@npm:8.58.0"
   checksum: 10c0/f2fe1321758a04591c20d77caba956ae76b77cff0b976a0224b37077d80b1ebd826874d15ec79c3a3b7d57ee5679e5d10756db1b082bde3d51addbd3a8431d38
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/types@npm:^8.56.0":
+  version: 8.59.1
+  resolution: "@typescript-eslint/types@npm:8.59.1"
+  checksum: 10c0/a0bf98389e8673d4aa1034fdef9bb78f576b3dc6b8f413d4adf07ef6edff4a33fdb916148c3bac2cafdbf282c765eebf253c2a05edf3fda4123b8889921cd518
   languageName: node
   linkType: hard
 
@@ -1154,6 +1177,13 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
+"eslint-visitor-keys@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "eslint-visitor-keys@npm:4.2.1"
+  checksum: 10c0/fcd43999199d6740db26c58dbe0c2594623e31ca307e616ac05153c9272f12f1364f5a0b1917a8e962268fdecc6f3622c1c2908b4fcc2e047a106fe6de69dc43
+  languageName: node
+  linkType: hard
+
 "eslint-visitor-keys@npm:^5.0.0, eslint-visitor-keys@npm:^5.0.1":
   version: 5.0.1
   resolution: "eslint-visitor-keys@npm:5.0.1"
@@ -1206,6 +1236,17 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
+"espree@npm:^10.4.0":
+  version: 10.4.0
+  resolution: "espree@npm:10.4.0"
+  dependencies:
+    acorn: "npm:^8.15.0"
+    acorn-jsx: "npm:^5.3.2"
+    eslint-visitor-keys: "npm:^4.2.1"
+  checksum: 10c0/c63fe06131c26c8157b4083313cb02a9a54720a08e21543300e55288c40e06c3fc284bdecf108d3a1372c5934a0a88644c98714f38b6ae8ed272b40d9ea08d6b
+  languageName: node
+  linkType: hard
+
 "espree@npm:^11.2.0":
   version: 11.2.0
   resolution: "espree@npm:11.2.0"
@@ -1235,7 +1276,7 @@ duration-parser@supinic/duration-parser:
   languageName: node
   linkType: hard
 
-"estraverse@npm:^5.1.0, estraverse@npm:^5.2.0":
+"estraverse@npm:^5.1.0, estraverse@npm:^5.2.0, estraverse@npm:^5.3.0":
   version: 5.3.0
   resolution: "estraverse@npm:5.3.0"
   checksum: 10c0/1ff9447b96263dec95d6d67431c5e0771eb9776427421260a3e2f0fdd5d6bd4f8e37a7338f5ad2880c9f143450c9b1e4fc2069060724570a49cf9cf0312bd107
@@ -2348,6 +2389,7 @@ supi-db-init@supinic/supi-db-init:
   dependencies:
     "@eslint/js": "npm:^10.0.1"
     "@jprochazk/roll-dice": "npm:^0.4.2"
+    "@stylistic/eslint-plugin": "npm:^5.10.0"
     acorn-node: "npm:^2.0.1"
     async-markov: supinic/async-markov
     chrono-node: "npm:^2.9.0"

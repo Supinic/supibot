@@ -63,8 +63,8 @@ export default {
 		const worlds = await fetchWorldsData();
 		if (!worlds) {
 			return {
-			    success: false,
-			    reply: "OSRS worlds data is currently unavailable! Try again later."
+				success: false,
+				reply: "OSRS worlds data is currently unavailable! Try again later."
 			};
 		}
 

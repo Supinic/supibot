@@ -81,7 +81,7 @@ const getInstance = async function (channelId: string): Promise<string | null> {
 	const defaultInstanceIdList = instanceMap.get(defaultInstanceName);
 	if (!defaultInstanceIdList) {
 		throw new SupiError({
-		    message: "Assert error: no default instance exists"
+			message: "Assert error: no default instance exists"
 		});
 	}
 

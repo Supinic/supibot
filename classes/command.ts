@@ -382,7 +382,7 @@ export class SubcommandCollection {
 	get default () {
 		if (!this.defaultCommand) {
 			throw new SupiError({
-			    message: "No default subcommand in collection",
+				message: "No default subcommand in collection",
 				args: { name: this.name }
 			});
 		}
@@ -602,7 +602,7 @@ export class Command extends TemplateWithoutId {
 		const command = Command.get(identifier);
 		if (!command) {
 			throw new SupiError({
-			    message: `Assert error: Fetched command does not exist`,
+				message: `Assert error: Fetched command does not exist`,
 				args: {
 					command: (typeof identifier === "string") ? identifier : identifier.Name
 				}
@@ -613,13 +613,13 @@ export class Command extends TemplateWithoutId {
 	}
 
 	static async checkAndExecute (data: {
-		  command: string, // @todo consider renaming `command` to `invocation` here
-		  args: string[],
-		  user: User,
-		  channel: Channel | null,
-		  platform: Platform,
-		  options: ExecuteOptions,
-		  platformSpecificData: ContextPlatformSpecificData
+		command: string, // @todo consider renaming `command` to `invocation` here
+		args: string[],
+		user: User,
+		channel: Channel | null,
+		platform: Platform,
+		options: ExecuteOptions,
+		platformSpecificData: ContextPlatformSpecificData
 	}): Promise<Result> {
 		let { command: identifier } = data;
 		const {

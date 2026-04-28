@@ -44,7 +44,7 @@ export default {
 		const player = info.participants.find(i => i.puuid === puuid);
 		if (!player) {
 			throw new SupiError({
-			    message: "Assert error: Player not found within participants"
+				message: "Assert error: Player not found within participants"
 			});
 		}
 

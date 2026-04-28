@@ -125,7 +125,7 @@ export default declare({
 
 			if (!data) {
 				throw new SupiError({
-				    message: "Assert error: YouTube ID found in search but not in fetchData",
+					message: "Assert error: YouTube ID found in search but not in fetchData",
 					args: { track }
 				});
 			}

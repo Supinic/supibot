@@ -6,7 +6,7 @@ const charToFlagEmoji = (char: string) => {
 	const charCode = char.codePointAt(0);
 	if (typeof charCode === "undefined") {
 		throw new SupiError({
-		    message: "Assert error: Empty string provided"
+			message: "Assert error: Empty string provided"
 		});
 	}
 

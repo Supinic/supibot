@@ -15,14 +15,14 @@ export default {
 		const itemData = await fetchItemId(args.join(" "));
 		if (!itemData) {
 			return {
-			    success: false,
-			    reply: "No matching tradeable item found!"
+				success: false,
+				reply: "No matching tradeable item found!"
 			};
 		}
 		else {
 			return {
-			    success: true,
-			    reply: `${itemData.name}: ID = ${itemData.id}, HA value = ${itemData.highalch}`
+				success: true,
+				reply: `${itemData.name}: ID = ${itemData.id}, HA value = ${itemData.highalch}`
 			};
 		}
 	}

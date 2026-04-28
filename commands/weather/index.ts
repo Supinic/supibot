@@ -68,7 +68,7 @@ export default declare({
 		let weatherTime:
 			| { number: null; type: "current"; }
 			| { number: number; type: "hourly" | "daily"; }
-		= { number: null, type: "current" };
+				= { number: null, type: "current" };
 
 		const weatherRegex = /\b(hour|day)\+(\d+)$/;
 		const historyRegex = /-\s*\d/;
@@ -278,7 +278,7 @@ export default declare({
 
 		if (!formattedAddress) {
 			throw new SupiError({
-			    message: "Assert error: Formatted address not filled"
+				message: "Assert error: Formatted address not filled"
 			});
 		}
 

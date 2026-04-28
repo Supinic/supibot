@@ -89,7 +89,7 @@ export default {
 		if (newArticles.length === 0) {
 			// Should never happen due to conditions above
 			throw new SupiError({
-			    message: "Assert error: No eligible articles filtered",
+				message: "Assert error: No eligible articles filtered",
 				args: { ids: [...newArticleIds] }
 			});
 		}

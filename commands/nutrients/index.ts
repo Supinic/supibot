@@ -29,7 +29,7 @@ const getNutrient = (
 	const nutrient = data.find(i => id === i.nutrientId);
 	if (!nutrient) {
 		throw new SupiError({
-		    message: `Assert error: Missing nutrient ${name}`
+			message: `Assert error: Missing nutrient ${name}`
 		});
 	}
 
@@ -75,8 +75,8 @@ export default declare({
 		const { totalHits, foods } = searchSchema.parse(response.body);
 		if (totalHits === 0) {
 			return {
-			    success: false,
-			    reply: "No foods found for your query!"
+				success: false,
+				reply: "No foods found for your query!"
 			};
 		}
 

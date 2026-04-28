@@ -28,8 +28,8 @@ export default declare({
 
 		if (!chatLineAmount) {
 			return {
-			    success: false,
-			    reply: "No chat lines are currently being logged!"
+				success: false,
+				reply: "No chat lines are currently being logged!"
 			};
 		}
 

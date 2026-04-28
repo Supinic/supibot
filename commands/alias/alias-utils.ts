@@ -87,7 +87,7 @@ export const applyParameters = (context: Context, aliasArguments: string[], comm
 				const { groups } = numberMatch;
 				if (!groups) {
 					throw new SupiError({
-					    message: "Assert error: No alias argument regex groups exist",
+						message: "Assert error: No alias argument regex groups exist",
 						args: { groups, aliasArguments, commandArguments }
 					});
 				}
@@ -186,7 +186,7 @@ export const getAliasByIdAsserted = async (id: AliasData["ID"]) => {
 	const aliasData = await getAliasById(id);
 	if (!aliasData) {
 		throw new SupiError({
-		    message: "Assert error: Fetching alias by ID - does not exist",
+			message: "Assert error: Fetching alias by ID - does not exist",
 			args: { id }
 		});
 	}
@@ -228,7 +228,7 @@ export const getLinkedAlias = async (parentId: AliasData["ID"]) => {
 
 	if (!linkedAlias) {
 		throw new SupiError({
-		    message: "Assert error: Linked alias does not exist",
+			message: "Assert error: Linked alias does not exist",
 			args: { parentId }
 		});
 	}

@@ -18,8 +18,8 @@ export default {
 
 		if (!random) {
 			return {
-			    success: false,
-			    reply: "There are no approved Bad Apple!! renditions available at the moment!"
+				success: false,
+				reply: "There are no approved Bad Apple!! renditions available at the moment!"
 			};
 		}
 

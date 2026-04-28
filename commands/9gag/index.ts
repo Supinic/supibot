@@ -32,8 +32,8 @@ export default declare({
 		const match = response.body.match(scrapeDataRegex);
 		if (!match) {
 			return {
-			    success: false,
-			    reply: "Could not find any posts on 9GAG!"
+				success: false,
+				reply: "Could not find any posts on 9GAG!"
 			};
 		}
 
@@ -44,8 +44,8 @@ export default declare({
 		}
 		catch {
 			return {
-			    success: false,
-			    reply: "Could not parse the data from 9GAG's front page!"
+				success: false,
+				reply: "Could not parse the data from 9GAG's front page!"
 			};
 		}
 

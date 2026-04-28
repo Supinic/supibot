@@ -63,7 +63,7 @@ export default declare({
 		const status = await sb.MpvClient.getUpdatedStatus();
 		if (!status.position || !status.duration) {
 			throw new SupiError({
-			    message: "Assert error: mpv position/duration unavailable despite non-empty playlist"
+				message: "Assert error: mpv position/duration unavailable despite non-empty playlist"
 			});
 		}
 

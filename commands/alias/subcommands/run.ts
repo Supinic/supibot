@@ -45,7 +45,7 @@ export default {
 
 		if (subInvocation !== "try" && subInvocation !== "run") {
 			throw new SupiError({
-			    message: `Assert error: $alias run did not receive "run" or "try" as subInvocation`
+				message: `Assert error: $alias run did not receive "run" or "try" as subInvocation`
 			});
 		}
 
@@ -133,7 +133,7 @@ export default {
 			if (!parentAlias.User_Alias) {
 				/* node:coverage ignore next 4 */
 				throw new SupiError({
-				    message: "Assert error: Parent alias does not belong to a user",
+					message: "Assert error: Parent alias does not belong to a user",
 					args: { parentAlias, alias }
 				});
 			}
@@ -160,7 +160,7 @@ export default {
 		if (!isClassicAlias(alias)) {
 			/* node:coverage ignore next 4 */
 			throw new SupiError({
-			    message: "Assert error: No classic alias obtained",
+				message: "Assert error: No classic alias obtained",
 				args: { alias }
 			});
 		}

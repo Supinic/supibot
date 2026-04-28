@@ -32,8 +32,8 @@ export default declare({
 		}
 		else if (args.length < 2) {
 			return {
-			    success: false,
-			    reply: "You must provide some text to pyramid-ify and the syze of the pyramid!"
+				success: false,
+				reply: "You must provide some text to pyramid-ify and the syze of the pyramid!"
 			};
 		}
 
@@ -41,8 +41,8 @@ export default declare({
 		const size = Number(words.pop());
 		if (Number.isNaN(size)) {
 			return {
-			    success: false,
-			    reply: "You must provide the size as the last parameter!"
+				success: false,
+				reply: "You must provide the size as the last parameter!"
 			};
 		}
 		else if (!core.Utils.isValidInteger(size, 0) || size > REASONABLE_PYRAMID_MAXIMUM) {
@@ -57,16 +57,16 @@ export default declare({
 			const permissions = await context.getUserPermissions();
 			if (!permissions.is("administrator")) {
 				return {
-				    success: false,
-				    reply: "Only administrators can change the pyramid message delay!"
+					success: false,
+					reply: "Only administrators can change the pyramid message delay!"
 				};
 			}
 
 			delay = context.params.delay;
 			if (delay <= 0 || delay >= 10_000) {
 				return {
-				    success: false,
-				    reply: "Provided delay is out of practical bounds!"
+					success: false,
+					reply: "Provided delay is out of practical bounds!"
 				};
 			}
 		}
@@ -74,7 +74,7 @@ export default declare({
 		// sanity check
 		if (words.length === 0) {
 			throw new SupiError({
-			    message: "Assert error: words array is empty"
+				message: "Assert error: words array is empty"
 			});
 		}
 
