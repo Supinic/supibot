@@ -268,7 +268,7 @@ export const ivrEmoteSchema = z.object({
 	emoteID: z.string(),
 	emoteCode: z.string(),
 	emoteURL: z.string(),
-	emoteSetID: z.string(),
+	emoteSetID: z.string().nullable(),
 	emoteAssetType: z.string(),
 	emoteState: z.string(),
 	emoteType: z.string(),
