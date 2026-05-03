@@ -381,6 +381,10 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		if (IGNORED_CHANNEL_TYPES.has(channelType)) {
 			return;
 		}
+		// Do not process empty messages (parseMessage does take attachments into account)
+		else if (!msg) {
+			return;
+		}
 
 		// If the bot does not have SEND_MESSAGES permission in the channel, completely ignore the message.
 		// Do not process it for logging, commands, AFKs, Reminders, anything.
@@ -394,19 +398,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		// eslint-disable-next-line @typescript-eslint/no-misused-spread
 		const usernameCharacterLength = [...user].length;
 		if (usernameCharacterLength > 32) {
-			const json = JSON.stringify({
-				chan,
-				discordID,
-				guildName: guild?.name ?? null,
-				guildMembers: guild?.memberCount ?? null,
-				msg,
-				messageID: messageObject.id,
-				author: messageObject.author,
-				user,
-				userLength: user.length
-			});
-
-			await logger.log("Discord.Warning", `Discord username length > 32 characters: ${json}`);
+			// usually happens for compound channel announcement "users", don't process and skip
 			return;
 		}
 
@@ -509,23 +501,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			this.resolveUserMessage(channelData, userData, msg);
 
 			if (channelData.Logging.has("Meta")) {
-				if (!msg) {
-					const obj = {
-						channel: channelData.Name,
-						guild: guild.id,
-						messageObject
-					};
-
-					await logger.log(
-						"Discord.Warning",
-						`No message text on Discord: ${JSON.stringify(obj)}`,
-						channelData,
-						userData
-					);
-				}
-				else {
-					logger.updateLastSeen({ channelData, userData, message: msg });
-				}
+				logger.updateLastSeen({ channelData, userData, message: msg });
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
 				await logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
@@ -867,7 +843,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			return this.#emoteFetchingPromise;
 		}
 
-		this.#emoteFetchingPromise = (async (): Promise<Emote[]> => {
+		this.#emoteFetchingPromise = (async () => {
 			const result = [];
 			const guilds = await this.client.guilds.fetch();
 
@@ -890,7 +866,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			}
 
 			this.#emoteFetchingPromise = null;
-			return result;
+			return result satisfies Emote[];
 		})();
 
 		return await this.#emoteFetchingPromise;
