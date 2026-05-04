@@ -1,4 +1,5 @@
 import { SupiError } from "supi-core";
+import { logger } from "../singletons/logger.js";
 
 import type { TwitchPlatform } from "./twitch.js";
 import type { User } from "../classes/user.js";
@@ -678,8 +679,16 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 			}
 		});
 
-		result.push(...loopResponse.body.data);
-		cursor = loopResponse.body.pagination.cursor ?? null;
+		if (response.ok || !Array.isArray(loopResponse.body.data)) {
+			result.push(...loopResponse.body.data);
+			cursor = loopResponse.body.pagination.cursor ?? null;
+		}
+		else {
+			await logger.log(
+				"Twitch.Warning",
+				`Subscription fetch failed or is incompatible: ${response.statusCode}; ${JSON.stringify(response.body)}`
+			);
+		}
 	}
 
 	return result;
