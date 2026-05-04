@@ -228,34 +228,28 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			});
 		}
 
+		let success = false;
 		const fixed = (typeof sendTarget === "string") ? escapeMarkdown(sendTarget) : sendTarget;
 		try {
 			await channelObject.send(fixed);
-			this.incrementMessageMetric("sent", channelData);
+			success = true;
 		}
 		catch (e) {
-			const errorContext = {
-				hasEmbeds: Boolean(options.embeds),
-				channelID: channelObject.id,
-				channelName: channelObject.name,
-				guildID: channelObject.guild.id,
-				guildName: channelObject.guild.name
-			};
+			const cause = (e instanceof Error) ? e : new Error(String(e));
+			await logger.logError("Backend", cause, {
+				origin: "External",
+				context: {
+					hasEmbeds: Boolean(options.embeds),
+					channelID: channelObject.id,
+					channelName: channelObject.name,
+					guildID: channelObject.guild.id,
+					guildName: channelObject.guild.name
+				}
+			});
+		}
 
-			if (e instanceof DiscordAPIError) {
-				await logger.logError("Backend", e, {
-					origin: "External",
-					context: errorContext
-				});
-			}
-			else {
-				const cause = (e instanceof Error) ? e : new Error(String(e));
-				throw new SupiError({
-					message: "Sending Discord channel message failed",
-					args: errorContext,
-					cause
-				});
-			}
+		if (success) {
+			this.incrementMessageMetric("sent", channelData);
 		}
 	}
 
