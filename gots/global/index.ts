@@ -1,17 +1,25 @@
 import { Agent } from "http2-wrapper";
 import type { Http2Session } from "node:http2";
-import { isGotRequestError, type GotInstanceDefinition } from "supi-core";
+import type { GotInstanceDefinition } from "supi-core";
 
 import { getConfig } from "../../config.js";
-import { logger } from "../../singletons/logger.js";
 const { defaultUserAgent } = getConfig().modules.gots;
 
 const agent = new Agent({
-	maxEmptySessions: 100,
+	timeout: 15_000,
+	maxEmptySessions: 25,
 	maxCachedTlsSessions: 250
 });
+
 agent.on("session", (session: Http2Session) => {
-	session.on("goaway", () => session.destroy());
+	session.once("goaway", () => {
+		session.close();
+		setTimeout(() => {
+			if (!session.destroyed && !session.closed) {
+				session.destroy();
+			}
+		}, 30_000).unref();
+	});
 });
 
 export default {
@@ -22,7 +30,7 @@ export default {
 		http2: true,
 		agent: { http2: agent },
 		retry: {
-			limit: 0
+			limit: 2
 		},
 		timeout: {
 			request: 30000
@@ -39,28 +47,7 @@ export default {
 			beforeRetry: [],
 			beforeRequest: [],
 			init: [],
-			beforeError: [
-				async (err) => {
-					if (!isGotRequestError(err)) {
-						return err;
-					}
-					else if (err.code !== "ETIMEDOUT") {
-						return err;
-					}
-
-					await logger.logError("Request", err, {
-						origin: "External",
-						context: {
-							code: err.code,
-							responseType: err.options.responseType,
-							timeout: err.options.timeout,
-							url: err.options.url?.toString() ?? null
-						}
-					});
-
-					return err;
-				}
-			]
+			beforeError: []
 		}
 	})),
 	parent: null,
