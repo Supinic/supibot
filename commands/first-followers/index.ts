@@ -5,7 +5,7 @@ import type { User } from "../../classes/user.js";
 
 const edgesShape = z.array(z.object({
 	followedAt: z.iso.datetime(),
-	node: z.object({ login: z.string() }).optional()
+	node: z.object({ login: z.string() }).nullish()
 })).optional();
 
 type Edges = z.infer<typeof edgesShape>;
@@ -45,13 +45,17 @@ const parseEdges = (user: User, name: string, edges: Edges, type: "channelFollow
 
 const channelFollowerSchema = z.object({
 	data: z.object({
-		user: z.object({ followers: z.object({ edges: edgesShape }) }).optional()
+		user: z.object({
+			followers: z.object({ edges: edgesShape })
+		}).optional()
 	}),
 	errors: z.array(z.object({ message: z.string() })).optional()
 });
 const followedChannelSchema = z.object({
 	data: z.object({
-		user: z.object({ follows: z.object({ edges: edgesShape }) }).optional()
+		user: z.object({
+			follows: z.object({ edges: edgesShape })
+		}).optional()
 	}),
 	errors: z.array(z.object({ message: z.string() })).optional()
 });
