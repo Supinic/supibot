@@ -10,7 +10,6 @@ const config = {
 	definitionFilePaths: [
 		"chat_data/tables/Error",
 		"chat_data/tables/Channel",
-		"chat_data/tables/Chat_Module",
 		"chat_data/tables/Channel_Chat_Module",
 		"chat_data/tables/User_Alias",
 		"chat_data/tables/Channel_Data",
