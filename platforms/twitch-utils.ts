@@ -663,6 +663,8 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 
 	const result: EnabledSubscription[] = [...response.body.data];
 	let cursor: string | null = response.body.pagination.cursor ?? null;
+	let retries = 0;
+
 	while (cursor) {
 		const loopResponse = await core.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 			url: "https://api.twitch.tv/helix/eventsub/subscriptions",
@@ -684,7 +686,15 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 			cursor = loopResponse.body.pagination.cursor ?? null;
 		}
 		else {
-			await logger.log(
+			if (retries > 3) {
+				throw new SupiError({
+					message: "Too many subscription fetch failures",
+					args: { body: loopResponse.body }
+				});
+			}
+
+			retries++;
+			void logger.log(
 				"Twitch.Warning",
 				`Subscription fetch failed or is incompatible: ${response.statusCode}; ${JSON.stringify(response.body)}`
 			);
