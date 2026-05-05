@@ -25,9 +25,9 @@ const querySchema = z.object({
 				}))
 			}).optional()
 		})
-	})
+	}).optional()
 });
-type CacheData = z.infer<typeof querySchema>["data"]["user"];
+type CacheData = NonNullable<z.infer<typeof querySchema>["data"]>["user"];
 
 const getCacheKey = (user: string) => `instagram-profile-data-${user}`;
 const facebookAppId = "936619743392459";
@@ -86,11 +86,19 @@ export default declare({
 			else if (!response.ok) {
 				return {
 					success: false,
-					reply: `Instagram API does not allow any more requests now! Try again in several minutes.`
+					reply: `Instagram API does not allow any more requests now! Try again in several minutes. The account could also be deleted.`
 				};
 			}
 
-			data = querySchema.parse(response.body).data.user;
+			const parsed = querySchema.parse(response.body).data;
+			if (!parsed) {
+				return {
+					success: false,
+					reply: "Instagram API does not allow any more requests now! Try again in several minutes."
+				};
+			}
+
+			data = parsed.user;
 			await this.setCacheData({ user }, data, { expiry: 36e5 });
 		}
 
