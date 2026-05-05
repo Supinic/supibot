@@ -31,7 +31,7 @@ const querySchema = z.array(z.object({
 				}).nullable()
 			})
 		}).nullable()
-	})
+	}).optional()
 }));
 
 export default declare({
@@ -112,6 +112,12 @@ export default declare({
 			return {
 				success: false,
 				reply: `No subscription data available!`
+			};
+		}
+		else if (!sub.data) {
+			return {
+				success: false,
+				reply: "Could not load subscription status! Try again later."
 			};
 		}
 		else if (!sub.data.targetUser) {
