@@ -223,10 +223,7 @@ process.on("unhandledRejection", (reason) => {
 		return;
 	}
 
-	const origin = (reason.message.includes("RequestError: Timeout awaiting 'request'"))
-		? "External"
-		: "Internal";
-
+	const origin = (reason.message.includes("RequestError")) ? "External" : "Internal";
 	void logger.logError("Backend", reason, {
 		origin,
 		context: {

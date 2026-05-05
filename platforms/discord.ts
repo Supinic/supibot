@@ -231,32 +231,23 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		const fixed = (typeof sendTarget === "string") ? escapeMarkdown(sendTarget) : sendTarget;
 		try {
 			await channelObject.send(fixed);
-			this.incrementMessageMetric("sent", channelData);
 		}
 		catch (e) {
-			const errorContext = {
-				hasEmbeds: Boolean(options.embeds),
-				channelID: channelObject.id,
-				channelName: channelObject.name,
-				guildID: channelObject.guild.id,
-				guildName: channelObject.guild.name
-			};
-
-			if (e instanceof DiscordAPIError) {
-				await logger.logError("Backend", e, {
-					origin: "External",
-					context: errorContext
-				});
-			}
-			else {
-				const cause = (e instanceof Error) ? e : new Error(String(e));
-				throw new SupiError({
-					message: "Sending Discord channel message failed",
-					args: errorContext,
-					cause
-				});
-			}
+			const cause = (e instanceof Error) ? e : new Error(String(e));
+			void logger.logError("Backend", cause, {
+				origin: "External",
+				context: {
+					hasEmbeds: Boolean(options.embeds),
+					channelID: channelObject.id,
+					channelName: channelObject.name,
+					guildID: channelObject.guild.id,
+					guildName: channelObject.guild.name
+				}
+			});
+			return;
 		}
+
+		this.incrementMessageMetric("sent", channelData);
 	}
 
 	/**
@@ -280,17 +271,15 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			discordUser = await this.client.users.fetch(userData.Discord_ID);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
+			const wrapErr = new SupiError({
 				message: "Cannot send private message: Discord user does not exist",
-				args: {
-					message,
-					discordUserID: userData.Discord_ID,
-					userID: userData.ID,
-					userName: userData.Name
-				},
-				cause
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { user: userData.ID, username: userData.Name, message },
+				origin: "External"
+			});
+			return;
 		}
 
 		try {
@@ -303,58 +292,59 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					embeds: options.embeds
 				});
 			}
-
-			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
-				message: "Sending Discord private message failed",
-				args: {
-					message,
-					userName: userData.Name,
-					userID: userData.ID,
-					discordUserID: userData.Discord_ID
-				},
-				cause
+			const wrapErr = new SupiError({
+				message: "CanSending Discord private message failed",
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { user: userData.ID, username: userData.Name, message },
+				origin: "External"
+			});
+			return;
 		}
+
+		this.incrementMessageMetric("sent", null);
 	}
 
 	/**
 	 * Directly sends a private message to user, without them necessarily being saved as a user.
 	 */
-	async directPm (userID: string, message: string) {
+	async directPm (userID: string, message: string): Promise<void> {
 		let discordUser;
 		try {
 			discordUser = await this.client.users.fetch(userID);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
+			const wrapErr = new SupiError({
 				message: "Cannot send direct private message: Discord user does not exist",
-				args: { message, userID },
-				cause
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { userID, message },
+				origin: "External"
+			});
+			return;
 		}
 
 		try {
 			const fixed = escapeMarkdown(message);
 			await discordUser.send(fixed);
-			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
+			const wrapErr = new SupiError({
 				message: "Sending direct Discord private message failed",
-				args: {
-					message,
-					discordUserName: discordUser.username,
-					discordUserID: userID
-				},
-				cause
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { userID, message },
+				origin: "External"
+			});
+			return;
 		}
+
+		this.incrementMessageMetric("sent", null);
 	}
 
 	async handleMessage (messageObject: DiscordMessage) {
@@ -381,6 +371,10 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		if (IGNORED_CHANNEL_TYPES.has(channelType)) {
 			return;
 		}
+		// Do not process empty messages (parseMessage does take attachments into account)
+		else if (!msg) {
+			return;
+		}
 
 		// If the bot does not have SEND_MESSAGES permission in the channel, completely ignore the message.
 		// Do not process it for logging, commands, AFKs, Reminders, anything.
@@ -394,19 +388,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		// eslint-disable-next-line @typescript-eslint/no-misused-spread
 		const usernameCharacterLength = [...user].length;
 		if (usernameCharacterLength > 32) {
-			const json = JSON.stringify({
-				chan,
-				discordID,
-				guildName: guild?.name ?? null,
-				guildMembers: guild?.memberCount ?? null,
-				msg,
-				messageID: messageObject.id,
-				author: messageObject.author,
-				user,
-				userLength: user.length
-			});
-
-			await logger.log("Discord.Warning", `Discord username length > 32 characters: ${json}`);
+			// usually happens for compound channel announcement "users", don't process and skip
 			return;
 		}
 
@@ -509,23 +491,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			this.resolveUserMessage(channelData, userData, msg);
 
 			if (channelData.Logging.has("Meta")) {
-				if (!msg) {
-					const obj = {
-						channel: channelData.Name,
-						guild: guild.id,
-						messageObject
-					};
-
-					await logger.log(
-						"Discord.Warning",
-						`No message text on Discord: ${JSON.stringify(obj)}`,
-						channelData,
-						userData
-					);
-				}
-				else {
-					logger.updateLastSeen({ channelData, userData, message: msg });
-				}
+				logger.updateLastSeen({ channelData, userData, message: msg });
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
 				await logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
@@ -867,7 +833,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			return this.#emoteFetchingPromise;
 		}
 
-		this.#emoteFetchingPromise = (async (): Promise<Emote[]> => {
+		this.#emoteFetchingPromise = (async () => {
 			const result = [];
 			const guilds = await this.client.guilds.fetch();
 
@@ -890,7 +856,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			}
 
 			this.#emoteFetchingPromise = null;
-			return result;
+			return result satisfies Emote[];
 		})();
 
 		return await this.#emoteFetchingPromise;

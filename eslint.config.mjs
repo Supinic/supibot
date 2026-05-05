@@ -65,15 +65,9 @@ export default tseslint.config(
 			"lines-between-class-members": ["warn", "always", {
 				exceptAfterSingleLine: true
 			}],
-			"max-nested-callbacks": ["warn", {
-				max: 2
-			}],
-			"max-params": ["warn", {
-				max: 5
-			}],
-			"max-statements-per-line": ["error", {
-				max: 1
-			}],
+			"max-nested-callbacks": ["warn", { max: 3 }],
+			"max-params": ["warn", { max: 5 }],
+			"max-statements-per-line": ["error", { max: 1 }],
 			"multiline-ternary": ["warn", "always-multiline"],
 			"new-cap": ["warn", {
 				capIsNew: false,
