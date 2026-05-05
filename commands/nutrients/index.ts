@@ -84,6 +84,13 @@ export default declare({
 			foodNutrients: nutrients,
 			description
 		} = foods[0];
+		
+		if (nutrients.length === 0) {
+			return {
+				success: false,
+				reply: "That foodstuff has no nutrient data associated with it!"
+			};
+		}
 
 		const energy = getNutrient("energy", nutrients);
 		const fat = getNutrient("fat", nutrients);
