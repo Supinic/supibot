@@ -228,15 +228,13 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			});
 		}
 
-		let success = false;
 		const fixed = (typeof sendTarget === "string") ? escapeMarkdown(sendTarget) : sendTarget;
 		try {
 			await channelObject.send(fixed);
-			success = true;
 		}
 		catch (e) {
 			const cause = (e instanceof Error) ? e : new Error(String(e));
-			await logger.logError("Backend", cause, {
+			void logger.logError("Backend", cause, {
 				origin: "External",
 				context: {
 					hasEmbeds: Boolean(options.embeds),
@@ -246,11 +244,10 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					guildName: channelObject.guild.name
 				}
 			});
+			return;
 		}
 
-		if (success) {
-			this.incrementMessageMetric("sent", channelData);
-		}
+		this.incrementMessageMetric("sent", channelData);
 	}
 
 	/**
@@ -274,17 +271,15 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			discordUser = await this.client.users.fetch(userData.Discord_ID);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
+			const wrapErr = new SupiError({
 				message: "Cannot send private message: Discord user does not exist",
-				args: {
-					message,
-					discordUserID: userData.Discord_ID,
-					userID: userData.ID,
-					userName: userData.Name
-				},
-				cause
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { user: userData.ID, username: userData.Name, message },
+				origin: "External"
+			});
+			return;
 		}
 
 		try {
@@ -297,58 +292,59 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					embeds: options.embeds
 				});
 			}
-
-			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
-				message: "Sending Discord private message failed",
-				args: {
-					message,
-					userName: userData.Name,
-					userID: userData.ID,
-					discordUserID: userData.Discord_ID
-				},
-				cause
+			const wrapErr = new SupiError({
+				message: "CanSending Discord private message failed",
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { user: userData.ID, username: userData.Name, message },
+				origin: "External"
+			});
+			return;
 		}
+
+		this.incrementMessageMetric("sent", null);
 	}
 
 	/**
 	 * Directly sends a private message to user, without them necessarily being saved as a user.
 	 */
-	async directPm (userID: string, message: string) {
+	async directPm (userID: string, message: string): Promise<void> {
 		let discordUser;
 		try {
 			discordUser = await this.client.users.fetch(userID);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
+			const wrapErr = new SupiError({
 				message: "Cannot send direct private message: Discord user does not exist",
-				args: { message, userID },
-				cause
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { userID, message },
+				origin: "External"
+			});
+			return;
 		}
 
 		try {
 			const fixed = escapeMarkdown(message);
 			await discordUser.send(fixed);
-			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
-			const cause = (e instanceof Error) ? e : new Error(String(e));
-			throw new SupiError({
+			const wrapErr = new SupiError({
 				message: "Sending direct Discord private message failed",
-				args: {
-					message,
-					discordUserName: discordUser.username,
-					discordUserID: userID
-				},
-				cause
+				cause: (e instanceof Error) ? e : new Error(String(e))
 			});
+			void logger.logError("Backend", wrapErr, {
+				context: { userID, message },
+				origin: "External"
+			});
+			return;
 		}
+
+		this.incrementMessageMetric("sent", null);
 	}
 
 	async handleMessage (messageObject: DiscordMessage) {
