@@ -1,6 +1,7 @@
 import getLinkParser from "../../utils/link-parser.js";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 import type { CronDefinition } from "../index.js";
+import { logger } from "../../singletons/logger.js";
 
 const { SOUNDCLOUD_CLIENT_ID } = sharedKeys;
 const fetchStatusCode = async (clientId: string): Promise<number> => {
@@ -65,14 +66,10 @@ export default {
 		if (finalClientID) {
 			const linkParser = await getLinkParser();
 			linkParser.reloadParser("soundcloud", { key: finalClientID });
-
-			const channelData = sb.Channel.get("supinic", "twitch");
-			if (channelData) {
-				void channelData.send("Successfully updated soundcloud client");
-			}
+			void logger.log("System.Success","Successfully updated soundcloud client-id");
 		}
 		else {
-			console.warn("Could not fetch Soundcloud client-id!");
+			void logger.log("System.Fail","Could not fetch Soundcloud client-id");
 		}
 	})
 } satisfies CronDefinition;
