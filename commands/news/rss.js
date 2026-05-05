@@ -52,18 +52,13 @@ export default {
 				feed = await parseRSS(xml);
 			}
 			catch (e) {
-				const err = new SupiError({
+				const wrapErr = new SupiError({
 					message: "RSS fetching/parsing failed",
 					cause: e
 				});
-
-				await logger.logError("Command", err, {
-					origin: "Internal",
-					context: {
-						code: news.code,
-						url,
-						source
-					}
+				void logger.logError("Command", wrapErr, {
+					origin: "External",
+					context: { code: news.code, url, source }
 				});
 
 				return {
