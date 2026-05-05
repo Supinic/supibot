@@ -191,7 +191,7 @@ export const ivrFoundersSchema = z.object({
 		login: z.string(),
 		displayName: z.string(),
 		entitlementStart: z.iso.datetime()
-	}))
+	})).optional()
 });
 
 export const ivrClipSchema = z.object({

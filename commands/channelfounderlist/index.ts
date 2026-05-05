@@ -2,6 +2,7 @@ import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
 import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 import { ivrErrorSchema, ivrFoundersSchema } from "../../utils/schemas.js";
+import error from "supi-core/build/objects/error.js";
 
 export default declare({
 	Name: "channelfounderlist",
@@ -60,6 +61,13 @@ export default declare({
 		}
 
 		const { founders } = ivrFoundersSchema.parse(response.body);
+		if (!founders || founders.length === 0) {
+			return { // ref: Error #542404
+				success: false,
+				reply: `Could not load the founder list for the provided channel! Try again later.`
+			};
+		}
+
 		const separator = (context.params.subStatus) ? " " : ", ";
 		const foundersString = founders.map(i => {
 			let message = `${i.login[0]}${TWITCH_ANTIPING_CHARACTER}${i.login.slice(1)}`;
