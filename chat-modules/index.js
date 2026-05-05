@@ -1,6 +1,7 @@
 import AsyncMarkovExperimentModule from "./async-markov-experiment/index.js";
 import AutomaticUnscrambleModule from "./automatic-unscramble/index.js";
 import ChatSuggestionLinkerModule from "./chat-suggestion-linker/index.js";
+import DiscordAnnouncementSubscriber from "./discord-announcement-subscriber/index.js";
 import ImgurLinkGathererModule from "./imgur-link-gatherer/index.js";
 import LiveDetectionModule from "./live-detection/index.js";
 import MessageReactionModule from "./message-react/index.js";
@@ -21,6 +22,7 @@ export default [
 	AsyncMarkovExperimentModule,
 	AutomaticUnscrambleModule,
 	ChatSuggestionLinkerModule,
+	DiscordAnnouncementSubscriber,
 	ImgurLinkGathererModule,
 	LiveDetectionModule,
 	MessageReactionModule,

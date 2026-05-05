@@ -104,7 +104,7 @@ const sendChannelSubscriptionMessage = async (message: string, channelID: number
 	await channelData.send(`${chatPing.join(" ")} ${message}`);
 };
 
-const handleSubscription = async function (subType: SubscriptionType, message: string, options: HandleOptions = {}) {
+export const handleEventSubscription = async function (subType: SubscriptionType, message: string, options: HandleOptions = {}) {
 	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType, options.lastSeenThreshold);
 
 	await createReminders(inactiveUsers, message);
@@ -291,5 +291,5 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 		message = result.message;
 	}
 
-	await handleSubscription(name, message);
+	await handleEventSubscription(name, message);
 };
