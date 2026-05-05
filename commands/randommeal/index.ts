@@ -1,16 +1,18 @@
 import * as z from "zod";
 import { declare } from "../../classes/command.js";
 
-// region Zod query schema
+// region -- Zod query schema --
+const ing = z.string().nullable();
 const mealsShape = z.array(z.object({
 	strMeal: z.string(),
 	strYoutube: z.string(),
+	// yes, this is real
 	/* eslint-disable object-property-newline */
-	strIngredient1: z.string(), strIngredient2: z.string(), strIngredient3: z.string(), strIngredient4: z.string(),
-	strIngredient5: z.string(), strIngredient6: z.string(), strIngredient7: z.string(), strIngredient8: z.string(),
-	strIngredient9: z.string(), strIngredient10: z.string(), strIngredient11: z.string(), strIngredient12: z.string(),
-	strIngredient13: z.string(), strIngredient14: z.string(), strIngredient15: z.string(), strIngredient16: z.string(),
-	strIngredient17: z.string(), strIngredient18: z.string(), strIngredient19: z.string(), strIngredient20: z.string()
+	strIngredient1: ing, strIngredient2: ing, strIngredient3: ing, strIngredient4: ing,
+	strIngredient5: ing, strIngredient6: ing, strIngredient7: ing, strIngredient8: ing,
+	strIngredient9: ing, strIngredient10: ing, strIngredient11: ing, strIngredient12: ing,
+	strIngredient13: ing, strIngredient14: ing, strIngredient15: ing, strIngredient16: ing,
+	strIngredient17: ing, strIngredient18: ing, strIngredient19: ing, strIngredient20: ing
 	/* eslint-enable object-property-newline */
 })).transform((arg) => {
 	const meals = [];
