@@ -113,7 +113,7 @@ const steamGameDataSchema = z.record(z.string(), z.discriminatedUnion("success",
 		success: z.literal(true),
 		data: z.object({
 			name: z.string(),
-			developers: z.array(z.string())
+			developers: z.array(z.string()).optional()
 		})
 	}),
 	z.object({
@@ -247,6 +247,7 @@ export default declare({
 		}
 
 		const { data: gameData } = gameSchema;
+
 		let publisher = "";
 		const devs = gameData.developers;
 		if (Array.isArray(devs)) {
