@@ -199,7 +199,7 @@ export class MpvClient {
 		}
 
 		if (skip) {
-			await this.send(["playlist-remove", 0]);
+			await this.send(["playlist-remove", 0], true);
 			await this.saveCache();
 			setTimeout(() => void this.play(), 2000);
 		}
