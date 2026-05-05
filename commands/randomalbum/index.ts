@@ -15,7 +15,7 @@ const apiSchema = z.object({
 				name: z.string()
 			}),
 			name: z.string(),
-			release_date: z.string(),
+			release_date: z.string().nullable(),
 			url: z.string() // yyyy-mm-dd
 		})
 	})
@@ -59,13 +59,13 @@ export default declare({
 
 		const { album } = data.response;
 		const { artist, url } = album;
-		const releaseYear = (album.release_date)
-			? new SupiDate(album.release_date).year
-			: "(unknown)";
+		const releaseString = (album.release_date)
+			? `, released in ${new SupiDate(album.release_date).year}`
+			: "";
 
 		return {
 			success: true,
-			reply: `Your random album: ${album.name} by ${artist.name}, released in ${releaseYear}. More info here: ${url}`
+			reply: `Your random album: ${album.name} by ${artist.name}${releaseString}. More info here: ${url}`
 		};
 	}),
 	Dynamic_Description: null
