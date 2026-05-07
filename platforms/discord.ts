@@ -11,7 +11,6 @@ import {
 	type User as DiscordUser,
 	ChannelType,
 	Client,
-	DiscordAPIError,
 	GatewayIntentBits,
 	Partials,
 	PermissionFlagsBits,

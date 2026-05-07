@@ -2,7 +2,6 @@ import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
 import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 import { ivrErrorSchema, ivrFoundersSchema } from "../../utils/schemas.js";
-import error from "supi-core/build/objects/error.js";
 
 export default declare({
 	Name: "channelfounderlist",
