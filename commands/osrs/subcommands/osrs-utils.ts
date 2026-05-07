@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { SupiError } from "supi-core";
 import type { Context } from "../../../classes/command.js";
 import type { User } from "../../../classes/user.js";
@@ -35,46 +36,49 @@ export const isValidActivityAlias = (input: string): input is ActivityAlias => (
 );
 export const getActivityFromAlias = (input: ActivityAlias) => GameData.activityAliases[input];
 
-type Activity = {
-	name: string;
-	rank: number | null;
-	value: number | null;
-};
-type Skill = {
-	name: string;
-	rank: number | null;
-	level: number | null;
-	experience: number | null;
-	virtualLevel: number | null;
-};
+const activitySchema = z.object({
+	name: z.string(),
+	rank: z.number().nullable(),
+	value: z.number().nullable()
+});
+const skillSchema = z.object({
+	name: z.string(),
+	rank: z.number().nullable(),
+	level: z.number().nullable(),
+	experience: z.number().nullable(),
+	virtualLevel: z.number().nullable()
+});
 
+const fetchDataSchema = z.object({
+	skills: z.array(skillSchema),
+	activities: z.array(activitySchema),
+	combatLevel: z.number().nullable(),
+	seasonal: z.boolean(),
+	ironman: z.object({
+		regular: z.boolean(),
+		hardcore: z.boolean(),
+		ultimate: z.boolean(),
+		deadHardcore: z.boolean(),
+		abandoned: z.boolean()
+	})
+});
+const fetchFailureSchema = z.object({
+	data: z.null(),
+	error: z.object({
+		message: z.string()
+	})
+});
+const fetchSuccessSchema = z.object({
+	data: fetchDataSchema,
+	error: z.null()
+});
+const fetchResultSchema = z.union([fetchSuccessSchema, fetchFailureSchema]);
+
+type UserData = z.infer<typeof fetchDataSchema>;
 type FetchOptions = {
 	seasonal?: boolean;
 	force?: boolean;
 };
-type FetchData = {
-	skills: Skill[];
-	activities: Activity[];
-	combatLevel: number | null; // @todo check if this can be `null`
-	seasonal: boolean;
-	ironman: {
-		regular: boolean;
-		hardcore: boolean;
-		ultimate: boolean;
-		deadHardcore: boolean;
-		abandoned: boolean;
-	};
-};
-
-type FetchSuccess = {
-	data: FetchData;
-	error: null;
-};
-type FetchFailure = {
-	data: null;
-	error: { message: string; };
-};
-type FetchResult = FetchSuccess | FetchFailure;
 
 type Failure = {
 	success: false;
@@ -87,7 +91,7 @@ type UsernameSuccess = {
 };
 type FetchUserSuccess = {
 	success: true;
-	data: FetchData;
+	data: UserData;
 };
 
 export const flagEmojis = {
@@ -282,7 +286,7 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 		: `osrs-user-data-${user}-seasonal`;
 
 	if (!options.force) {
-		const cacheData = await core.Cache.getByPrefix(key) as FetchData | null;
+		const cacheData = await core.Cache.getByPrefix(key) as UserData | null;
 		if (cacheData) {
 			return {
 				success: true,
@@ -293,12 +297,12 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 
 	let response;
 	if (!options.seasonal) {
-		response = await core.Got.get("Supinic")<FetchResult>({
+		response = await core.Got.get("Supinic")({
 			url: `osrs/lookup/${user}`
 		});
 	}
 	else {
-		response = await core.Got.get("Supinic")<FetchResult>({
+		response = await core.Got.get("Supinic")({
 			url: `osrs/lookup/${user}`,
 			searchParams: {
 				seasonal: "1"
@@ -306,23 +310,31 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 		});
 	}
 
-	const { body, ok, statusCode } = response;
-	if (!ok && body.error) {
-		if (statusCode === 404) {
+	const { ok, statusCode } = response;
+	const { data, error } = fetchResultSchema.parse(response.body);
+
+	if (!ok || error) {
+		if (!error) {
+			return {
+				success: false,
+				reply: "Could not fetch data! Try again later."
+			};
+		}
+		else if (statusCode === 404) {
 			return {
 				success: false,
 				reply: `No data found for player name "${user}"!`
 			};
 		}
 		else if (statusCode === 502 || statusCode === 503) {
-			const { message } = body.error;
+			const { message } = error;
 			return {
 				success: false,
 				reply: `Could not reach the OSRS API: ${statusCode} ${message}`
 			};
 		}
 		else {
-			const { message } = body.error;
+			const { message } = error;
 			return {
 				success: false,
 				reply: `Supinic OSRS API has failed: ${statusCode} ${message}`
@@ -330,7 +342,6 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 		}
 	}
 
-	const data = body.data as FetchData;
 	await core.Cache.setByPrefix(key, data, {
 		expiry: 600_000
 	});
@@ -341,7 +352,7 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 	};
 };
 
-export const getIronman = (data: FetchData, rude: boolean) => {
+export const getIronman = (data: UserData, rude: boolean) => {
 	let ironman = "user";
 	if (data.ironman.deadHardcore) {
 		ironman = (rude) ? "ex-hardcore ironman" : "ironman";
