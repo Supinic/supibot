@@ -84,7 +84,7 @@ export default declare({
 			foodNutrients: nutrients,
 			description
 		} = foods[0];
-		
+
 		if (nutrients.length === 0) {
 			return {
 				success: false,
