@@ -16,9 +16,9 @@ const stockSchema = z.object({
 			"10. change percent": z.string()
 		}),
 		z.object({}) // API returns an empty object when no stock symbol matches (response code 200, of course)
-	])
+	]).optional() // API returns empty object *on the top level* sometimes?? (response code 200 again) e.g. for "NASDAQ"
 }).transform(({ "Global Quote": g }) => {
-	if (Object.keys(g).length === 0) {
+	if (!g || Object.keys(g).length === 0) {
 		return null;
 	}
 
