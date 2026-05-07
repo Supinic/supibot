@@ -39,7 +39,7 @@ export const twitchStreamSchema = z.object({
 		game_name: z.string(),
 		type: z.enum(["live", ""]),
 		title: z.string(),
-		tags: z.array(z.string()),
+		tags: z.array(z.string()).nullable(),
 		viewer_count: z.int().min(0),
 		started_at: z.iso.datetime(),
 		language: z.string(),
