@@ -27,7 +27,20 @@ export default {
 			};
 		}
 
-		const guilds = await platformData.client.guilds.fetch();
+		let guilds;
+		try {
+			guilds = await platformData.client.guilds.fetch();
+		}
+		catch (e) {
+			return {
+				statusCode: 502,
+				error: {
+					reason: "Could not fetch Discord guilds list",
+					message: (e instanceof Error) ? e.message : String(e)
+				}
+			};
+		}
+
 		return {
 			statusCode: 200,
 			data: {
