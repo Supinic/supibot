@@ -101,6 +101,28 @@ export const twitchVodSchema = z.object({
 	}))
 });
 
+export const twitchClipSchema = z.object({
+	data: z.array(z.object({
+		id: z.string(),
+		url: z.string(),
+		embed_url: z.string(),
+		broadcaster_id: z.string(),
+		broadcaster_name: z.string(),
+		creator_id: z.string(),
+		creator_name: z.string(),
+		video_id: z.string(),
+		game_id: z.string(),
+		language: z.string(),
+		title: z.string(),
+		view_count: z.int(),
+		created_at: z.string(), // RFC3339
+		thumbnail_url: z.string(),
+		duration: z.number(),
+		vod_offset: z.int().nullable(),
+		is_featured: z.boolean()
+	}))
+});
+
 export const ivrErrorSchema = z.object({
 	statusCode: z.int().min(400).max(599),
 	error: z.object({

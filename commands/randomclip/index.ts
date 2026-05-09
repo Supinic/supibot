@@ -1,14 +1,17 @@
 import { SupiDate } from "supi-core";
 import { getTwitchGameID } from "../../utils/command-utils.js";
-const EARLIEST_CLIP_DATE = new Date("2011-01-01");
+import { declare } from "../../classes/command.js";
+import { twitchClipSchema } from "../../utils/schemas.js";
 
-export default {
+const EARLIEST_CLIP_DATE = new SupiDate("2011-01-01");
+
+export default declare({
 	Name: "randomclip",
 	Aliases: ["rc"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts a random clip from either the current channel or the specified channel.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "author", type: "string" },
 		{ name: "dateFrom", type: "date" },
@@ -19,7 +22,7 @@ export default {
 		{ name: "period", type: "string" }
 	],
 	Whitelist_Response: null,
-	Code: async function randomClip (context, channelName) {
+	Code: async function randomClip (context, channelName?: string) {
 		let gameID = null;
 		let channelID = null;
 
@@ -36,15 +39,14 @@ export default {
 		}
 		else {
 			const channel = channelName ?? context.channel?.Name;
-			if (!channel && (context.privateMessage || context.platform.Name !== "twitch")) {
+			if (!channel) {
 				return {
 					success: false,
 					reply: "You must specify the target channel if you're in PMs or not on Twitch!"
 				};
 			}
 
-			/** @type {TwitchPlatform} */
-			const twitchPlatform = await sb.Platform.get("twitch");
+			const twitchPlatform = sb.Platform.getAsserted("twitch");
 			channelID = await twitchPlatform.getUserID(channel);
 			if (!channelID) {
 				return {
@@ -56,7 +58,6 @@ export default {
 
 		const now = new SupiDate();
 		const dateRange = [EARLIEST_CLIP_DATE, now];
-
 		if (context.params.dateFrom) {
 			dateRange[0] = context.params.dateFrom;
 		}
@@ -155,16 +156,17 @@ export default {
 				reply: `Twitch didn't send any clips data! Try again later`
 			};
 		}
-		else if (response.body.data.length === 0) {
+
+		let clips = twitchClipSchema.parse(response.body).data;
+		if (clips.length === 0) {
 			return {
 				success: false,
 				reply: "No clips found!"
 			};
 		}
 
-		let clips = response.body.data;
 		if (context.params.author) {
-			const platform = sb.Platform.get("twitch");
+			const platform = sb.Platform.getAsserted("twitch");
 			const userID = await platform.getUserID(context.params.author);
 			if (!userID) {
 				return {
@@ -185,6 +187,7 @@ export default {
 		const clip = core.Utils.randArray(clips);
 		if (context.params.linkOnly) {
 			return {
+				success: true,
 				reply: clip.url
 			};
 		}
@@ -194,7 +197,7 @@ export default {
 			reply: `"${clip.title}" - ${clip.duration} sec, clipped by ${clip.creator_name}, ${delta}: ${clip.url}`
 		};
 	},
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Fetches a random clip in the current, or a provided channel.",
 		"",
 
@@ -243,5 +246,5 @@ export default {
 		"The dates cannot be earlier than 2011-01-01 (Twitch limit), or later than right now (no future clips).",
 		"You can use both <code>dateFrom</code> and <code>dateTo</code>, or just one - in that case, the limit will be the limit mentioned above.",
 		"This parameter cannot be used with <code>period!</code>"
-	])
-};
+	]
+});
