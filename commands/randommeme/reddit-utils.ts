@@ -192,9 +192,12 @@ type SubredditSuccess = {
 const createSubredditKey = (name: string) => `cache-subreddit-${name}`;
 export const getSubreddit = async (name: string): Promise<SubredditSuccess | ResultFailure> => {
 	const key = createSubredditKey(name);
-	const cachedData = await core.Cache.getByPrefix(key) as SubredditSuccess | undefined;
+	const cachedData = await core.Cache.getByPrefix(key) as Subreddit | undefined;
 	if (cachedData) {
-		return cachedData;
+		return {
+			success: true,
+			subreddit: cachedData
+		};
 	}
 
 	const aboutResponse = await core.Got.get("Reddit")({
