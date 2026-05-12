@@ -117,7 +117,7 @@ const parsePost = (data: z.infer<typeof postShape>): RedditPost => {
 		const [crosspost] = data.crosspost_parent_list;
 
 		crosspostNSFW = data.over_18;
-		crosspostOrigin = data.subreddit_name_prefixed;
+		crosspostOrigin = crosspost.subreddit_name_prefixed;
 		data = crosspost;
 	}
 
@@ -248,7 +248,7 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 	if (postsResponse.statusCode !== 200) {
 		return {
 			success: false,
-			reply: `Reddit responded with error ${aboutResponse.statusCode}! Try again later.`
+			reply: `Reddit responded with error ${postsResponse.statusCode}! Try again later.`
 		};
 	}
 

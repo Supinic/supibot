@@ -104,7 +104,7 @@ export default declare({
 		}
 		if (context.params.flair) {
 			const lower = context.params.flair.toLowerCase();
-			validPosts = validPosts.filter(i => i.flairs.includes(lower));
+			validPosts = validPosts.filter(post => post.flairs.some(i => i.includes(lower)));
 
 			if (validPosts.length === 0) {
 				repeatedPostsMap.delete(repeatedPostKey);
@@ -237,10 +237,6 @@ export default declare({
 
 		`<code>${prefix}rm (subreddit) ignoreFlair:(flair)</code>`,
 		"The opposite of <code>flair</code>, only the posts that do not contain such flair will be used (case-insensitive).",
-		"",
-
-		`<code>${prefix}rm (subreddit) showFlairs:true</code>`,
-		"Posts a list of available flairs for given subreddit.",
 		"",
 
 		`<code>${prefix}rm linkOnly:true</code>`,
