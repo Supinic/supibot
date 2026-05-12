@@ -1,5 +1,6 @@
 import * as z from "zod";
 import rawConfig from "./config.json" with { type: "json" };
+import { filterNonNullable } from "../../utils/ts-helpers.js";
 import type { ResultFailure } from "../../classes/command.js";
 
 const configShape = z.object({
@@ -51,8 +52,8 @@ const postShape = z.object({
 	removal_reason: z.unknown(),
 	removed_by_category: z.unknown(),
 	link_flair_richtext: z.array(z.object({
-		e: z.unknown(),
-		t: z.string()
+		e: z.string(),
+		t: z.string().optional()
 	})),
 	get crosspost_parent_list () { return z.array(postShape).optional(); }
 });
@@ -121,9 +122,17 @@ const parsePost = (data: z.infer<typeof postShape>): RedditPost => {
 	}
 
 	const commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
-	const flairs = data.link_flair_richtext
-		.filter(i => i.e === "text")
-		.map(i => core.Utils.fixHTML(i.t.trim()).toLowerCase());
+	const flairs = filterNonNullable(
+		data.link_flair_richtext
+			.filter(i => i.e === "text")
+			.map(i => {
+				if (!i.t) {
+					return null;
+				}
+
+				return core.Utils.fixHTML(i.t.trim()).toLowerCase();
+			})
+	);
 
 	const galleryLinks = [];
 	if (data.is_gallery && data.gallery_data && data.media_metadata) {
