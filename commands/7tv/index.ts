@@ -19,10 +19,17 @@ const aliasCommandDefinition = declare({
 			};
 		}
 
-		const subcommand = SevenTvSubcommands.get(type);
-		if (!subcommand) {
-			const defaultSubcommand = SevenTvSubcommands.default;
-			return await defaultSubcommand.execute.call(this, context, defaultSubcommand.name, type, ...args);
+		let subcommand;
+		if (!type && args.length === 0) {
+			// Handling a bare "$7tv" invocation as "$7tv check"
+			subcommand = SevenTvSubcommands.getAsserted("check");
+		}
+		else {
+			subcommand = SevenTvSubcommands.get(type);
+			if (!subcommand) {
+				const defaultSubcommand = SevenTvSubcommands.default;
+				return await defaultSubcommand.execute.call(this, context, defaultSubcommand.name, type, ...args);
+			}
 		}
 
 		return await subcommand.execute.call(this, context, type, ...args);

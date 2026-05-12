@@ -12,8 +12,10 @@ export default {
 		"The emotes will be posted oldest to newest.",
 		"",
 
+		`<code>${prefix}7tv</code>`,
 		`<code>${prefix}7tv check</code>`,
-		"Posts the list of current rotating emotes."
+		"Posts the list of current rotating emotes.",
+		`You can also use the <code>${prefix}7tv</code> command with on its own (with no arguments) and it will post the list of emotes.`
 	],
 	execute: async (context, type, emote) => {
 		if (!context.channel) {
