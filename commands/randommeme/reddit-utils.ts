@@ -58,7 +58,9 @@ const postShape = z.object({
 });
 const postsSchema = z.object({
 	data: z.object({
-		children: z.array(postShape)
+		children: z.object({
+			data: z.array(postShape)
+		})
 	})
 });
 
@@ -239,7 +241,7 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 	}
 
 	const aboutData = rawAboutData.data;
-	const rawPostsData = postsSchema.parse(postsResponse.body).data.children;
+	const rawPostsData = postsSchema.parse(postsResponse.body).data.children.data;
 	const posts = rawPostsData.map(i => parsePost(i));
 	const subreddit = {
 		name: aboutData.display_name,
