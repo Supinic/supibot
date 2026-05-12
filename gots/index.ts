@@ -14,6 +14,7 @@ import GoogleGot from "./google/index.js";
 import HelixGot from "./helix/index.js";
 import IVRGot from "./ivr/index.js";
 import RaspberryPi4Got from "./raspberry-pi-4/index.js";
+import RedditGot from "./reddit/index.js";
 import SupibotGot from "./supibot/index.js";
 import SupinicGot from "./supinic/index.js";
 import TwitchGQLGot from "./twitch-gql/index.js";
@@ -28,6 +29,7 @@ export const definitions = [
 	HelixGot,
 	IVRGot,
 	RaspberryPi4Got,
+	RedditGot,
 	SupibotGot,
 	SupinicGot,
 	TwitchEmotesGot,
