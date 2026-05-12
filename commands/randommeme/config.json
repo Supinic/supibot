@@ -1,13 +1,6 @@
 {
   "repeats": 25,
-  "uncached": [
-    "random",
-    "randnsfw"
-  ],
-  "banned": [
-    "iranianporn",
-    "orientalsluts"
-  ],
+  "banned": [],
   "defaultMemeSubreddits": [
     "okbuddyretard",
     "memes",
