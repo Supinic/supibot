@@ -12,15 +12,16 @@ const configShape = z.object({
 });
 export const redditConfig = configShape.parse(rawConfig);
 
-const subredditNotFoundShape = z.object({
-	after: z.null()
-});
-const subredditShape = z.object({
-	display_name: z.string(),
-	quarantine: z.boolean().optional(),
-	over18: z.boolean().optional()
-});
-const subredditSchema = z.union([subredditNotFoundShape, subredditShape]);
+const subredditSchema = z.union([
+	z.object({ after: z.null() }),
+	z.object({
+		data: z.object({
+			display_name: z.string(),
+			quarantine: z.boolean().optional(),
+			over18: z.boolean().optional()
+		})
+	})
+]);
 
 const postShape = z.object({
 	id: z.string(),
@@ -218,8 +219,8 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 		};
 	}
 
-	const aboutData = subredditSchema.parse(aboutResponse.body);
-	if ("after" in aboutData) {
+	const rawAboutData = subredditSchema.parse(aboutResponse.body);
+	if ("after" in rawAboutData) {
 		return {
 			success: false,
 			reply: `There is no subreddit with that name!`
@@ -237,6 +238,7 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 		};
 	}
 
+	const aboutData = rawAboutData.data;
 	const rawPostsData = postsSchema.parse(postsResponse.body).data.children;
 	const posts = rawPostsData.map(i => parsePost(i));
 	const subreddit = {
