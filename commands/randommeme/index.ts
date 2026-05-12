@@ -9,7 +9,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random Reddit meme. If you provide a subreddit, a post will be chosen randomly.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "comments", type: "boolean" },
 		{ name: "flair", type: "string" },
@@ -20,9 +20,6 @@ export default declare({
 		{ name: "skipGalleries", type: "boolean" },
 		{ name: "skipVideos", type: "boolean" }
 	],
-	initialize: function () {
-		this.data.subreddits = {};
-	},
 	Whitelist_Response: null,
 	Code: (async function randomMeme (context, ...args) {
 		let safeSpace = false;
