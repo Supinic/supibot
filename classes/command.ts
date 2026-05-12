@@ -362,6 +362,17 @@ export class SubcommandCollection {
 		return null;
 	}
 
+	getAsserted (name: string) {
+		const subcommand = this.get(name);
+		if (!subcommand) {
+			throw new SupiError({
+				message: `Assert error: Subcommand collection couldn't find ${name}`
+			});
+		}
+
+		return subcommand;
+	}
+
 	async createDescription () {
 		const result: string[] = [];
 		for (const subcommand of this.subcommands) {
