@@ -197,7 +197,7 @@ export default declare({
 			reply: core.Utils.fixHTML(core.Utils.tag.trim `
 				${symbol}
 				r/${subreddit.name}:
-				${post.title} ${fixedUrl} (Score: ${post.score}, posted ${delta}${xpost}
+				${post.title} ${fixedUrl} (Score: ${post.score}, posted ${delta}${xpost})
 				${commentsUrl}
 				${galleryLinksString}
 			`)
