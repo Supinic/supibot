@@ -1,16 +1,11 @@
-import type {
-	ChatModuleDefinition,
-	GenericMessageEventData,
-	TwitchMessageEventData
-} from "../../classes/chat-module.js";
+import type { ChatModuleDefinition, GenericMessageEventData, TwitchMessageEventData } from "../../classes/chat-module.js";
 import type { TwitchPlatform } from "../../platforms/twitch.js";
 import type { User } from "../../classes/user.js";
-import { SupiError } from "supi-core";
+import { SupiError, type SupiDate } from "supi-core";
 import { ivrUserDataSchema } from "../../utils/schemas.js";
 import { logger } from "../../singletons/logger.js";
 
 type UserAliasRow = Pick<User, "Discord_ID" | "Twitch_ID" | "Name">;
-
 type ReplyData = TwitchMessageEventData["messageData"]["reply"];
 
 const isTwitchEvent = (eventData: GenericMessageEventData): eventData is TwitchMessageEventData => (eventData.platform.name === "twitch");
@@ -68,46 +63,67 @@ export default {
 		if (isMessageSelfCheck(raw.user, message)) {
 			alreadySelfCheckedUsernames.add(raw.user);
 
-			const assumedUserID = await core.Query.getRecordset<string | undefined>(rs => rs
-				.select("Twitch_ID")
+			type UserData = { id: string; internalId: string; };
+			const assumedUserData = await core.Query.getRecordset<UserData | undefined>(rs => rs
+				.select("Twitch_ID AS id", "ID AS internalId")
 				.from("chat_data", "User_Alias")
 				.where("Name = %s", raw.user)
 				.flat("Twitch_ID")
 				.single()
 				.limit(1)
 			);
-			if (!assumedUserID) {
+			if (!assumedUserData) {
 				await channel.send(`Could not find user ${raw.user} in the database for Twitch_ID!`);
 				return;
 			}
 
+			const { id, internalId } = assumedUserData;
 			const response = await core.Got.get("IVR")({
 				url: "v2/twitch/user",
-				searchParams: {
-					id: assumedUserID
-				}
+				searchParams: { id }
 			});
 
+			let hintMessage;
 			if (!response.ok || response.body.length === 0) {
-				await channel.send(`Could not check @${raw.user} for suspiciousness!`);
-				return;
-			}
-
-			const [data] = ivrUserDataSchema.parse(response.body);
-			if (data.login === raw.user) {
-				const logID = await logger.log(
-					"Twitch.Warning",
-					`Weird suspicious case: ${JSON.stringify({ data, assumedUserID })}`
+				type StalkData = { text: string; date: SupiDate; channelName: string; };
+				const data = await core.Query.getRecordset<StalkData | undefined>(rs => rs
+					.select("Last_Message_Text AS text", "Last_Message_Posted AS date", "Channel.Name AS channel")
+					.from("chat_data", "Message_Meta_User_Alias")
+					.join("chat_data", "Channel")
+					.where("User_Alias = %n", internalId)
+					.orderBy("Last_Message_Posted DESC")
+					.limit(1)
+					.single()
 				);
 
-				await channel.send(`It seems like @${raw.user} is not suspicious at all...! Something probably went wrong. @Supinic check Log ID ${logID} pleae`);
-				return;
+				if (!data) {
+					await channel.send(`Could not find any kind of data for this user! Please contact @Supinic for manual help.`);
+					return;
+				}
+
+				const { text, date, channelName } = data;
+				const delta = core.Utils.timeDelta(date);
+
+				hintMessage = `this last-seen message: "${core.Utils.wrapString(text, 100)}" in channel ${channelName} ${delta} belongs to you or someone else.`;
+			}
+			else {
+				const [data] = ivrUserDataSchema.parse(response.body);
+				if (data.login === raw.user) {
+					const logID = await logger.log(
+						"Twitch.Warning",
+						`Weird suspicious case: ${JSON.stringify({ data, id })}`
+					);
+
+					await channel.send(`It seems like @${raw.user} is not suspicious at all...! Something probably went wrong. @Supinic check Log ID ${logID} pleae`);
+					return;
+				}
+
+				hintMessage = `@${data.login} is a different account/name that you used in the past, or if it belongs to someone else.`;
 			}
 
 			const resultMessage = core.Utils.tag.trim `
-				Hey @${raw.user}, I'd like to verify whether @${data.login} 
-				is a different account/name that you used in the past, or if it belongs to someone else.
-				Reply to this message with "me" or "not me" accordingly - use the Reply function in Twitch chat.
+				Hey @${raw.user}, I'd like to verify whether ${hintMessage}
+				Use the "Reply to message" Twitch function to this message with "me" or "not me" accordingly.
 			`;
 
 			const messageResult = await (platform as TwitchPlatform).send(resultMessage, channel);
