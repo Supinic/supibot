@@ -33,7 +33,7 @@ export default declare({
 		else if (args.length < 2) {
 			return {
 				success: false,
-				reply: "You must provide some text to pyramid-ify and the syze of the pyramid!"
+				reply: "You must provide some text to pyramid-ify and the size of the pyramid!"
 			};
 		}
 
