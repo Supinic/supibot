@@ -12,6 +12,15 @@ const defSchema = z.object({
 	messagePrefix: z.string()
 });
 
+const prepareMessage = (message: string): string => (
+	message
+		// regex based on https://r.3v.fi/discord-timestamps/
+		// consume spaces around if available, then add them back - prevents mistakes on the origins' ends
+		.replaceAll(/\s*(at\s+)?<t:(\d+):\w>\s*/g, (_, _prefix, timestamp) => ` ${core.Utils.timeDelta(Number(timestamp) * 1000)} `)
+		// remove angle brackets around links
+		.replaceAll(/<(https?:\/\/.+?)>/g, "$1")
+);
+
 export default {
 	Name: "discord-announcement-subscriber",
 	Events: ["message"],
@@ -52,7 +61,8 @@ export default {
 			return;
 		}
 
-		await handleEventSubscription(subscription, `${messagePrefix}: ${message}`);
+		const finalMessage = `${messagePrefix}: ${prepareMessage(message)}`;
+		await handleEventSubscription(subscription, finalMessage);
 	}),
 	Global: false,
 	Platform: null
