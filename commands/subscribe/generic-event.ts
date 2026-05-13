@@ -63,7 +63,7 @@ const createReminders = async function (users: UserSubscription[], message: stri
 	return await Promise.all(users.map(user => (
 		sb.Reminder.create({
 			Channel: null,
-			User_From: 1127,
+			User_From: null,
 			User_To: user.ID,
 			Text: `${message} (you were not around when it was announced)`,
 			Schedule: null,

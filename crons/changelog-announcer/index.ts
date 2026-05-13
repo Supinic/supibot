@@ -92,7 +92,7 @@ export default {
 				else {
 					await sb.Reminder.create({
 						Channel: null,
-						User_From: 1127,
+						User_From: null,
 						User_To: sub.User_Alias,
 						Text: message,
 						Schedule: null,

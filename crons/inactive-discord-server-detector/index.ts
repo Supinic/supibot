@@ -99,7 +99,7 @@ export default {
 
 		suggestion.setValues({
 			Text: message,
-			User_Alias: 1127,
+			User_Alias: null,
 			Priority: 255
 		});
 
