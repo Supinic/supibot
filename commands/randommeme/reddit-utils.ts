@@ -14,7 +14,9 @@ const configShape = z.object({
 export const redditConfig = configShape.parse(rawConfig);
 
 const subredditSchema = z.union([
-	z.object({ after: z.null() }),
+	z.object({
+		data: z.object({ after: z.null() })
+	}),
 	z.object({
 		data: z.object({
 			display_name: z.string(),
