@@ -68,7 +68,6 @@ export default {
 				.select("Twitch_ID AS id", "ID AS internalId")
 				.from("chat_data", "User_Alias")
 				.where("Name = %s", raw.user)
-				.flat("Twitch_ID")
 				.single()
 				.limit(1)
 			);
