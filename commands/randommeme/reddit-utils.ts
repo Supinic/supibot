@@ -235,8 +235,8 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 		};
 	}
 
-	const rawAboutData = subredditSchema.parse(aboutResponse.body);
-	if ("after" in rawAboutData) {
+	const aboutData = subredditSchema.parse(aboutResponse.body).data;
+	if ("after" in aboutData) {
 		return {
 			success: false,
 			reply: `There is no subreddit with that name!`
@@ -254,7 +254,6 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 		};
 	}
 
-	const aboutData = rawAboutData.data;
 	const rawPostsData = postsSchema.parse(postsResponse.body).data.children;
 	const posts = rawPostsData.map(i => parsePost(i.data));
 	const subreddit = {
