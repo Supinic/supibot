@@ -352,11 +352,15 @@ export const fetchGeoLocationData = async (query: string | Coordinates) => {
 
 	const object: Record<string, string> = {};
 	for (const row of components) {
-		let { types, long_name: long } = row;
-		if (types.includes("political")) {
-			types = types.filter(i => i !== "political");
-			types[0] = types[0].replaceAll("_", "").replace("administrativearea", "");
-			object[types[0]] = long;
+		const { types, long_name: long } = row;
+		if (!types.includes("political")) {
+			continue;
+		}
+
+		const filteredTypes = types.filter(i => i !== "political");
+		if (filteredTypes.length !== 0) {
+			const identifier = filteredTypes[0].replaceAll("_", "").replace("administrativearea", "");
+			object[identifier] = long;
 		}
 	}
 
