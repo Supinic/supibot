@@ -376,7 +376,9 @@ export class MpvClient {
 
 	public async getPosition (): Promise<number | null> {
 		const rawPosition = await this.send(["get_property", "time-pos"], true);
-		const position = (rawPosition.error === PROPERTY_NA) ? null : dataSchemas.position.parse(rawPosition.data);
+		const position = (rawPosition.error === PROPERTY_NA || rawPosition.error.includes("timed out"))
+			? null
+			: dataSchemas.position.parse(rawPosition.data);
 
 		return position;
 	}
