@@ -1271,7 +1271,11 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		const channelId = channelData.Specific_ID;
 		if (!channelId) {
 			throw new SupiError({
-				message: "Channel has no Twitch ID specified"
+				message: "Channel has no Twitch ID specified",
+				args: {
+					name: channelData.Name,
+					id: channelData.ID
+				}
 			});
 		}
 
