@@ -6,7 +6,7 @@ import type { User } from "../../classes/user.js";
 const edgesShape = z.array(z.object({
 	followedAt: z.iso.datetime(),
 	node: z.object({ login: z.string() }).nullish()
-})).optional();
+})).nullish();
 
 type Edges = z.infer<typeof edgesShape>;
 const parseEdges = (user: User, name: string, edges: Edges, type: "channelFollower" | "followedChannel") => {
