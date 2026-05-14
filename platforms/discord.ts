@@ -631,7 +631,12 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 		if (!channelData) {
 			throw new SupiError({
-				message: "Assert error: No channel outside of Discord PM"
+				message: "Assert error: No channel outside of Discord PM",
+				args: {
+					reply,
+					execution: JSON.stringify(execution),
+					user: userData.ID
+				}
 			});
 		}
 
