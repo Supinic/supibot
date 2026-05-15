@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { handleEventSubscription } from "../../commands/subscribe/generic-event.js";
 import type { ChatModuleDefinition } from "../../classes/chat-module.js";
+import { postToHastebin } from "../../utils/command-utils.js";
 
 const defSchema = z.object({
 	channelId: z.string(),
@@ -19,6 +20,7 @@ const prepareMessage = (message: string): string => (
 		.replaceAll(/\s*(at\s+)?<t:(\d+):\w>\s*/g, (_, _prefix, timestamp) => ` ${core.Utils.timeDelta(Number(timestamp) * 1000)} `)
 		// remove angle brackets around links
 		.replaceAll(/<(https?:\/\/.+?)>/g, "$1")
+		.replaceAll(/https:\/\/media.discordapp.net.+?(\s|$)/g, "")
 );
 
 export default {
@@ -61,7 +63,19 @@ export default {
 			return;
 		}
 
-		const finalMessage = `${messagePrefix}: ${prepareMessage(message)}`;
+		const preparedMessage = prepareMessage(message);
+		let finalMessage = `${messagePrefix}: ${preparedMessage}`;
+
+		if (finalMessage.length > 500) {
+			const haste = await postToHastebin(preparedMessage);
+			if (!haste.ok) {
+				finalMessage = core.Utils.wrapString(finalMessage, 500);
+			}
+			else {
+				finalMessage = `${messagePrefix}: ${core.Utils.wrapString(preparedMessage, 100)} Post text: ${haste.link}`;
+			}
+		}
+
 		await handleEventSubscription(subscription, finalMessage);
 	}),
 	Global: false,
