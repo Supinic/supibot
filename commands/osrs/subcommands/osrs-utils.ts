@@ -203,54 +203,55 @@ export const fetchItemId = async (query: string) => {
 };
 
 export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
-	let data = await core.Cache.getByPrefix("osrs-worlds-data") as GameWorlds | null;
-	if (!data) {
-		const response = await core.Got.get("FakeAgent")({
-			url: "https://oldschool.runescape.com/slu",
-			responseType: "text"
-		}) as GameWorldResult;
-
-		if (!response.ok) {
-			return null;
-		}
-
-		const $ = core.Utils.cheerio(response.body);
-		const rows = $("tr.server-list__row");
-		const worlds: GameWorlds = {};
-
-		for (const row of rows) {
-			const list = $("td", row);
-			const [idEl] = list;
-
-			// [World name, Player count, Location, Type, Activity]
-			const [countryEl, typeEl, activityEl] = list.slice(2);
-
-			// Element might not be present -> optional chaining is warranted
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1);
-			if (!id) {
-				continue;
-			}
-
-			const country = $(countryEl).text();
-			const type = $(typeEl).text().toLowerCase() as "free" | "members";
-			const activity = $(activityEl).text();
-
-			worlds[id] = {
-				country,
-				type,
-				activity: (activity !== "-") ? activity : null,
-				flagEmoji: createFlagEmoji(country)
-			};
-		}
-
-		data = worlds;
-		await core.Cache.setByPrefix("osrs-worlds-data", data, {
-			expiry: 864e5 // 1 day
-		});
+	const cacheData = await core.Cache.getByPrefix("osrs-worlds-data") as GameWorlds | null;
+	if (cacheData) {
+		return cacheData;
 	}
 
-	return data;
+	const response = await core.Got.get("FakeAgent")({
+		url: "https://oldschool.runescape.com/slu",
+		responseType: "text"
+	}) as GameWorldResult;
+
+	if (!response.ok) {
+		return null;
+	}
+
+	const $ = core.Utils.cheerio(response.body);
+	const rows = $("tr.server-list__row");
+	const worlds: GameWorlds = {};
+
+	for (const row of rows) {
+		const list = $("td", row);
+		const [idEl] = list;
+
+		// [World name, Player count, Location, Type, Activity]
+		const [countryEl, typeEl, activityEl] = list.slice(2);
+
+		// Element might not be present -> optional chaining is warranted
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1);
+		if (!id) {
+			continue;
+		}
+
+		const country = $(countryEl).text();
+		const type = $(typeEl).text().toLowerCase() as "free" | "members";
+		const activity = $(activityEl).text();
+
+		worlds[id] = {
+			country,
+			type,
+			activity: (activity !== "-") ? activity : null,
+			flagEmoji: createFlagEmoji(country)
+		};
+	}
+
+	await core.Cache.setByPrefix("osrs-worlds-data", worlds, {
+		expiry: 864e5 // 1 day
+	});
+
+	return worlds;
 };
 
 const playerCountRegex = /([\d,]+)/;
