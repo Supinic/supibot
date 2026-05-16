@@ -1,8 +1,9 @@
 import { Agent } from "http2-wrapper";
 import type { Http2Session } from "node:http2";
-import type { GotInstanceDefinition } from "supi-core";
+import { type GotInstanceDefinition, isGotRequestError } from "supi-core";
 
 import { getConfig } from "../../config.js";
+import { logger } from "../../singletons/logger.js";
 const { defaultUserAgent } = getConfig().modules.gots;
 
 const agent = new Agent({
@@ -47,7 +48,40 @@ export default {
 			beforeRetry: [],
 			beforeRequest: [],
 			init: [],
-			beforeError: []
+			beforeError: [
+				async (err) => {
+					if (!isGotRequestError(err)) {
+						return err;
+					}
+					else if (!/HTTP\/2 stream has been early terminated/i.test(err.message)) {
+						return err;
+					}
+
+					const { cause = null, code, options, timings } = err;
+					const url = options.url?.toString() ?? null;
+					await logger.logError("Request", err, {
+						origin: "External",
+						context: {
+							url,
+							method: options.method,
+							code,
+							cause,
+							responseType: options.responseType,
+							timeout: options.timeout,
+							http2: options.http2,
+							retry: options.retry,
+							timings,
+							agentsStatus: {
+								sessionCount: agent.sessionCount,
+								emptySessionCount: agent.emptySessionCount,
+								pendingSessionCount: agent.pendingSessionCount
+							}
+						}
+					});
+
+					return err;
+				}
+			]
 		}
 	})),
 	parent: null,
