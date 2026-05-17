@@ -7,9 +7,9 @@ import { logger } from "../../singletons/logger.js";
 const { defaultUserAgent } = getConfig().modules.gots;
 
 const agent = new Agent({
-	timeout: 15_000,
-	maxEmptySessions: 25,
-	maxCachedTlsSessions: 250
+	timeout: 10_000,
+	maxEmptySessions: 10,
+	maxCachedTlsSessions: 100
 });
 
 agent.on("session", (session: Http2Session) => {
@@ -31,7 +31,19 @@ export default {
 		http2: true,
 		agent: { http2: agent },
 		retry: {
-			limit: 2
+			limit: 2,
+			methods: ["GET", "PUT", "HEAD", "DELETE", "OPTIONS", "TRACE"],
+			errorCodes: [
+				"ETIMEDOUT",
+				"ECONNRESET",
+				"EADDRINUSE",
+				"ECONNREFUSED",
+				"EPIPE",
+				"ENOTFOUND",
+				"ENETUNREACH",
+				"EAI_AGAIN",
+				"ERR_GOT_REQUEST_ERROR"
+			]
 		},
 		timeout: {
 			request: 30000
@@ -65,7 +77,7 @@ export default {
 							url,
 							method: options.method,
 							code,
-							cause,
+							cause: String(cause),
 							responseType: options.responseType,
 							timeout: options.timeout,
 							http2: options.http2,
@@ -78,6 +90,8 @@ export default {
 							}
 						}
 					});
+
+					agent.closeEmptySessions();
 
 					return err;
 				}
