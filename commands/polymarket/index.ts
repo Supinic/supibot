@@ -1,7 +1,6 @@
 import * as z from "zod";
 import { declare } from "../../classes/command.js";
 import { SupiError } from "supi-core";
-import * as eventS from "node:events";
 import { postToHastebin } from "../../utils/command-utils.js";
 
 const marketShape = z.object({
@@ -13,7 +12,7 @@ const marketShape = z.object({
 	endDate: z.string(),
 	outcomes: z.string(), // JSON stringified string[]
 	outcomePrices: z.string(), // JSON stringified string[]
-	volume: z.number(),
+	volumeNum: z.number(),
 	active: z.boolean(),
 	closed: z.boolean()
 });
@@ -123,12 +122,12 @@ export default declare({
 				});
 			}
 
-			const { volume } = market;
+			const { volumeNum } = market;
 			const prices = formatOutcomes(market);
 
 			return {
 				success: true,
-				reply: `Event "${event.title}" - market "${market.question}": ${prices}. Total volume: ${volume}`
+				reply: `Event "${event.title}" - market "${market.question}": ${prices}. Total volume: ${volumeNum}`
 			};
 		}
 		else {
