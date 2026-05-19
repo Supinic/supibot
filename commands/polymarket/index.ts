@@ -12,11 +12,14 @@ const marketShape = z.object({
 	endDate: z.string(),
 	outcomes: z.string(), // JSON stringified string[]
 	outcomePrices: z.string().optional(), // JSON stringified string[]
-	volumeNum: z.number(),
+	volumeNum: z.number().optional(),
 	active: z.boolean(),
 	closed: z.boolean()
 }).transform(i => ({
 	...i,
+	volumeNum: (typeof i.volumeNum === "number")
+		? core.Utils.round(i.volumeNum, 2)
+		: 0,
 	outcomes: JSON.parse(i.outcomes) as string[],
 	outcomePrices: (i.outcomePrices) ? JSON.parse(i.outcomePrices) as string[] : null
 }));
@@ -142,7 +145,7 @@ export default declare({
 		else {
 			const eventStrings = [];
 			for (const event of events) {
-				const { title, description, active, closed, markets } = event;
+				const { title, description, active, closed, markets, volume } = event;
 				if (!active || closed) {
 					continue;
 				}
@@ -162,7 +165,9 @@ export default declare({
 
 				const cleanDescription = description.replaceAll(/\s+/g, " ");
 				const marketString = marketStrings.join("\n");
-				const eventString = `**${title}**\n${cleanDescription}\n\n${marketString}`.trim();
+				const volumeString = `Total volume for this event: ${volume}`;
+
+				const eventString = `**${title}**\n${cleanDescription}\n\n${marketString}\n${volumeString}`.trim();
 				eventStrings.push(eventString);
 			}
 
