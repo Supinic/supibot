@@ -32,10 +32,7 @@ const eventShape = z.object({
 	active: z.boolean(),
 	closed: z.boolean(),
 	markets: z.array(marketShape)
-}).transform(i => ({
-	...i,
-	description: i.description.replaceAll(/\n+/g, "\n")
-}));
+});
 const searchSchema = z.object({
 	events: z.array(eventShape).optional()
 });
@@ -163,12 +160,13 @@ export default declare({
 					marketStrings.push(`${closedEmoji}${question} - ${prices}`.trim());
 				}
 
+				const cleanDescription = description.replaceAll(/\s+/g, " ");
 				const marketString = marketStrings.join("\n");
-				const eventString = `${title}\n${description}\n\n${marketString}`.trim();
+				const eventString = `**${title}**\n${cleanDescription}\n\n${marketString}`.trim();
 				eventStrings.push(eventString);
 			}
 
-			const result = await postToHastebin(eventStrings.join(`\n\n`));
+			const result = await postToHastebin(eventStrings.join(`\n\n\n`));
 			if (!result.ok) {
 				return {
 					success: false,
