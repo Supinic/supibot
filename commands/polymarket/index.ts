@@ -146,7 +146,7 @@ export default declare({
 			const eventStrings = [];
 			for (const event of events) {
 				const { title, description, active, closed, markets } = event;
-				if (!active && !closed) {
+				if (!active || closed) {
 					continue;
 				}
 
@@ -160,7 +160,7 @@ export default declare({
 					const closedEmoji = (closed) ? "⛔ " : "";
 					const prices = formatOutcomes(outcomes, outcomePrices);
 
-					marketStrings.push(`\t${closedEmoji}${question} - ${prices}`.trim());
+					marketStrings.push(`${closedEmoji}${question} - ${prices}`.trim());
 				}
 
 				const marketString = marketStrings.join("\n");
@@ -168,7 +168,7 @@ export default declare({
 				eventStrings.push(eventString);
 			}
 
-			const result = await postToHastebin(eventStrings.join(`\n====\n`));
+			const result = await postToHastebin(eventStrings.join(`\n\n`));
 			if (!result.ok) {
 				return {
 					success: false,
