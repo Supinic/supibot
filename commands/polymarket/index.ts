@@ -32,7 +32,10 @@ const eventShape = z.object({
 	active: z.boolean(),
 	closed: z.boolean(),
 	markets: z.array(marketShape)
-});
+}).transform(i => ({
+	...i,
+	description: i.description.replaceAll(/\n+/, "\n")
+}));
 const searchSchema = z.object({
 	events: z.array(eventShape).optional()
 });
@@ -90,7 +93,7 @@ export default declare({
 		}
 
 		if (mode === "direct") {
-			const event = events.find(i => i.active);
+			const event = events.find(i => i.active && !i.closed);
 			if (!event) {
 				return {
 					success: false,
@@ -99,7 +102,7 @@ export default declare({
 			}
 
 			const { markets } = event;
-			const activeMarkets = markets.filter(i => i.active && i.outcomePrices);
+			const activeMarkets = markets.filter(i => i.active && !i.closed && i.outcomePrices);
 			if (activeMarkets.length === 0) {
 				return {
 					success: false,
@@ -142,24 +145,27 @@ export default declare({
 		else {
 			const eventStrings = [];
 			for (const event of events) {
-				const { title, description, active, markets } = event;
-				const inactiveEmoji = (active) ? "" : "⛔";
+				const { title, description, active, closed, markets } = event;
+				if (!active) {
+					continue;
+				}
 
+				const closedEmoji = (closed) ? "" : "⛔";
 				const marketStrings = [];
 				for (const market of markets) {
-					const { question, active, outcomes, outcomePrices } = market;
-					if (!outcomePrices) {
+					const { question, active, closed, outcomes, outcomePrices } = market;
+					if (!outcomePrices || !active) {
 						continue;
 					}
 
-					const inactiveEmoji = (active) ? "" : "⛔ ";
+					const closedEmoji = (closed) ? "" : "⛔ ";
 					const prices = formatOutcomes(outcomes, outcomePrices);
 
-					marketStrings.push(`\t${inactiveEmoji}${question} - ${prices}`);
+					marketStrings.push(`\t${closedEmoji}${question} - ${prices}`.trim());
 				}
 
 				const marketString = marketStrings.join("\n");
-				const eventString = `${inactiveEmoji}${title}\n${description}\n\n${marketString}`;
+				const eventString = `${closedEmoji}${title}\n${description}\n\n${marketString}`.trim();
 				eventStrings.push(eventString);
 			}
 
