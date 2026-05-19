@@ -56,11 +56,11 @@ export default declare({
 	Name: "polymarket",
 	Aliases: ["poly"],
 	Cooldown: 10000,
-	Description: "",
+	Description: "Checks Polymarket for currently active events and markets, and posts info about a market directly, or a summary about multiple events and markets.",
 	Flags: ["mention", "pipe"],
 	Params: [{ name: "mode", type: "string" }],
 	Whitelist_Response: null,
-	Code: (async function polymarket (context, ...args) {
+	Code: async function polymarket (context, ...args) {
 		const query = args.join(" ").trim();
 		if (!query) {
 			return {
@@ -181,6 +181,22 @@ export default declare({
 				reply: `Summary for your query: ${result.link}`
 			};
 		}
-	}),
-	Dynamic_Description: null
+	},
+	Dynamic_Description: (prefix) => [
+		"Checks Polymarket for various info, either specifically for a market or a summary of events and their markets.",
+		"",
+
+		`<code>${prefix}polymarket (query)</code>`,
+		`<code>${prefix}poly (query)</code>`,
+		`<code>${prefix}poly mode:direct (query)</code>`,
+		"Checks for the most relevant event and its most relevant market based on your query.",
+		"Will provide basic info and the current prices and volume.",
+		"Closed or inactive events are skipped, and so are closed or inactive markets.",
+		"",
+
+		`<code>${prefix}polymarket mode:summary (query)</code>`,
+		"Creates a neat summary of active events and their markets.",
+		"Will provide full info about the events, their descriptions, and a summary of current prices and the total volume.",
+		"Closed or inactive events are skipped, but closed markets are included with an emoji to show that they're not active anymore."
+	]
 });
