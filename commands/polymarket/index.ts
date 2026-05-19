@@ -18,7 +18,7 @@ const marketShape = z.object({
 }).transform(i => ({
 	...i,
 	outcomes: JSON.parse(i.outcomes) as string[],
-	outcomePrices: (i.outcomePrices) ? JSON.parse(i.outcomes) as string[] : null
+	outcomePrices: (i.outcomePrices) ? JSON.parse(i.outcomePrices) as string[] : null
 }));
 
 const eventShape = z.object({
