@@ -11,11 +11,16 @@ const marketShape = z.object({
 	startDate: z.string(),
 	endDate: z.string(),
 	outcomes: z.string(), // JSON stringified string[]
-	outcomePrices: z.string(), // JSON stringified string[]
+	outcomePrices: z.string().optional(), // JSON stringified string[]
 	volumeNum: z.number(),
 	active: z.boolean(),
 	closed: z.boolean()
-});
+}).transform(i => ({
+	...i,
+	outcomes: JSON.parse(i.outcomes) as string[],
+	outcomePrices: (i.outcomePrices) ? JSON.parse(i.outcomes) as string[] : null
+}));
+
 const eventShape = z.object({
 	id: z.string(),
 	title: z.string(),
@@ -32,10 +37,7 @@ const searchSchema = z.object({
 	events: z.array(eventShape).optional()
 });
 
-const formatOutcomes = (market: z.infer<typeof marketShape>): string => {
-	const outcomes = JSON.parse(market.outcomes) as string[];
-	const outcomePrices = (JSON.parse(market.outcomePrices) as string[]).map(Number);
-
+const formatOutcomes = (outcomes: string[], outcomePrices: string[]): string => {
 	const prices = [];
 	for (let i = 0; i < outcomes.length; i++) {
 		const price = core.Utils.round(Number(outcomePrices[i]) * 100, 3);
@@ -97,7 +99,7 @@ export default declare({
 			}
 
 			const { markets } = event;
-			const activeMarkets = markets.filter(i => i.active);
+			const activeMarkets = markets.filter(i => i.active && i.outcomePrices);
 			if (activeMarkets.length === 0) {
 				return {
 					success: false,
@@ -122,8 +124,15 @@ export default declare({
 				});
 			}
 
-			const { volumeNum } = market;
-			const prices = formatOutcomes(market);
+			const { volumeNum, outcomes, outcomePrices } = market;
+			if (!outcomePrices) { // guaranteed by filtering above
+				throw new SupiError({
+					message: "Assert error: outcomePrices is empty",
+					args: { market }
+				});
+			}
+
+			const prices = formatOutcomes(outcomes, outcomePrices);
 
 			return {
 				success: true,
@@ -138,9 +147,13 @@ export default declare({
 
 				const marketStrings = [];
 				for (const market of markets) {
-					const { question, active } = market;
+					const { question, active, outcomes, outcomePrices } = market;
+					if (!outcomePrices) {
+						continue;
+					}
+
 					const inactiveEmoji = (active) ? "" : "⛔ ";
-					const prices = formatOutcomes(market);
+					const prices = formatOutcomes(outcomes, outcomePrices);
 
 					marketStrings.push(`\t${inactiveEmoji}${question} - ${prices}`);
 				}
