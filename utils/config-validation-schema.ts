@@ -32,7 +32,7 @@ const rustlogInstances = z.record(z.string(), z.object({
 }));
 
 export const ConfigSchema = z.strictObject({
-	usageGuide: z.unknown(),
+	usageGuide: z.unknown().optional(),
 	basePath: z.string(),
 	responses: z.strictObject({
 		defaultBanphrase: z.string(),
