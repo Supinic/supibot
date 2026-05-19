@@ -146,11 +146,10 @@ export default declare({
 			const eventStrings = [];
 			for (const event of events) {
 				const { title, description, active, closed, markets } = event;
-				if (!active) {
+				if (!active && !closed) {
 					continue;
 				}
 
-				const closedEmoji = (closed) ? "" : "⛔";
 				const marketStrings = [];
 				for (const market of markets) {
 					const { question, active, closed, outcomes, outcomePrices } = market;
@@ -158,14 +157,14 @@ export default declare({
 						continue;
 					}
 
-					const closedEmoji = (closed) ? "" : "⛔ ";
+					const closedEmoji = (closed) ? "⛔ " : "";
 					const prices = formatOutcomes(outcomes, outcomePrices);
 
 					marketStrings.push(`\t${closedEmoji}${question} - ${prices}`.trim());
 				}
 
 				const marketString = marketStrings.join("\n");
-				const eventString = `${closedEmoji}${title}\n${description}\n\n${marketString}`.trim();
+				const eventString = `${title}\n${description}\n\n${marketString}`.trim();
 				eventStrings.push(eventString);
 			}
 
