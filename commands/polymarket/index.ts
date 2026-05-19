@@ -34,7 +34,7 @@ const eventShape = z.object({
 	markets: z.array(marketShape)
 }).transform(i => ({
 	...i,
-	description: i.description.replaceAll(/\n+/, "\n")
+	description: i.description.replaceAll(/\n+/g, "\n")
 }));
 const searchSchema = z.object({
 	events: z.array(eventShape).optional()
