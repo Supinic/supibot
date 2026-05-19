@@ -15,6 +15,7 @@ export default declare({
 	Params: [
 		{ name: "after", type: "string" },
 		{ name: "at", type: "string" },
+		{ name: "in", type: "string" },
 		{ name: "on", type: "string" },
 		{ name: "private", type: "boolean" }
 	],
@@ -25,11 +26,11 @@ export default declare({
 		if (chronoParams.length > 1) {
 			return {
 				success: false,
-				reply: `Cannot specify more than one of the parameters "after", "at" and "on" at the same time!`
+				reply: `Cannot specify more than one of the parameters "after", "at", "in" and "on" at the same time!`
 			};
 		}
 
-		const chronoParam = params.after ?? params.at ?? params.on ?? null;
+		const chronoParam = params.after ?? params.at ?? params.in ?? params.on ?? null;
 		if (!chronoParam && args.length === 0) {
 			return {
 				success: false,
@@ -104,7 +105,7 @@ export default declare({
 
 		const now = new SupiDate();
 		if (chronoParam) {
-			let chronoValue = (params.after && !chronoParam.includes(":"))
+			let chronoValue = ((params.after && !chronoParam.includes(":")) || params.in)
 				? `in ${chronoParam}`
 				: chronoParam;
 
@@ -363,9 +364,11 @@ export default declare({
 		`<code>${prefix}remind (person) hello :) in (time)</code>`,
 		`<code>${prefix}remind supinic hello, how's it going? in 5 minutes</code>`,
 		`<code>${prefix}remind supinic in 1 year, 3 months and 5 days hi to the future!</code>`,
+		`<code>${prefix}remind (person) hi :) in:(time)!</code>`,
+		`<code>${prefix}remind supinic test in:1hr</code>`,
 		"Creates a timed remind for target person that's going to fire in whatever time you provide, in the channel you used the command in.",
-		"You <b>must</b> use the keyword <code>in</code> followed by the time specification for this to work.",
-		"The position of the time specification does not matter.",
+		"You <b>must</b> use the keyword <code>in</code> followed by the time specification for this to work, or use the <code>in</code> parameter.",
+		"The position of the time specification does not matter if used in text.",
 		"",
 
 		`<code>${prefix}remindme test (time)</code>`,
