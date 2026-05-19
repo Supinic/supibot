@@ -1,4 +1,4 @@
-import { addChannel, isSupported } from "../../randomline/rustlog.js";
+import { addChannel, isChannelSupported } from "../../randomline/rustlog.js";
 
 export default {
 	name: "enable-rustlog",
@@ -19,7 +19,7 @@ export default {
 		}
 
 		const channelID = channelData.Specific_ID;
-		if (await isSupported(channelID)) {
+		if (await isChannelSupported(channelID)) {
 			return {
 				success: false,
 				reply: `This channel is already added and configured in Rustlog!`

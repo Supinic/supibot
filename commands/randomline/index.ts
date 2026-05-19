@@ -1,16 +1,17 @@
-import DatabaseLogs from "./db-randomline.js";
-import { getRandomChannelLine, getRandomUserLine, isSupported } from "./rustlog.js";
-
+import * as LocalLogs from "./db-randomline.js";
+import * as Rustlog from "./rustlog.js";
 import { getConfig } from "../../config.js";
+import { declare } from "../../classes/command.js";
+
 const { instances } = getConfig().rustlog;
 
-export default {
+export default declare({
 	Name: "randomline",
-	Aliases: ["rl","rq"],
+	Aliases: ["rl", "rq"],
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only. \"rq\" only chooses from your own lines.",
-	Flags: ["block","external-input","opt-out","pipe"],
+	Flags: ["block", "external-input", "opt-out", "pipe"],
 	Params: [
 		{ name: "textOnly", type: "boolean" },
 		{ name: "userID", type: "string" }
@@ -19,6 +20,7 @@ export default {
 	Code: (async function randomLine (context, user) {
 		if (context.channel === null) {
 			return {
+				success: false,
 				reply: "This command cannot be used in private messages!"
 			};
 		}
@@ -39,8 +41,15 @@ export default {
 			}
 
 			const channelID = context.channel.Specific_ID;
-			const isChannelSupported = await isSupported(channelID);
-			if (isChannelSupported === false) {
+			if (!channelID) {
+				return {
+					success: false,
+					reply: "Random lines cannot be used in this channel!"
+				};
+			}
+
+			const isChannelSupported = await Rustlog.isChannelSupported(channelID);
+			if (!isChannelSupported) {
 				let addendum = "";
 				const hadLogs = await context.channel.getDataProperty("logsRemovedReason");
 				if (hadLogs) {
@@ -66,7 +75,7 @@ export default {
 			}
 
 			if (user) {
-				const platform = sb.Platform.get("twitch");
+				const platform = sb.Platform.getAsserted("twitch");
 				const userID = await platform.getUserID(sb.User.normalizeUsername(user));
 				if (!userID) {
 					return {
@@ -75,43 +84,38 @@ export default {
 					};
 				}
 
-				result = await getRandomUserLine(channelID, userID);
+				result = await Rustlog.fetchRandomUserLine(channelID, userID);
 			}
 			else if (context.params.userID) {
-				result = await getRandomUserLine(channelID, context.params.userID);
+				result = await Rustlog.fetchRandomUserLine(channelID, context.params.userID);
 			}
 			else {
-				result = await getRandomChannelLine(channelID);
+				result = await Rustlog.fetchRandomChannelLine(channelID);
 			}
 		}
-		else {
-			if (user) {
-				const targetUser = await sb.User.get(user);
-				if (!targetUser) {
-					return {
-						success: false,
-						reply: "I have not seen that user before, so you cannot check their random lines!"
-					};
-				}
-				else if (context.params.userID) {
-					return {
-						success: false,
-						reply: "Cannot fetch logs by user ID in this channel!"
-					};
-				}
+		else if (user) {
+			const targetUser = await sb.User.get(user);
+			if (!targetUser) {
+				return {
+					success: false,
+					reply: "I have not seen that user before, so you cannot check their random lines!"
+				};
+			}
+			else if (context.params.userID) {
+				return {
+					success: false,
+					reply: "Cannot fetch logs by user ID in this channel!"
+				};
+			}
 
-				result = await DatabaseLogs.fetchUserRandomLine(targetUser, context.channel);
-			}
-			else {
-				result = await DatabaseLogs.fetchChannelRandomLine(context.channel);
-			}
+			result = await LocalLogs.fetchUserRandomLine(targetUser, context.channel);
+		}
+		else {
+			result = await LocalLogs.fetchChannelRandomLine(context.channel);
 		}
 
 		if (!result.success) {
-			return {
-				success: false,
-				reply: result.reason
-			};
+			return result;
 		}
 
 		const partialReplies = [{
@@ -134,10 +138,11 @@ export default {
 		}
 
 		return {
+			success: true,
 			partialReplies
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (prefix) => {
 		const instanceList = Object.entries(instances).map(([key, data]) => {
 			const defaultString = (data.default) ? " (default)" : "";
 			return `<li><a href="//${data.url}">${key}${defaultString}</a>`;
@@ -177,5 +182,5 @@ export default {
 			`Uses a user ID directly instead of providing a name. Useful for looking up messages of deactivated accounts etc.`,
 			""
 		];
-	})
-};
+	}
+});

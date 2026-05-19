@@ -1,5 +1,13 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
+import type { ResultFailure } from "../../classes/command.js";
+
+type RandomLine = {
+	success: true,
+	text: string;
+	username: string;
+	date: SupiDate;
+};
 
 import { getConfig } from "../../config.js";
 const { instances } = getConfig().rustlog;
@@ -105,21 +113,12 @@ const getInstance = async function (channelId: string): Promise<string | null> {
 	return null;
 };
 
-export const isSupported = async function (channelId: string): Promise<boolean> {
+export const isChannelSupported = async function (channelId: string): Promise<boolean> {
 	const instance = await getInstance(channelId);
 	return (instance !== null);
 };
 
-type RandomLineData =
-	| { success: false; reason: string; }
-	| {
-		success: true;
-		date: SupiDate;
-		text: string;
-		username: string;
-	};
-
-export const getRandomChannelLine = async function (channelId: string): Promise<RandomLineData> {
+export const fetchRandomChannelLine = async function (channelId: string): Promise<RandomLine | ResultFailure> {
 	const instanceName = await getInstance(channelId);
 	if (!instanceName) {
 		throw new SupiError({
@@ -140,19 +139,19 @@ export const getRandomChannelLine = async function (channelId: string): Promise<
 	if (response.statusCode === 403) {
 		return {
 			success: false,
-			reason: "This channel has opted out of having their messages logged via the Rustlog third party service!"
+			reply: "This channel has opted out of having their messages logged via the Rustlog third party service!"
 		};
 	}
 	else if (response.statusCode === 404) {
 		return {
 			success: false,
-			reason: "Could not load logs for that channel!"
+			reply: "Could not load logs for that channel!"
 		};
 	}
 	else if (response.statusCode !== 200) {
 		return {
 			success: false,
-			reason: `The channel logs are not available at the moment (status code ${response.statusCode})! Try again later.`
+			reply: `The channel logs are not available at the moment (status code ${response.statusCode})! Try again later.`
 		};
 	}
 
@@ -160,7 +159,7 @@ export const getRandomChannelLine = async function (channelId: string): Promise<
 	if (!message) {
 		return {
 			success: false,
-			reason: `Couldn't fetch a random line! Try again in a little bit.`
+			reply: `Couldn't fetch a random line! Try again in a little bit.`
 		};
 	}
 
@@ -172,7 +171,7 @@ export const getRandomChannelLine = async function (channelId: string): Promise<
 	};
 };
 
-export const getRandomUserLine = async function (channelId: string, userId: string): Promise<RandomLineData> {
+export const fetchRandomUserLine = async function (channelId: string, userId: string): Promise<RandomLine | ResultFailure> {
 	const instanceName = await getInstance(channelId);
 	if (!instanceName) {
 		throw new SupiError({
@@ -193,19 +192,19 @@ export const getRandomUserLine = async function (channelId: string, userId: stri
 	if (response.statusCode === 403) {
 		return {
 			success: false,
-			reason: "This user has opted out of having their messages logged via the Rustlog third party service!"
+			reply: "This user has opted out of having their messages logged via the Rustlog third party service!"
 		};
 	}
 	else if (response.statusCode === 404) {
 		return {
 			success: false,
-			reason: "Could not load logs for that user!"
+			reply: "Could not load logs for that user!"
 		};
 	}
 	else if (response.statusCode !== 200) {
 		return {
 			success: false,
-			reason: `The channel logs are not available at the moment (status code ${response.statusCode})! Try again later.`
+			reply: `The channel logs are not available at the moment (status code ${response.statusCode})! Try again later.`
 		};
 	}
 

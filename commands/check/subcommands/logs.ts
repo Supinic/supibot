@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import { isSupported } from "../../randomline/rustlog.js";
+import { isChannelSupported } from "../../randomline/rustlog.js";
 import type { CheckSubcommandDefinition } from "../index.js";
 
 export default {
@@ -47,7 +47,7 @@ export default {
 				});
 			}
 
-			if (await isSupported(platformId)) {
+			if (await isChannelSupported(platformId)) {
 				arr.push("This channel is being logged by the IVR Rustlog service.");
 			}
 			else {
