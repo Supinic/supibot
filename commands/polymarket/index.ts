@@ -84,23 +84,24 @@ export default declare({
 			}
 		});
 
-		const { events } = searchSchema.parse(response.body);
-		if (!events || events.length === 0) {
+		const { events: allEvents } = searchSchema.parse(response.body);
+		if (!allEvents || allEvents.length === 0) {
 			return {
 				success: false,
 				reply: "No events found for your query!"
 			};
 		}
 
-		if (mode === "direct") {
-			const event = events.find(i => i.active && !i.closed);
-			if (!event) {
-				return {
-					success: false,
-					reply: "There are no active events found for your query!"
-				};
-			}
+		const events = allEvents.filter(i => i.active && !i.closed);
+		if (events.length === 0) {
+			return {
+				success: false,
+				reply: "There are no active events for your query!"
+			};
+		}
 
+		if (mode === "direct") {
+			const event = events[0];
 			const { markets } = event;
 			const activeMarkets = markets.filter(i => i.active && !i.closed && i.outcomePrices);
 			if (activeMarkets.length === 0) {
@@ -145,11 +146,7 @@ export default declare({
 		else {
 			const eventStrings = [];
 			for (const event of events) {
-				const { title, description, active, closed, markets, volume } = event;
-				if (!active || closed) {
-					continue;
-				}
-
+				const { title, description, markets, volume } = event;
 				const marketStrings = [];
 				for (const market of markets) {
 					const { question, active, closed, outcomes, outcomePrices } = market;
