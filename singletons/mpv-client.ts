@@ -80,7 +80,7 @@ const TIMED_OUT_REGEX = /^MPV request #\d+ timed out$/;
 
 const dataSchemas = {
 	generic: z.object({
-		data: z.unknown(),
+		data: z.unknown().optional(),
 		request_id: z.int().optional(),
 		error: z.string()
 	}),
