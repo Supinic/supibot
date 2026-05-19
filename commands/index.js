@@ -98,6 +98,7 @@ import PingMeCommand from "./pingme/index.js";
 import PipeCommand from "./pipe/index.js";
 import PlaySoundCommand from "./playsound/index.js";
 import PoeCommand from "./poe/index.js";
+import PolymarketCommand from "./polymarket/index.js";
 import PyramidCommand from "./pyramid/index.js";
 import QueryCommand from "./query/index.js";
 import RandomAlbumCommand from "./randomalbum/index.js";
@@ -279,6 +280,7 @@ export default [
 	PipeCommand,
 	PlaySoundCommand,
 	PoeCommand,
+	PolymarketCommand,
 	PyramidCommand,
 	QueryCommand,
 	RandomAlbumCommand,
