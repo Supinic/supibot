@@ -164,11 +164,11 @@ export default declare({
 				const marketString = marketStrings.join("\n");
 				const volumeString = `Total volume for this event: ${volume}`;
 
-				const eventString = `**${title}**\n${cleanDescription}\n\n${marketString}\n${volumeString}`.trim();
+				const eventString = `**${title}**\n${cleanDescription}\n\n${volumeString}\n\n${marketString}`.trim();
 				eventStrings.push(eventString);
 			}
 
-			const result = await postToHastebin(eventStrings.join(`\n\n\n`));
+			const result = await postToHastebin(eventStrings.join(`\n\n`));
 			if (!result.ok) {
 				return {
 					success: false,
