@@ -31,7 +31,7 @@ const eventShape = z.object({
 	slug: z.string(),
 	startDate: z.string(),
 	endDate: z.string(),
-	volume: z.number(),
+	volume: z.number().nullish(),
 	active: z.boolean(),
 	closed: z.boolean(),
 	markets: z.array(marketShape)
@@ -162,7 +162,7 @@ export default declare({
 
 				const cleanDescription = description.replaceAll(/\s+/g, " ");
 				const marketString = marketStrings.join("\n");
-				const volumeString = `Total volume for this event: ${volume}`;
+				const volumeString = `Total volume for this event: ${volume ?? "(none)"}`;
 
 				const eventString = `**${title}**\n${cleanDescription}\n\n${volumeString}\n\n${marketString}`.trim();
 				eventStrings.push(eventString);

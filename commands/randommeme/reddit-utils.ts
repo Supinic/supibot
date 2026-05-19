@@ -41,7 +41,7 @@ const postShape = z.object({
 		items: z.array(z.object({
 			media_id: z.string()
 		}))
-	}).optional(),
+	}).nullish(),
 	media_metadata: z.record(z.string(), z.object({
 		status: z.string(),
 		m: z.string().optional()
