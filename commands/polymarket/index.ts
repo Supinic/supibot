@@ -6,13 +6,13 @@ import { postToHastebin } from "../../utils/command-utils.js";
 const marketShape = z.object({
 	id: z.string(),
 	question: z.string(),
-	description: z.string(),
+	description: z.string().nullish(),
 	slug: z.string(),
-	startDate: z.string(),
-	endDate: z.string(),
+	startDate: z.string().nullish(),
+	endDate: z.string().nullish(),
 	outcomes: z.string(), // JSON stringified string[]
-	outcomePrices: z.string().optional(), // JSON stringified string[]
-	volumeNum: z.number().optional(),
+	outcomePrices: z.string().nullish(), // JSON stringified string[]
+	volumeNum: z.number().nullish(),
 	active: z.boolean(),
 	closed: z.boolean()
 }).transform(i => ({
@@ -27,10 +27,10 @@ const marketShape = z.object({
 const eventShape = z.object({
 	id: z.string(),
 	title: z.string(),
-	description: z.string(),
+	description: z.string().nullish(),
 	slug: z.string(),
-	startDate: z.string(),
-	endDate: z.string(),
+	startDate: z.string().nullish(),
+	endDate: z.string().nullish(),
 	volume: z.number().nullish(),
 	active: z.boolean(),
 	closed: z.boolean(),
@@ -160,7 +160,10 @@ export default declare({
 					marketStrings.push(`${closedEmoji}${question} - ${prices}`.trim());
 				}
 
-				const cleanDescription = description.replaceAll(/\s+/g, " ");
+				const cleanDescription = (description)
+					? description.replaceAll(/\s+/g, " ")
+					: "(no description)";
+
 				const marketString = marketStrings.join("\n");
 				const volumeString = `Total volume for this event: ${volume ?? "(none)"}`;
 
