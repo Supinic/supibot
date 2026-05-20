@@ -260,7 +260,7 @@ export default declare({
 				if (checkLocation) {
 					return {
 						success: false,
-						reply: `That place was not found! However, you probably meant to check that user's location - make sure to add the @ symbol before their name.`,
+						reply: `That place was not found! However, you probably meant to check @${location}'s location. Use "$weather @${location}" instead, with the @ symbol.`,
 						cooldown: 5000
 					};
 				}
