@@ -213,6 +213,7 @@ export default tseslint.config(
 			}],
 			"@typescript-eslint/no-unused-vars": "warn", // Only warn for unused vars instead of resulting in an error
 			"@typescript-eslint/no-unnecessary-condition": "warn", // Only warn for unnecessary conditions  instead of resulting in an error
+			"@typescript-eslint/no-unnecessary-type-assertion": "off", // Can trigger false positives (TwitchPlatform)
 			"@typescript-eslint/no-unnecessary-type-conversion": "off", // Maybe re-enable later to force proper types
 			"@typescript-eslint/no-useless-default-assignment": "off", // Does not work for rest arguments
 
