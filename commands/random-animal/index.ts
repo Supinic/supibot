@@ -137,7 +137,7 @@ export const RandomAnimalPictureCommand = declare({
 	Params: [],
 	Whitelist_Response: null,
 	Code: async function randomAnimalPicture (context, input?: string) {
-		const type = resolveAnimalType("fact", context.invocation, input);
+		const type = resolveAnimalType("picture", context.invocation, input);
 		if (!type) {
 			return {
 				success: false,
