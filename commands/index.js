@@ -157,7 +157,6 @@ import TopCommand from "./top/index.js";
 import TopGamesCommand from "./topgames/index.js";
 import TopStreamsCommand from "./topstreams/index.js";
 import TotalCountLineCommand from "./totalcountline/index.js";
-import TrackReuploadCommand from "./trackreupload/index.js";
 import TranslateCommand from "./translate/index.js";
 import TransliterateCommand from "./transliterate/index.js";
 import TuckCommand from "./tuck/index.js";
@@ -339,7 +338,6 @@ export default [
 	TopGamesCommand,
 	TopStreamsCommand,
 	TotalCountLineCommand,
-	TrackReuploadCommand,
 	TranslateCommand,
 	TransliterateCommand,
 	TuckCommand,
