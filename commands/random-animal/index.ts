@@ -8,10 +8,10 @@ type AnimalType = typeof supportedAnimalTypes[number];
 type AnimalsData = UserDataPropertyMap["animals"];
 
 const simpleFactSchema = z.object({ fact: z.string() });
-const multiFactSchema = z.object({ facts: z.array(z.string()) });
+const multiFactSchema = z.object({ facts: z.array(z.string()).min(1) });
 const linkSchema = z.object({ link: z.string() });
 const messageSchema = z.object({ message: z.string() });
-const urlsSchema = z.array(z.object({ url: z.string() }));
+const urlsSchema = z.array(z.object({ url: z.string() })).min(1);
 
 const resolveAnimalType = (command: "fact" | "picture", invocation: string, arg?: string) => {
 	if (command === "fact") {
@@ -31,7 +31,11 @@ const resolveAnimalType = (command: "fact" | "picture", invocation: string, arg?
 		}
 	}
 
-	const parsed = animalTypeSchema.safeParse(arg);
+	if (!arg) {
+		return null;
+	}
+
+	const parsed = animalTypeSchema.safeParse(arg.toLowerCase());
 	return (parsed.success) ? parsed.data : null;
 };
 
@@ -67,9 +71,10 @@ export const RandomAnimalFactCommand = declare({
 	Code: async function randomAnimalFact (context, input?: string) {
 		const type = resolveAnimalType("fact", context.invocation, input);
 		if (!type) {
+			const word = (input) ? "Unsupported" : "No";
 			return {
 				success: false,
-				reply: `No animal type provided! To get a fact, use one of: ${supportedAnimalTypes.join(", ")}`
+				reply: `${word} animal type provided! To get a fact, use one of: ${supportedAnimalTypes.join(", ")}`
 			};
 		}
 
@@ -92,7 +97,7 @@ export const RandomAnimalFactCommand = declare({
 				break;
 			}
 			case "dog": {
-				const response = await core.Got.get("GenericAPI")("tps://dog-api.kinduff.com/api/facts");
+				const response = await core.Got.get("GenericAPI")("https://dog-api.kinduff.com/api/facts");
 				fact = multiFactSchema.parse(response.body).facts[0];
 				break;
 			}
@@ -139,9 +144,10 @@ export const RandomAnimalPictureCommand = declare({
 	Code: async function randomAnimalPicture (context, input?: string) {
 		const type = resolveAnimalType("picture", context.invocation, input);
 		if (!type) {
+			const word = (input) ? "Unsupported" : "No";
 			return {
 				success: false,
-				reply: `No animal type provided! To get a picture, use one of: ${supportedAnimalTypes.join(", ")}`
+				reply: `${word} animal type provided! To get a picture, use one of: ${supportedAnimalTypes.join(", ")}`
 			};
 		}
 
