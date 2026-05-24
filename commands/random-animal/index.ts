@@ -108,7 +108,24 @@ export const RandomAnimalFactCommand = declare({
 			reply: fact
 		};
 	},
-	Dynamic_Description: (prefix) => []
+	Dynamic_Description: (prefix) => [
+		"If you have verified that you own a given animal type as a pet, you can use this command to get a random fact about the selected animal.",
+		`To verify, use the <a href="/bot/command/detail/suggest">${prefix}suggest</a> command to post a picture of your pet and mention that you want to get verified.`,
+		"",
+
+		`<code>${prefix}randomanimalfact bird</code>`,
+		`<code>${prefix}randomanimalfact cat</code>`,
+		`<code>${prefix}randomanimalfact dog</code>`,
+		`<code>${prefix}randomanimalfact fox</code>`,
+		"Posts a random fact for a given animal.",
+		"",
+
+		`<code>${prefix}rbf</code>`,
+		`<code>${prefix}rcf</code>`,
+		`<code>${prefix}rdf</code>`,
+		`<code>${prefix}rff</code>`,
+		"As above, but using shorthands for the command."
+	]
 });
 
 export const RandomAnimalPictureCommand = declare({
@@ -163,5 +180,22 @@ export const RandomAnimalPictureCommand = declare({
 			reply: url
 		};
 	},
-	Dynamic_Description: (prefix) => []
+	Dynamic_Description: (prefix) => [
+		"If you have verified that you own a given animal type as a pet, you can use this command to get a random picture of the selected animal.",
+		`To verify, use the <a href="/bot/command/detail/suggest">${prefix}suggest</a> command to post a picture of your pet and mention that you want to get verified.`,
+		"",
+
+		`<code>${prefix}randomanimalpicture bird</code>`,
+		`<code>${prefix}randomanimalpicture cat</code>`,
+		`<code>${prefix}randomanimalpicture dog</code>`,
+		`<code>${prefix}randomanimalpicture fox</code>`,
+		"Posts a random picture of a given animal.",
+		"",
+
+		`<code>${prefix}rbp</code>`,
+		`<code>${prefix}rcp</code>`,
+		`<code>${prefix}rdp</code>`,
+		`<code>${prefix}rfp</code>`,
+		"As above, but using shorthands for the command."
+	]
 });
