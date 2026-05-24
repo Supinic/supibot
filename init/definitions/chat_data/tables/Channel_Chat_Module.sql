@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Channel_Chat_Module` (
 	`Last_Edit` DATETIME(3) NULL DEFAULT NULL ON UPDATE current_timestamp(3),
 	PRIMARY KEY (`Channel`, `Chat_Module`) USING BTREE,
 	INDEX `FK_Channel_Chat_Module_Chat_Module` (`Chat_Module`) USING BTREE,
-	CONSTRAINT `FK_Channel_Chat_Module_Channel` FOREIGN KEY (`Channel`) REFERENCES `chat_data`.`Channel` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT `FK_Channel_Chat_Module_Channel` FOREIGN KEY (`Channel`) REFERENCES `chat_data`.`Channel` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
