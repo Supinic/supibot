@@ -113,7 +113,7 @@ export const fetchChannelRandomLine = async function (channelData: Channel): Pro
 	};
 
 	const randomLine = await core.Query.getRecordset<RandomLine | undefined>(rs => rs
-		.select("Text", "Posted", "Platform_ID", "Historic")
+		.select("Text", "Posted", "Platform_ID")
 		.from("chat_line", channelName)
 		.where("ID >= %n", randomInt(1, channelMessageCount))
 		.orderBy("ID ASC")
@@ -128,13 +128,7 @@ export const fetchChannelRandomLine = async function (channelData: Channel): Pro
 		};
 	}
 
-	let username = (randomLine.Historic)
-		? randomLine.Platform_ID
-		: await channelData.Platform.fetchUsernameByUserPlatformID(randomLine.Platform_ID);
-
-	// Fallback - if no name is available, use the platform ID or a fallback string if not even that is available
-	username ??= `(${randomLine.Platform_ID})`;
-
+	const username = await channelData.Platform.fetchUsernameByUserPlatformID(randomLine.Platform_ID) ?? `(${randomLine.Platform_ID})`;
 	return {
 		success: true,
 		text: randomLine.Text,
