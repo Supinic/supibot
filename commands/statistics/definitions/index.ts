@@ -1,3 +1,5 @@
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+
 import ActiveChatterStatistic from "./active-chatters.js";
 import AfkStatistic from "./afk.js";
 import AliasNameStatistic from "./alias-names.js";
@@ -14,7 +16,7 @@ import SuggestionStatistic from "./suggestions.js";
 import SupibotStatistic from "./supibot.js";
 import TwitchLottoStatistic from "./twitch-lotto.js";
 
-export default [
+const subcommands: SubcommandDefinition[] = [
 	ActiveChatterStatistic,
 	AfkStatistic,
 	AliasNameStatistic,
@@ -31,3 +33,5 @@ export default [
 	SupibotStatistic,
 	TwitchLottoStatistic
 ];
+
+export const StatsSubcommands = new SubcommandCollection("stats", subcommands);
