@@ -223,7 +223,7 @@ process.on("unhandledRejection", (reason) => {
 		return;
 	}
 
-	const origin = (reason.message.includes("RequestError")) ? "External" : "Internal";
+	const origin = (reason.name.includes("RequestError")) ? "External" : "Internal";
 	void logger.logError("Backend", reason, {
 		origin,
 		context: {
