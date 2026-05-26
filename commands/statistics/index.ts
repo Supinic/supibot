@@ -9,7 +9,7 @@ const statisticsCommandDefinition = declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you or other users, e.g. total AFK time.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function statistics (context, type, ...args) {
@@ -28,7 +28,7 @@ const statisticsCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, ...args);
+		return await subcommand.execute.call(this, context, type, ...args);
 	}),
 	Dynamic_Description: async (prefix) => {
 		const subcommandsDescription = await StatsSubcommands.createDescription();

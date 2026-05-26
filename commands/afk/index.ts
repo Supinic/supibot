@@ -1,19 +1,8 @@
-import { declare } from "../../classes/command.js";
-import type { Status as AfkStatus } from "../../classes/afk.js";
-import afkDefinitions from "../../classes/afk-definitions.json" with { type: "json" };
 import { SupiError } from "supi-core";
+import { declare } from "../../classes/command.js";
+import { afkDefinitions } from "../../classes/afk.js";
 
-type AfkInvocation = {
-	name: AfkStatus;
-	specialSuffix?: "foodEmojis";
-	aliases?: string[];
-	status: string;
-	textSuffix: string;
-	noTextString: string;
-};
-
-const invocations = afkDefinitions.invocations as AfkInvocation[];
-const { specialSuffixes } = afkDefinitions;
+const { invocations, specialSuffixes } = afkDefinitions;
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;
 
 export default declare({
