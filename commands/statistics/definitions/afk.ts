@@ -2,7 +2,7 @@ import { SupiDate } from "supi-core";
 import type { StatsSubcommandDefinition } from "../index.js";
 import { afkStatuses } from "../../../classes/afk.js";
 
-export default {
+export const AfkStatistic = {
 	name: "afk",
 	aliases: ["total-afk", ...afkStatuses],
 	title: "Away from keyboard statuses",
@@ -92,6 +92,60 @@ export default {
 				for a total of ~${delta}.
 				This averages to ~${average} spent AFK per invocation.
 				${who} resumed AFK statuses ${interruptedAmount} times.
+			`
+		};
+	}
+} satisfies StatsSubcommandDefinition;
+
+export const LongestAfkStatistic = {
+	name: "longest-afk",
+	title: "Away from keyboard statuses",
+	aliases: ["longestafk"],
+	description: [],
+	getDescription: (prefix) => [
+		`<code>${prefix}stats longest-afk</code>`,
+		`<code>${prefix}stats longestafk</code>`,
+		"Checks the longest time you (or another user) have been AFK for."
+	],
+	execute: async (context, type, user) => {
+		const targetUser = (user) ? await sb.User.get(user) : context.user;
+		if (!targetUser) {
+			return {
+				success: false,
+				reply: "Provided user does not exist!"
+			};
+		}
+
+		const data = await core.Query.getRecordset<{ Started: SupiDate; Ended: SupiDate; } | undefined>(rs => rs
+			.select("Started", "Ended")
+			.from("chat_data", "AFK")
+			.where("User_Alias = %n", targetUser.ID)
+			.where("Interrupted_ID IS NULL")
+			.where("NOT EXISTS(SELECT 1 FROM chat_data.AFK AS SubAFK WHERE AFK.ID = SubAFK.Interrupted_ID LIMIT 1)")
+			.orderBy("(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) DESC")
+			.limit(1)
+			.single()
+		);
+
+		const who = (targetUser === context.user) ? "You have" : "That user has";
+		if (!data) {
+			return {
+				success: true,
+				reply: `${who} not been AFK before at all.`
+			};
+		}
+
+		const delta = core.Utils.timeDelta(data.Started, true, true, data.Ended);
+		const started = core.Utils.timeDelta(data.Started);
+		const ended = core.Utils.timeDelta(data.Ended);
+
+		return {
+			success: true,
+			reply: core.Utils.tag.trim `
+				The longest time ${who.toLowerCase()} been AFK for
+				is ${delta}, 
+				which started ${started}
+				and ended ${ended}.
 			`
 		};
 	}

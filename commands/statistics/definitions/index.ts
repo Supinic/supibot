@@ -1,7 +1,7 @@
 import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
 
 import ActiveChatterStatistic from "./active-chatters.js";
-import AfkStatistic from "./afk.js";
+import { AfkStatistic, LongestAfkStatistic } from "./afk.js";
 import AliasNameStatistic from "./alias-names.js";
 import AliasStatistic from "./aliases.js";
 import CookieCountStatistic from "./cookie-count.js";
@@ -19,6 +19,7 @@ import TwitchLottoStatistic from "./twitch-lotto.js";
 const subcommands: SubcommandDefinition[] = [
 	ActiveChatterStatistic,
 	AfkStatistic,
+	LongestAfkStatistic,
 	AliasNameStatistic,
 	AliasStatistic,
 	CookieCountStatistic,
