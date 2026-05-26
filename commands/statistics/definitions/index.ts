@@ -3,7 +3,7 @@ import { SubcommandCollection, type SubcommandDefinition } from "../../../classe
 import ActiveChatterStatistic from "./active-chatters.js";
 import { AfkStatistic, LongestAfkStatistic } from "./afk.js";
 import AliasStatistic from "./aliases.js";
-import CookiesStatistic from "./cookies.js";
+import { TotalCookieCountStatistic, UserCookieCountStatistic } from "./cookies.js";
 import DiscordStatistic from "./discord.js";
 import GptStatistic from "./gpt.js";
 import PlaysoundStatistic from "./playsounds.js";
@@ -18,7 +18,8 @@ const subcommands: SubcommandDefinition[] = [
 	AfkStatistic,
 	LongestAfkStatistic,
 	AliasStatistic,
-	CookiesStatistic,
+	TotalCookieCountStatistic,
+	UserCookieCountStatistic,
 	DiscordStatistic,
 	GptStatistic,
 	PlaysoundStatistic,
