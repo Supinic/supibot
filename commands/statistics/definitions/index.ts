@@ -10,7 +10,6 @@ import PlaysoundStatistic from "./playsounds.js";
 import ReminderStatistic from "./reminders.js";
 import SongRequestStatistic from "./song-requests.js";
 import SuggestionStatistic from "./suggestions.js";
-import SupibotStatistic from "./supibot.js";
 import TwitchLottoStatistic from "./twitch-lotto.js";
 
 const subcommands: SubcommandDefinition[] = [
@@ -26,7 +25,6 @@ const subcommands: SubcommandDefinition[] = [
 	ReminderStatistic,
 	SongRequestStatistic,
 	SuggestionStatistic,
-	SupibotStatistic,
 	TwitchLottoStatistic
 ];
 
