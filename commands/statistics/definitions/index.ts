@@ -7,7 +7,6 @@ import CookieCountStatistic from "./cookie-count.js";
 import DalleStatistic from "./dalle.js";
 import DiscordStatistic from "./discord.js";
 import GptStatistic from "./gpt.js";
-import MarkovStatistic from "./markov.js";
 import PlaysoundStatistic from "./playsounds.js";
 import ReminderStatistic from "./reminders.js";
 import SongRequestStatistic from "./song-requests.js";
@@ -24,7 +23,6 @@ const subcommands: SubcommandDefinition[] = [
 	DalleStatistic,
 	DiscordStatistic,
 	GptStatistic,
-	MarkovStatistic,
 	PlaysoundStatistic,
 	ReminderStatistic,
 	SongRequestStatistic,
