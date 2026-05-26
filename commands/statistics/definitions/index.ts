@@ -4,7 +4,6 @@ import ActiveChatterStatistic from "./active-chatters.js";
 import { AfkStatistic, LongestAfkStatistic } from "./afk.js";
 import AliasStatistic from "./aliases.js";
 import CookieCountStatistic from "./cookie-count.js";
-import DalleStatistic from "./dalle.js";
 import DiscordStatistic from "./discord.js";
 import GptStatistic from "./gpt.js";
 import PlaysoundStatistic from "./playsounds.js";
@@ -20,7 +19,6 @@ const subcommands: SubcommandDefinition[] = [
 	LongestAfkStatistic,
 	AliasStatistic,
 	CookieCountStatistic,
-	DalleStatistic,
 	DiscordStatistic,
 	GptStatistic,
 	PlaysoundStatistic,
