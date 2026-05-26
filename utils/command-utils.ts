@@ -903,7 +903,7 @@ export const handleGenericFilter = async (type: FilterType, data: GenericFilterD
 		commandString = `all valid commands`;
 	}
 	else if (resultFilter.Invocation !== null) {
-		commandString = `command ${prefix}${resultFilter.Command} (alias ${prefix}${resultFilter.Invocation})`;
+		commandString = `command ${prefix}${resultFilter.Command} (only applies to alias ${prefix}${resultFilter.Invocation})`;
 	}
 	else {
 		commandString = `command ${prefix}${resultFilter.Command}`;
