@@ -29,6 +29,11 @@ type Temperature = {
 };
 type GptHistoryMode = "enabled" | "disabled";
 
+export const globalSystemPrompts = [
+	"Keep the response as short and concise as possible.",
+	"Do not use Markdown unless specifically instructed."
+] as const;
+
 export const determineOutputLimit = (context: GptContext, modelData: ModelData): OutputLimit | ExecuteFailure => {
 	const { limit } = context.params;
 	let outputLimit = modelData.outputLimit?.default ?? null;

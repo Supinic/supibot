@@ -1,5 +1,5 @@
 import { type GotResponse, SupiError } from "supi-core";
-import { getHistoryMode, getTemperature, determineOutputLimit, type GptTemplate } from "./gpt-template.js";
+import { getHistoryMode, getTemperature, determineOutputLimit, globalSystemPrompts, type GptTemplate } from "./gpt-template.js";
 import { get as getHistoryEntry, add as addHistoryEntry } from "./history-control.js";
 import type { GptContext } from "./index.js";
 import type { ModelData } from "./config-schema.js";
@@ -34,7 +34,7 @@ const getHistoryEntries = async (context: GptContext, query: string) => {
 		? await getHistoryEntry(context.user)
 		: [];
 
-	const systemMessage = "Keep the response as short and concise as possible.";
+	const systemMessage = globalSystemPrompts.join(" ");
 	return [
 		{ role: "system", content: systemMessage },
 		...promptHistory,

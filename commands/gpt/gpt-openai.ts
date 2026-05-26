@@ -1,5 +1,11 @@
 import { type GotResponse, SupiError } from "supi-core";
-import { checkInputLimits, getHistoryMode, getUserHash, type GptTemplate } from "./gpt-template.js";
+import {
+	checkInputLimits,
+	getHistoryMode,
+	getUserHash,
+	globalSystemPrompts,
+	type GptTemplate
+} from "./gpt-template.js";
 import GptHistory from "./history-control.js";
 import type { GptContext } from "./index.js";
 import type { ModelData } from "./config-schema.js";
@@ -48,8 +54,10 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 		? await GptHistory.get(context.user)
 		: [];
 
+	const systemMessage = globalSystemPrompts.join(" ");
 	if (options.noSystemRole) {
 		return [
+			{ role: "system", content: systemMessage },
 			...promptHistory,
 			{ role: "user", content: query }
 		];
@@ -61,6 +69,7 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 			{
 				role: "user",
 				content: [
+					{ role: "system", content: systemMessage },
 					{ type: "text", text: `${DEFAULT_SYSTEM_MESSAGE} ${query}` },
 					{ type: "image_url", image_url: { url: context.params.image } }
 				]
@@ -69,6 +78,7 @@ const getHistory = async (context: GptContext, query: string, options: { noSyste
 	}
 	else {
 		return [
+			{ role: "system", content: systemMessage },
 			...promptHistory,
 			{ role: "user", content: `${DEFAULT_SYSTEM_MESSAGE} ${query}` }
 		];
