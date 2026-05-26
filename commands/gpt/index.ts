@@ -9,7 +9,6 @@ const GptConfig = gptConfigSchema.parse(rawGptConfig);
 import GptCache from "./cache-control.js";
 import { determineOutputLimit, handleHistoryCommand, type GptTemplate } from "./gpt-template.js";
 import { GptOpenAI } from "./gpt-openai.js";
-import { GptNexra, GptNexraComplements } from "./gpt-nexra.js";
 import { GptDeepInfra } from "./gpt-deepinfra.js";
 import { process as processMetrics } from "./metrics.js";
 import { check as checkModeration } from "./moderation.js";
@@ -32,8 +31,6 @@ export const isModelName = (input: string): input is ModelName => Object.keys(Gp
 
 const handlerMap = {
 	openai: GptOpenAI,
-	nexra: GptNexra,
-	"nexra-complements": GptNexraComplements,
 	deepinfra: GptDeepInfra
 } as const;
 

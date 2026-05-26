@@ -191,12 +191,12 @@ export default declare({
 		const contextQuery = addQueryContext(query, channel);
 		const fakeContext = context as unknown as GptContext;
 
-		const nexraExecution = await GptDeepInfra.execute(fakeContext, `${contextQuery}\n\n${logsResult.text}`, summaryModel);
-		if (!nexraExecution.success) {
-			return nexraExecution;
+		const deepInfraExecution = await GptDeepInfra.execute(fakeContext, `${contextQuery}\n\n${logsResult.text}`, summaryModel);
+		if (!deepInfraExecution.success) {
+			return deepInfraExecution;
 		}
 
-		const { response } = nexraExecution;
+		const { response } = deepInfraExecution;
 		// API errors can come as 200 OK with error status code in body
 		if (!response.ok) {
 			return {
