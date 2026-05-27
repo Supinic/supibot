@@ -153,7 +153,6 @@ import TextTransformCommand from "./texttransform/index.js";
 import Tf2Command from "./tf2/index.js";
 import ThesaurusCommand from "./thesaurus/index.js";
 import TimeCommand from "./time/index.js";
-import TopCommand from "./top/index.js";
 import TopGamesCommand from "./topgames/index.js";
 import TopStreamsCommand from "./topstreams/index.js";
 import TotalCountLineCommand from "./totalcountline/index.js";
@@ -334,7 +333,6 @@ export default [
 	Tf2Command,
 	ThesaurusCommand,
 	TimeCommand,
-	TopCommand,
 	TopGamesCommand,
 	TopStreamsCommand,
 	TotalCountLineCommand,

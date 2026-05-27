@@ -7,6 +7,7 @@ import { TotalCookieCountStatistic, UserCookieCountStatistic } from "./cookies.j
 import DiscordStatistic from "./discord.js";
 import GptStatistic from "./gpt.js";
 import ReminderStatistic from "./reminders.js";
+import TopChattersStatistic from "./top-chatters.js";
 
 const subcommands: SubcommandDefinition[] = [
 	ActiveChatterStatistic,
@@ -17,7 +18,8 @@ const subcommands: SubcommandDefinition[] = [
 	UserCookieCountStatistic,
 	DiscordStatistic,
 	GptStatistic,
-	ReminderStatistic
+	ReminderStatistic,
+	TopChattersStatistic
 ];
 
 export const StatsSubcommands = new SubcommandCollection("stats", subcommands);
