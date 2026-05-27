@@ -1,4 +1,4 @@
-import CookieStatistics from "../../statistics/definitions/cookie-count.js";
+import { UserCookieCountStatistic } from "../../statistics/definitions/cookies.js";
 
 export default {
 	name: "stats",
@@ -6,7 +6,12 @@ export default {
 	description: [
 		`<code>$cookie stats</code>`,
 		`<code>$cookie statistics</code>`,
-		CookieStatistics.description
+		"Checks the total amount of cookies you have eaten, plus a quick \"karma check\" on how many you gifted vs. received.",
+		"",
+
+		`<code>$cookie statsc (user)</code>`,
+		`<code>$cookie stats (user)</code>`,
+		"Checks the cookies eaten for someone else, with the same karma check as above."
 	],
-	execute: async (context, cookieData, subcommandName, user) => await CookieStatistics.execute(context, "cookie", user)
+	execute: async (context, cookieData, subcommandName, user) => await UserCookieCountStatistic.execute(context, "cookie", user)
 };

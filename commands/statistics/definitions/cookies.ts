@@ -13,8 +13,7 @@ export const UserCookieCountStatistic = {
 
 		`<code>${prefix}stats cc (user)</code>`,
 		`<code>${prefix}stats cookies (user)</code>`,
-		"Checks the cookies eaten for someone else, with the same karma check as above.",
-		""
+		"Checks the cookies eaten for someone else, with the same karma check as above."
 	],
 	execute: async (context, _type, user) => {
 		const targetUser = (user) ? await sb.User.get(user) : context.user;
