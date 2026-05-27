@@ -2,7 +2,7 @@ import type { StatsSubcommandDefinition } from "../index.js";
 
 export const UserCookieCountStatistic = {
 	name: "cookiecount",
-	aliases: ["cc", "tcc", "cookie", "cookies"],
+	aliases: ["cc", "cookie", "cookies"],
 	title: "Cookies eaten",
 	description: [],
 	getDescription: (prefix) => [
@@ -101,7 +101,7 @@ export const UserCookieCountStatistic = {
 export const TotalCookieCountStatistic = {
 	name: "totalcookiecount",
 	aliases: ["tcc"],
-	title: "Totalookies eaten",
+	title: "Total cookies eaten",
 	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats tcc</code>`,
