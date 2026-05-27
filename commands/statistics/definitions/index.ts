@@ -7,7 +7,6 @@ import { TotalCookieCountStatistic, UserCookieCountStatistic } from "./cookies.j
 import DiscordStatistic from "./discord.js";
 import GptStatistic from "./gpt.js";
 import ReminderStatistic from "./reminders.js";
-import SuggestionStatistic from "./suggestions.js";
 import TwitchLottoStatistic from "./twitch-lotto.js";
 
 const subcommands: SubcommandDefinition[] = [
@@ -20,7 +19,6 @@ const subcommands: SubcommandDefinition[] = [
 	DiscordStatistic,
 	GptStatistic,
 	ReminderStatistic,
-	SuggestionStatistic,
 	TwitchLottoStatistic
 ];
 
