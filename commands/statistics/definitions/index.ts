@@ -6,7 +6,6 @@ import AliasStatistic from "./aliases.js";
 import { TotalCookieCountStatistic, UserCookieCountStatistic } from "./cookies.js";
 import DiscordStatistic from "./discord.js";
 import GptStatistic from "./gpt.js";
-import PlaysoundStatistic from "./playsounds.js";
 import ReminderStatistic from "./reminders.js";
 import SongRequestStatistic from "./song-requests.js";
 import SuggestionStatistic from "./suggestions.js";
@@ -21,7 +20,6 @@ const subcommands: SubcommandDefinition[] = [
 	UserCookieCountStatistic,
 	DiscordStatistic,
 	GptStatistic,
-	PlaysoundStatistic,
 	ReminderStatistic,
 	SongRequestStatistic,
 	SuggestionStatistic,
