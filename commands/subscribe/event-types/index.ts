@@ -38,7 +38,7 @@ export default [
 	DotnetSubDefinition,
 	FactorioSubDefinition,
 	GithubBlogDefinition,
-	GithubStatusDefinition
+	GithubStatusDefinition,
 	GlobalTwitchEmotesDefinition,
 	MicrosoftCppSubDefinition,
 	NodeSubDefinition,
