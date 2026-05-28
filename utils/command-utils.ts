@@ -38,6 +38,14 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 export const VIDEO_TYPE_REPLACE_PREFIX = "$";
 export const TWITCH_ANTIPING_CHARACTER = "\u034F";
 
+export const unping = (input: string): string => {
+	if (input.length <= 2) {
+		return input;
+	}
+
+	return `${input[0]}${TWITCH_ANTIPING_CHARACTER}${input.slice(1)}`;
+};
+
 export const randomInt = (min: number, max: number): number => {
 	if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
 		throw new SupiError({

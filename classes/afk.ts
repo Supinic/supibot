@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
 import { TemplateWithId } from "./template.js";
@@ -6,12 +7,40 @@ import Filter from "./filter.js";
 import User from "./user.js";
 import type Channel from "./channel.js";
 
-import afkDefinitions from "./afk-definitions.json" with { type: "json" };
 import { getConfig } from "../config.js";
 const { responses: configResponses } = getConfig();
-const { responses } = afkDefinitions;
 
-export type Status = "afk" | "gn" | "brb" | "shower" | "poop" | "lurk" | "work" | "study" | "nap" | "food";
+import rawAfkDefinitions from "./afk-definitions.json" with { type: "json" };
+export const afkStatuses = ["afk", "gn", "brb", "shower", "poop", "lurk", "work", "study", "nap", "food"] as const;
+export type Status = typeof afkStatuses[number];
+
+const specialSuffixesSchema = z.object({
+	foodEmojis: z.array(z.string())
+});
+const responsesSchema = z.object({
+	responses: z.object({
+		static: z.record(z.enum(afkStatuses), z.array(z.string()).min(1)),
+		duration: z.partialRecord(z.enum(afkStatuses), z.array(z.object({
+			interval: z.union([
+				z.tuple([z.number(), z.number()]),
+				z.tuple([z.number(), z.null()])
+			]),
+			responses: z.array(z.string()).min(1)
+		})))
+	}),
+	invocations: z.array(z.object({
+		name: z.enum(afkStatuses),
+		aliases: z.array(z.string()).min(1).optional(),
+		status: z.string(),
+		textSuffix: z.string().nullable(),
+		specialSuffix: specialSuffixesSchema.keyof().optional(),
+		noTextString: z.string()
+	})),
+	specialSuffixes: specialSuffixesSchema
+});
+
+export const afkDefinitions = responsesSchema.parse(rawAfkDefinitions);
+const { responses } = afkDefinitions;
 
 type DurationStatus = {
 	interval: [number, number | null];
@@ -170,10 +199,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 			statusMessage ??= core.Utils.randArray(responses.static[status]);
 		}
 		else {
-			// Fallback for missing responses in the `afk-responses.json` file
-			// This check exists for the potential new AFK type being added and missing in the responses JSON
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			const staticResponses = responses.static[status] ?? responses.static[DEFAULT_AFK_STATUS];
+			const staticResponses = responses.static[status];
 			statusMessage = core.Utils.randArray(staticResponses);
 		}
 
