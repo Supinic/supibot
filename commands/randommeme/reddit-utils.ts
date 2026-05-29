@@ -212,7 +212,7 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 	}
 
 	const aboutResponse = await core.Got.get("Reddit")({
-		url: `${name}/about.json`
+		url: `https://oauth.reddit.com/r/${name}/about.json`
 	});
 
 	if (aboutResponse.statusCode === 403) {
@@ -244,7 +244,7 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 	}
 
 	const postsResponse = await core.Got.get("Reddit")({
-		url: `${name}/hot.json`
+		url: `https://oauth.reddit.com/r/${name}/hot.json`
 	});
 
 	if (postsResponse.statusCode !== 200) {
