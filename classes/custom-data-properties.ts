@@ -146,6 +146,7 @@ const userDataSchema = {
 	developer: "boolean",
 	discordChallengeNotificationSent: "boolean",
 	fishData: {} as {
+		removedFromLeaderboards?: true | null;
 		catch: {
 			luckyStreak: number;
 			dryStreak: number;
