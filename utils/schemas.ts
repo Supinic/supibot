@@ -170,7 +170,7 @@ const BaseIvrUserDataSchema = z.object({
 		isUniqueChatModeEnabled: z.boolean(),
 		requireVerifiedAccount: z.boolean(),
 		rules: z.array(z.string())
-	}),
+	}).nullable(),
 	stream: z.object({
 		title: z.string(),
 		id: z.string(),
