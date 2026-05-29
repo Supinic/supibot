@@ -6,7 +6,7 @@ import type { SubcommandDefinition as GenericSubcommandDefinition } from "../../
 import type { UserDataPropertyMap } from "../../../classes/custom-data-properties.js";
 
 type FishData = UserDataPropertyMap["fishData"];
-type TopResult = { username: string; value: number };
+type TopResult = { userId: number; value: number };
 
 type LeaderboardConfig = {
 	sqlPath: string;
@@ -90,20 +90,21 @@ type RankGroup = {
 	value: number;
 	usernames: string[];
 };
-const createRankedMessages = (results: readonly TopResult[]): string[] => {
+const createRankedMessages = async (results: readonly TopResult[]): Promise<string[]> => {
 	const groups = new Map<number, RankGroup>();
 	for (let index = 0; index < results.length; index++) {
-		const { username, value } = results[index];
+		const { userId, value } = results[index];
 		const existingGroup = groups.get(value);
+		const userData = await sb.User.getAsserted(userId);
 		if (existingGroup) {
-			existingGroup.usernames.push(username);
+			existingGroup.usernames.push(userData.Name);
 			continue;
 		}
 
 		groups.set(value, {
 			rank: index + 1,
 			value,
-			usernames: [username]
+			usernames: [userData.Name]
 		});
 	}
 
@@ -166,22 +167,20 @@ export default {
 
 		const { sqlPath, name, getTotal } = config;
 		const data = await core.Query.getRecordset<TopResult[]>(rs => rs
-			.select("User_Alias.Name AS username")
+			.select("User_Alias AS userId")
 			.select(`CONVERT(JSON_EXTRACT(Value, '$.${sqlPath}'), INT) AS value`)
 			.from("chat_data", "User_Alias_Data")
-			.join("chat_data", "User_Alias")
 			.where("Property = %s", "fishData")
 			.where(`JSON_EXTRACT(Value, '$.${sqlPath}') IS NOT NULL`)
 			.where("JSON_EXTRACT(Value, '$.removedFromLeaderboards') IS NULL")
 			.orderBy(`value DESC`)
-			.orderBy(`username DESC`)
 			.limit(10)
 		);
 
-		const rankMessages = createRankedMessages(data);
+		const rankMessages = await createRankedMessages(data);
 		const messages = [`Top 10 ${name}:`, ...rankMessages];
 
-		const appearsInTopTen = data.some(i => i.username === context.user.Name);
+		const appearsInTopTen = data.some(i => i.userId === context.user.ID);
 		if (!appearsInTopTen) {
 			let userRankMessage: string | null = null;
 			const userFishData = await context.user.getDataProperty("fishData");
