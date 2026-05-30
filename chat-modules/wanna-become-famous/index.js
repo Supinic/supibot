@@ -36,6 +36,9 @@ export default {
 		else if (msg.includes(".ru")) {
 			reason = "being suspicious";
 		}
+		else if (msg.includes("ai") && msg.includes("view")) {
+			reason = "vibe coding an audience";
+		}
 		else if (basicRegex.test(msg)) {
 			reason = "no more spam";
 		}
