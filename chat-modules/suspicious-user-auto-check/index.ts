@@ -86,7 +86,7 @@ export default {
 			if (!response.ok || response.body.length === 0) {
 				type StalkData = { text: string; date: SupiDate; channelName: string; };
 				const data = await core.Query.getRecordset<StalkData | undefined>(rs => rs
-					.select("Last_Message_Text AS text", "Last_Message_Posted AS date", "Channel.Name AS channel")
+					.select("Last_Message_Text AS text", "Last_Message_Posted AS date", "Channel.Name AS channelName")
 					.from("chat_data", "Message_Meta_User_Alias")
 					.join("chat_data", "Channel")
 					.where("User_Alias = %n", internalId)
@@ -182,7 +182,7 @@ export default {
 			await row.save({ skipLoad: true });
 			await sb.User.invalidateUserCache(raw.user);
 
-			await channel.send(`Success 🥳 Make sure to try using a command before you leave to confirm everything is okay.`);
+			await channel.send(`Success 🥳 Make sure to try using a command (like $test) before leaving, to confirm everything is okay.`);
 			replyIdUserMap.delete(raw.user);
 		}
 	}),
