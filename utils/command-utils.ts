@@ -1047,3 +1047,21 @@ export const formatTimezoneOffset = (timezone: LocationTimeData) => {
 
 	return `${symbol}${hours}:${minutes}`;
 };
+
+/**
+ * Selects the closest-matching object based on a property selector and a provided query - via string distance matching.
+ * @todo Consider moving to `supi-core`
+ */
+export const selectClosestObject = <T extends object> (
+	from: string,
+	originalTargets: T[],
+	selector: (object: T) => string
+) => {
+	const strings = originalTargets.map(item => selector(item));
+	const bestTarget = core.Utils.selectClosestString(from, strings, { descriptor: true });
+	if (!bestTarget) {
+		return null;
+	}
+
+	return originalTargets[bestTarget.index] ?? null;
+};
