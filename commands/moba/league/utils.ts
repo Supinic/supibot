@@ -225,18 +225,17 @@ export const getPUUIDByName = async (gameName: string, tagLine: string) => {
 
 const leagueEntriesSchema = z.array(
 	z.object({
-		leagueId: z.string(),
-		queueType: z.string(),
-		tier: z.string(),
-		rank: z.string(),
-		puuid: z.string(),
-		leaguePoints: z.number(),
-		wins: z.number(),
-		losses: z.number(),
-		veteran: z.boolean(),
-		inactive: z.boolean(),
 		freshBlood: z.boolean(),
-		hotStreak: z.boolean()
+		hotStreak: z.boolean(),
+		inactive: z.boolean(),
+		leaguePoints: z.number(),
+		losses: z.number(),
+		puuid: z.string(),
+		queueType: z.string(),
+		rank: z.string(),
+		tier: z.string(),
+		veteran: z.boolean(),
+		wins: z.number()
 	})
 );
 export const getLeagueEntries = async (platform: string, puuid: string) => {
