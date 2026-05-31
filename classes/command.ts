@@ -713,7 +713,6 @@ export class Command extends TemplateWithoutId {
 		// Used in pipe command, for instance.
 		// Administrators are not affected by Pending - this is expected to be used for debugging.
 		const isAdmin = await userData.getDataProperty("administrator") as boolean;
-
 		if (!options.skipPending && !isAdmin) {
 			const sourceName = channelData?.Name ?? `${platformData.name} PMs`;
 			Command.#cooldownManager.setPending(

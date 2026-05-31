@@ -87,6 +87,14 @@ class Pending implements Inhibitor {
 		this.#expires = 0;
 	}
 
+	toJSON () {
+		return {
+			user: this.#user,
+			expires: this.#expires,
+			description: this.#description
+		};
+	}
+
 	get user () { return this.#user; }
 	get expires () { return this.#expires; }
 	get description () { return this.#description; }
