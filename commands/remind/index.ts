@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.js";
-import { fetchTimeData, parseChrono } from "../../utils/command-utils.js";
+import { fetchTimeData, formatTimezoneOffset, parseChrono } from "../../utils/command-utils.js";
 
 // SQL DATETIME limit - 9999-12-31 23:59:59.999
 const MAXIMUM_SQL_TIMESTAMP = 253_402_297_199_999;
@@ -141,12 +141,7 @@ export default declare({
 					};
 				}
 
-				const totalOffset = (timeData.rawOffset + timeData.dstOffset);
-				const symbol = (totalOffset >= 0 ? "+" : "-");
-				const hours = Math.trunc(Math.abs(totalOffset) / 3600);
-				const minutes = core.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
-				const prettyOffset = `${symbol}${hours}:${minutes}`;
-
+				const prettyOffset = formatTimezoneOffset(timeData);
 				chronoValue += ` UTC${prettyOffset}`;
 
 				referenceDate = new SupiDate();

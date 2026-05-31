@@ -205,7 +205,7 @@ const userDataSchema = {
 			lng: number;
 		};
 		original: string;
-		timezone: {
+		timezone?: {
 			dstOffset: number;
 			stringOffset: string;
 			offset: number;

@@ -66,18 +66,18 @@ export const randomInt = (min: number, max: number): number => {
 	return (min + roll);
 };
 
+type LocationTimeData = {
+	dstOffset: number;
+	rawOffset: number;
+	status: string;
+	timeZoneId: string;
+	timeZoneName: string;
+};
+
 /**
  * Fetches time data for given GPS coordinates and timestamp, if provided.
  */
 export const fetchTimeData = async (data: { coordinates: Coordinates, date?: SupiDate }) => {
-	type LocationTimeData = {
-		dstOffset: number;
-		rawOffset: number;
-		status: string;
-		timeZoneId: string;
-		timeZoneName: string;
-	};
-
 	if (!process.env.API_GOOGLE_TIMEZONE) {
 		throw new SupiError({
 			message: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
@@ -1034,4 +1034,16 @@ export const postToHastebin = async (text: string, options: { title?: string } =
 			reason: null
 		};
 	}
+};
+
+/**
+ * Forms a well-formatted timezone offset based on the raw offset numbers.
+ */
+export const formatTimezoneOffset = (timezone: LocationTimeData) => {
+	const totalOffset = (timezone.rawOffset + timezone.dstOffset);
+	const symbol = (totalOffset >= 0 ? "+" : "-");
+	const hours = Math.trunc(Math.abs(totalOffset) / 3600);
+	const minutes = core.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
+
+	return `${symbol}${hours}:${minutes}`;
 };

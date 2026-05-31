@@ -1,18 +1,29 @@
+import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
-import { fetchTimeData } from "../../utils/command-utils.js";
-import timezones from "./timezones.json" with { type: "json" };
+import { declare } from "../../classes/command.js";
+import { fetchGeoLocationData, fetchTimeData, formatTimezoneOffset } from "../../utils/command-utils.js";
+import rawTimezones from "./timezones.json" with { type: "json" };
+import { typeRegexGroups } from "../../utils/ts-helpers.js";
 
-const detectTimezone = async (...args) => {
+const timezonesSchema = z.array(z.object({
+	abbreviation: z.string(),
+	name: z.string(),
+	offset: z.number(),
+	description: z.string().nullable()
+}));
+const timezones = timezonesSchema.parse(rawTimezones);
+
+const detectTimezone = (...args: string[]) => {
 	const query = args.join(" ");
 	const utcRegex = /(?<base>UTC|GMT)(?<sign>[+-])(?<hours>\d{1,2})(:?(?<minutes>\d{1,2}))?/i;
+	const match = query.match(utcRegex);
 
-	if (utcRegex.test(query)) {
-		const match = query.match(utcRegex);
-		const { sign, hours, minutes } = match.groups;
+	if (match) {
+		const groups = typeRegexGroups<"sign" | "hours", "minutes">(match);
+		const { sign, hours, minutes } = groups;
 
 		const multiplier = (sign === "-") ? -1 : 1;
 		const numMinutes = (minutes) ? Number(minutes) : 0;
-
 		const offset = multiplier * (Number(hours) * 60 + numMinutes);
 
 		if (!Number.isFinite(offset)) {
@@ -56,7 +67,7 @@ const detectTimezone = async (...args) => {
 	};
 };
 
-export default {
+export default declare({
 	Name: "time",
 	Aliases: null,
 	Author: "supinic",
@@ -77,7 +88,7 @@ export default {
 			});
 		}
 
-		const zone = await detectTimezone(...args);
+		const zone = detectTimezone(...args);
 		if (zone) {
 			return {
 				reply: (zone.name && zone.abbr)
@@ -144,16 +155,8 @@ export default {
 		}
 
 		if (coordinates === null) {
-			const response = await core.Got.get("Google")({
-				url: "geocode/json",
-				searchParams: {
-					address: place,
-					key: process.env.API_GOOGLE_GEOCODING
-				}
-			});
-
-			const [geoData] = response.body.results;
-			if (!geoData) {
+			const geoData = await fetchGeoLocationData(place);
+			if (!geoData.success) {
 				const checkUserData = await sb.User.get(args[0]);
 				const checkLocation = await checkUserData?.getDataProperty("location");
 
@@ -172,7 +175,7 @@ export default {
 				};
 			}
 			else {
-				coordinates = geoData.geometry.location;
+				coordinates = geoData.location;
 			}
 		}
 
@@ -197,18 +200,14 @@ export default {
 			});
 		}
 
-		const totalOffset = (timeData.rawOffset + timeData.dstOffset);
-		const symbol = (totalOffset >= 0 ? "+" : "-");
-		const hours = Math.trunc(Math.abs(totalOffset) / 3600);
-		const minutes = core.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
-
-		const offset = `${symbol}${hours}:${minutes}`;
+		const offset = formatTimezoneOffset(timeData);
 		const time = new SupiDate();
+		const totalOffset = (timeData.rawOffset + timeData.dstOffset);
 		time.setTimezoneOffset(totalOffset / 60);
 
-		if (user) {
+		if (user) { // fixing historic data
 			const locationData = await user.getDataProperty("location");
-			if (locationData && (!locationData.timezone || locationData.timezone?.dstOffset === 1111)) {
+			if (locationData && (!locationData.timezone || locationData.timezone.dstOffset === 1111)) {
 				locationData.timezone = {
 					dstOffset: timeData.dstOffset,
 					stringOffset: offset,
@@ -239,7 +238,7 @@ export default {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"For a provided location, returns the current time, timezone and date it is observing.",
 		`Supports custom locations of users - this can be set with the <a href="/bot/command/detail/set"><code>${prefix}set location</code></a> command.`,
 		"",
@@ -263,5 +262,5 @@ export default {
 		`<code>${prefix}time @(user)</code>`,
 		`Similar to your own custom location, but for a different user. Make sure to include the <code>@</code> symbol!`,
 		""
-	])
-};
+	]
+});
