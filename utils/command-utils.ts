@@ -109,6 +109,10 @@ const getFormTypes = (type: "image" | "video") => (type === "image")
 	? { filename: "image.png", mime: "image/png" }
 	: { filename: "video.mp4", mime: "video/mp4" };
 
+export const sanitizeHtmlString = (string: string): string => (
+	core.Utils.fixHTML(core.Utils.removeHTML(string)).replaceAll(/\s+/g, " ")
+);
+
 type ImageUploadResult = {
 	statusCode: number;
 	link: string | null;

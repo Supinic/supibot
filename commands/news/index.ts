@@ -1,14 +1,15 @@
-import rssNews from "./rss.js";
-import googleNews from "./google-news.js";
+import * as Rss from "./rss.js";
+import { fetchGoogleNews } from "./google-news.js";
 import definitions from "./definitions.json" with { type: "json" };
+import { declare } from "../../classes/command.js";
+import { SupiError } from "supi-core";
 
-export default {
+const newsCommandDefinition = declare({
 	Name: "news",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 uppercase letter code to get country specific news, or any other word as a search query.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "country", type: "string" },
 		{ name: "latest", type: "boolean" },
@@ -16,10 +17,10 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function news (context, ...args) {
-		let input;
+		let input: string;
 		if (context.params.country) {
 			const value = context.params.country;
-			const code = await core.Query.getRecordset(rs => rs
+			const code = await core.Query.getRecordset<string | undefined>(rs => rs
 				.select("Code_Alpha_2 AS Code")
 				.from("data", "Country")
 				.where("Name = %s OR Code_Alpha_2 = %s OR Code_Alpha_3 = %s", value, value, value)
@@ -40,18 +41,21 @@ export default {
 			input = args[0];
 		}
 
-		if (rssNews.has(input)) {
-			const code = (context.params.country)
-				? input
-				: args.shift();
-
-			return await rssNews.fetch(context, code, args.join(" "));
+		if (Rss.has(input)) {
+			const code = (context.params.country) ? input : args.shift();
+			if (!code) {
+				throw new SupiError({
+					message: "Assert error: Could not get extra news code"
+				});
+			}
+			
+			return await Rss.fetch(context, code, args.join(" "));
 		}
 		else {
-			return await googleNews.fetch(context, args.join(" "));
+			return await fetchGoogleNews(context, args.join(" "));
 		}
 	}),
-	Dynamic_Description: (async function (prefix) {
+	Dynamic_Description: (prefix) => {
 		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
 
 		const extraNews = sorted.map(def => {
@@ -128,5 +132,7 @@ export default {
 			`<table><thead><th>Code</th><th>Language</th><th>Sources</th><th>Helpers</th></thead>${extraNews}</table>`,
 			""
 		];
-	})
-};
+	}
+});
+
+export default newsCommandDefinition;
