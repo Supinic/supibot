@@ -1,8 +1,7 @@
+import { SupiError } from "supi-core";
 import * as Rss from "./rss.js";
 import { fetchGoogleNews } from "./google-news.js";
-import definitions from "./definitions.json" with { type: "json" };
 import { declare } from "../../classes/command.js";
-import { SupiError } from "supi-core";
 
 const newsCommandDefinition = declare({
 	Name: "news",
@@ -48,91 +47,63 @@ const newsCommandDefinition = declare({
 					message: "Assert error: Could not get extra news code"
 				});
 			}
-			
+
 			return await Rss.fetch(context, code, args.join(" "));
 		}
 		else {
 			return await fetchGoogleNews(context, args.join(" "));
 		}
 	}),
-	Dynamic_Description: (prefix) => {
-		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
+	Dynamic_Description: (prefix) => [
+		`Fetches short news articles. Powered by RSS and <a href="https://currentsapi.services/en">CurrentsAPI</a>`,
+		"",
 
-		const extraNews = sorted.map(def => {
-			const { code, language, sources } = def;
+		`<code>${prefix}news</code>`,
+		"(worldwide news in english)",
+		"",
 
-			const links = [];
-			const helpers = [];
-			for (const source of sources) {
-				links.push(`<a href="${source.specificMainPageUrl ?? source.url}">${source.name}</a>`);
-				helpers.push(...source.helpers);
-			}
+		`<code>${prefix}news (text to search)</code>`,
+		`<code>${prefix}news trump</code>`,
+		"(worldwide news in English that contain the text you searched for",
+		"",
 
-			const uniqueHelpers = (helpers.length > 0)
-				? [...new Set(helpers)].join(", ")
-				: "N/A";
+		`<code>${prefix}news <u>(uppercase two-letter country code)</u></code>`,
+		`<code>${prefix}news <u>BE</u></code>`,
+		"Fetches country-specific news, based on the code provided.",
 
-			return core.Utils.tag.trim `
-				<tr>
-					<td>${code.toUpperCase()}</td>
-					<td>${core.Utils.capitalize(language)}</td>
-					<td>${links.join("<br>")}
-					<td>${uniqueHelpers}</td>
-				</tr>
-			`;
-		}).join("");
+		`<code>${prefix}news <u>country:(country name or code)</u></code>`,
+		`<code>${prefix}news <u>country:BE</u></code>`,
+		`<code>${prefix}news <u>country:belgium</u></code>`,
+		`<code>${prefix}news <u>country:"united kingdom"</u></code>`,
+		"Fetches country-specific news, based on the code/name provided.",
+		"",
 
-		return [
-			`Fetches short news articles. Powered by RSS and <a href="https://currentsapi.services/en">CurrentsAPI</a>`,
-			"",
+		`<code>${prefix}news (two-letter country code) <u>(text to search for)</u></code>`,
+		`<code>${prefix}news country:(country name or code) <u>(text to search for)</u></code>`,
+		`<code>${prefix}news DE </u>berlin</u></code>`,
+		`<code>${prefix}news country:czechia </u>prague</u></code>`,
+		"Fetches country-specific news that contain the text you searched for.",
+		"",
 
-			`<code>${prefix}news</code>`,
-			"(worldwide news in english)",
-			"",
+		`<code>${prefix}news <u>(special code)</u></code>`,
+		`<code>${prefix}news <u>ONION</u></code>`,
+		"Fetches special news, usually from a specific source. Consult the table below.",
+		"",
 
-			`<code>${prefix}news (text to search)</code>`,
-			`<code>${prefix}news trump</code>`,
-			"(worldwide news in English that contain the text you searched for",
-			"",
+		`<code>${prefix}news (code) <u>latest:true</u></code>`,
+		`<code>${prefix}news SK <u>link:true</u></code>`,
+		"Fetches the news along with a link to the article, if available.",
+		"",
 
-			`<code>${prefix}news <u>(uppercase two-letter country code)</u></code>`,
-			`<code>${prefix}news <u>BE</u></code>`,
-			"Fetches country-specific news, based on the code provided.",
+		`<code>${prefix}news (code) <u>link:true</u></code>`,
+		`<code>${prefix}news SK <u>link:true</u></code>`,
+		"Fetches the news along with a link to the article, if available.",
+		"",
 
-			`<code>${prefix}news <u>country:(country name or code)</u></code>`,
-			`<code>${prefix}news <u>country:BE</u></code>`,
-			`<code>${prefix}news <u>country:belgium</u></code>`,
-			`<code>${prefix}news <u>country:"united kingdom"</u></code>`,
-			"Fetches country-specific news, based on the code/name provided.",
-			"",
-
-			`<code>${prefix}news (two-letter country code) <u>(text to search for)</u></code>`,
-			`<code>${prefix}news country:(country name or code) <u>(text to search for)</u></code>`,
-			`<code>${prefix}news DE </u>berlin</u></code>`,
-			`<code>${prefix}news country:czechia </u>prague</u></code>`,
-			"Fetches country-specific news that contain the text you searched for.",
-			"",
-
-			`<code>${prefix}news <u>(special code)</u></code>`,
-			`<code>${prefix}news <u>ONION</u></code>`,
-			"Fetches special news, usually from a specific source. Consult the table below.",
-			"",
-
-			`<code>${prefix}news (code) <u>latest:true</u></code>`,
-			`<code>${prefix}news SK <u>link:true</u></code>`,
-			"Fetches the news along with a link to the article, if available.",
-			"",
-
-			`<code>${prefix}news (code) <u>link:true</u></code>`,
-			`<code>${prefix}news SK <u>link:true</u></code>`,
-			"Fetches the news along with a link to the article, if available.",
-			"",
-
-			"The following are supported country-specific codes and special codes.",
-			`<table><thead><th>Code</th><th>Language</th><th>Sources</th><th>Helpers</th></thead>${extraNews}</table>`,
-			""
-		];
-	}
+		"The following are supported country-specific codes and special codes.",
+		Rss.getDescription(),
+		""
+	]
 });
 
 export default newsCommandDefinition;

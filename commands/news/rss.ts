@@ -1,8 +1,8 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
-import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
 import { logger } from "../../singletons/logger.js";
 import rawDefinitions from "./definitions.json" with { type: "json" };
+import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
 import type { Context, ResultFailure, StrictResult } from "../../classes/command.js";
 
 const rssDefinitionSchema = z.array(z.strictObject({
@@ -156,4 +156,41 @@ export const fetch = async (context: Context, code: string, query: string): Prom
 		success: true,
 		reply: result
 	};
+};
+
+let description: string | undefined;
+export const getDescription = (): string => {
+	if (description) {
+		return description;
+	}
+
+	const result = [];
+	const sortedDefinitions = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
+	for (const { code, language, sources } of sortedDefinitions) {
+		const links = [];
+		const helpers = [];
+
+		for (const source of sources) {
+			links.push(`<a href="${source.specificMainPageUrl ?? source.url}">${source.name}</a>`);
+			helpers.push(...source.helpers);
+		}
+
+		const uniqueHelpers = (helpers.length > 0)
+			? [...new Set(helpers)].join(", ")
+			: "N/A";
+
+		const rowText = core.Utils.tag.trim `
+			<tr>
+				<td>${code.toUpperCase()}</td>
+				<td>${core.Utils.capitalize(language)}</td>
+				<td>${links.join("<br>")}
+				<td>${uniqueHelpers}</td>
+			</tr>
+		`;
+
+		result.push(rowText);
+	}
+
+	description = `<table><thead><th>Code</th><th>Language</th><th>Sources</th><th>Helpers</th></thead>${result.join("")}</table>`;
+	return description;
 };
