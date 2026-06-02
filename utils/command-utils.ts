@@ -1,4 +1,5 @@
 import { randomInt as cryptoRandomInt } from "node:crypto";
+import * as z from "zod";
 import RSSParser from "rss-parser";
 import { parse as chronoParse, type ParsingOption, type Component as ChronoComponent } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
@@ -1064,4 +1065,35 @@ export const selectClosestObject = <T extends object> (
 	}
 
 	return originalTargets[bestTarget.index] ?? null;
+};
+
+type RelaySuccess = { success: true; link: string; statusCode: number; };
+type RelayFailure = { success: false; link: null; statusCode: number; };
+const relaySchema = z.object({
+	data: z.object({ link: z.string() })
+});
+
+export const createRelayLink = async (url: string): Promise<RelaySuccess | RelayFailure> => {
+	const response = await core.Got.get("Supinic")({
+		method: "POST",
+		url: "relay",
+		throwHttpErrors: false,
+		json: { url }
+	});
+
+	if (!response.ok) {
+		return {
+			success: false,
+			link: null,
+			statusCode: response.statusCode
+		};
+	}
+	else {
+		const { link } = relaySchema.parse(response.body).data;
+		return {
+			success: true,
+			link,
+			statusCode: response.statusCode
+		};
+	}
 };
