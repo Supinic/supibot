@@ -1073,6 +1073,9 @@ const relaySchema = z.object({
 	data: z.object({ link: z.string() })
 });
 
+/**
+ * Creates a local relay link, e.g. "link shortener" based on the provided relative url + any search params.
+ */
 export const createRelayLink = async (url: string): Promise<RelaySuccess | RelayFailure> => {
 	const response = await core.Got.get("Supinic")({
 		method: "POST",
