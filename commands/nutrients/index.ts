@@ -24,16 +24,10 @@ const relevantNutrientIds = {
 const getNutrient = (
 	name: keyof typeof relevantNutrientIds,
 	data: z.infer<typeof searchSchema>["foods"][number]["foodNutrients"]
-): number => {
+): number | "(N/A)" => {
 	const id = relevantNutrientIds[name];
 	const nutrient = data.find(i => id === i.nutrientId);
-	if (!nutrient) {
-		throw new SupiError({
-			message: `Assert error: Missing nutrient ${name}`
-		});
-	}
-
-	return nutrient.value;
+	return (nutrient) ? nutrient.value : "(N/A)";
 };
 
 export default declare({
@@ -93,6 +87,13 @@ export default declare({
 		}
 
 		const energy = getNutrient("energy", nutrients);
+		if (energy === "(N/A)") {
+			return {
+				success: false,
+				reply: `No relevant nutrient data is associated with ${description.toLowerCase()}!`
+			};
+		}
+
 		const fat = getNutrient("fat", nutrients);
 		const carbohdyrates = getNutrient("carbohdyrate", nutrients);
 		const protein = getNutrient("protein", nutrients);
