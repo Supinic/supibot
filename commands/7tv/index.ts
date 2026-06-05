@@ -7,7 +7,7 @@ const aliasCommandDefinition = declare({
 	Name: "7tv",
 	Aliases: null,
 	Cooldown: 10000,
-	Description: "",
+	Description: "Manages a rotating list of 7TV emotes, where users can add or replace a 7TV emote of their choosing within that list.",
 	Flags: ["whitelist"],
 	Params: [],
 	Whitelist_Response: null,
