@@ -120,6 +120,14 @@ export default {
 			};
 		}
 
+		const existsByName = apiEmotes.some(i => i.alias === emoteData.defaultName);
+		if (existsByName) {
+			return {
+				success: false,
+				reply: "Your provided emote has a name conflict with an existing emote!"
+			};
+		}
+
 		const apiEmoteIds = new Set(apiEmotes.map(i => i.id));
 		const combinedEmoteData = localData.emotes.filter(i => apiEmoteIds.has(i.id));
 		const limit = localData.limit ?? SEVEN_TV_DEFAULT_LIMIT;
