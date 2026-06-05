@@ -2437,8 +2437,8 @@ supi-db-init@supinic/supi-db-init:
 
 track-link-parser@supinic/track-link-parser:
   version: 1.2.0
-  resolution: "track-link-parser@https://github.com/supinic/track-link-parser.git#commit=2f82447b32daeb9c39d46d48fad330a46c30cbfe"
-  checksum: 10c0/286b5c887b8248f2c4d8730839b858f630ce5863ed513c57d5335809de82a31316763f6639016d42ca1806453703003440edaf29165ff9a271b4d42ccfda2aec
+  resolution: "track-link-parser@https://github.com/supinic/track-link-parser.git#commit=5930d1f6854c43e5ece8f954f068ed6b7e894dce"
+  checksum: 10c0/1c0ad4c8d21f6d87534e14ee04512d3df788c22c75d82745f8be1514c0d62024f93c058589f439f5e4105f70a24fda046d369a545971c54f11e504f8e92e60ed
   languageName: node
   linkType: hard
 
