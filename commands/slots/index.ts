@@ -3,11 +3,12 @@ import { declare } from "../../classes/command.js";
 const leaderboardKeywords = ["leader", "leaders", "leaderboard", "winners"];
 
 const ROLLED_ITEMS = 3;
+let logTableExists: boolean | undefined;
 
 export default declare({
 	Name: "slots",
 	Aliases: null,
-	Cooldown: 10000,
+	Cooldown: 5000,
 	Description: "Once at least three unique emotes (or words) have been provided, rolls a pseudo slot machine to see if you get a flush.",
 	Flags: ["mention", "pipe"],
 	Params: [
@@ -15,13 +16,19 @@ export default declare({
 	],
 	Whitelist_Response: null,
 	Code: (async function slots (context, ...args) {
-		if (leaderboardKeywords.includes(args[0])) {
+		if (args.length === 0 && !context.params.pattern) {
+			return {
+				success: false,
+				reply: "No input provided! You should use a couple of words to roll or use one of existing patterns."
+			};
+		}
+		else if (leaderboardKeywords.includes(args[0])) {
 			return {
 				reply: "Check out all the previous slots winners here: https://supinic.com/data/slots-winner/leaderboard",
 				cooldown: 5000
 			};
 		}
-		if (!context.channel) {
+		else if (!context.channel) {
 			return {
 				success: false,
 				reply: `This command cannot be used in private messages!`
@@ -31,10 +38,9 @@ export default declare({
 		let rolledItems: string[];
 		let itemAmount: number;
 		let resultList: string | undefined;
-		const patternName = context.params.pattern ?? null;
 
 		if (context.params.pattern) {
-			const pattern = slotCommandPatterns.find(i => i.name === patternName);
+			const pattern = slotCommandPatterns.find(i => i.name === context.params.pattern);
 			if (!pattern) {
 				return {
 					success: false,
@@ -45,10 +51,7 @@ export default declare({
 			const emotes = await context.channel.fetchEmotes();
 			const result = pattern.execute(emotes, ...args);
 			if (!result.success) {
-				return {
-					...result,
-					cooldown: 2500
-				};
+				return result;
 			}
 
 			if ("list" in result) {
@@ -65,7 +68,7 @@ export default declare({
 			}
 		}
 		else {
-			const uniqueItems = new Set(...args);
+			const uniqueItems = new Set(args);
 			if (uniqueItems.size !== args.length) {
 				return {
 					success: false,
@@ -100,21 +103,22 @@ export default declare({
 		const odds = (1 / itemAmount) ** (ROLLED_ITEMS - 1);
 		const oneInChance = core.Utils.round((1 / odds), 3);
 
-		const row = await core.Query.getRow("data", "Slots_Winner");
-		row.setValues({
-			User_Alias: context.user.ID,
-			Source: (resultList) ?? `Number roll: 1 to ${itemAmount}`,
-			Result: rolledItems.join(" "),
-			Channel: context.channel.ID,
-			Odds: oneInChance
-		});
+		logTableExists ??= await core.Query.isTablePresent("data", "Slots_Winner");
+		if (logTableExists) {
+			const row = await core.Query.getRow("data", "Slots_Winner");
+			row.setValues({
+				User_Alias: context.user.ID,
+				Source: (resultList) ?? `Number roll: 1 to ${itemAmount}`,
+				Result: rolledItems.join(" "),
+				Channel: context.channel.ID,
+				Odds: oneInChance
+			});
+
+			await row.save({ skipLoad: true });
+		}
 
 		// Discard the row save result - not needed anywhere
-		const [, pogEmote] = await Promise.all([
-			row.save(),
-			context.getBestAvailableEmote(["PagChomp", "Pog", "PogChamp"], "🎉")
-		]);
-
+		const pogEmote = await context.getBestAvailableEmote(["PagChomp", "Pog", "PogChamp"], "🎉");
 		return {
 			success: true,
 			reply: core.Utils.tag.trim `
