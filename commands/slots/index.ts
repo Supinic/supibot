@@ -68,20 +68,13 @@ export default declare({
 			}
 		}
 		else {
-			const uniqueItems = new Set(args);
-			if (uniqueItems.size !== args.length) {
-				return {
-					success: false,
-					reply: "Your list of words must not have any repeats!"
-				};
-			}
-
+			const uniqueItems = [...new Set(args)];
 			rolledItems = [];
-			itemAmount = args.length;
-			resultList = args.join(" ");
+			itemAmount = uniqueItems.length;
+			resultList = uniqueItems.join(" ");
 
 			for (let i = 0; i < ROLLED_ITEMS; i++) {
-				rolledItems.push(core.Utils.randArray(args));
+				rolledItems.push(core.Utils.randArray(uniqueItems));
 			}
 		}
 
