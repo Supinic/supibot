@@ -40,7 +40,7 @@ export const slotCommandPatterns: Pattern[] = [
 	},
 	{
 		name: "bttv",
-		description: "Rollsf from BTTV emotes in the current channel.",
+		description: "Rolls from BTTV emotes in the current channel.",
 		execute: (emotes) => ({
 			success: true,
 			list: emotes.filter(i => i.type === "bttv").map(i => i.name)
