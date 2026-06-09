@@ -1,5 +1,9 @@
 import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import { SevenTvSubcommands } from "./subcommands/index.js";
+import {
+	checkSevenTvAvailable,
+	SevenTvSubcommands,
+	syncLocalDataToApi
+} from "./subcommands/index.js";
 
 export type SevenTvSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
 
@@ -17,6 +21,18 @@ const aliasCommandDefinition = declare({
 				success: false,
 				reply: "This command is only usable on Twitch!"
 			};
+		}
+
+		if (context.channel) {
+			const isAvailable = await checkSevenTvAvailable(context.channel);
+			if (!isAvailable) {
+				return {
+					success: false,
+					reply: "7TV is not set up in this channel!"
+				};
+			}
+
+			await syncLocalDataToApi(context.channel);
 		}
 
 		let subcommand;
