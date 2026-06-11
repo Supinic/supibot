@@ -189,10 +189,8 @@ export default {
 			message = `${appendix} ${prefix} alias "${aliasName}" has this definition: ${targetAlias.Invocation} ${aliasArgs.join(" ")}`;
 		}
 
-		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 		const cooldown = (context.append.pipe) ? null : this.Cooldown;
-
-		if (!context.append.pipe && message.length >= limit) {
+		if (!context.append.pipe && message.length >= context.messageLimit) {
 			const escapedAliasName = encodeURIComponent(aliasName);
 			const escapedUsername = encodeURIComponent(user.Name);
 			const prefixMessage = (invocation !== "code")

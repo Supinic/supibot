@@ -79,7 +79,7 @@ export default declare({
 		}
 
 		const text = `${words.join(" ")} `; // add space for easier concatenation and length checking
-		const limit = context.channel.Message_Limit ?? context.platform.Message_Limit;
+		const limit = context.messageLimit;
 		if ((text.length * size) > limit) {
 			return {
 				success: false,

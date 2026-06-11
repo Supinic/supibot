@@ -45,9 +45,7 @@ export default declare({
 		}
 
 		let message = `I am currently subscribed to: ${channelNames.join(" ")} - ${emotes}`;
-		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
-
-		if (message.length > limit) {
+		if (message.length > context.messageLimit) {
 			message = `${result.length} channels: ${emotes}`;
 		}
 

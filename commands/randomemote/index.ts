@@ -101,7 +101,7 @@ export default declare({
 		const string = result.join(" ");
 		const messageLengthLimit = (context.append.pipe)
 			? RESULT_CHARACTER_LIMIT // maximum character limit in a pipe command (resultCharacterLimit)
-			: (context.channel?.Message_Limit ?? context.platform.Message_Limit);
+			: context.messageLimit;
 
 		const [partition] = core.Utils.partitionString(string, messageLengthLimit, 1);
 		return {

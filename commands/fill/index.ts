@@ -19,7 +19,7 @@ export default declare({
 		const result = [];
 
 		let live = false;
-		let limit = (context.channel?.Message_Limit ?? context.platform.Message_Limit);
+		let limit = context.messageLimit;
 		if (context.channel) {
 			const isLive = await context.channel.isLive();
 			if (isLive) {

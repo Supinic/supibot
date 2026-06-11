@@ -7,7 +7,7 @@ export default {
 		["$abb linkify some long text that will most likely never fit into a single message", "(hastebin link)"]
 	],
 	execute: async (context, ...args) => {
-		const limit = context.params.limit ?? context.channel?.Message_Limit ?? context.platform.Message_Limit;
+		const limit = context.params.limit ?? context.messageLimit;
 		if (!core.Utils.isValidInteger(limit, 0)) {
 			return {
 				success: false,

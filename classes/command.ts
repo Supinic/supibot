@@ -277,6 +277,10 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	}
 
 	get tee () { return this.append.tee; }
+
+	get messageLimit () {
+		return this.channel?.Message_Limit ?? this.platform.Message_Limit;
+	}
 }
 
 export interface CommandDefinition <T extends ParameterDefinitions = ParameterDefinitions> extends TemplateDefinition {

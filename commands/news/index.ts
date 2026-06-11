@@ -39,7 +39,7 @@ const newsCommandDefinition = declare({
 
 		const options = {
 			params: context.params,
-			limit: context.channel?.Message_Limit ?? context.platform.Message_Limit
+			limit: context.messageLimit
 		};
 
 		if (Rss.has(input)) {

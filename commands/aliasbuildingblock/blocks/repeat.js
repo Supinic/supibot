@@ -30,8 +30,7 @@ export default {
 			};
 		}
 
-		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
-		const maximumRepeats = Math.trunc(limit / query.length);
+		const maximumRepeats = Math.trunc(context.messageLimit / query.length);
 		const actualRepeats = Math.min(amount, maximumRepeats);
 
 		return {
