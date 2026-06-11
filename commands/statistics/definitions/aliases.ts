@@ -13,9 +13,9 @@ export default {
 		`<code>${prefix}stats alias (user)</code>`,
 		"Checks the statistics of aliases belonging to the provided user."
 	],
-	execute: async (context, type, userName) => {
-		if (userName) {
-			const userData = await sb.User.get(userName);
+	execute: async (context, type, username) => {
+		if (username) {
+			const userData = await sb.User.get(username);
 			if (!userData) {
 				return {
 					success: false,

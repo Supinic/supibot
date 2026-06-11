@@ -22,7 +22,7 @@ type FetchUsersResult = {
 	inactiveUsers: UserSubscription[];
 };
 
-const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSeenThreshold = 36e5): Promise<FetchUsersResult> {
+const fetchSubscriptionUsers = async function (subscriptionType: SubscriptionType, lastSeenThreshold = 36e5): Promise<FetchUsersResult> {
 	const users = await core.Query.getRecordset<UserSubscription[]>(rs => rs
 		.select("Event_Subscription.Channel as Reminder_Channel")
 		.select("Event_Subscription.User_Alias AS ID")
@@ -38,7 +38,7 @@ const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSe
 			on: "Event_Subscription.User_Alias = Meta.User_Alias"
 		})
 		.groupBy("Meta.User_Alias")
-		.where("Type = %s", subType)
+		.where("Type = %s", subscriptionType)
 		.where("Active = %b", true)
 	);
 
@@ -104,8 +104,8 @@ const sendChannelSubscriptionMessage = async (message: string, channelID: number
 	await channelData.send(`${chatPing.join(" ")} ${message}`);
 };
 
-export const handleEventSubscription = async function (subType: SubscriptionType, message: string, options: HandleOptions = {}) {
-	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType, options.lastSeenThreshold);
+export const handleEventSubscription = async function (subscriptionType: SubscriptionType, message: string, options: HandleOptions = {}) {
+	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subscriptionType, options.lastSeenThreshold);
 
 	await createReminders(inactiveUsers, message);
 

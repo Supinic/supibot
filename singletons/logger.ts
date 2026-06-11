@@ -198,7 +198,7 @@ export class LoggerSingleton {
 
 			if (batch.records.length > loggingWarnLimit) {
 				const length = batch.records.length;
-				const channelID = Number(name.split("-")[1]);
+				const channelID = Number(name.split("-", 2)[1]);
 				const channelData = sb.Channel.get(channelID);
 				if (!channelData) {
 					continue;

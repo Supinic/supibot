@@ -126,13 +126,13 @@ export default declare({
 				};
 			}
 
-			if (latitude > 90 || latitude < -90) {
+			if (Math.abs(latitude) > 90) {
 				return {
 					success: false,
 					reply: `Invalid latitude! Must be in range <-90, 90>`
 				};
 			}
-			else if (longitude < -180 || longitude > 180) {
+			else if (Math.abs(longitude) > 180) {
 				return {
 					success: false,
 					reply: `Invalid longitude! Must be in range <-180, 180>`

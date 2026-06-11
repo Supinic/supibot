@@ -464,12 +464,12 @@ export class Filter extends TemplateWithId {
 		});
 
 		if (command.Flags.includes("whitelist")) {
-			const whitelist = localFilters.find((
+			const isWhitelisted = localFilters.some((
 				i => i.Type === "Whitelist"
 				&& (i.User_Alias === user.ID || i.User_Alias === null)
 			));
 
-			if (!whitelist) {
+			if (!isWhitelisted) {
 				return {
 					success: false,
 					reason: "whitelist",

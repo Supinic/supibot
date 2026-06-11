@@ -801,14 +801,14 @@ export const parseGenericFilterOptions = async (
 		filterData.user = null;
 
 		const userArgId = options.argsOrder.indexOf("user");
-		const userName = (params.user as string | undefined) ?? args[userArgId];
+		const username = (params.user as string | undefined) ?? args[userArgId];
 
-		if (userName) {
-			const userData = await sb.User.get(userName);
+		if (username) {
+			const userData = await sb.User.get(username);
 			if (!userData) {
 				return {
 					success: false,
-					reply: `User ${userName} does not exist!`
+					reply: `User ${username} does not exist!`
 				};
 			}
 

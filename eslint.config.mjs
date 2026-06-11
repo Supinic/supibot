@@ -220,6 +220,9 @@ export default tseslint.config(
 			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
 			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
 
+			"unicorn/filename-case": "off", // Sudden opinionated default rule - removed
+			"unicorn/consistent-compound-words": "warn", // Do not error on grammar
+			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
 			"unicorn/prevent-abbreviations": "off",
 			"unicorn/no-null": "off",
 			"unicorn/explicit-length-check": "off",
@@ -237,7 +240,9 @@ export default tseslint.config(
 			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
 			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
 			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
+			"unicorn/no-this-outside-of-class": "off", // Completely breaks for all command, chatmodule, cron, (...) definitions' codes
 			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
+			"unicorn/prefer-includes-over-repeated-comparisons": ["warn", { minimumComparisons: 4 }], // Three comparisons are fine
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error",
 

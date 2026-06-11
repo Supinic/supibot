@@ -84,6 +84,27 @@ const getSevenTvUserData = async (twitchUserId: string) => {
 	return sevenTvUserIdSchema.parse(response.body).user;
 };
 
+export const checkSevenTvAvailable = async (channelData: Channel): Promise<boolean> => {
+	if (channelData.Platform.name !== "twitch") {
+		throw new SupiError({
+			message: "Channel is not Twitch lol"
+		});
+	}
+
+	const channelTwitchId = channelData.Specific_ID;
+	if (!channelTwitchId) {
+		throw new SupiError({
+			message: "Assert error: Twitch channel has no user ID"
+		});
+	}
+
+	const response = await core.Got.get("GenericAPI")({
+		url: `https://7tv.io/v3/users/twitch/${channelTwitchId}`
+	});
+
+	return (response.ok);
+};
+
 export const fetchSevenTvChannelData = async (channelData: Channel) => {
 	if (channelData.Platform.name !== "twitch") {
 		throw new SupiError({
@@ -215,4 +236,23 @@ export const fetchSevenTvToken = (): string => {
 	}
 
 	return token;
+};
+
+export const syncLocalDataToApi = async (channelData: Channel) => {
+	const localData = await fetchSevenTvChannelData(channelData);
+	const liveEmotes = await getEmotesInSet(localData.emoteSetId);
+
+	const newEmotes = [];
+	for (const oldEmote of localData.emotes) {
+		const liveEmote = liveEmotes.find(i => i.id === oldEmote.id);
+		if (liveEmote) {
+			newEmotes.push({
+				...oldEmote,
+				name: liveEmote.alias
+			});
+		}
+	}
+
+	localData.emotes = newEmotes;
+	await channelData.setDataProperty("sevenTvRotatingEmotes", localData);
 };

@@ -45,12 +45,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "eslint": "^10.4.0",
-    "eslint-plugin-unicorn": "^64.0.0",
+    "eslint": "^10.4.1",
+    "eslint-plugin-unicorn": "^65.0.1",
     "globals": "^17.6.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0"
+    "typescript-eslint": "^8.61.0"
   },
   "nyc": {
     "all": false,
