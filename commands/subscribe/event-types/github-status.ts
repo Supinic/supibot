@@ -2,7 +2,7 @@ import type { RssEventDefinition } from "../generic-event.js";
 
 export default {
 	name: "GitHub Status",
-	aliases: [],
+	aliases: ["github-status"],
 	channelSpecificMention: true,
 	response: {
 		added: "You will now be pinged whenever GitHub goes down.",
