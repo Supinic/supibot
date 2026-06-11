@@ -37,8 +37,8 @@ export default {
 		"This can also be used to create links to your own aliases - essentially creating aliases of your own aliases 😅"
 	],
 	execute: async function (context, subInvocation, ...args) {
-		const [userName, aliasName] = args;
-		if (!userName || !aliasName) {
+		const [username, aliasName] = args;
+		if (!username || !aliasName) {
 			return {
 				success: false,
 				reply: `You didn't provide a user, or the alias name! Use: alias link (user) (alias name)`
@@ -55,7 +55,7 @@ export default {
 			};
 		}
 
-		const targetUserData = await sb.User.get(userName);
+		const targetUserData = await sb.User.get(username);
 		if (!targetUserData) {
 			return {
 				success: false,

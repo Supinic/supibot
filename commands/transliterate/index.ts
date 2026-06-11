@@ -46,7 +46,7 @@ const getHebrewSiteData = async () => {
 
 	const pageData = {
 		token,
-		cookie: tokenResponse.headers["set-cookie"]?.[0].split(";")[0].split("=")[1] ?? ""
+		cookie: tokenResponse.headers["set-cookie"]?.[0].split(";", 1)[0].split("=", 2)[1] ?? ""
 	};
 
 	await core.Cache.setByPrefix(cacheKey, pageData, {

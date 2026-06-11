@@ -52,7 +52,7 @@ export default declare({
 		}
 
 		type Meta = { First_Message_Posted: SupiDate | null; First_Message_Text: string | null; };
-		const metaData = await core.Query.getRecordset<Meta | undefined>(rs => rs
+		const metadata = await core.Query.getRecordset<Meta | undefined>(rs => rs
 			.select("First_Message_Posted", "First_Message_Text")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", targetUser.ID)
@@ -61,7 +61,7 @@ export default declare({
 			.single()
 		);
 
-		if (!metaData) {
+		if (!metadata) {
 			return {
 				success: false,
 				reply: (targetUser === context.user)
@@ -73,7 +73,7 @@ export default declare({
 		let {
 			First_Message_Posted: posted,
 			First_Message_Text: text
-		} = metaData;
+		} = metadata;
 
 		if (!posted || !text) {
 			const dbChannelName = targetChannel.getDatabaseName();

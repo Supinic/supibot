@@ -185,8 +185,8 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		return Promise.resolve();
 	}
 
-	directPm (message: string, userName: string) {
-		this.client.say(userName, message);
+	directPm (message: string, username: string) {
+		this.client.say(username, message);
 		this.incrementMessageMetric("sent", null);
 	}
 
@@ -213,12 +213,12 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		const isPrivateMessage = (event.target === this.selfName);
 
 		if (!event.tags.account) {
-			const userName = event.nick;
-			if (Command.is(message) && !this.#notifiedUnregisteredUsers.has(userName)) {
+			const username = event.nick;
+			if (Command.is(message) && !this.#notifiedUnregisteredUsers.has(username)) {
 				const message = `You must register an account before using my commands!`;
 
 				this.client.say(event.target, message);
-				this.#notifiedUnregisteredUsers.add(userName);
+				this.#notifiedUnregisteredUsers.add(username);
 			}
 
 			return;

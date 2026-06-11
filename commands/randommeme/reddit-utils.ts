@@ -151,7 +151,7 @@ const parsePost = (data: z.infer<typeof postShape>): RedditPost => {
 			}
 
 			const mime = itemMeta.m;
-			const ext = mime.split("/")[1];
+			const ext = mime.split("/", 2)[1];
 			const link = `https://i.redd.it/${item.media_id}.${ext}`;
 
 			galleryLinks.push(link);

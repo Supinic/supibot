@@ -1,3 +1,5 @@
+/* eslint-disable unicorn/prefer-https */
+// this is correct because the GraphQL returns `null` for the same URL at `anyBaseUrl`
 import * as z from "zod";
 import { declare } from "../../classes/command.js";
 

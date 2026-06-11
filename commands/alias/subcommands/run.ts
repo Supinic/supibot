@@ -215,7 +215,7 @@ export default {
 
 			const aliasIndex = totalUsedCommandNames.indexOf("alias");
 			if (aliasIndex !== -1) {
-				totalUsedCommandNames.splice(aliasIndex, 1, commandData.Name);
+				totalUsedCommandNames[aliasIndex] = commandData.Name;
 			}
 			else {
 				totalUsedCommandNames.push(commandData.Name);

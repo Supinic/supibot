@@ -11,6 +11,8 @@ export default declare({
 	Whitelist_Response: null,
 	Code: (async function comment () {
 		const response = await core.Got.get("FakeAgent")({
+			// This is correct - the website's certificate has expired
+			// eslint-disable-next-line unicorn/prefer-https
 			url: "http://www.randomyoutubecomment.com",
 			responseType: "text"
 		});

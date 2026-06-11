@@ -37,7 +37,7 @@ export default {
 			};
 		}
 
-		const [aliasName, userName] = args;
+		const [aliasName, username] = args;
 		if (!aliasName) {
 			return {
 				success: false,
@@ -47,8 +47,8 @@ export default {
 
 		const existing = await getChannelAlias(aliasName, channel.ID);
 		if (invocation === "publish") {
-			const userData = (userName)
-				? await sb.User.get(userName)
+			const userData = (username)
+				? await sb.User.get(username)
 				: context.user;
 
 			if (!userData) {

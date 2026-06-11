@@ -24,8 +24,8 @@ export default {
 		"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking."
 	],
 	execute: async function (context, type, ...args) {
-		const [targetUserName, targetAliasName] = args;
-		if (!targetUserName) {
+		const [targetUsername, targetAliasName] = args;
+		if (!targetUsername) {
 			return {
 				success: false,
 				reply: "No target username provided!"
@@ -44,7 +44,7 @@ export default {
 			};
 		}
 
-		const targetUser = await sb.User.get(targetUserName);
+		const targetUser = await sb.User.get(targetUsername);
 		if (!targetUser) {
 			return {
 				success: false,
@@ -56,7 +56,7 @@ export default {
 		if (!targetAlias) {
 			return {
 				success: false,
-				reply: `User "${targetUserName}" doesn't have the "${targetAliasName}" alias!`
+				reply: `User "${targetUsername}" doesn't have the "${targetAliasName}" alias!`
 			};
 		}
 		else if (isLinkedAlias(targetAlias)) {

@@ -4,15 +4,15 @@ import { ivrUserDataSchema } from "../../utils/schemas.js";
 import type { Platform } from "../../platforms/template.js";
 import type { User } from "../../classes/user.js";
 
-const getTargetName = (userName: string, user: User, platform: Platform) => {
-	if (userName === user.Name) {
+const getTargetName = (username: string, user: User, platform: Platform) => {
+	if (username === user.Name) {
 		return "You are";
 	}
-	else if (userName === platform.selfName) {
+	else if (username === platform.selfName) {
 		return "I am";
 	}
 	else {
-		return `User ${userName} is`;
+		return `User ${username} is`;
 	}
 };
 
@@ -45,13 +45,13 @@ export default declare({
 	Whitelist_Response: null,
 	Code: async function subAge (context, user?: string, channel?: string) {
 		const platform = sb.Platform.getAsserted("twitch");
-		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
+		const username = sb.User.normalizeUsername(user ?? context.user.Name);
 
-		const userID = await platform.getUserID(userName);
+		const userID = await platform.getUserID(username);
 		if (!userID) {
 			return {
 				success: false,
-				reply: `User ${userName} does not exist on Twitch, or is banned!`
+				reply: `User ${username} does not exist on Twitch, or is banned!`
 			};
 		}
 
@@ -77,14 +77,14 @@ export default declare({
 		if (!channelID) {
 			return {
 				success: false,
-				reply: `Channel ${userName} does not exist on Twitch, or is banned!`
+				reply: `Channel ${username} does not exist on Twitch, or is banned!`
 			};
 		}
 
 		const response = await core.Got.get("TwitchGQL")({
 			responseType: "json",
 			headers: {
-				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${userName}`
+				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${username}`
 			},
 			body: JSON.stringify([{
 				operationName: "ViewerCard",
@@ -99,7 +99,7 @@ export default declare({
 					channelLogin: channelName,
 					badgeSourceChannelID: channelID,
 					badgeSourceChannelLogin: channelName,
-					giftRecipientLogin: userName,
+					giftRecipientLogin: username,
 					hasChannelID: true,
 					isViewerBadgeCollectionEnabled: true,
 					withStandardGifting: true
@@ -163,10 +163,10 @@ export default declare({
 		}
 
 		let channelString;
-		if (channelName === context.user.Name && userName === channelName) {
+		if (channelName === context.user.Name && username === channelName) {
 			channelString = "yourself";
 		}
-		else if (channelName === context.platform.Self_Name && userName === channelName) {
+		else if (channelName === context.platform.Self_Name && username === channelName) {
 			channelString = "myself";
 		}
 		else if (channelName === context.user.Name) {
@@ -179,7 +179,7 @@ export default declare({
 			channelString = channelName;
 		}
 
-		const userString = getTargetName(userName, context.user, context.platform);
+		const userString = getTargetName(username, context.user, context.platform);
 		const { daysRemaining, months } = relationship.cumulativeTenure;
 		if (!relationship.subscriptionBenefit) {
 			if (daysRemaining === 0 && months === 0) {

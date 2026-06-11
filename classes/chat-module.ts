@@ -329,7 +329,7 @@ export class ChatModule extends TemplateWithoutId {
 	static getChannelModules (channelData: Channel) {
 		const modules = [];
 		for (const module of ChatModule.data.values()) {
-			const hasChannel = module.attachmentReferences.find(i => i.channelID === channelData.ID);
+			const hasChannel = module.attachmentReferences.some(i => i.channelID === channelData.ID);
 			if (hasChannel) {
 				modules.push(module);
 			}
