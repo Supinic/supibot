@@ -1,9 +1,10 @@
 import { SupiDate } from "supi-core";
 import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
-import type { Context, ResultFailure, StrictResult } from "../../classes/command.js";
+import type { ResultFailure, StrictResult } from "../../classes/command.js";
+import type { NewsOptions } from "./news-helpers.js";
 
-export const fetchGoogleNews = async (context: Context, query?: string): Promise<ResultFailure | StrictResult> => {
-	if (context.params.link) {
+export const fetchGoogleNews = async (options: NewsOptions, query?: string): Promise<ResultFailure | StrictResult> => {
+	if (options.params.link) {
 		return {
 			success: false,
 			reply: `Links are only available for code-specific news!`
@@ -52,7 +53,7 @@ export const fetchGoogleNews = async (context: Context, query?: string): Promise
 		});
 	}
 
-	const article = (context.params.latest)
+	const article = (options.params.latest)
 		? articles.sort((a, b) => b.published - a.published)[0]
 		: core.Utils.randArray(articles);
 

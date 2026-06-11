@@ -1,10 +1,11 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { logger } from "../../singletons/logger.js";
-import rawDefinitions from "./definitions.json" with { type: "json" };
 import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
-import type { Context, ResultFailure, StrictResult } from "../../classes/command.js";
+import type { ResultFailure, StrictResult } from "../../classes/command.js";
+import type { NewsOptions } from "./news-helpers.js";
 
+import rawDefinitions from "./definitions.json" with { type: "json" };
 const rssDefinitionSchema = z.array(z.strictObject({
 	code: z.string().lowercase(),
 	alternateCodes: z.array(z.string()).optional(),
@@ -43,7 +44,7 @@ type Article = {
 	published: number;
 };
 
-export const fetch = async (context: Context, code: string, query: string): Promise<ResultFailure | StrictResult> => {
+export const fetch = async (options: NewsOptions, code: string, query: string): Promise<ResultFailure | StrictResult> => {
 	const lower = code.toLowerCase();
 	const news = definitions.find(i => i.code === lower || i.alternateCodes?.includes(lower));
 	if (!news) {
@@ -114,7 +115,7 @@ export const fetch = async (context: Context, code: string, query: string): Prom
 	}
 
 	let article: Article | undefined;
-	if (context.params.latest) {
+	if (options.params.latest) {
 		article = resultArticles.sort((a, b) => b.published - a.published).at(0);
 	}
 	else {
@@ -133,12 +134,12 @@ export const fetch = async (context: Context, code: string, query: string): Prom
 	const delta = (published) ? `(published ${core.Utils.timeDelta(new SupiDate(published))})` : "";
 
 	let result;
-	const includeLink = context.params.link ?? Boolean(source.includeLink);
+	const includeLink = options.params.link ?? Boolean(source.includeLink);
 	if (!includeLink) {
 		result = sanitizeHtmlString(`${title}${separator}${content ?? ""} ${delta}`);
 	}
 	else {
-		const limit = context.channel?.Message_Limit ?? context.platform.messageLimit;
+		const { limit } = options;
 		result = sanitizeHtmlString(`${title}${separator}${content ?? ""} ${link} ${delta}`);
 
 		// If the result is too long at first, skip the article content

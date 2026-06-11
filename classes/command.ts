@@ -51,13 +51,12 @@ type ParameterValueMap = {
 };
 export type ParameterType = keyof ParameterValueMap;
 type ParameterValue = ParameterValueMap[ParameterType];
-type ParameterDefinition = {
+export type ParameterDefinition = {
 	readonly name: string;
 	readonly type: ParameterType;
 };
 type ParameterDefinitions = readonly ParameterDefinition[];
-
-type ParamFromDefinition<T extends ParameterDefinitions> = {
+export type ParamFromDefinition<T extends ParameterDefinitions> = {
 	[P in T[number] as P["name"]]: ParameterValueMap[P["type"]] | undefined;
 };
 

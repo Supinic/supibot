@@ -2,6 +2,7 @@ import { SupiError } from "supi-core";
 import * as Rss from "./rss.js";
 import { fetchGoogleNews } from "./google-news.js";
 import { declare } from "../../classes/command.js";
+import { newsParams } from "./news-helpers.js";
 
 const newsCommandDefinition = declare({
 	Name: "news",
@@ -9,11 +10,7 @@ const newsCommandDefinition = declare({
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 uppercase letter code to get country specific news, or any other word as a search query.",
 	Flags: ["mention", "non-nullable", "pipe"],
-	Params: [
-		{ name: "country", type: "string" },
-		{ name: "latest", type: "boolean" },
-		{ name: "link", type: "boolean" }
-	],
+	Params: newsParams,
 	Whitelist_Response: null,
 	Code: (async function news (context, ...args) {
 		let input: string;
@@ -40,6 +37,11 @@ const newsCommandDefinition = declare({
 			input = args[0];
 		}
 
+		const options = {
+			params: context.params,
+			limit: context.channel?.Message_Limit ?? context.platform.Message_Limit
+		};
+
 		if (Rss.has(input)) {
 			const code = (context.params.country) ? input : args.shift();
 			if (!code) {
@@ -48,10 +50,10 @@ const newsCommandDefinition = declare({
 				});
 			}
 
-			return await Rss.fetch(context, code, args.join(" "));
+			return await Rss.fetch(options, code, args.join(" "));
 		}
 		else {
-			return await fetchGoogleNews(context, args.join(" "));
+			return await fetchGoogleNews(options, args.join(" "));
 		}
 	}),
 	Dynamic_Description: (prefix) => [
