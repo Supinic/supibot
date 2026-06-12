@@ -2,17 +2,12 @@ import { SupiDate, SupiError } from "supi-core";
 const IGNORED_ASSETS = new Set(["VEF"]);
 
 export default async (cron) => {
+	// fix the return later
 	if (!process.env.API_CRYPTO_COMPARE) {
-		cron.job.stop();
-		throw new SupiError({
-			message: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
-		});
+		return;
 	}
 	if (!process.env.API_FIXER_IO) {
-		cron.job.stop();
-		throw new SupiError({
-			message: "No FixerIO key configured (API_FIXER_IO)"
-		});
+		return;
 	}
 
 	const conditionalFixerIo = (async () => {
