@@ -21,6 +21,7 @@ services:
     build: .
     ports:
       - "9229:9229"
+      - "11000:11000"
     links:
       - db
       - redis
