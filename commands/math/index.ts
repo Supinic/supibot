@@ -52,22 +52,16 @@ export default declare({
 			json: parameters
 		});
 
-		if (!response.ok) {
+		const { error, data } = querySchema.safeParse(response.body);
+		if (error || data.error || !data.result) {
+			const message = data?.error ?? "The math API is currently unavailable";
 			return {
 				success: false,
-				reply: `The math API is currently unavailable! Try again later (status code ${response.statusCode})`
+				reply: `Could not evaluate! ${message}`
 			};
 		}
 
-		const { error, result } = querySchema.parse(response.body);
-		if (error !== null) {
-			return {
-				success: false,
-				reply: error
-			};
-		}
-
-		let reply = result;
+		let reply = data.result;
 		if (context.params.fixed !== false) {
 			reply = reply.replaceAll(/(^")|("$)/g, "");
 		}
