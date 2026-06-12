@@ -42,7 +42,7 @@ export const fetchGoogleNews = async (options: NewsOptions, query?: string): Pro
 
 	const articles = [];
 	for (const article of rss.items) {
-		if (typeof article.title !== "string" || article.content !== "string") {
+		if (typeof article.title !== "string" || typeof article.content !== "string") {
 			continue;
 		}
 
