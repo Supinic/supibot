@@ -167,7 +167,8 @@
       "messageLimit": 500,
       "mirrorIdentifier": "(N)",
       "platform": {
-        "port": 11001
+        "port": 11001,
+        "verbose": false
       },
       "logging": {}
 

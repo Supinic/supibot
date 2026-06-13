@@ -8,9 +8,11 @@ import { Platform } from "./template.js";
 import type { User } from "../classes/user.js";
 
 const NetConfigSchema = BasePlatformConfigSchema.extend({
-	platform: z.object({ port: z.number() })
+	platform: z.object({
+		verbose: z.boolean(),
+		port: z.number()
+	})
 });
-const NET_HOST = "localhost";
 
 export type NetConfig = z.infer<typeof NetConfigSchema>;
 type NetClient = {
@@ -19,25 +21,9 @@ type NetClient = {
 };
 
 const readSingleLine = (socket: Socket, rl: Interface): Promise<string | null> => new Promise((resolve) => {
-	const cleanup = () => {
-		rl.removeAllListeners();
-		rl.close();
-	};
-
-	rl.once("line", (line) => {
-		cleanup();
-		resolve(line);
-	});
-
-	socket.once("end", () => {
-		cleanup();
-		resolve(null);
-	});
-
-	socket.once("error", () => {
-		cleanup();
-		resolve(null);
-	});
+	rl.once("line", (line) => resolve(line));
+	socket.once("end", () => resolve(null));
+	socket.once("error", () => resolve(null));
 });
 
 export class NetPlatform extends Platform<NetConfig> {
@@ -53,13 +39,23 @@ export class NetPlatform extends Platform<NetConfig> {
 			return Promise.resolve();
 		}
 
-		const server = createServer((socket) => void this.handleConnection(socket));
-		server.once("error", (err) => {
-			console.warn(err);
+		const server = createServer((socket) => {
+			if (this.config.verbose) {
+				socket.on("close", () => console.log("[net] client closed"));
+				socket.on("error", (err) => console.error("[net] client error", err));
+			}
+
+			void this.handleConnection(socket);
 		});
-		server.listen(this.config.port, NET_HOST, () => {
+
+		server.on("error", (err) => console.warn(err));
+		server.listen(this.config.port, "0.0.0.0", () => {
 			console.log("Net platform is listening");
 		});
+
+		if (this.config.verbose) {
+			server.on("listening", () => console.log("[net] listening"));
+		}
 
 		this.server = server;
 		return Promise.resolve();
@@ -117,7 +113,11 @@ export class NetPlatform extends Platform<NetConfig> {
 			});
 		}
 
-		client.socket.write(message);
+		this.writeToSocket(client.socket, message);
+	}
+
+	private writeToSocket (socket: Socket, message: string) {
+		socket.write(`< ${message}\n> `);
 	}
 
 	private async handleConnection (socket: Socket) {
@@ -132,26 +132,26 @@ export class NetPlatform extends Platform<NetConfig> {
 			crlfDelay: Infinity
 		});
 
-		socket.write("Connected, select a username");
+		this.writeToSocket(socket, "Connected, select a username");
 
 		let user: User | undefined;
 		while (!user) {
 			const response = await readSingleLine(socket, rl);
 			if (!response) {
-				socket.write("No response received, quitting");
+				this.writeToSocket(socket, "No response received, quitting");
 				return;
 			}
 
 			const possibleUser = await sb.User.get(response.toLowerCase());
 			if (!possibleUser) {
-				socket.write("Unknown user provided, try again");
+				this.writeToSocket(socket, "Unknown username provided, try again");
 			}
 			else {
 				user = possibleUser;
 			}
 		}
 
-		socket.write("Initialized");
+		this.writeToSocket(socket, "Initialized, waiting for commands");
 		const client = { rl, socket };
 		this.clients.set(user, client);
 
