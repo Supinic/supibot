@@ -20,8 +20,9 @@ services:
   supibot:
     build: .
     ports:
-      - "9229:9229"
-      - "11000:11000"
+      - "9229:9229" # Default CDhrome DevTools port
+      - "11000:11000" # Default Supibot internal API port
+      - "11001:11001" # Default Supibot nc port
     links:
       - db
       - redis

@@ -11,6 +11,7 @@ import type { TwitchConfig, TwitchPlatform } from "./twitch.js";
 import type { DiscordConfig, DiscordPlatform } from "./discord.js";
 import type { CytubeConfig, CytubePlatform } from "./cytube.js";
 import type { IrcConfig, IrcPlatform } from "./irc.js";
+import type { NetConfig, NetPlatform } from "./net.js";
 
 import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
 import type { Emote } from "../utils/globals.js";
@@ -467,6 +468,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public static get (identifier: "discord"): DiscordPlatform | null;
 	public static get (identifier: "cytube"): CytubePlatform | null;
 	public static get (identifier: "irc", host: string): IrcPlatform | null;
+	public static get (identifier: "net", host: string): NetPlatform | null;
 	public static get (identifier: Like, host?: string): Platform | null;
 	public static get (identifier: Like, host?: string | null): Platform | null {
 		if (identifier instanceof Platform) {
@@ -520,6 +522,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public static async create (type: "discord", config: DiscordConfig): Promise<DiscordPlatform>;
 	public static async create (type: "cytube", config: CytubeConfig): Promise<CytubePlatform>;
 	public static async create (type: "irc", config: IrcConfig): Promise<IrcPlatform>;
+	public static async create (type: "net", config: NetConfig): Promise<NetPlatform>;
 	public static async create (type: string, config: BaseConfig): Promise<GenericPlatform>;
 	public static async create (type: string, config: BaseConfig) {
 		switch (type) {
@@ -538,6 +541,10 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			case "irc": {
 				const Instance = await import("./irc.js");
 				return new Instance.default(config as IrcConfig);
+			}
+			case "net": {
+				const Instance = await import("./net.js");
+				return new Instance.default(config as NetConfig);
 			}
 			default: {
 				console.log(`No file found for platform "${type}", creating generic platform`);

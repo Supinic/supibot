@@ -156,6 +156,21 @@
         "messages": false,
         "whispers": true
       }
+    },
+    {
+      "ID": 99,
+      "active": true,
+      "type": "net",
+      "host": null,
+      "selfName": "bot",
+      "selfId": "bot",
+      "messageLimit": 500,
+      "mirrorIdentifier": "(N)",
+      "platform": {
+        "port": 11001
+      },
+      "logging": {}
+
     }
   ],
   "rustlog": {
