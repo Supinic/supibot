@@ -38,6 +38,7 @@ services:
     restart: unless-stopped
     environment:
       #- "DEBUG_MODE=1"
+      - "AUTO_SETUP_MODE=auto" # auto / never / always
       - "MARIA_HOST=db"
       - "MARIA_USER=supibot"
       - "MARIA_PASSWORD=supibot"

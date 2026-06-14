@@ -1,8 +1,8 @@
 # Supibot
-Main repository for the multi-platform, novelty and utility chat bot Supibot.
+Main repository for the multi-platform, novelty and utility chatbot Supibot.
 
 ## Platforms
-Supibot can and is currently run on four distinct platforms:
+Supibot can and is currently run on four distinct chat platforms:
 - [Twitch](https://twitch.tv/)
 - [Discord](https://discordapp.com/)
 - [Cytube](https://cytu.be/)
