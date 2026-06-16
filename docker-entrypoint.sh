@@ -14,6 +14,7 @@ run_auto_setup() {
 }
 
 if [[ "${AUTO_SETUP_MODE:-}" = "always" ]]; then
+  echo "Force running setup"
   run_auto_setup
 elif [[ "${AUTO_SETUP_MODE:-}" = "never" ]]; then
   echo "Skipping setup"
@@ -22,9 +23,10 @@ elif [[ "${AUTO_SETUP_MODE:-}" = "auto" ]]; then
     TARGET_VERSION="${AUTO_SETUP_VERSION:-1}"
 
     if [[ "$CURRENT_VERSION" != "$TARGET_VERSION" ]]; then
+      echo "Old version detected, auto-running setup"
       run_auto_setup
     else
-      echo "Setup already completed for version $TARGET_VERSION"
+      echo "Setup already completed for version $TARGET_VERSION, skipping"
     fi
 fi
 
