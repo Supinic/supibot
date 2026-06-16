@@ -1,2 +1,15 @@
-config.json
+.coverage
+.db
 .env
+.git
+.idea
+.nyc_output
+.yarn
+
+build
+config.json
+coverage
+docker-compose*.yml
+docs
+Dockerfile
+node_modules

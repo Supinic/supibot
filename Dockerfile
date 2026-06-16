@@ -1,4 +1,4 @@
-FROM node:25
+FROM node:24-bookworm-slim
 
 RUN npm install -g --force corepack
 RUN npm install -g typescript
@@ -9,27 +9,10 @@ RUN useradd -m supibot
 USER supibot
 WORKDIR /home/project/supibot
 
-COPY --chown=supibot:supibot package.json ./
-COPY --chown=supibot:supibot tsconfig.json ./
-COPY --chown=supibot:supibot .yarnrc.yml ./
-COPY --chown=supibot:supibot yarn.lock ./
+COPY --chown=supibot:supibot package.json tsconfig.json yarn.lock .yarnrc.yml ./
+RUN yarn install --immutable
 
-RUN yarn install
-
-COPY --chown=supibot:supibot master.ts ./
-COPY --chown=supibot:supibot config.ts ./
-COPY --chown=supibot:supibot init ./init
-
-COPY --chown=supibot:supibot api ./api
-COPY --chown=supibot:supibot chat-modules ./chat-modules
-COPY --chown=supibot:supibot classes ./classes
-COPY --chown=supibot:supibot commands ./commands
-COPY --chown=supibot:supibot crons ./crons
-COPY --chown=supibot:supibot gots ./gots
-COPY --chown=supibot:supibot platforms ./platforms
-COPY --chown=supibot:supibot singletons ./singletons
-COPY --chown=supibot:supibot utils ./utils
-
+COPY --chown=supibot:supibot . .
 RUN yarn build
 
 COPY docker-entrypoint.sh /usr/local/bin/
