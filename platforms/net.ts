@@ -25,6 +25,7 @@ const readSingleLine = (socket: Socket, rl: Interface): Promise<string | null> =
 	socket.once("end", () => resolve(null));
 	socket.once("error", () => resolve(null));
 });
+const exitCommands = new Set(["exit", "quit"]);
 
 export class NetPlatform extends Platform<NetConfig> {
 	private server: Server | null = null;
@@ -69,6 +70,12 @@ export class NetPlatform extends Platform<NetConfig> {
 	async handleMessage (message: string, userData: User) {
 		this.incrementMessageMetric("read", null);
 		this.resolveUserMessage(null, userData, message);
+
+		if (exitCommands.has(message.toLowerCase().trim())) {
+			this.write("Bye", userData);
+			this.removeUser(userData);
+			return;
+		}
 
 		if (!sb.Command.is(message)) {
 			this.write("No valid command provided", userData);
@@ -124,6 +131,7 @@ export class NetPlatform extends Platform<NetConfig> {
 		socket.setEncoding("utf8");
 		socket.setNoDelay(true);
 		socket.setKeepAlive(true);
+		socket.unref();
 
 		const rl = createInterface({
 			input: socket,
@@ -151,7 +159,7 @@ export class NetPlatform extends Platform<NetConfig> {
 			}
 		}
 
-		this.writeToSocket(socket, "Initialized, waiting for commands");
+		this.writeToSocket(socket, "Initialized, waiting for commands. Use 'exit' or 'quit' to terminate the session");
 		const client = { rl, socket };
 		this.clients.set(user, client);
 
@@ -164,6 +172,10 @@ export class NetPlatform extends Platform<NetConfig> {
 		const client = this.clients.get(user);
 		if (!client) {
 			return;
+		}
+
+		if (!client.socket.closed) {
+			client.socket.destroySoon();
 		}
 
 		client.rl.close();
