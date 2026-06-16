@@ -16,36 +16,14 @@ catch (e) {
 	process.exit(1);
 }
 
-const platformsData = {
-	twitch: {
-		ID: 1,
-		envs: []
-	},
-	discord: {
-		ID: 2,
-		envs: []
-	},
-	cytube: {
-		ID: 3,
-		envs: []
-	}
-};
-const platforms = Object.keys(platformsData);
-
-console.log("Setting up initial platform...");
+const supportedInitialPlatforms = new Set(["twitch"]);
 const initialPlatform = process.env.INITIAL_PLATFORM;
-if (!initialPlatform || !platforms.includes(initialPlatform)) {
-	console.error("Invalid or no initial platform specified in env.INITIAL_PLATFORM");
-	process.exit(1);
+if (!initialPlatform) {
+	process.exit();
 }
-
-const platformData = platformsData[initialPlatform];
-for (const envKey of platformData.envs) {
-	const env = process.env[envKey];
-	if (!env) {
-		console.error(`Missing env.${envKey} for platform ${initialPlatform}`);
-		process.exit(1);
-	}
+else if (!supportedInitialPlatforms.has(initialPlatform)) {
+	console.error(`Provided initial platform "${initialPlatform}" cannot be set up automatically!`);
+	process.exit(1);
 }
 
 if (initialPlatform === "twitch") {
