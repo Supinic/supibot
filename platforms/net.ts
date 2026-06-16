@@ -115,9 +115,8 @@ export class NetPlatform extends Platform<NetConfig> {
 	private write (message: string, user: User) {
 		const client = this.clients.get(user);
 		if (!client) {
-			throw new SupiError({
-				message: "Net platform has no client available to send to"
-			});
+			console.warn("Net platform has no client available to send to", { message, user: user.ID });
+			return;
 		}
 
 		this.writeToSocket(client.socket, message);
@@ -140,22 +139,47 @@ export class NetPlatform extends Platform<NetConfig> {
 			crlfDelay: Infinity
 		});
 
-		this.writeToSocket(socket, "Connected, select a username");
-
 		let user: User | undefined;
-		while (!user) {
+		if (process.env.DEBUG_NET_EDIT_USER) {
+			this.writeToSocket(socket, "Connected. Select an existing username or type a new one to be created. Use '<username> admin' to create the user as administrator");
+			this.writeToSocket(socket, "If you want to disable this and only use existing usernames, unset the env variable 'DEBUG_NET_EDIT_USER'");
+
 			const response = await readSingleLine(socket, rl);
 			if (!response) {
 				this.writeToSocket(socket, "No response received, quitting");
 				return;
 			}
 
-			const possibleUser = await sb.User.get(response.toLowerCase());
+			const [username, possibleAdmin] = response.trim().split(" ", 3);
+			const possibleUser = await sb.User.get(username, false);
 			if (!possibleUser) {
-				this.writeToSocket(socket, "Unknown username provided, try again");
+				throw new SupiError({
+					message: "Assert error: No user found nor created"
+				});
 			}
-			else {
-				user = possibleUser;
+
+			user = possibleUser;
+			if (possibleAdmin === "admin") {
+				await user.setDataProperty("administrator", true);
+			}
+		}
+		else {
+			this.writeToSocket(socket, "Connected. Select an existing username");
+
+			while (!user) {
+				const response = await readSingleLine(socket, rl);
+				if (!response) {
+					this.writeToSocket(socket, "No response received, quitting");
+					return;
+				}
+
+				const possibleUser = await sb.User.get(response.toLowerCase());
+				if (!possibleUser) {
+					this.writeToSocket(socket, "Unknown username provided, try again");
+				}
+				else {
+					user = possibleUser;
+				}
 			}
 		}
 

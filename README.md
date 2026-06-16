@@ -23,11 +23,31 @@ Pick your platform, and follow these steps:
 To contact me, see [Contact](https://supinic.com/contact) on my website.
 
 ## Running own instance
-It's possible to host your own instance of supibot. You can either set it up as a node app manually, or use the docker image.
+It's possible to host your own instance of Supibot. You can either set it up as a node app manually, or use the docker image.
+Follow [this guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.
 
-Follow [the guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.
+### Debugging
+Importantly, the bot can be run and used for debugging without authenticating to any actual chat platforms.
+By default, Supibot exposes port `11001` to a simple TCP connection, usable via utilities such as [`ncat`](https://nmap.org/ncat/).
 
-Also check out the [modules configuration file](./config-default.json) for a brief guide on how to enable/disable a specific set of commands or other modules. 
+#### Ncat example
+Do keep in mind that this example uses a debugging fork of Supibot which uses the `*` character as its prefix.
+![Ncat example](./docs/ncat-example.png)
+
+#### Ncat example - debug-only user addition
+By default, the `DEBUG_NET_EDIT_USER` env variable is set, so you will be able to create a user on the go, and even set them as admin.
+![Ncat debugging example](./docs/ncat-debug-example.png)
+
+#### Change the port
+If you want to change this port, it is defined as the `port` option within platform `net`'s configuration in [`config.json`](./config-default.json).
+Do keep in mind that when running via Docker, the configuration of exposed ports also needs to change accordingly in [`docker-compose`](./docker-compose.example.yaml) as well.
+
+#### Chrome DevTools
+Also by default, Supibot runs in debug mode with the default Chrome DevTools port open (`9229`). 
+This allows connecting via the `chrome://inspect` tool.
+
+#### JSON configuration: `config.json`
+Finally, check out the "usageGuide" text in [`config.json`](./config-default.json) for a brief guide on how to enable/disable a specific set of commands or other modules. 
 
 ## Ambassadors
 Owners of channels (or Discord servers) have elevated rights to manage Supibot. 

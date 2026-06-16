@@ -22,7 +22,7 @@ services:
     ports:
       - "9229:9229" # Default Chrome DevTools port
       - "11000:11000" # Default Supibot internal API port
-      - "127.0.0.1:11001:11001" # Default Supibot nc port, local only
+      - "127.0.0.1:11001:11001" # Default Supibot ncat port, local only
     links:
       - db
       - redis
@@ -38,7 +38,8 @@ services:
         target: /home/project/supibot/.env
     restart: unless-stopped
     environment:
-      #- "DEBUG_MODE=1"
+      - "DEBUG_MODE=1"
+      - "DEBUG_NET_EDIT_USER=1" # allows user editing from the `net` platform
       - "AUTO_SETUP_MODE=auto" # auto / never / always
       - "AUTO_SETUP_VERSION=1"
       - "MARIA_HOST=db"
