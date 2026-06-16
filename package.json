@@ -32,7 +32,7 @@
     "auto-setup": "tsc && node --env-file=.env init/auto-setup.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "ncu": "yarn dlx npm-check-updates",
+    "ncu": "yarn dlx npm-check-updates -c 7d",
     "test": "node --test-reporter=dot --import ./tests/register-loader.mjs --experimental-test-module-mocks --test",
     "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core",
     "validate:config": "node ./build/utils/validate-config.js"
@@ -50,14 +50,11 @@
     "globals": "^17.6.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0"
+    "typescript-eslint": "^8.61.1"
   },
   "nyc": {
     "all": false,
-    "reporter": [
-      "text",
-      "html"
-    ]
+    "reporter": ["text", "html"]
   },
-  "packageManager": "yarn@4.16.0"
+  "packageManager": "yarn@4.17.0"
 }
