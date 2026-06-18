@@ -98,6 +98,9 @@ export const flagEmojis = {
 	Australia: "🇦🇺",
 	Brazil: "🇧🇷",
 	Germany: "🇩🇪",
+	Japan: "🇯🇵",
+	Singapore: "🇸🇬",
+	"South Africa": "🇿🇦",
 	"United Kingdom": "🇬🇧",
 	"United States": "🇺🇸"
 };
