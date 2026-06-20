@@ -97,7 +97,7 @@ export const RandomAnimalFactCommand = declare({
 				break;
 			}
 			case "dog": {
-				const response = await core.Got.get("GenericAPI")("https://dog-api.kinduff.com/api/facts");
+				const response = await core.Got.get("GenericAPI")("https://dogapi.dog/api/v1/facts");
 				fact = multiFactSchema.parse(response.body).facts[0];
 				break;
 			}
