@@ -16,7 +16,7 @@ import {
 	PermissionFlagsBits,
 	Routes,
 	TextChannel,
-	escapeMarkdown, type OmitPartialGroupDMChannel
+	escapeMarkdown
 } from "discord.js";
 
 import { BasePlatformConfigSchema } from "./schema.js";

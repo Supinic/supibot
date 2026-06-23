@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
 
 const searchSchema = z.tuple([ // For given search term:
