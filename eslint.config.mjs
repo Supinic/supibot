@@ -6,7 +6,7 @@ import globals from "globals";
 
 export default tseslint.config(
 	eslintJs.configs.recommended,
-	unicornPlugin.configs.recommended,
+	unicornPlugin.configs.unopinionated,
 	tseslint.configs.strictTypeChecked,
 	{
 		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
