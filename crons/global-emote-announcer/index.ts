@@ -184,7 +184,7 @@ export default {
 			message += `Deleted: ${json.deleted.map(i => i.name).join(" ")}`;
 		}
 
-		for (const [channelId, usernames] of channelUserMap.entries()) {
+		for (const [channelId, usernames] of channelUserMap) {
 			const channelData = sb.Channel.getAsserted(channelId);
 			const names = usernames.map(i => `@${i}`).join(" ");
 			const finalMessage = `${names} ${message}`;

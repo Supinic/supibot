@@ -215,6 +215,7 @@ export default tseslint.config(
 			"@typescript-eslint/no-unnecessary-type-assertion": "off", // Can trigger false positives (TwitchPlatform)
 			"@typescript-eslint/no-unnecessary-type-conversion": "off", // Maybe re-enable later to force proper types
 			"@typescript-eslint/no-useless-default-assignment": "off", // Does not work for rest arguments
+			"@typescript-eslint/require-array-sort-compare": "warn", // Supersedes unicorn/require-array-sort-compare
 
 			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
 			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
@@ -245,6 +246,12 @@ export default tseslint.config(
 			"unicorn/max-nested-calls": "off", // Reports on Zod schemas and is in general not very useful
 			"unicorn/no-useless-else": "off", // Honestly thinking of switching to unopinionated at this point
 			"unicorn/prefer-type-literal-last": "off", // Honestly thinking of switching to unopinionated at this point
+			"unicorn/prefer-at": "off", // Just flat out wrong in some cases
+			"unicorn/require-array-sort-compare": "off", // Superseded by TypeScript rule @typescript-eslint/require-array-sort-compare
+			"unicorn/prefer-uint8array-base64": "off", // Prefer working with Buffer myself
+			"unicorn/prefer-minimal-ternary": "off", // Seems to just not work? api/index.ts
+			"unicorn/prefer-await": "off", // Triggers in constructors (??),
+			"unicorn/prefer-unicode-code-point-escapes": "off", // Conflicts with no-incorrect-template-string-interpolation and also makes regexes way too verbose
 
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error",

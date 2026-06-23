@@ -12,7 +12,6 @@ export default {
 	add: async (req, res, url) => {
 		const channelName = url.searchParams.get("name");
 		const platformName = url.searchParams.get("platform");
-		const botChannelMode = url.searchParams.get("mode") ?? "Write";
 
 		if (!channelName || !platformName) {
 			return {
@@ -26,6 +25,8 @@ export default {
 				data: { message: "Invalid platform provided" }
 			};
 		}
+
+		const botChannelMode = url.searchParams.get("mode") ?? "Write";
 		if (!isChannelMode(botChannelMode)) {
 			return {
 				statusCode: 400,

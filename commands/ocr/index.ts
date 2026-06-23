@@ -79,7 +79,7 @@ export default declare({
 			}
 
 			parsedURL.protocol = "https";
-			link = parsedURL.toString();
+			link = parsedURL.href;
 
 			break;
 		}
@@ -171,7 +171,7 @@ export default declare({
 	},
 	Dynamic_Description: function (prefix) {
 		const tableBody = [];
-		for (const [code, def] of ocrLanguages.entries()) {
+		for (const [code, def] of ocrLanguages) {
 			const name = getName(code) ?? "(N/A)";
 			const engines = def.engines.join(", ");
 

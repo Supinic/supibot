@@ -303,7 +303,7 @@ class CytubeClient {
 			channel: this.channelData,
 			platform: this.platform,
 			platformSpecificData: null,
-			options: { privateMessage: Boolean(replyIntoPM) }
+			options: { privateMessage: replyIntoPM }
 		});
 		if (!execution.reply) {
 			return;
@@ -468,10 +468,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 		}
 
 		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
-		const promises = [];
-		for (const channelData of eligibleChannels) {
-			promises.push(this.joinChannel(channelData));
-		}
+		const promises = eligibleChannels.map(channelData => this.joinChannel(channelData));
 
 		await Promise.all(promises);
 	}

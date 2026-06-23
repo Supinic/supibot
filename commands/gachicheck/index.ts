@@ -114,7 +114,7 @@ export default declare({
 			const existingId = await core.Query.getRecordset<number | undefined>(rs => rs
 				.select("ID")
 				.from("music", "Track")
-				.where("Link = %s", String(videoData.ID))
+				.where("Link = %s", videoData.ID)
 				.single()
 				.flat("ID")
 			);

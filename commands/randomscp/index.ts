@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/prefer-https */
-// this is correct because the GraphQL returns `null` for the same URL at `anyBaseUrl`
 import * as z from "zod";
 import { declare } from "../../classes/command.js";
 
@@ -27,6 +25,7 @@ export default declare({
 	Code: (async function randomSCP () {
 		const response = await core.Got.gql({
 			url: "https://api.crom.avn.sh/graphql",
+			// HTTP is correct because the GraphQL returns `null` for the same URL at `anyBaseUrl`
 			query: `{
 				randomPage (filter: {
 					anyBaseUrl: "http://scp-wiki.wikidot.com"
@@ -66,7 +65,7 @@ export default declare({
 			reply: core.Utils.tag.trim `
 				(${ratingString})
 				${title}:
-				${url.toString()}
+				${url.href}
 			`
 		};
 	}),

@@ -123,7 +123,7 @@ export const handleEventSubscription = async function (subscriptionType: Subscri
 	}
 
 	const promises = [];
-	for (const [channelID, userDataList] of channelUsers.entries()) {
+	for (const [channelID, userDataList] of channelUsers) {
 		const promise = sendChannelSubscriptionMessage(message, channelID, userDataList);
 		promises.push(promise);
 	}

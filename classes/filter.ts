@@ -456,7 +456,6 @@ export class Filter extends TemplateWithId {
 			return { success: true };
 		}
 
-		let userTo: User | null = null;
 		const channel = options.channel ?? privateMessageChannelSymbol;
 		const localFilters = Filter.getLocals("all", {
 			...options,
@@ -496,6 +495,7 @@ export class Filter extends TemplateWithId {
 			};
 		}
 
+		let userTo: User | null = null;
 		if ((command.Flags.includes("opt-out") || command.Flags.includes("block")) && targetUser) {
 			userTo = await User.get(targetUser);
 		}

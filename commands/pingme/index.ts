@@ -46,7 +46,7 @@ export default declare({
 			Text: text,
 			Schedule: null,
 			Created: new SupiDate(),
-			Private_Message: Boolean(context.privateMessage),
+			Private_Message: context.privateMessage,
 			Platform: context.platform.ID,
 			Type: "Pingme"
 		});

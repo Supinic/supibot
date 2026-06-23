@@ -162,7 +162,7 @@ export class MpvClient {
 	}
 
 	private async saveCache () {
-		const data = [...this.itemData.entries()] satisfies MapEntries<typeof this.itemData>;
+		const data = [...this.itemData] satisfies MapEntries<typeof this.itemData>;
 		await core.Cache.setByPrefix(ITEM_DATA_CACHE_KEY, data, {
 			expiry: 12 * 36e5 // 12 hours
 		});
@@ -393,7 +393,7 @@ export class MpvClient {
 		const { data } = dataSchemas.playlist.parse(raw);
 		const urls = new Set(data.map(i => i.filename));
 
-		for (const [id, item] of this.itemData.entries()) {
+		for (const [id, item] of this.itemData) {
 			if (urls.has(item.url)) {
 				continue;
 			}

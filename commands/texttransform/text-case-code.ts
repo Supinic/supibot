@@ -69,7 +69,6 @@ const decode = (input: string, codeWord: string) => {
 	const words = input.split(/\s/);
 	const output = [];
 	for (const rawWord of words) {
-		let appendix = "";
 		const normalized = rawWord.normalize("NFKD").replaceAll(DIAERESIS, "").toLowerCase();
 		const codeIndex = normalized.indexOf(codeWord.toLowerCase());
 		if (codeIndex === -1) {
@@ -78,6 +77,7 @@ const decode = (input: string, codeWord: string) => {
 		}
 
 		let word = rawWord;
+		let appendix = "";
 		if (normalized.length !== codeWord.length) {
 			word = rawWord.slice(codeIndex, codeIndex + codeWord.length);
 			if (codeIndex > 0) {

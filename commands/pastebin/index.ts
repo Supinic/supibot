@@ -50,10 +50,6 @@ export default declare({
 	],
 	Whitelist_Response: null,
 	Code: async function pastebin (context, command, ...rest) {
-		let type: "get" | "post";
-		let provider;
-		const rawArgs = [...rest];
-
 		if (!command) {
 			return {
 				success: false,
@@ -61,6 +57,9 @@ export default declare({
 			};
 		}
 
+		let type: "get" | "post";
+		let provider;
+		const rawArgs = [...rest];
 		if (command === "get" || context.invocation === "pbg") {
 			provider = "pastebin";
 			type = "get";

@@ -272,10 +272,12 @@ export class Reminder extends TemplateWithId {
 	}
 
 	destroy () {
-		if (this.timeout) {
-			this.timeout.clear();
-			this.timeout = null;
+		if (!this.timeout) {
+			return;
 		}
+
+		this.timeout.clear();
+		this.timeout = null;
 	}
 
 	static async initialize () {

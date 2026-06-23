@@ -330,7 +330,7 @@ export default declare({
 		else {
 			return {
 				reply: (context.params.textOnly)
-					? `${post.content}`
+					? String(post.content)
 					: `${post.ID} ${flagEmoji} (posted ${delta}): ${post.content ?? ""}`
 			};
 		}

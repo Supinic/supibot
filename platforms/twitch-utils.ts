@@ -5,7 +5,7 @@ import type { TwitchPlatform } from "./twitch.js";
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 
-const { env } = globalThis.process;
+const { env } = process;
 
 const APP_ACCESS_CACHE_KEY = "twitch-app-access-token";
 const CONDUIT_ID_KEY = "twitch-conduit-id";

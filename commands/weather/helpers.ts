@@ -170,17 +170,17 @@ export const getIcon = (code: number, current: WeatherDataItem) => {
 	}
 };
 
+const windDirectionInterval = 22.5;
 export const getWindDirection = (degrees: number) => {
 	degrees %= 360;
 
 	const base = 11.25;
-	const interval = 22.5;
 	if (degrees < base || degrees >= (360 - base)) {
 		return "N";
 	}
 
 	// It is guaranteed that the value (0-359) is going to fall between the 15 different wind directions, so always `string`
-	const index = Math.trunc((degrees - base) / interval);
+	const index = Math.trunc((degrees - base) / windDirectionInterval);
 	return WIND_DIRECTIONS.at(index) as string;
 };
 
