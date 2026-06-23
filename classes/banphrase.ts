@@ -99,21 +99,27 @@ const ExternalBanphraseAPI = {
 	async pajbot (message: string, url: string) {
 		message = message.trim().replaceAll(/\s+/g, " ");
 
-		const response = await core.Got.get("GenericAPI")<PajbotResponse>({
-			method: "POST",
-			url: `https://${url}/api/v1/banphrases/test`,
-			json: { message },
-			timeout: {
-				request: values.pajbotBanphraseRequestTimeout
-			},
-			retry: {
-				limit: 1
-			}
-		});
+		let response;
+		try {
+			response = await core.Got.get("GenericAPI")<PajbotResponse>({
+				method: "POST",
+				url: `https://${url}/api/v1/banphrases/test`,
+				json: { message },
+				timeout: {
+					request: values.pajbotBanphraseRequestTimeout
+				},
+				retry: {
+					limit: 1
+				}
+			});
+		}
+		catch (e) {
+			console.warn("Banphrase request failure", { e, url, message });
+		}
 
-		if (!response.ok) {
+		if (!response || !response.ok) {
 			throw new SupiError({
-				message: "Cannot check for banphrases",
+				message: `Cannot request the "${url}" banphrase API`,
 				args: { message, url }
 			});
 		}
