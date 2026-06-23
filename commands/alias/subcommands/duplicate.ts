@@ -5,8 +5,10 @@ import {
 	ALIAS_INVALID_NAME_RESPONSE,
 	ALIAS_NAME_REGEX,
 	getAliasByNameAndUser,
-	getClassicAliasRow, isClassicAlias,
-	isLinkedAlias
+	getClassicAliasRow,
+	isClassicAlias,
+	isLinkedAlias,
+	isOrphanedAlias
 } from "../alias-utils.js";
 
 export default {
@@ -44,6 +46,12 @@ export default {
 			return {
 				success: false,
 				reply: `You cannot duplicate links to other aliases!`
+			};
+		}
+		else if (isOrphanedAlias(oldAlias)) {
+			return {
+				success: false,
+				reply: "You cannot duplicate this alias because the original it links to has been deleted!"
 			};
 		}
 

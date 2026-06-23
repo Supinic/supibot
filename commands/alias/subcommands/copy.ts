@@ -8,6 +8,7 @@ import {
 	getClassicAliasRow,
 	isClassicAlias,
 	isLinkedAlias,
+	isOrphanedAlias,
 	isRestricted
 } from "../alias-utils.js";
 
@@ -62,13 +63,18 @@ export default {
 		else if (isLinkedAlias(targetAlias)) {
 			const parentAlias = await getAliasById(targetAlias.Parent);
 			if (!parentAlias) {
-				return {
-					success: false,
-					reply: "You cannot copy this alias because the original it links to has been deleted!"
-				};
+				throw new SupiError({
+					message: "Assert error: Parent alias does not exist"
+				});
 			}
 
 			targetAlias = parentAlias;
+		}
+		else if (isOrphanedAlias(targetAlias)) {
+			return {
+				success: false,
+				reply: "You cannot copy this alias because the original it links to has been deleted!"
+			};
 		}
 
 		/* node:coverage ignore next 6 */

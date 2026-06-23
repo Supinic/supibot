@@ -15,7 +15,8 @@ import {
 	applyParameters,
 	parseInvocationName,
 	parseCommandName,
-	isClassicAlias
+	isClassicAlias,
+	isOrphanedAlias
 } from "../alias-utils.js";
 
 const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
@@ -144,7 +145,7 @@ export default {
 			subInvocation = "try";
 			user = await sb.User.getAsserted(parentAlias.User_Alias);
 		}
-		else if (alias.Command === null && alias.Parent === null) {
+		else if (isOrphanedAlias(alias)) {
 			return {
 				success: false,
 				reply: `You tried to ${subInvocation} a linked alias, but the original has been deleted!`
@@ -160,7 +161,7 @@ export default {
 		if (!isClassicAlias(alias)) {
 			/* node:coverage ignore next 4 */
 			throw new SupiError({
-				message: "Assert error: No classic alias obtained",
+				message: "Assert error: Alias is not classic-type",
 				args: { alias }
 			});
 		}

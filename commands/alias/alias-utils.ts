@@ -44,14 +44,16 @@ type ClassicAliasData = AliasData & {
 	Invocation: Command["Name"];
 	Arguments: string | null;
 };
-type LinkedAliasData = AliasData & {
+type PossiblyLinkedAliasData = AliasData & {
 	User_Alias: User["ID"];
 	Channel: null;
 	Command: null;
 	Invocation: null;
 	Arguments: null;
-	Parent: AliasData["ID"];
+	Parent: AliasData["ID"] | null;
 };
+type LinkedAliasData = PossiblyLinkedAliasData & { Parent: AliasData["ID"]; };
+type OrphanedAliasData = PossiblyLinkedAliasData & { Parent: null; };
 type ChannelAliasData = AliasData & {
 	User_Alias: null;
 	Channel: Channel["ID"];
@@ -211,6 +213,10 @@ export const isClassicAlias = (alias: AliasData): alias is ClassicAliasData => (
 
 export const isLinkedAlias = (alias: AliasData): alias is LinkedAliasData => (
 	(alias.Parent !== null) && (alias.Command === null) && (alias.Channel === null) && (alias.User_Alias !== null)
+);
+
+export const isOrphanedAlias = (alias: AliasData): alias is OrphanedAliasData => (
+	(alias.Parent === null) && (alias.Command === null) && (alias.Channel === null) && (alias.User_Alias !== null)
 );
 
 export const isChannelAlias = (alias: AliasData): alias is ChannelAliasData => (
