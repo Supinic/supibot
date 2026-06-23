@@ -11,7 +11,7 @@ const searchSchema = z.tuple([ // For given search term:
 const articleSchema = z.object({
 	query: z.object({
 		pages: z.record(z.string(), z.object({
-			extract: z.string(),
+			extract: z.string().nullish(),
 			ns: z.int(),
 			pageid: z.int(),
 			title: z.string()
@@ -99,11 +99,13 @@ export default declare({
 
 		const data = articleSchema.parse(response.body).query.pages;
 		const key = Object.keys(data)[0];
-		if (key === "-1") {
-			throw new SupiError({
-				message: "Assert error: Wiki provides no result despite providing a search title",
-				args: { data, searchData }
-			});
+		const { extract, title } = data[key];
+
+		if (!extract) {
+			return {
+				success: false,
+				reply: `This type of special page (${title}) is not supported for this command!`
+			};
 		}
 
 		const idLink = `https://${languageCode}.wikipedia.org/?curid=${key}`;
@@ -136,7 +138,6 @@ export default declare({
 			};
 		}
 
-		const { extract, title } = data[key];
 		return {
 			success: true,
 			reply: `${link} ${title}: ${core.Utils.wrapString(extract, 500)}`
