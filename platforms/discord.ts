@@ -16,7 +16,7 @@ import {
 	PermissionFlagsBits,
 	Routes,
 	TextChannel,
-	escapeMarkdown
+	escapeMarkdown, type OmitPartialGroupDMChannel
 } from "discord.js";
 
 import { BasePlatformConfigSchema } from "./schema.js";
@@ -352,6 +352,21 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		// The only embeds sent like this are (usually) from bots, and can be ignored.
 		if (messageObject.content.length === 0 && Array.isArray(messageObject.embeds) && messageObject.embeds.length > 0) {
 			return;
+		}
+
+		if (messageObject.channel.partial) {
+			try {
+				await messageObject.fetch();
+			}
+			catch (e) {
+				const err = (e instanceof Error) ? e : new SupiError({ message: String(e) });
+				void logger.logError("Command", err, {
+					origin: "External",
+					context: "Discord partial channel fetch failure",
+					arguments: { message: JSON.stringify(messageObject) }
+				});
+				return;
+			}
 		}
 
 		const {
