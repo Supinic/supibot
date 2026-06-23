@@ -104,11 +104,7 @@ export default function initialize () {
 		: http.createServer((req, res) => void handleRequest(req, res, baseURL));
 
 	for (const [routeName, endpoints] of Object.entries(routeDefinitions)) {
-		const endpointMap = new Map<string, ApiFunction>();
-		for (const [endpoint, handler] of Object.entries(endpoints)) {
-			endpointMap.set(endpoint, handler);
-		}
-
+		const endpointMap = new Map<string, ApiFunction>(Object.entries(endpoints));
 		router.set(routeName, endpointMap);
 	}
 

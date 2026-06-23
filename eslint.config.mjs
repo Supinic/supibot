@@ -176,7 +176,6 @@ export default tseslint.config(
 			"unicorn/prefer-spread": "off",
 			"unicorn/empty-brace-spaces": "warn",
 			"unicorn/new-for-builtins": "error",
-			"unicorn/no-array-for-each": "error",
 			"unicorn/no-array-push-push": "warn",
 			"unicorn/no-console-spaces": "warn",
 			"unicorn/no-lonely-if": "warn",
@@ -243,6 +242,10 @@ export default tseslint.config(
 			"unicorn/no-this-outside-of-class": "off", // Completely breaks for all command, chatmodule, cron, (...) definitions' codes
 			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
 			"unicorn/prefer-includes-over-repeated-comparisons": ["warn", { minimumComparisons: 4 }], // Three comparisons are fine
+			"unicorn/max-nested-calls": "off", // Reports on Zod schemas and is in general not very useful
+			"unicorn/no-useless-else": "off", // Honestly thinking of switching to unopinionated at this point
+			"unicorn/prefer-type-literal-last": "off", // Honestly thinking of switching to unopinionated at this point
+
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error",
 

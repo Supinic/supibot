@@ -182,7 +182,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 
 		let statusMessage;
 		const status = data.Status ?? DEFAULT_AFK_STATUS; // Fallback for old AFKs without `Status` property
-		if (durationStatuses[status]) {
+		if (Object.hasOwn(durationStatuses, status)) {
 			const minutesDelta = (SupiDate.now() - data.Started.getTime()) / 60_000;
 			const durationDefinitions = durationStatuses[status];
 

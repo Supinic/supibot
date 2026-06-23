@@ -92,7 +92,7 @@ export class ChatModule extends TemplateWithoutId {
 		this.Name = data.Name;
 		this.Code = data.Code;
 		this.Events = data.Events;
-		this.Global = Boolean(data.Global);
+		this.Global = data.Global;
 
 		if (data.Platform) {
 			const platform = Platform.get(data.Platform);
@@ -217,7 +217,7 @@ export class ChatModule extends TemplateWithoutId {
 
 		this.detach({
 			channel: channels,
-			remove: Boolean(hard)
+			remove: hard
 		});
 	}
 

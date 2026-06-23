@@ -13,7 +13,6 @@ export default {
 		const channelName = url.searchParams.get("name");
 		const platformName = url.searchParams.get("platform");
 		const botChannelMode = url.searchParams.get("mode") ?? "Write";
-		const announcement = url.searchParams.get("announcement") ?? null;
 
 		if (!channelName || !platformName) {
 			return {
@@ -46,6 +45,7 @@ export default {
 		const newChannelData = await sb.Channel.add(channelName, platformData, botChannelMode, channelID);
 		await platformData.joinChannel(channelID);
 
+		const announcement = url.searchParams.get("announcement") ?? null;
 		if (announcement) {
 			await newChannelData.send(announcement);
 		}
@@ -59,7 +59,7 @@ export default {
 		let total = 0;
 		const platformStats: Record<string, number> = {};
 
-		for (const [platformData, platformMap] of sb.Channel.data.entries()) {
+		for (const [platformData, platformMap] of sb.Channel.data) {
 			for (const channelData of platformMap.values()) {
 				if (channelData.Mode === "Inactive") {
 					continue;
