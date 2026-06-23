@@ -8,7 +8,7 @@ type ParserOptions = {
 };
 
 let linkParser: LinkParser | null = null;
-export default async (): Promise<LinkParser> => {
+export const getLinkParser = async (): Promise<LinkParser> => {
 	if (!linkParser) {
 		const options: ParserOptions = {};
 		if (process.env.API_GOOGLE_YOUTUBE) {

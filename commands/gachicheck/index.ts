@@ -1,7 +1,7 @@
 import { SupiDate, SupiError } from "supi-core";
 import type { ParserName } from "track-link-parser";
 import { postToHastebin } from "../../utils/command-utils.js";
-import getLinkParser from "../../utils/link-parser.js";
+import { getLinkParser } from "../../utils/link-parser.js";
 import { declare } from "../../classes/command.js";
 import type { Channel } from "../../classes/channel.js";
 

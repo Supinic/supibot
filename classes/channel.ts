@@ -18,7 +18,7 @@ import {
 } from "./custom-data-properties.js";
 
 import type { User } from "./user.js";
-import createMessageLoggingTable from "../utils/create-db-table.js";
+import { createMessageLoggingTable } from "../utils/create-db-table.js";
 import { TemplateWithId } from "./template.js";
 import type { Emote } from "../utils/globals.js";
 

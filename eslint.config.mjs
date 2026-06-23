@@ -225,7 +225,6 @@ export default tseslint.config(
 			"unicorn/no-typeof-undefined": "off",
 			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
 
-			"unicorn/no-anonymous-default-export": "off", // Remove when refactored to imports/exports
 			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
 			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
 			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
