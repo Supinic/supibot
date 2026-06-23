@@ -218,16 +218,20 @@ console.timeEnd("crons");
 console.debug("Connected to all platforms. Ready!");
 console.groupEnd();
 
-process.on("unhandledRejection", (reason) => {
+process.on("unhandledRejection", (reason, promise) => {
 	if (!(reason instanceof Error)) {
 		return;
 	}
 
 	const origin = (reason.name.includes("RequestError")) ? "External" : "Internal";
-	void logger.logError("Backend", reason, {
+	logger.logError("Backend", reason, {
 		origin,
 		context: {
 			cause: "UnhandledPromiseRejection"
 		}
+	}).then(id => {
+		console.log(`Unhandled rejection ID ${id}`, { reason, promise, origin });
+	}).catch((e: unknown) => {
+		console.error("Could not log unhandled rejection", { e, reason, promise, origin });
 	});
 });
