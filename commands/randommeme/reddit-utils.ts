@@ -14,14 +14,21 @@ const configShape = z.object({
 export const redditConfig = configShape.parse(rawConfig);
 
 const subredditSchema = z.union([
-	z.object({
-		data: z.object({ after: z.null() })
-	}),
-	z.object({
+	z.object({ // Exact subreddit match
 		data: z.object({
 			display_name: z.string(),
 			quarantine: z.boolean().optional(),
 			over18: z.boolean().optional()
+		})
+	}),
+	z.object({ // Attempt to search for subreddits, no results
+		data: z.object({ after: z.null() })
+	}),
+	z.object({ // Attempt to search for subreddits, nonzero results
+		data: z.object({
+			children: z.array(z.object({
+				kind: z.literal("t5")
+			}))
 		})
 	})
 ]);
@@ -236,7 +243,7 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 	}
 
 	const aboutData = subredditSchema.parse(aboutResponse.body).data;
-	if ("after" in aboutData) {
+	if ("after" in aboutData || "children" in aboutData) {
 		return {
 			success: false,
 			reply: `There is no subreddit with that name!`
