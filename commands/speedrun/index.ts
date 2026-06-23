@@ -27,7 +27,7 @@ const runsSchema = z.object({
 				players: z.array(z.object({
 					id: z.string().optional()
 				})),
-				date: z.string(),
+				date: z.string().nullable(),
 				times: z.object({
 					primary_t: z.number()
 				}),
@@ -131,7 +131,10 @@ export default declare({
 		}
 
 		const link = run.videos?.links?.[0]?.uri ?? run.weblink;
-		const date = new SupiDate(run.date).format("Y-m-d");
+		const date = (run.date)
+			? new SupiDate(run.date).format("Y-m-d")
+			: "(no date)";
+
 		const time = core.Utils.formatTime(run.times.primary_t);
 		return {
 			success: true,
