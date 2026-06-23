@@ -220,21 +220,11 @@ export default tseslint.config(
 			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
 			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
 
-			"unicorn/filename-case": "off", // Sudden opinionated default rule - removed
-			"unicorn/consistent-compound-words": "warn", // Do not error on grammar
-			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
-			"unicorn/prevent-abbreviations": "off",
-			"unicorn/no-null": "off",
-			"unicorn/explicit-length-check": "off",
-			"unicorn/no-negated-condition": "off",
 			"unicorn/prefer-ternary": "off",
-			"unicorn/no-for-loop": "off",
-			"unicorn/text-encoding-identifier-case": "off", // Also applies to standalone strings rather than arguments => disable
+			"unicorn/no-negated-condition": "off",
 			"unicorn/no-typeof-undefined": "off",
-			"unicorn/no-static-only-class": "off",
-			"unicorn/switch-case-braces": "off",
-			"unicorn/prefer-default-parameters": "off",
-			"unicorn/prefer-type-error": "off",
+			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
+
 			"unicorn/no-anonymous-default-export": "off", // Remove when refactored to imports/exports
 			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
 			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
