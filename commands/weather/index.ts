@@ -45,8 +45,6 @@ export default declare({
 	Params: [
 		{ name: "alerts", type: "boolean" },
 		{ name: "format", type: "string" },
-		{ name: "latitude", type: "number" },
-		{ name: "longitude", type: "number" },
 		{ name: "pollution", type: "boolean" },
 		{ name: "status", type: "string" }
 	],
@@ -116,34 +114,7 @@ export default declare({
 		let formattedAddress: string | null = null;
 		let isOwnLocation: boolean | null = null;
 
-		if (typeof context.params.latitude === "number" || typeof context.params.longitude === "number") {
-			const { latitude, longitude } = context.params;
-			if (typeof latitude !== "number" || typeof longitude !== "number") {
-				return {
-					success: false,
-					reply: `If using exact coordinates, you must specify both the latitude and the longitude!`
-				};
-			}
-
-			if (Math.abs(latitude) > 90) {
-				return {
-					success: false,
-					reply: `Invalid latitude! Must be in range <-90, 90>`
-				};
-			}
-			else if (Math.abs(longitude) > 180) {
-				return {
-					success: false,
-					reply: `Invalid longitude! Must be in range <-180, 180>`
-				};
-			}
-
-			coords = {
-				lat: latitude,
-				lng: longitude
-			};
-		}
-		else if (args.length === 0) {
+		if (args.length === 0) {
 			isOwnLocation = true;
 
 			const location = await context.user.getDataProperty("location");

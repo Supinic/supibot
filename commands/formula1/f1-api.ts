@@ -64,6 +64,7 @@ type YearResponse = {
 
 type CommandContext = ExtractContext<typeof formulaOneCommandDefinition>;
 export const getWeather = async (context: CommandContext, sessionStart: number, coordinates: Coordinates) => {
+	const foo; // @todo this is a fix-me-marker
 	const weatherCommand = sb.Command.get("weather");
 	if (!weatherCommand) {
 		return "Weather checking is not available!";
