@@ -48,8 +48,7 @@ export default declare({
 		{ name: "latitude", type: "number" },
 		{ name: "longitude", type: "number" },
 		{ name: "pollution", type: "boolean" },
-		{ name: "status", type: "string" },
-		{ name: "radar", type: "boolean" }
+		{ name: "status", type: "string" }
 	],
 	Whitelist_Response: null,
 	Code: (async function weather (context, ...args) {
@@ -280,36 +279,6 @@ export default declare({
 			throw new SupiError({
 				message: "Assert error: Formatted address not filled"
 			});
-		}
-
-		if (context.params.radar) {
-			const lat = coords.lat.toFixed(4);
-			const lng = coords.lng.toFixed(4);
-			const message = `Weather radar for ${formattedAddress}: https://www.windy.com/-Weather-radar-radar?radar,${lat},${lng},6,d:picker`;
-			if (skipLocation) {
-				if (isOwnLocation) {
-					await context.platform.pm(
-						message,
-						context.user,
-						context.channel
-					);
-
-					return {
-						reply: `I private messaged the radar link, as you have set your location to private.`
-					};
-				}
-				else {
-					return {
-						success: false,
-						reply: `Cannot show the radar for their location, as they have set it to private!`
-					};
-				}
-			}
-			else {
-				return {
-					reply: message
-				};
-			}
 		}
 
 		if (context.params.pollution) {
@@ -613,10 +582,6 @@ export default declare({
 
 		`<code>${prefix}weather (place) pollution:true</code>`,
 		"Posts a summary of the current pollution for the provided location.",
-		"",
-
-		`<code>${prefix}weather (place) radar:true</code>`,
-		"Posts a link to a weather radar for the provided location. Uses Windy.com",
 		"",
 
 		`<code>${prefix}weather (place) status:text</code>`,
