@@ -1,6 +1,11 @@
 // @todo figure out where to place this file properly within the project
 import * as z from "zod";
 
+export const probabilityShape = z.number().min(0).max(1);
+export const percentShape = z.number().min(0).max(100);
+export const degreeShape = z.number().min(0).max(360);
+export const unixTimestampShape = z.number().int().nonnegative();
+
 export const twitchIdentitySchema = z.object({
 	access_token: z.string(),
 	refresh_token: z.string()
