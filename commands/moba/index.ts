@@ -20,7 +20,7 @@ const mobaCommandDefinition = declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "This command lets you check many things related to several MOBA games - League of Legends ($league).",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention", "pipe", "skip-banphrase"],
 	Params: [
 		{ name: "rawData", type: "boolean" }
 	],

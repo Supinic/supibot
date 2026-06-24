@@ -27,7 +27,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Attempts to convert a specified amount of one currency to another. Only supports 3-letter ISO codes. Example: 100 USD to EUR.",
-	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
+	Flags: ["mention", "non-nullable", "pipe", "skip-banphrase"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function currency (context, ...args) {

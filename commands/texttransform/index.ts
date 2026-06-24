@@ -7,11 +7,11 @@ const LOREM_IPSUM = "Lorem Ipsum is simply dummy text of the printing and typese
 
 export default declare({
 	Name: "texttransform",
-	Aliases: ["tt","reversetexttransform","rtt"],
+	Aliases: ["tt", "reversetexttransform", "rtt"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Transforms provided text into one of the provided types, such as \"vaporwave\", for example.",
-	Flags: ["external-input","non-nullable","pipe"],
+	Flags: ["external-input", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: function textTransform (context, name, ...args) {

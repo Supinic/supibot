@@ -40,7 +40,7 @@ const ERROR_REASONS = {
 
 type Cause =
 	| "scheduled-incoming" | "scheduled-outgoing" | "public-incoming"
- 	| "public-outgoing" | "private-incoming" | "private-outgoing"
+	| "public-outgoing" | "private-incoming" | "private-outgoing"
 	| "existing-pingme";
 type LimitCheckFailure = { success: false; cause: Cause; reason: typeof ERROR_REASONS[Cause]; };
 type LimitCheckResult = { success: true; } | LimitCheckFailure;
@@ -272,10 +272,12 @@ export class Reminder extends TemplateWithId {
 	}
 
 	destroy () {
-		if (this.timeout) {
-			this.timeout.clear();
-			this.timeout = null;
+		if (!this.timeout) {
+			return;
 		}
+
+		this.timeout.clear();
+		this.timeout = null;
 	}
 
 	static async initialize () {

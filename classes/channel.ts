@@ -18,7 +18,7 @@ import {
 } from "./custom-data-properties.js";
 
 import type { User } from "./user.js";
-import createMessageLoggingTable from "../utils/create-db-table.js";
+import { createMessageLoggingTable } from "../utils/create-db-table.js";
 import { TemplateWithId } from "./template.js";
 import type { Emote } from "../utils/globals.js";
 
@@ -243,7 +243,7 @@ export class Channel extends TemplateWithId {
 	): Promise<ChannelDataPropertyMap[T]> {
 		if (!options.forceCacheReload && isCachedChannelProperty(propertyName)) {
 			const cache = Channel.dataCache.get(this);
-			if (cache && cache[propertyName]) {
+			if (cache && Object.hasOwn(cache, propertyName) && cache[propertyName] !== null) {
 				return cache[propertyName];
 			}
 		}
@@ -426,7 +426,7 @@ export class Channel extends TemplateWithId {
 
 	static getActivePlatforms () {
 		const activePlatforms = [];
-		for (const [platformData, platformMap] of Channel.data.entries()) {
+		for (const [platformData, platformMap] of Channel.data) {
 			for (const channelData of platformMap.values()) {
 				if (channelData.Mode !== "Inactive") {
 					activePlatforms.push(platformData);

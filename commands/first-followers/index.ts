@@ -101,8 +101,17 @@ export const FirstChannelFollowerCommand = declare({
 
 		const response = await core.Got.gql({
 			url: "https://gql.twitch.tv/gql",
-			headers: Object.fromEntries(headers.entries()),
-			query: `{user(login:"${name}"){followers(first:1){edges{node{login}followedAt}}}}`
+			headers: Object.fromEntries(headers),
+			query: `{ 
+				user (login: "${name}") {
+					followers (first: 1) {
+						edges{
+							node { login }
+							followedAt
+						}
+					}
+				}
+			}`
 		});
 
 		const { user } = channelFollowerSchema.parse(response.body).data;
@@ -139,7 +148,7 @@ export const FirstFollowedChannelCommand = declare({
 	Aliases: ["ffc"],
 	Cooldown: 10000,
 	Description: "Fetches the first channel you or someone else have ever followed on Twitch.",
-	Flags: ["mention","non-nullable","opt-out","pipe"],
+	Flags: ["mention", "non-nullable", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function firstFollowedChannel (context, target?: string) {
@@ -155,8 +164,17 @@ export const FirstFollowedChannelCommand = declare({
 
 		const response = await core.Got.gql({
 			url: "https://gql.twitch.tv/gql",
-			headers: Object.fromEntries(headers.entries()),
-			query: `query ChannelFollows{user(login:"${name}"){follows(first:1){edges{node{login}followedAt}}}}`
+			headers: Object.fromEntries(headers),
+			query: `query ChannelFollows {
+				user(login: "${name}") {
+					follows (first:1) { 
+						edges {
+							node { login }
+							followedAt
+						}
+					}
+				}
+			}`
 		});
 
 		const rawData = followedChannelSchema.parse(response.body);

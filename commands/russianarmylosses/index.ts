@@ -63,11 +63,11 @@ export default declare({
 			}
 		}
 		else {
-			const replyParts = Object.keys(stats).map(key => {
+			const replyParts = Object.entries(stats).map(([key, value]) => {
 				const category = categories.find(i => i.code === key);
 				const term = (category) ? category.name : key; // In case of a newly added term, use the key as a fallback
 
-				let string = `${term}: ${stats[key]}`;
+				let string = `${term}: ${value}`;
 				if (increase[key] !== 0) {
 					string += ` (+${increase[key]})`;
 				}

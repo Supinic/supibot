@@ -12,9 +12,7 @@ type RandomLine = {
 import { getConfig } from "../../config.js";
 const { instances } = getConfig().rustlog;
 
-const instancesCacheKey = "rustlog-supported-channels";
 const instanceNames = Object.keys(instances);
-
 let defaultInstanceName: string | undefined;
 for (const [name, def] of Object.entries(instances)) {
 	if (def.default) {
@@ -28,6 +26,7 @@ if (!defaultInstanceName) {
 	});
 }
 
+const instancesCacheKey = "rustlog-supported-channels";
 type InstanceChannelMap = Record<string, string[]>;
 const channelListSchema = z.object({
 	channels: z.array(z.object({

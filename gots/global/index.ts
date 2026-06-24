@@ -12,6 +12,7 @@ const agent = new Agent({
 	maxCachedTlsSessions: 100
 });
 
+// eslint-disable-next-line unicorn/no-top-level-side-effects
 agent.on("session", (session: Http2Session) => {
 	session.once("goaway", () => {
 		session.close();

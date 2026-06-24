@@ -79,10 +79,10 @@ type PostData = {
 
 export default declare({
 	Name: "chan",
-	Aliases: ["4chan","textchan","filechan","imagechan"],
+	Aliases: ["4chan", "textchan", "filechan", "imagechan"],
 	Cooldown: 10000,
 	Description: "Pulls a random post from a random 4Chan board, or a specified one if you provide it.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "regex", type: "regex" },
 		{ name: "search", type: "string" },
@@ -330,7 +330,7 @@ export default declare({
 		else {
 			return {
 				reply: (context.params.textOnly)
-					? `${post.content}`
+					? String(post.content)
 					: `${post.ID} ${flagEmoji} (posted ${delta}): ${post.content ?? ""}`
 			};
 		}

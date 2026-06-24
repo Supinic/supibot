@@ -28,7 +28,7 @@ export default declare({
 	Aliases: null,
 	Cooldown: 10000,
 	Description: "Checks your question against the fortune-telling 8-ball.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (function _8ball () {

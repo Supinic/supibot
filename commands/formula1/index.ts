@@ -8,7 +8,7 @@ const formulaOneCommandDefinition = declare({
 	Aliases: ["f1"],
 	Cooldown: 5000,
 	Description: "Aggregate command about anything regarding Formula 1.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [
 		{ name: "season", type: "number" },
 		{ name: "year", type: "number" },

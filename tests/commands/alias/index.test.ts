@@ -489,7 +489,8 @@ describe("$alias", async () => {
 				[TARGET_ALIAS]: {
 					Channel: null,
 					User_Alias: TARGET_USER_ID,
-					Parent: 1,
+					// Parent: 1, // This cannot ever happen because of the SET NULL rule in the Custom_Command_Alias table
+					Parent: null,
 					Command: null
 				}
 			};

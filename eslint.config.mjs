@@ -6,7 +6,7 @@ import globals from "globals";
 
 export default tseslint.config(
 	eslintJs.configs.recommended,
-	unicornPlugin.configs.recommended,
+	unicornPlugin.configs.unopinionated,
 	tseslint.configs.strictTypeChecked,
 	{
 		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
@@ -31,6 +31,7 @@ export default tseslint.config(
 			sourceType: "module"
 		},
 		rules: {
+			// JavaScript rules
 			"array-bracket-newline": ["warn", "consistent"],
 			"array-bracket-spacing": ["warn", "never"],
 			"array-element-newline": ["warn", "consistent"],
@@ -120,7 +121,6 @@ export default tseslint.config(
 			"no-var": "error",
 			"no-whitespace-before-property": "warn",
 			"no-unused-private-class-members": "warn",
-			// "no-use-before-define": "error",
 			"no-with": "error",
 			"object-curly-newline": ["warn", {
 				consistent: true
@@ -170,13 +170,15 @@ export default tseslint.config(
 			"symbol-description": "off",
 			"template-curly-spacing": ["warn", "never"],
 			"template-tag-spacing": ["warn", "always"],
+			"wrap-iife": ["warn", "inside"],
+			yoda: "error",
+
+			// Unicorn rules - additions
 			"unicorn/catch-error-name": ["warn", {
 				name: "e"
 			}],
-			"unicorn/prefer-spread": "off",
 			"unicorn/empty-brace-spaces": "warn",
 			"unicorn/new-for-builtins": "error",
-			"unicorn/no-array-for-each": "error",
 			"unicorn/no-array-push-push": "warn",
 			"unicorn/no-console-spaces": "warn",
 			"unicorn/no-lonely-if": "warn",
@@ -184,7 +186,6 @@ export default tseslint.config(
 			"unicorn/no-nested-ternary": "warn",
 			"unicorn/no-new-buffer": "error",
 			"unicorn/no-unreadable-array-destructuring": "error",
-			"unicorn/no-unsafe-regex": "off",
 			"unicorn/number-literal-case": "warn",
 			"unicorn/numeric-separators-style": ["warn", {
 				onlyIfContainsSeparator: true
@@ -198,11 +199,28 @@ export default tseslint.config(
 			"unicorn/prefer-date-now": "warn",
 			"unicorn/prefer-includes": "warn",
 			"unicorn/prefer-math-trunc": "warn",
-			"unicorn/prefer-string-raw": "off",
 			"unicorn/prefer-string-starts-ends-with": "warn",
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
+			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
+			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
 
+			// Unicorn rules - removals
+			"unicorn/prefer-ternary": "off", // Could be perhaps enabled later as ["warn", "only-single-line"]
+			"unicorn/no-negated-condition": "off", // Could be perhaps enabled later to enforce a specific condition flow
+			"unicorn/no-typeof-undefined": "off", // Too much of a "muscle memory" for me
+			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
+			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
+			"unicorn/prefer-event-target": "off", // Not the same API as EventEmitter, fine in a Node.js project
+			"unicorn/require-array-sort-compare": "off", // Superseded by TypeScript rule @typescript-eslint/require-array-sort-compare
+			"unicorn/prefer-at": "off", // Just flat out wrong in some cases
+			"unicorn/prefer-type-literal-last": "off", // Not un-opinionated
+			"unicorn/prefer-uint8array-base64": "off", // Prefer working with Buffer myself
+			"unicorn/prefer-minimal-ternary": "off", // Seems to just not work? api/index.ts
+			"unicorn/prefer-await": "off", // Triggers in constructors (??),
+			"unicorn/prefer-unicode-code-point-escapes": "off", // Conflicts with no-incorrect-template-string-interpolation and also makes regexes way too verbose
+
+			// TypeScript rules
 			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
@@ -216,52 +234,36 @@ export default tseslint.config(
 			"@typescript-eslint/no-unnecessary-type-assertion": "off", // Can trigger false positives (TwitchPlatform)
 			"@typescript-eslint/no-unnecessary-type-conversion": "off", // Maybe re-enable later to force proper types
 			"@typescript-eslint/no-useless-default-assignment": "off", // Does not work for rest arguments
+			"@typescript-eslint/require-array-sort-compare": "warn", // Supersedes unicorn/require-array-sort-compare
 
-			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
-			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
-
-			"unicorn/filename-case": "off", // Sudden opinionated default rule - removed
-			"unicorn/consistent-compound-words": "warn", // Do not error on grammar
-			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
-			"unicorn/prevent-abbreviations": "off",
-			"unicorn/no-null": "off",
-			"unicorn/explicit-length-check": "off",
-			"unicorn/no-negated-condition": "off",
-			"unicorn/prefer-ternary": "off",
-			"unicorn/no-for-loop": "off",
-			"unicorn/text-encoding-identifier-case": "off", // Also applies to standalone strings rather than arguments => disable
-			"unicorn/no-typeof-undefined": "off",
-			"unicorn/no-static-only-class": "off",
-			"unicorn/switch-case-braces": "off",
-			"unicorn/prefer-default-parameters": "off",
-			"unicorn/prefer-type-error": "off",
-			"unicorn/no-anonymous-default-export": "off", // Remove when refactored to imports/exports
-			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
-			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
-			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
-			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
-			"unicorn/no-this-outside-of-class": "off", // Completely breaks for all command, chatmodule, cron, (...) definitions' codes
-			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
-			"unicorn/prefer-includes-over-repeated-comparisons": ["warn", { minimumComparisons: 4 }], // Three comparisons are fine
-			"wrap-iife": ["warn", "inside"],
-			yoda: "error",
-
+			// Style rules
+			"@stylistic/array-bracket-newline": ["warn", "consistent"],
+			"@stylistic/array-bracket-spacing": ["warn", "never"],
+			"@stylistic/arrow-spacing": ["warn", { before: true, after: true }],
+			"@stylistic/block-spacing": ["warn", "always"],
+			"@stylistic/comma-dangle": ["warn", "never"],
+			"@stylistic/comma-spacing": ["warn", { before: false, after: true }],
 			"@stylistic/brace-style": ["warn", "stroustrup", { allowSingleLine: true }],
+			"@stylistic/eol-last": ["warn", "always"],
 			"@stylistic/indent": ["warn", "tab"],
+			"@stylistic/keyword-spacing": "warn",
+			"@stylistic/new-parens": ["warn", "always"],
 			"@stylistic/no-extra-semi": "warn",
+			"@stylistic/no-floating-decimal": "warn",
+			"@stylistic/no-extra-semi": "warn",
+			"@stylistic/no-mixed-operators": "warn",
+			"@stylistic/no-mixed-spaces-and-tabs": "warn",
+			"@stylistic/no-multi-spaces": "warn",
 			"@stylistic/semi": "warn",
 		}
 	},
 	{
 		files: ["tests/**/*.{test,spec}.ts", "**/*.test.ts"],
-		languageOptions: {
-		},
+		languageOptions: {},
 		rules: {
-			"max-nested-callbacks": "off",
-			"max-statements-per-line": ["warn", {
-				max: 2
-			}],
-			"unicorn/prefer-module": "off",
+			"max-nested-callbacks": "off", // There is a ton of nesting within test suites
+			"max-statements-per-line": ["warn", { max: 2 }], // Tests sometimes stack up two statements to save space
+			"unicorn/prefer-module": "off", // Different importing system (because of loaders)
 			"unicorn/consistent-function-scoping": "off",
 			"unicorn/no-useless-undefined": "off",
 			"unicorn/no-await-expression-member": "off",

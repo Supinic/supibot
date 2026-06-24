@@ -16,7 +16,7 @@ import {
 	PermissionFlagsBits,
 	Routes,
 	TextChannel,
-	escapeMarkdown, type OmitPartialGroupDMChannel
+	escapeMarkdown
 } from "discord.js";
 
 import { BasePlatformConfigSchema } from "./schema.js";
@@ -406,7 +406,6 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			return;
 		}
 
-		let channelData = null;
 		const userData = await sb.User.get(user, false, { Discord_ID: discordID });
 		if (userData) {
 			if (userData.Discord_ID === null && userData.Twitch_ID !== null) {
@@ -476,6 +475,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			return;
 		}
 
+		let channelData = null;
 		// @todo improve typings by removing some stuff from DiscordPlatform.parseMessage and introduce types
 		if (!privateMessage && guild && isTextChannel(messageObject.channel)) {
 			channelData = sb.Channel.get(chan, this);
@@ -657,7 +657,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 		if (embeds.length !== 0) {
 			await this.send(null, channelData, {
-				keepWhitespace: Boolean(commandOptions.keepWhitespace),
+				keepWhitespace: commandOptions.keepWhitespace,
 				embeds
 			});
 		}
@@ -683,7 +683,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 			if (typeof message === "string") {
 				await this.send(message, channelData, {
-					keepWhitespace: Boolean(commandOptions.keepWhitespace)
+					keepWhitespace: commandOptions.keepWhitespace
 				});
 			}
 		}
@@ -783,7 +783,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			user: messageObject.author.username.toLowerCase().replaceAll(/\s/g, "_"),
 			chan: messageObject.channel.id,
 			channelType: messageObject.channel.type,
-			discordID: String(messageObject.author.id),
+			discordID: messageObject.author.id,
 			author: messageObject.author,
 			mentions: messageObject.mentions,
 			guild,
@@ -837,11 +837,8 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			guild.roles.fetch()
 		]);
 
-		const list: string[] = [];
-		for (const member of discordChannel.members.values()) {
-			list.push(member.user.username);
-		}
-
+		const members = discordChannel.members.values();
+		const list = [...members].map(i => i.user.username);
 		return list;
 	}
 

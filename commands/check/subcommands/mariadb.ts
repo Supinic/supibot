@@ -25,9 +25,6 @@ export default {
 		});
 
 		const { data: memoryData } = memoryUsageSchema.parse(response.body);
-		const residental = core.Utils.formatByteSize(memoryData.VmRSS, 2);
-		const swap = core.Utils.formatByteSize(memoryData.VmSwap, 2);
-
 		if (response.statusCode !== 200) {
 			return {
 				success: false,
@@ -44,7 +41,9 @@ export default {
 			.flat("Uptime")
 		);
 
+		const swap = core.Utils.formatByteSize(memoryData.VmSwap, 2);
 		const uptime = core.Utils.timeDelta(new SupiDate().addSeconds(Number(uptimeVariable)), true);
+		const residental = core.Utils.formatByteSize(memoryData.VmRSS, 2);
 		return {
 			reply: `The MariaDB process is running for ${uptime}, and it is currently using ${residental} of memory + ${swap} in swap.`
 		};

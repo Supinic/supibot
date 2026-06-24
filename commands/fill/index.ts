@@ -15,9 +15,6 @@ export default declare({
 			};
 		}
 
-		let length = 0;
-		const result = [];
-
 		let live = false;
 		let limit = context.messageLimit;
 		if (context.channel) {
@@ -28,6 +25,8 @@ export default declare({
 			}
 		}
 
+		let length = 0;
+		const result = [];
 		while (length < limit) {
 			const randomWord = core.Utils.randArray(words);
 			result.push(randomWord);

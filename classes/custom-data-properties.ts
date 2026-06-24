@@ -39,7 +39,7 @@ function parsePrimitiveTag (input: string, type: "string"): string;
 function parsePrimitiveTag (input: string, type: PrimitiveTag): number | string | boolean;
 function parsePrimitiveTag (input: string, type: PrimitiveTag): number | string | boolean {
 	if (type === "string") {
-		return String(input);
+		return input;
 	}
 	else if (type === "number") {
 		return Number(input);
@@ -379,7 +379,7 @@ export const saveChannelDataProperty = async <T extends ChannelDataProperty> (
 
 export const saveUserDataProperty = async <T extends UserDataProperty> (
 	propertyName: T,
-	value: UserDataPropertyMap[T] ,
+	value: UserDataPropertyMap[T],
 	instanceId: User["ID"],
 	options: SpecificFetchOptions = {}
 ): Promise<void> => {

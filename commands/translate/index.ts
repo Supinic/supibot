@@ -22,7 +22,7 @@ export const translateCommandDefinition = declare({
 	Aliases: ["deepl"],
 	Cooldown: 10000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\"",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "confidence", type: "boolean" },
 		{ name: "engine", type: "string" },

@@ -1,4 +1,4 @@
-export default async (tableName: string) => {
+export const createMessageLoggingTable = async (tableName: string) => {
 	const alreadySetup = await core.Query.isTablePresent("chat_line", tableName);
 	if (alreadySetup) {
 		return {

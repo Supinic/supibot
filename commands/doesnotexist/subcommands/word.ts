@@ -28,11 +28,8 @@ export default {
 			.replaceAll(".", "")
 			.trim();
 
-		const word = $("div#definition-word").text();
-		const definition = $("div#definition-definition").text().trim();
-		// Can be empty string
-		const example = $("div#definition-example").text();
 
+		const word = $("div#definition-word").text();
 		if (context.params.wordOnly) {
 			return {
 				text: "No link available for this type!",
@@ -40,6 +37,9 @@ export default {
 			};
 		}
 
+		// Can be empty string
+		const example = $("div#definition-example").text();
+		const definition = $("div#definition-definition").text().trim();
 		return {
 			text: "No link available for this type!",
 			reply: core.Utils.tag.trim `

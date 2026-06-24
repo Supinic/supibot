@@ -7,7 +7,7 @@ export default declare({
 	Aliases: null,
 	Cooldown: 30000,
 	Description: "Checks the top 10 streams on Twitch - if you add a game, will look for the top 10 streams playing that game. The game must be provided verbatim.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function topStreams (context, ...args) {

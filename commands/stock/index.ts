@@ -62,7 +62,7 @@ export default declare({
 	Aliases: ["stocks", "stonks"],
 	Cooldown: 10000,
 	Description: "Fetches the latest price and daily change for a stock.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: async function stock (context, ...args) {

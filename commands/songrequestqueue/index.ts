@@ -5,11 +5,11 @@ const { SONG_REQUESTS_STATE } = cacheKeys;
 
 export default declare({
 	Name: "songrequestqueue",
-	Aliases: ["srq","queue"],
+	Aliases: ["srq", "queue"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts the summary of the song request queue.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["mention", "pipe", "whitelist"],
 	Params: [],
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequestQueue () {
@@ -40,7 +40,7 @@ export default declare({
 		const total = playlist.reduce((acc, cur) => acc + (cur.duration ?? 0), 0);
 
 		const length = total - (position ?? 0);
-		const delta = core.Utils.timeDelta(Math.round(SupiDate.now() + length * 1000), true);
+		const delta = core.Utils.timeDelta(Math.round(SupiDate.now() + (length * 1000)), true);
 		const pauseString = (paused)
 			? "The song request is paused at the moment."
 			: "";

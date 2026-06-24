@@ -4,7 +4,7 @@ import type { default as LinkParser } from "track-link-parser";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 
 import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
-import getLinkParser from "../../utils/link-parser.js";
+import { getLinkParser } from "../../utils/link-parser.js";
 
 import { type User } from "../../classes/user.js";
 import { type MpvPlaylistItem } from "../../singletons/mpv-client.js";
@@ -58,7 +58,7 @@ export default declare({
 	Aliases: ["sr"],
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["mention", "pipe", "whitelist"],
 	Params: [
 		{ name: "start", type: "string" },
 		{ name: "end", type: "string" },

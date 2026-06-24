@@ -32,7 +32,7 @@ export default declare({
 	Aliases: null,
 	Cooldown: 10000,
 	Description: "Randomly creates fake news headlines from existing presets. These are not real, and are supposed to be light-hearted and just a joke. Don't take them seriously.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: function fakeNews () {

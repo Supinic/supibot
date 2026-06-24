@@ -24,9 +24,6 @@ export default declare({
 		}
 
 		const string = args.join(" ");
-		let scriptString;
-		let scriptArgs;
-
 		let importedText;
 		if (context.params.importGist) {
 			if (context.params.importGist.includes(" ")) {
@@ -60,6 +57,8 @@ export default declare({
 			}
 		}
 
+		let scriptArgs;
+		let scriptString;
 		if (context.params.function) {
 			scriptString = context.params.function;
 			scriptArgs = [...args];
