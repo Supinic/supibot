@@ -40,7 +40,7 @@ const ERROR_REASONS = {
 
 type Cause =
 	| "scheduled-incoming" | "scheduled-outgoing" | "public-incoming"
- 	| "public-outgoing" | "private-incoming" | "private-outgoing"
+	| "public-outgoing" | "private-incoming" | "private-outgoing"
 	| "existing-pingme";
 type LimitCheckFailure = { success: false; cause: Cause; reason: typeof ERROR_REASONS[Cause]; };
 type LimitCheckResult = { success: true; } | LimitCheckFailure;

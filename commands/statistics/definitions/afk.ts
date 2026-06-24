@@ -81,7 +81,7 @@ export const AfkStatistic = {
 			.single()
 		);
 
-		const delta = core.Utils.timeDelta(SupiDate.now() + data.Delta * 1000, true);
+		const delta = core.Utils.timeDelta(SupiDate.now() + (data.Delta * 1000), true);
 		const average = core.Utils.timeDelta(SupiDate.now() + (data.Delta * 1000 / Number(data.Amount)), true);
 
 		return {

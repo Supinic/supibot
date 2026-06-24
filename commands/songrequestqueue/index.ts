@@ -40,7 +40,7 @@ export default declare({
 		const total = playlist.reduce((acc, cur) => acc + (cur.duration ?? 0), 0);
 
 		const length = total - (position ?? 0);
-		const delta = core.Utils.timeDelta(Math.round(SupiDate.now() + length * 1000), true);
+		const delta = core.Utils.timeDelta(Math.round(SupiDate.now() + (length * 1000)), true);
 		const pauseString = (paused)
 			? "The song request is paused at the moment."
 			: "";

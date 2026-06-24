@@ -24,7 +24,7 @@ const detectTimezone = (...args: string[]) => {
 
 		const multiplier = (sign === "-") ? -1 : 1;
 		const numMinutes = (minutes) ? Number(minutes) : 0;
-		const offset = multiplier * (Number(hours) * 60 + numMinutes);
+		const offset = multiplier * ((Number(hours) * 60) + numMinutes);
 
 		if (!Number.isFinite(offset)) {
 			return {

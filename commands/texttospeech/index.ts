@@ -141,7 +141,7 @@ export default declare({
 
 		const duration = core.Utils.round(Number(messageTime) / 1_000_000, 0);
 		let cooldown = (duration > 10000)
-			? (BASE_COOLDOWN + (duration - 10000) * 10)
+			? (BASE_COOLDOWN + ((duration - 10000) * 10))
 			: BASE_COOLDOWN;
 
 		if (cooldown > MAX_TTS_COOLDOWN) {
