@@ -31,6 +31,7 @@ export default tseslint.config(
 			sourceType: "module"
 		},
 		rules: {
+			// JavaScript rules
 			"array-bracket-newline": ["warn", "consistent"],
 			"array-bracket-spacing": ["warn", "never"],
 			"array-element-newline": ["warn", "consistent"],
@@ -120,7 +121,6 @@ export default tseslint.config(
 			"no-var": "error",
 			"no-whitespace-before-property": "warn",
 			"no-unused-private-class-members": "warn",
-			// "no-use-before-define": "error",
 			"no-with": "error",
 			"object-curly-newline": ["warn", {
 				consistent: true
@@ -170,10 +170,13 @@ export default tseslint.config(
 			"symbol-description": "off",
 			"template-curly-spacing": ["warn", "never"],
 			"template-tag-spacing": ["warn", "always"],
+			"wrap-iife": ["warn", "inside"],
+			yoda: "error",
+
+			// Unicorn rules - additions
 			"unicorn/catch-error-name": ["warn", {
 				name: "e"
 			}],
-			"unicorn/prefer-spread": "off",
 			"unicorn/empty-brace-spaces": "warn",
 			"unicorn/new-for-builtins": "error",
 			"unicorn/no-array-push-push": "warn",
@@ -183,7 +186,6 @@ export default tseslint.config(
 			"unicorn/no-nested-ternary": "warn",
 			"unicorn/no-new-buffer": "error",
 			"unicorn/no-unreadable-array-destructuring": "error",
-			"unicorn/no-unsafe-regex": "off",
 			"unicorn/number-literal-case": "warn",
 			"unicorn/numeric-separators-style": ["warn", {
 				onlyIfContainsSeparator: true
@@ -197,11 +199,28 @@ export default tseslint.config(
 			"unicorn/prefer-date-now": "warn",
 			"unicorn/prefer-includes": "warn",
 			"unicorn/prefer-math-trunc": "warn",
-			"unicorn/prefer-string-raw": "off",
 			"unicorn/prefer-string-starts-ends-with": "warn",
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
+			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
+			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
 
+			// Unicorn rules - removals
+			"unicorn/prefer-ternary": "off", // Could be perhaps enabled later as ["warn", "only-single-line"]
+			"unicorn/no-negated-condition": "off", // Could be perhaps enabled later to enforce a specific condition flow
+			"unicorn/no-typeof-undefined": "off", // Too much of a "muscle memory" for me
+			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
+			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
+			"unicorn/prefer-event-target": "off", // Not the same API as EventEmitter, fine in a Node.js project
+			"unicorn/require-array-sort-compare": "off", // Superseded by TypeScript rule @typescript-eslint/require-array-sort-compare
+			"unicorn/prefer-at": "off", // Just flat out wrong in some cases
+			"unicorn/prefer-type-literal-last": "off", // Not un-opinionated
+			"unicorn/prefer-uint8array-base64": "off", // Prefer working with Buffer myself
+			"unicorn/prefer-minimal-ternary": "off", // Seems to just not work? api/index.ts
+			"unicorn/prefer-await": "off", // Triggers in constructors (??),
+			"unicorn/prefer-unicode-code-point-escapes": "off", // Conflicts with no-incorrect-template-string-interpolation and also makes regexes way too verbose
+
+			// TypeScript rules
 			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
@@ -217,34 +236,7 @@ export default tseslint.config(
 			"@typescript-eslint/no-useless-default-assignment": "off", // Does not work for rest arguments
 			"@typescript-eslint/require-array-sort-compare": "warn", // Supersedes unicorn/require-array-sort-compare
 
-			"unicorn/prefer-switch": ["error", { minimumCases: 4 }],
-			"unicorn/consistent-function-scoping": ["warn", { checkArrowFunctions: false }], // triggers on class timeout/interval callbacks that use `this`
-
-			"unicorn/prefer-ternary": "off",
-			"unicorn/no-negated-condition": "off",
-			"unicorn/no-typeof-undefined": "off",
-			"unicorn/better-dom-traversing": "off", // Irrelevant in a node project
-
-			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
-			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
-			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
-			"unicorn/no-array-sort": "off", // Doesn't allow in-place sorting
-			"unicorn/no-this-outside-of-class": "off", // Completely breaks for all command, chatmodule, cron, (...) definitions' codes
-			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
-			"unicorn/prefer-includes-over-repeated-comparisons": ["warn", { minimumComparisons: 4 }], // Three comparisons are fine
-			"unicorn/max-nested-calls": "off", // Reports on Zod schemas and is in general not very useful
-			"unicorn/no-useless-else": "off", // Honestly thinking of switching to unopinionated at this point
-			"unicorn/prefer-type-literal-last": "off", // Honestly thinking of switching to unopinionated at this point
-			"unicorn/prefer-at": "off", // Just flat out wrong in some cases
-			"unicorn/require-array-sort-compare": "off", // Superseded by TypeScript rule @typescript-eslint/require-array-sort-compare
-			"unicorn/prefer-uint8array-base64": "off", // Prefer working with Buffer myself
-			"unicorn/prefer-minimal-ternary": "off", // Seems to just not work? api/index.ts
-			"unicorn/prefer-await": "off", // Triggers in constructors (??),
-			"unicorn/prefer-unicode-code-point-escapes": "off", // Conflicts with no-incorrect-template-string-interpolation and also makes regexes way too verbose
-
-			"wrap-iife": ["warn", "inside"],
-			yoda: "error",
-
+			// Style rules
 			"@stylistic/brace-style": ["warn", "stroustrup", { allowSingleLine: true }],
 			"@stylistic/indent": ["warn", "tab"],
 			"@stylistic/no-extra-semi": "warn",
@@ -253,8 +245,7 @@ export default tseslint.config(
 	},
 	{
 		files: ["tests/**/*.{test,spec}.ts", "**/*.test.ts"],
-		languageOptions: {
-		},
+		languageOptions: {},
 		rules: {
 			"max-nested-callbacks": "off",
 			"max-statements-per-line": ["warn", {
