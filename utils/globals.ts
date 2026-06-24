@@ -18,7 +18,9 @@ export type DiscordEmote = BaseEmote & {
 };
 export type Emote = TwitchEmote | DiscordEmote | ThirdPartyEmote;
 
-export type Coordinates = { lat: number; lng: number; } | { lat: string; lng: string; };
+export type NumericCoordinates = { lat: number; lng: number; };
+export type StringCoordinates = { lat: string; lng: string; };
+export type Coordinates = NumericCoordinates | StringCoordinates;
 
 export type Port = number;
 export type URL = string;
