@@ -247,11 +247,9 @@ export default tseslint.config(
 		files: ["tests/**/*.{test,spec}.ts", "**/*.test.ts"],
 		languageOptions: {},
 		rules: {
-			"max-nested-callbacks": "off",
-			"max-statements-per-line": ["warn", {
-				max: 2
-			}],
-			"unicorn/prefer-module": "off",
+			"max-nested-callbacks": "off", // There is a ton of nesting within test suites
+			"max-statements-per-line": ["warn", { max: 2 }], // Tests sometimes stack up two statements to save space
+			"unicorn/prefer-module": "off", // Different importing system (because of loaders)
 			"unicorn/consistent-function-scoping": "off",
 			"unicorn/no-useless-undefined": "off",
 			"unicorn/no-await-expression-member": "off",
