@@ -1,9 +1,8 @@
-import { promisify } from "node:util";
-import { exec } from "node:child_process";
 import { SupiDate, SupiError } from "supi-core";
 
+import { getWeatherLocation } from "./location.js";
 import { declare } from "../../classes/command.js";
-import { fetchGeoLocationData, postToHastebin } from "../../utils/command-utils.js";
+import { postToHastebin } from "../../utils/command-utils.js";
 
 import {
 	getSunPosition,
@@ -13,8 +12,6 @@ import {
 	type WeatherFormatObject,
 	WeatherItem
 } from "./helpers.js";
-
-const shell = promisify(exec);
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",
@@ -109,149 +106,12 @@ export default declare({
 			}
 		}
 
-		let skipLocation = false;
-		let coords: { lat: number; lng: number; } | null = null;
-		let formattedAddress: string | null = null;
-		let isOwnLocation: boolean | null = null;
-
-		if (args.length === 0) {
-			isOwnLocation = true;
-
-			const location = await context.user.getDataProperty("location");
-			if (location) {
-				skipLocation = location.hidden;
-				coords = location.coordinates;
-				formattedAddress = location.formatted;
-			}
-			else {
-				return {
-					success: false,
-					reply: `No place provided, and you don't have a default location set! You can use $set location (location) to set it, or add "private" to make it private 🙂`,
-					cooldown: 2500
-				};
-			}
-		}
-		else if (args[0].startsWith("@")) {
-			const userData = await sb.User.get(args[0]);
-			isOwnLocation = (userData === context.user);
-
-			if (!userData) {
-				return {
-					reply: "Invalid user provided!",
-					cooldown: {
-						length: 1000
-					}
-				};
-			}
-
-			if (userData.Name === context.platform.selfName) {
-				let temperature;
-				try {
-					const result = await shell("vcgencmd measure_temp");
-					const temperatureMatch = result.stdout.toString().match(/([\d.]+)/);
-					if (temperatureMatch) {
-						temperature = `${temperatureMatch[1]}°C`;
-					}
-				}
-				catch (e) {
-					console.warn(e);
-					temperature = "Unknown temperature";
-				}
-
-				return {
-					reply: `Supibot, Supinic's LACK table: ${temperature}. No wind detected. No precipitation expected.`
-				};
-			}
-
-			const location = await userData.getDataProperty("location");
-			if (!location) {
-				return {
-					reply: "That user did not set their location!",
-					cooldown: {
-						length: 2500
-					}
-				};
-			}
-			else {
-				coords = location.coordinates;
-				skipLocation = location.hidden;
-				formattedAddress = location.formatted;
-			}
+		const locationResult = await getWeatherLocation(context, args);
+		if ("command" in locationResult) {
+			return locationResult.command;
 		}
 
-		if (!coords || !formattedAddress) {
-			if (args.length === 0 && !coords) {
-				return {
-					reply: "No place or data provided!",
-					cooldown: 2500
-				};
-			}
-
-			type GeoCacheData = { empty: true } | {
-				empty: false;
-				formattedAddress: string;
-				coords: { lat: number; lng: number; };
-			};
-
-			const location = args.join(" ");
-			const cacheKey = (location)
-				? `weather-location-${location}`
-				: `weather-coords-${JSON.stringify(coords)}`;
-
-			let geoData = await core.Cache.getByPrefix(cacheKey) as GeoCacheData | undefined;
-			if (!geoData) {
-				let data;
-				if (coords) {
-					data = await fetchGeoLocationData(coords);
-				}
-				else {
-					data = await fetchGeoLocationData(args.join(" "));
-				}
-
-				if (!data.success) {
-					geoData = { empty: true };
-				}
-				else {
-					geoData = {
-						empty: false,
-						formattedAddress: data.formatted,
-						coords: data.location
-					};
-				}
-
-				await this.setCacheData(cacheKey, geoData, { expiry: 7 * 864e5 });
-			}
-
-			if (geoData.empty) {
-				// Check if the location is actually someone's username
-				const checkUserData = await sb.User.get(location);
-				const checkLocation = await checkUserData?.getDataProperty("location");
-
-				if (checkLocation) {
-					return {
-						success: false,
-						reply: `That place was not found! However, you probably meant to check @${location}'s location. Use "$weather @${location}" instead, with the @ symbol.`,
-						cooldown: 5000
-					};
-				}
-
-				const emote = await context.getBestAvailableEmote(["peepoSadDank", "PepeHands", "FeelsBadMan"], "🙁");
-				return {
-					success: false,
-					reply: `That place was not found! ${emote}`
-				};
-			}
-
-			formattedAddress = geoData.formattedAddress;
-			coords = geoData.coords;
-		}
-
-		if (!formattedAddress) {
-			throw new SupiError({
-				message: "Assert error: Formatted address not filled"
-			});
-		}
-
+		const { coords, address, hidden, origin } = locationResult.location;
 		if (context.params.pollution) {
 			const response = await core.Got.get("GenericAPI")<OwmPollutionResponse>({
 				url: "https://api.openweathermap.org/data/2.5/air_pollution",
@@ -268,11 +128,9 @@ export default declare({
 			});
 
 			const [data] = response.body.list;
-			const index = data.main.aqi;
-
+			const pollutionIndex = data.main.aqi;
 			const { components } = data;
-			const place = (skipLocation) ? "(location hidden)" : formattedAddress;
-			const icon = POLLUTION_INDEX_ICONS[index];
+			const icon = POLLUTION_INDEX_ICONS[pollutionIndex];
 
 			const componentsString = Object.entries(components)
 				.map(([type, value]) => `${type.toUpperCase().replace("_", ".")}: ${value.toFixed(3)}`)
@@ -280,7 +138,7 @@ export default declare({
 
 			return {
 				reply: core.Utils.tag.trim `
-					${place} current pollution index: ${index} ${icon}
+					${address} current pollution index: ${pollutionIndex} ${icon}
 					Particles: ${componentsString}.				
 				`
 			};
@@ -326,12 +184,8 @@ export default declare({
 		if (context.params.alerts) {
 			if (!data.alerts || data.alerts.length === 0) {
 				return {
-					reply: core.Utils.tag.trim `
-						Weather alert summary for
-						${(skipLocation) ? "(location hidden)" : formattedAddress}
-						-
-						no alerts.
-					 `
+					success: true,
+					reply: `Weather alert summary for ${address} - no alerts.`
 				};
 			}
 
@@ -354,9 +208,9 @@ export default declare({
 				}).join("\n\n");
 
 				const paste = await postToHastebin(text, {
-					title: (skipLocation)
+					title: (hidden)
 						? `Weather alerts - private location`
-						: `Weather alerts - ${formattedAddress}`
+						: `Weather alerts - ${address}`
 				});
 
 				if (!paste.ok) {
@@ -370,8 +224,8 @@ export default declare({
 				await this.setCacheData(hastebinKey, hastebinLink, { expiry: 3_600_000 });
 			}
 
-			if (skipLocation) {
-				if (isOwnLocation) {
+			if (hidden) {
+				if (origin === "self") {
 					await context.platform.pm(
 						`Your location's weather alerts: ${hastebinLink}`,
 						context.user,
@@ -394,7 +248,7 @@ export default declare({
 			else {
 				return {
 					reply: core.Utils.tag.trim `
-						Weather alert summary for ${formattedAddress} - 
+						Weather alert summary for ${address} - 
 						${data.alerts.length} alerts -
 						full info: ${hastebinLink}
 					`
@@ -430,7 +284,7 @@ export default declare({
 		}
 
 		const obj = {
-			place: (skipLocation) ? "(location hidden)" : formattedAddress,
+			place: address,
 			icon: target.icon,
 			temperature: target.temperature,
 			cloudCover: target.cloudCover,
@@ -439,7 +293,7 @@ export default declare({
 			windSpeed: target.windSpeed,
 			windGusts: target.windGusts,
 			precipitation: target.precipitation,
-			sun: (weatherTime.type === "current" && !skipLocation) ? getSunPosition(data) : ""
+			sun: (weatherTime.type === "current" && !hidden) ? getSunPosition(data) : ""
 		} satisfies WeatherFormatObject;
 
 		let weatherAlert = "";
@@ -482,7 +336,7 @@ export default declare({
 			plusTime = " (now)";
 		}
 
-		if (!skipLocation) {
+		if (!hidden) {
 			const counter = this.registerMetric("Counter", "geomap_count", {
 				help: "Total amount of command usages for specific GPS coordinates.",
 				labelNames: ["lat", "lng"]
