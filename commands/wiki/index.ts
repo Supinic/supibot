@@ -29,7 +29,7 @@ export default declare({
 	Aliases: null,
 	Cooldown: 10000,
 	Description: "Fetches the headline of the first article found according to the user query. Watch out, articles might be case-sensitive.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "lang", type: "language" },
 		{ name: "linkOnly", type: "boolean" }

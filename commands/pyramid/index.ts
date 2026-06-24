@@ -11,7 +11,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Creates a pyramid in chat. Only usable in chats where Supibot is a VIP or a Moderator.",
-	Flags: ["developer","whitelist"],
+	Flags: ["developer", "whitelist"],
 	Params: [
 		{ name: "delay", type: "number" },
 		{ name: "wait", type: "boolean" }

@@ -66,10 +66,10 @@ export default {
 		if (finalClientID) {
 			const linkParser = await getLinkParser();
 			linkParser.reloadParser("soundcloud", { key: finalClientID });
-			void logger.log("System.Success","Successfully updated soundcloud client-id");
+			void logger.log("System.Success", "Successfully updated soundcloud client-id");
 		}
 		else {
-			void logger.log("System.Fail","Could not fetch Soundcloud client-id");
+			void logger.log("System.Fail", "Could not fetch Soundcloud client-id");
 		}
 	})
 } satisfies CronDefinition;

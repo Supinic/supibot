@@ -58,7 +58,7 @@ export default declare({
 	Aliases: ["sr"],
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["mention", "pipe", "whitelist"],
 	Params: [
 		{ name: "start", type: "string" },
 		{ name: "end", type: "string" },

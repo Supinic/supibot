@@ -5,7 +5,7 @@ export default declare({
 	Aliases: ["give"],
 	Cooldown: 5000,
 	Description: "This command is deprecated! Use `$cookie gift` instead.",
-	Flags: ["developer","mention","pipe"],
+	Flags: ["developer", "mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: () => ({

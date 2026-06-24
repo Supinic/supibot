@@ -148,7 +148,7 @@ export const FirstFollowedChannelCommand = declare({
 	Aliases: ["ffc"],
 	Cooldown: 10000,
 	Description: "Fetches the first channel you or someone else have ever followed on Twitch.",
-	Flags: ["mention","non-nullable","opt-out","pipe"],
+	Flags: ["mention", "non-nullable", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function firstFollowedChannel (context, target?: string) {

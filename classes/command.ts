@@ -1364,7 +1364,7 @@ export class Command extends TemplateWithoutId {
 				}
 
 				if (char === ":") {
-					currentParam = paramsDefinition.find(i => i.name === buffer.slice(0,-1)) ?? null;
+					currentParam = paramsDefinition.find(i => i.name === buffer.slice(0, -1)) ?? null;
 					if (currentParam) {
 						insideParam = true;
 						buffer = "";

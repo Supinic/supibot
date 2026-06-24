@@ -16,7 +16,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the latest price of a cryptocurrency. If none is provided, defaults to BTC.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function crypto (context, symbol = "BTC") {

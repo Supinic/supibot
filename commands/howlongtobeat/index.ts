@@ -212,7 +212,7 @@ export default declare({
 	Aliases: ["hltb"],
 	Cooldown: 5000,
 	Description: "For a provided game, shows how long it takes to beat based on the https://howlongtobeat.com website's data.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: async function howLongToBeat (context, ...args) {

@@ -36,7 +36,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts basic nutrients for a specified food query",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function nutrients (context, ...args) {

@@ -42,7 +42,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Returns the contents of a Pastebin/Hastebin paste, or from a GitHub gist; or posts your input into a new paste.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "hasteServer", type: "string" },
 		{ name: "force", type: "boolean" },

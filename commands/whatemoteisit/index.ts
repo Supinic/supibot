@@ -22,7 +22,7 @@ export default declare({
 	Aliases: ["weit"],
 	Cooldown: 10000,
 	Description: "What emote is it? Posts specifics about a given Twitch subscriber emote.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "noLinks", type: "boolean" }

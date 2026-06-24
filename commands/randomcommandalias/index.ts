@@ -14,7 +14,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Posts a random Supibot command alias. Can be configured to create a somewhat precise search query.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "body", type: "string" },
 		{ name: "command", type: "string" },

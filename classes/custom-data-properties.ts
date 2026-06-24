@@ -379,7 +379,7 @@ export const saveChannelDataProperty = async <T extends ChannelDataProperty> (
 
 export const saveUserDataProperty = async <T extends UserDataProperty> (
 	propertyName: T,
-	value: UserDataPropertyMap[T] ,
+	value: UserDataPropertyMap[T],
 	instanceId: User["ID"],
 	options: SpecificFetchOptions = {}
 ): Promise<void> => {

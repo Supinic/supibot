@@ -6,7 +6,7 @@ export default declare({
 	Aliases: null,
 	Cooldown: 10000,
 	Description: "Shuffles the provided message, word by word.",
-	Flags: ["non-nullable","pipe"],
+	Flags: ["non-nullable", "pipe"],
 	Params: [{ name: "fancy", type: "boolean" }],
 	Whitelist_Response: null,
 	Code: function shuffle (context, ...args) {

@@ -33,7 +33,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "engine", type: "number" },
 		{ name: "force", type: "boolean" },

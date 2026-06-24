@@ -22,7 +22,7 @@ export default declare({
 	Aliases: ["ys"],
 	Cooldown: 10000,
 	Description: "Searches YouTube for video(s) with your query. Only a certain number of uses are available daily.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "index", type: "number" },
 		{ name: "linkOnly", type: "boolean" }

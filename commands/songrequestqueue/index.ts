@@ -5,11 +5,11 @@ const { SONG_REQUESTS_STATE } = cacheKeys;
 
 export default declare({
 	Name: "songrequestqueue",
-	Aliases: ["srq","queue"],
+	Aliases: ["srq", "queue"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts the summary of the song request queue.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["mention", "pipe", "whitelist"],
 	Params: [],
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequestQueue () {

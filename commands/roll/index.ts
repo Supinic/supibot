@@ -9,7 +9,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Rolls a random number. If nothing is specified, rolls 1-100. You can specify min and max values, or some expression using standard dice notation.",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention", "pipe", "skip-banphrase"],
 	Params: [
 		{ name: "textOnly", type: "boolean" }
 	],

@@ -73,7 +73,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the current time and timezone for a given location, or a user, if they have set their location.",
-	Flags: ["block","mention","non-nullable","opt-out","pipe"],
+	Flags: ["block", "mention", "non-nullable", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function time (context, ...args) {

@@ -140,7 +140,7 @@ export default declare({
 	Aliases: null,
 	Cooldown: 10000,
 	Description: "Transliterates non-Latin text into Latin. Should support most of the languages not using Latin (like Japanese, Chinese, Russian, ...)",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "lang", type: "language" }
 	],

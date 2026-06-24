@@ -242,6 +242,7 @@ export default tseslint.config(
 			"@stylistic/arrow-spacing": ["warn", { "before": true, "after": true }],
 			"@stylistic/block-spacing": ["warn", "always"],
 			"@stylistic/comma-dangle": ["warn", "never"],
+			"@stylistic/comma-spacing": ["warn", { "before": false, "after": true }],
 			"@stylistic/brace-style": ["warn", "stroustrup", { allowSingleLine: true }],
 			"@stylistic/indent": ["warn", "tab"],
 			"@stylistic/no-extra-semi": "warn",
