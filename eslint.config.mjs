@@ -237,6 +237,11 @@ export default tseslint.config(
 			"@typescript-eslint/require-array-sort-compare": "warn", // Supersedes unicorn/require-array-sort-compare
 
 			// Style rules
+			"@stylistic/array-bracket-newline": ["warn", "consistent"],
+			"@stylistic/array-bracket-spacing": ["warn", "never"],
+			"@stylistic/arrow-spacing": ["warn", { "before": true, "after": true }],
+			"@stylistic/block-spacing": ["warn", "always"],
+			"@stylistic/comma-dangle": ["warn", "never"],
 			"@stylistic/brace-style": ["warn", "stroustrup", { allowSingleLine: true }],
 			"@stylistic/indent": ["warn", "tab"],
 			"@stylistic/no-extra-semi": "warn",
