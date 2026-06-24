@@ -58,17 +58,17 @@ const convert = {
 	},
 	translate: (string: string, dictionary: TextTransformDictionary) => {
 		for (const [from, to] of dictionary.phrasesWords) {
-			const r = new RegExp(`\\b${from}\\b`, "gi");
+			const r = new RegExp(String.raw `\b${from}\b`, "gi");
 			string = string.replace(r, `_${to}_`);
 		}
 
 		for (const [from, to] of dictionary.prefixes) {
-			const r = new RegExp(`\\b${from}`, "gi");
+			const r = new RegExp(String.raw `\b${from}`, "gi");
 			string = string.replace(r, to);
 		}
 
 		for (const [from, to] of dictionary.suffixes) {
-			const r = new RegExp(`${from}\\b`, "gi");
+			const r = new RegExp(String.raw `${from}\b`, "gi");
 			string = string.replace(r, to);
 		}
 

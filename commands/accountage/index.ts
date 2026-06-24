@@ -8,7 +8,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches the Twitch account age of a given account. If none is given, checks yours.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function accountAge (context, user?: string) {

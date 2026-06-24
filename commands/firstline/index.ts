@@ -7,7 +7,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Posts the target user's first chat line in the context of the current or a specified channel, and the date they sent it.",
-	Flags: ["external-input","mention","opt-out","pipe"],
+	Flags: ["external-input", "mention", "opt-out", "pipe"],
 	Params: [
 		{ name: "channel", type: "string" },
 		{ name: "textOnly", type: "boolean" }

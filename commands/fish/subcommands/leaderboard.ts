@@ -154,8 +154,7 @@ export default {
 		"Shows the list of top owners all-time in a given category - according to its name.",
 		"These are <b>NOT</b> the current ones, but rather all-time statistics."
 	],
-	execute: async (context, type?: string) => {
-		const leaderboardType = type ?? "fish";
+	execute: async (context, leaderboardType: string = "fish") => {
 		const config = leaderboardTypes.get(leaderboardType);
 		if (!config) {
 			const types = [...leaderboardTypes.keys()];

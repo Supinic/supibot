@@ -773,7 +773,7 @@ export class Command extends TemplateWithoutId {
 			args
 		});
 
-		const isFilterGlobalBan = Boolean(
+		const isFilterGlobalBan = (
 			!filterData.success
 			&& filterData.reason === "blacklist"
 			&& filterData.filter.Active
@@ -1193,7 +1193,7 @@ export class Command extends TemplateWithoutId {
 		}
 
 		switch (type) {
-			case "string": return String(value);
+			case "string": return value;
 
 			case "number": {
 				const output = Number(value);
@@ -1364,7 +1364,7 @@ export class Command extends TemplateWithoutId {
 				}
 
 				if (char === ":") {
-					currentParam = paramsDefinition.find(i => i.name === buffer.slice(0,-1)) ?? null;
+					currentParam = paramsDefinition.find(i => i.name === buffer.slice(0, -1)) ?? null;
 					if (currentParam) {
 						insideParam = true;
 						buffer = "";

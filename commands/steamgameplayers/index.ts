@@ -127,7 +127,7 @@ export default declare({
 	Aliases: ["sgp"],
 	Cooldown: 5000,
 	Description: "Searches for a Steam game, and attempts to find its current player amount.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [
 		{ name: "gameID", type: "number" },
 		{ name: "skipReviews", type: "boolean" }

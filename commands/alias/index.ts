@@ -8,7 +8,7 @@ const aliasCommandDefinition = declare({
 	Aliases: ["$"],
 	Cooldown: 2500,
 	Description: "This command lets you create your own aliases (shorthands) for any other combination of commands and arguments. Check the extended help for step-by-step info.",
-	Flags: ["external-input","mention","pipe"],
+	Flags: ["external-input", "mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function alias (context, type, ...args) {

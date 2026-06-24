@@ -147,7 +147,7 @@ export default declare({
 	Aliases: ["csum"],
 	Cooldown: 5000,
 	Description: "Summarizes the last couple of messages in the current (or provided) channel via GPT. This command applies a 30s cooldown to all users in the channel it is used in.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [{ name: "type", type: "string" }],
 	Whitelist_Response: null,
 	Code: async function chatSummary (context, channelInput) {

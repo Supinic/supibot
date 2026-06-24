@@ -6,7 +6,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 2500,
 	Description: "Posts a link to a specific command's code definition on GitHub.",
-	Flags: ["developer","mention","pipe"],
+	Flags: ["developer", "mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (function code (context, commandString) {

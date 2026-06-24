@@ -66,7 +66,7 @@ export default declare({
 	Aliases: ["rpb"],
 	Cooldown: 10000,
 	Description: "Fetches a random recently posted Pastebin paste.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "syntax", type: "string" }

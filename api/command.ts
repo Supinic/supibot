@@ -111,8 +111,8 @@ export default {
 			params: commandData.Params
 		};
 
-		const includeDynamicDescription = url.searchParams.has("includeDynamicDescription");
-		if (includeDynamicDescription) {
+		const isIncludeDynamicDescription = url.searchParams.has("includeDynamicDescription");
+		if (isIncludeDynamicDescription) {
 			try {
 				info.dynamicDescription = await commandData.getDynamicDescription();
 			}
@@ -125,7 +125,7 @@ export default {
 					statusCode: 500,
 					error: {
 						reason: "Command dynamic description function failed",
-						message: String(e.message)
+						message: e.message
 					}
 				};
 			}
@@ -138,16 +138,13 @@ export default {
 	},
 
 	list: () => {
-		const data = [];
-		for (const command of sb.Command.data.values()) {
-			data.push({
-				name: command.Name,
-				aliases: command.Aliases,
-				description: command.Description,
-				cooldown: command.Cooldown,
-				flags: command.Flags
-			});
-		}
+		const data = [...sb.Command.data.values()].map(command => ({
+			name: command.Name,
+			aliases: command.Aliases,
+			description: command.Description,
+			cooldown: command.Cooldown,
+			flags: command.Flags
+		}));
 
 		return {
 			statusCode: 200,

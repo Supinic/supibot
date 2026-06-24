@@ -11,7 +11,7 @@ export default declare({
 	Aliases: ["si", "uptime", "vod"],
 	Cooldown: 10000,
 	Description: "Posts information about a Twitch channel's stream, or the current channel if none is provided.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [{ name: "rawData", type: "boolean" }],
 	Whitelist_Response: null,
 	Code: (async function streamInfo (context, ...args) {

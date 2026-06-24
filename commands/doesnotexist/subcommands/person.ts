@@ -11,9 +11,8 @@ export default {
 	aliases: [],
 	title: "Person",
 	default: true,
-	description: [],
-	getDescription: (prefix) => [
-		`<code>${prefix}</code> - <a href="https://this-person-does-not-exist.com/">This $prefix} does not exist</a>`
+	description: [
+		`<code>person</code> - <a href="https://this-person-does-not-exist.com/">This person does not exist</a>`
 	],
 	execute: async () => {
 		const response = await core.Got.get("GenericAPI")<PersonDoesNotExistResponse>({

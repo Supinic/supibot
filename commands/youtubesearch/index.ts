@@ -2,7 +2,7 @@ import { SupiDate, SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
 
 import { searchYoutube } from "../../utils/command-utils.js";
-import getLinkParser from "../../utils/link-parser.js";
+import { getLinkParser } from "../../utils/link-parser.js";
 
 const RESULTS_PER_SEARCH = 25;
 const DAILY_SEARCHES_CAP = 2000;
@@ -22,7 +22,7 @@ export default declare({
 	Aliases: ["ys"],
 	Cooldown: 10000,
 	Description: "Searches YouTube for video(s) with your query. Only a certain number of uses are available daily.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "index", type: "number" },
 		{ name: "linkOnly", type: "boolean" }

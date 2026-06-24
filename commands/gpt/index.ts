@@ -50,7 +50,7 @@ export default declare({
 	Aliases: ["chatgpt"],
 	Cooldown: 15000,
 	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: params,
 	Whitelist_Response: null,
 	initialize: async function () {

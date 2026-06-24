@@ -51,7 +51,7 @@ export default {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks the current number of infected/deceased people from the Coronavirus spread that started in October-December 2019.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function corona () {

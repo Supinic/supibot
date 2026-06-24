@@ -210,8 +210,6 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		}
 
 		const { message } = event;
-		const isPrivateMessage = (event.target === this.selfName);
-
 		if (!event.tags.account) {
 			const username = event.nick;
 			if (Command.is(message) && !this.#notifiedUnregisteredUsers.has(username)) {
@@ -234,6 +232,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 
 		const isSelf = (userData.Name === this.selfName);
 		const platformVerification = userVerificationData[this.ID];
+		const isPrivateMessage = (event.target === this.selfName);
 		if (!isSelf && (userData.Twitch_ID || userData.Discord_ID) && !platformVerification.active) {
 			// TODO: verification challenge creation for Discord/Twitch and sending the message
 			if (!platformVerification.notificationSent) {

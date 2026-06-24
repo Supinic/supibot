@@ -9,7 +9,7 @@ export default declare({
 	Aliases: null,
 	Cooldown: 0,
 	Description: "Multiple configurations regarding the stream. Mostly used for #supinic, and nobody else.",
-	Flags: ["developer","mention","pipe","system","whitelist"],
+	Flags: ["developer", "mention", "pipe", "system", "whitelist"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function stream (context, type, ...rest) {

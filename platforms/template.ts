@@ -5,7 +5,7 @@ import type { User } from "../classes/user.js";
 import { Channel, type Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
-import createMessageLoggingTable from "../utils/create-db-table.js";
+import { createMessageLoggingTable } from "../utils/create-db-table.js";
 
 import type { TwitchConfig, TwitchPlatform } from "./twitch.js";
 import type { DiscordConfig, DiscordPlatform } from "./discord.js";

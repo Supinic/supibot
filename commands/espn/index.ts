@@ -70,7 +70,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Shows info related to the matches played in a variety of North American sports leagues.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [
 		{ name: "date", type: "date" },
 		{ name: "mode", type: "string" }

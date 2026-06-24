@@ -42,7 +42,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Returns the contents of a Pastebin/Hastebin paste, or from a GitHub gist; or posts your input into a new paste.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "hasteServer", type: "string" },
 		{ name: "force", type: "boolean" },
@@ -50,10 +50,6 @@ export default declare({
 	],
 	Whitelist_Response: null,
 	Code: async function pastebin (context, command, ...rest) {
-		let type: "get" | "post";
-		let provider;
-		const rawArgs = [...rest];
-
 		if (!command) {
 			return {
 				success: false,
@@ -61,6 +57,9 @@ export default declare({
 			};
 		}
 
+		let type: "get" | "post";
+		let provider;
+		const rawArgs = [...rest];
 		if (command === "get" || context.invocation === "pbg") {
 			provider = "pastebin";
 			type = "get";

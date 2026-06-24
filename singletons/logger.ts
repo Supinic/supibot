@@ -244,7 +244,7 @@ export class LoggerSingleton {
 		}
 
 		const metaPromises = [];
-		for (const [channelId, meta] of channelMeta.entries()) {
+		for (const [channelId, meta] of channelMeta) {
 			const promise = setMetaChannelCommand(channelId, meta);
 			metaPromises.push(promise);
 		}
@@ -373,7 +373,7 @@ export class LoggerSingleton {
 				Text: message,
 				Posted: new SupiDate(),
 				Platform_ID: platformId,
-				...((typeof historic === "boolean") ? { Historic: historic } : {})
+				...((typeof historic === "boolean") && { Historic: historic }) // @todo fix into its own object
 			});
 		}
 		else if (platformData) {

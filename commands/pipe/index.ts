@@ -38,7 +38,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character \"|\" or \">\" to separate each command.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [
 		{ name: "_apos", type: "object" },
 		{ name: "_char", type: "string" },

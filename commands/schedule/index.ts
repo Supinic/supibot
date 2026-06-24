@@ -113,7 +113,7 @@ export default declare({
 				});
 
 				const { data } = twitchStreamSchema.parse(response.body);
-				const isLive = Boolean(response.statusCode === 200 && data.length !== 0);
+				const isLive = (response.statusCode === 200 && data.length !== 0);
 
 				if (!isLive) { // Stream is not live - use the first segment (when it should have started), and mention that stream is late
 					segment = segments[0];

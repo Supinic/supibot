@@ -41,9 +41,6 @@ export default {
 		""
 	],
 	execute: async function (context, subInvocation, ...args) {
-		let name: string;
-		let user: User;
-
 		if (subInvocation !== "try" && subInvocation !== "run") {
 			throw new SupiError({
 				message: `Assert error: $alias run did not receive "run" or "try" as subInvocation`
@@ -59,6 +56,8 @@ export default {
 			};
 		}
 
+		let name: string;
+		let user: User;
 		if (subInvocation === "run") {
 			name = firstArg;
 			user = context.user;

@@ -33,7 +33,7 @@ export default declare({
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["external-input", "mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "engine", type: "number" },
 		{ name: "force", type: "boolean" },
@@ -79,7 +79,7 @@ export default declare({
 			}
 
 			parsedURL.protocol = "https";
-			link = parsedURL.toString();
+			link = parsedURL.href;
 
 			break;
 		}
@@ -171,7 +171,7 @@ export default declare({
 	},
 	Dynamic_Description: function (prefix) {
 		const tableBody = [];
-		for (const [code, def] of ocrLanguages.entries()) {
+		for (const [code, def] of ocrLanguages) {
 			const name = getName(code) ?? "(N/A)";
 			const engines = def.engines.join(", ");
 
