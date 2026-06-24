@@ -138,7 +138,7 @@ export default {
 	},
 
 	list: () => {
-		const data = Array.from(sb.Command.data.values(), command => ({
+		const data = [...sb.Command.data.values()].map(command => ({
 			name: command.Name,
 			aliases: command.Aliases,
 			description: command.Description,
