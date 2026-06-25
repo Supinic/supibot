@@ -91,7 +91,7 @@ export const getWeather = async (sessionStart: number, coordinates: NumericCoord
 	}
 
 	if ("success" in result) {
-		return "No weather forecast available at the moment";
+		return "No weather forecast available at the moment.";
 	}
 
 	const { formatted } = formatWeatherReport(result, {

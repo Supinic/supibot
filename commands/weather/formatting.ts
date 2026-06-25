@@ -44,8 +44,8 @@ const formatTemperature = (report: Report) => {
 
 	const actual = `${report.temperature.actual}°C`;
 	return (typeof report.temperature.feelsLike === "number")
-		? `${actual}, feels like ${report.temperature.feelsLike}°C`
-		: actual;
+		? `${actual}, feels like ${report.temperature.feelsLike}°C.`
+		: `${actual}.`;
 };
 const formatCloudCover = (report: Report) => (typeof report.cloudCover === "number") ? `Cloud cover: ${report.cloudCover}%.` : "";
 const formatHumidity = (report: Report) => (typeof report.humidity === "number") ? `Humidity: ${report.humidity}%.` : "";
