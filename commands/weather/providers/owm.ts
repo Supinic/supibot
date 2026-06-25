@@ -61,7 +61,6 @@ const dailyWeatherDataItemSchema = baseWeatherDataItemSchema.extend({
 	pop: probabilityShape,
 	rain: z.number().nonnegative().optional(),
 	snow: z.number().nonnegative().optional(),
-	summary: z.string(),
 	temp: z.object({
 		day: z.number(),
 		eve: z.number(),
@@ -71,6 +70,12 @@ const dailyWeatherDataItemSchema = baseWeatherDataItemSchema.extend({
 		max: z.number()
 	})
 });
+
+type BaseDataItem = z.infer<typeof baseWeatherDataItemSchema>;
+type CurrentDataItem = z.infer<typeof currentWeatherDataItemSchema>;
+type MinuteDataItem = z.infer<typeof minutelyWeatherDataItemSchema>;
+type HourlyDataItem = z.infer<typeof hourlyWeatherDataItemSchema>;
+type DayDataItem = z.infer<typeof dailyWeatherDataItemSchema>;
 
 const owmWeatherResponseSchema = z.object({
 	current: currentWeatherDataItemSchema,
@@ -103,16 +108,16 @@ const owmPollutionResponseSchema = z.object({
 			])
 		}),
 		components: z.object({
-			co: z.number().positive(),
-			no: z.number().positive(),
-			no2: z.number().positive(),
-			o3: z.number().positive(),
-			so2: z.number().positive(),
-			pm2_5: z.number().positive(),
-			pm10: z.number().positive(),
-			nh3: z.number().positive()
+			co: z.number().nonnegative(),
+			no: z.number().nonnegative(),
+			no2: z.number().nonnegative(),
+			o3: z.number().nonnegative(),
+			so2: z.number().nonnegative(),
+			pm2_5: z.number().nonnegative(),
+			pm10: z.number().nonnegative(),
+			nh3: z.number().nonnegative()
 		})
-	}))
+	})).nonempty()
 });
 
 // Sourced from: https://openweathermap.org/weather-conditions
@@ -185,7 +190,7 @@ const getOwmApiKey = (): string => {
 const getOwm3CacheKey = (coords: NumericCoordinates) => `weather-cache-owm-3.0-${coords.lat}-${coords.lng}`;
 const getOwm4CacheKey = (coords: NumericCoordinates, report: WeatherReportType) => `weather-cache-owm-4.0-${coords.lat}-${coords.lng}-${report}`;
 
-const parseCommonReportFields = (item: z.infer<typeof baseWeatherDataItemSchema>) => {
+const parseCommonReportFields = (item: BaseDataItem) => {
 	const status = item.weather[0];
 	return {
 		timestamp: item.dt,
@@ -207,7 +212,7 @@ const parseCommonReportFields = (item: z.infer<typeof baseWeatherDataItemSchema>
 		}
 	};
 };
-const parseCurrentReport = (item: z.infer<typeof currentWeatherDataItemSchema>, minutely?: z.infer<typeof minutelyWeatherDataItemSchema>[]) => ({
+const parseCurrentReport = (item: CurrentDataItem, minutely?: MinuteDataItem[]) => ({
 	kind: "current" as const,
 	...parseCommonReportFields(item),
 	temperature: {
@@ -224,7 +229,7 @@ const parseCurrentReport = (item: z.infer<typeof currentWeatherDataItemSchema>, 
 		set: item.sunset
 	}
 });
-const parseHourlyReport = (items: z.infer<typeof hourlyWeatherDataItemSchema>[], timezoneOffset: number, offset: number) => {
+const parseHourlyReport = (items: HourlyDataItem[], timezoneOffset: number, offset: number) => {
 	const item = items.at(offset);
 	if (!item) {
 		return {
@@ -250,7 +255,7 @@ const parseHourlyReport = (items: z.infer<typeof hourlyWeatherDataItemSchema>[],
 		}
 	};
 };
-const parseDailyReport = (items: z.infer<typeof dailyWeatherDataItemSchema>[], timezoneOffset: number, offset: number) => {
+const parseDailyReport = (items: DayDataItem[], timezoneOffset: number, offset: number) => {
 	const item = items.at(offset);
 	if (!item) {
 		return {
@@ -280,6 +285,7 @@ const parseDailyReport = (items: z.infer<typeof dailyWeatherDataItemSchema>[], t
 };
 
 type AlertsData = { empty: true; } | { empty: false; amount: number; link: string; } | ResultFailure;
+type PollutionData = { icon: string; index: number; components: string; } | ResultFailure;
 
 export class Owm3WeatherProvider implements WeatherProvider {
 	readonly id = "owm3";
@@ -291,7 +297,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 			return data;
 		}
 
-		return parseCurrentReport(data.current);
+		return parseCurrentReport(data.current, data.minutely);
 	}
 
 	async getHourly (coords: NumericCoordinates, offset: number) {
@@ -369,7 +375,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 		};
 	}
 
-	async fetchPollution (coords: NumericCoordinates) {
+	async fetchPollution (coords: NumericCoordinates): Promise<PollutionData> {
 		const response = await core.Got.get("GenericAPI")({
 			url: "https://api.openweathermap.org/data/2.5/air_pollution",
 			responseType: "json",
@@ -380,9 +386,21 @@ export class Owm3WeatherProvider implements WeatherProvider {
 			searchParams: {
 				lat: coords.lat,
 				lon: coords.lng,
-				appid: process.env.API_OPEN_WEATHER_MAP
+				appid: getOwmApiKey()
 			}
 		});
+		if (response.statusCode === 429) {
+			return {
+				success: false,
+				reply: `The pollution API is currently unavailable due to too many requests! Try again later.`
+			} as const;
+		}
+		else if (!response.ok) {
+			return {
+				success: false,
+				reply: `The pollution API is currently not available! Try again later.`
+			} as const;
+		}
 
 		const [data] = owmPollutionResponseSchema.parse(response.body).list;
 		const index = data.main.aqi;
@@ -444,7 +462,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 }
 
 const current4ResponseSchema = z.object({
-	data: z.array(currentWeatherDataItemSchema)
+	data: z.array(currentWeatherDataItemSchema).nonempty()
 });
 const hourly4ResponseSchema = z.object({
 	data: z.array(hourlyWeatherDataItemSchema),
@@ -457,16 +475,76 @@ const daily4ResponseSchema = z.object({
 	timezone_offset: z.number().int()
 });
 
+type Hourly4DataResponse = z.infer<typeof hourly4ResponseSchema>;
+type Daily4DataResponse = z.infer<typeof daily4ResponseSchema>;
+
 export class Owm4WeatherProvider implements WeatherProvider {
 	readonly id = "owm4";
 	readonly name = "OpenWeatherMap 4.0";
 
 	async getCurrent (coords: NumericCoordinates) {
-		const cacheKey = getOwm4CacheKey(coords, "current");
-		let data = await core.Cache.getByPrefix(cacheKey) as z.infer<typeof currentWeatherDataItemSchema> | null;
-		if (!data) {
-			const apiKey = getOwmApiKey();
-			const response = await core.Got.get("GenericAPI")({
+		const data = await this.fetch("current", coords);
+		if ("success" in data) {
+			return data;
+		}
+
+		return parseCurrentReport(data);
+	}
+
+	async getHourly (coords: NumericCoordinates, offset: number) {
+		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 19) {
+			return {
+				success: false,
+				reply: "Invalid hour offset provided! Use a value between 0 and 20."
+			} as const;
+		}
+
+		const data = await this.fetch("hourly", coords);
+		if ("success" in data) {
+			return data;
+		}
+
+		return parseHourlyReport(data.data, data.timezone_offset, offset);
+	}
+
+	async getDaily (coords: NumericCoordinates, offset: number) {
+		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 9) {
+			return {
+				success: false,
+				reply: "Invalid hour offset provided! Use a value between 0 and 10."
+			} as const;
+		}
+
+		const data = await this.fetch("daily", coords);
+		if ("success" in data) {
+			return data;
+		}
+
+		return parseDailyReport(data.data, data.timezone_offset, offset);
+	}
+
+	private async fetch (type: "current", coords: NumericCoordinates): Promise<CurrentDataItem | ResultFailure>;
+	private async fetch (type: "hourly", coords: NumericCoordinates): Promise<Hourly4DataResponse | ResultFailure>;
+	private async fetch (type: "daily", coords: NumericCoordinates): Promise<Daily4DataResponse | ResultFailure>;
+	private async fetch (type: WeatherReportType, coords: NumericCoordinates): Promise<CurrentDataItem | Hourly4DataResponse | Daily4DataResponse | ResultFailure> {
+		const cacheKey = getOwm4CacheKey(coords, type);
+		const cacheData = await core.Cache.getByPrefix(cacheKey);
+		if (cacheData) {
+			if (type === "current") {
+				return cacheData as CurrentDataItem;
+			}
+			else if (type === "hourly") {
+				return cacheData as Hourly4DataResponse;
+			}
+			else {
+				return cacheData as Daily4DataResponse;
+			}
+		}
+
+		let response;
+		const apiKey = getOwmApiKey();
+		if (type === "current") {
+			response = await core.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/4.0/onecall/current",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -480,28 +558,9 @@ export class Owm4WeatherProvider implements WeatherProvider {
 					appid: apiKey
 				}
 			});
-
-			data = current4ResponseSchema.parse(response.body).data[0];
 		}
-
-		await core.Cache.setByPrefix(cacheKey, data satisfies z.infer<typeof currentWeatherDataItemSchema>, { expiry: 10 * 60_000 });
-
-		return parseCurrentReport(data);
-	}
-
-	async getHourly (coords: NumericCoordinates, offset: number) {
-		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 20) {
-			return {
-				success: false,
-				reply: "Invalid hour offset provided! Use a value between 0 and 20."
-			} as const;
-		}
-
-		const cacheKey = getOwm4CacheKey(coords, "hourly");
-		let data = await core.Cache.getByPrefix(cacheKey) as z.infer<typeof hourly4ResponseSchema> | null;
-		if (!data) {
-			const apiKey = getOwmApiKey();
-			const response = await core.Got.get("GenericAPI")({
+		else if (type === "hourly") {
+			response = await core.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/4.0/onecall/timeline/1h",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -515,28 +574,9 @@ export class Owm4WeatherProvider implements WeatherProvider {
 					appid: apiKey
 				}
 			});
-
-			data = hourly4ResponseSchema.parse(response.body);
 		}
-
-		await core.Cache.setByPrefix(cacheKey, data, { expiry: 10 * 60_000 });
-
-		return parseHourlyReport(data.data, data.timezone_offset, offset);
-	}
-
-	async getDaily (coords: NumericCoordinates, offset: number) {
-		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 10) {
-			return {
-				success: false,
-				reply: "Invalid hour offset provided! Use a value between 0 and 10."
-			} as const;
-		}
-
-		const cacheKey = getOwm4CacheKey(coords, "daily");
-		let data = await core.Cache.getByPrefix(cacheKey) as z.infer<typeof daily4ResponseSchema> | null;
-		if (!data) {
-			const apiKey = getOwmApiKey();
-			const response = await core.Got.get("GenericAPI")({
+		else {
+			response = await core.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/4.0/onecall/timeline/1day",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -550,12 +590,33 @@ export class Owm4WeatherProvider implements WeatherProvider {
 					appid: apiKey
 				}
 			});
+		}
 
+		if (response.statusCode === 429) {
+			return {
+				success: false,
+				reply: `The weather API is currently unavailable due to too many requests! Try again later.`
+			};
+		}
+		else if (!response.ok) {
+			return {
+				success: false,
+				reply: `The weather API is currently not available! Try again later.`
+			};
+		}
+
+		let data;
+		if (type === "current") {
+			data = current4ResponseSchema.parse(response.body).data[0];
+		}
+		else if (type === "hourly") {
+			data = hourly4ResponseSchema.parse(response.body);
+		}
+		else {
 			data = daily4ResponseSchema.parse(response.body);
 		}
 
 		await core.Cache.setByPrefix(cacheKey, data, { expiry: 10 * 60_000 });
-
-		return parseDailyReport(data.data, data.timezone_offset, offset);
+		return data;
 	}
 }

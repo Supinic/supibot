@@ -75,6 +75,10 @@ export default declare({
 		const { coords, address, hidden, origin } = locationResult.location;
 		if (context.params.pollution) {
 			const pollution = await providers.owm3.fetchPollution(coords);
+			if ("success" in pollution) {
+				return pollution;
+			}
+
 			return {
 				success: true,
 				reply: core.Utils.tag.trim `
@@ -170,7 +174,7 @@ export default declare({
 		"",
 
 		`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-		"weather forecast in X hour(s) - accepts 0 (this hour) through 48 (in 2 days).",
+		"weather forecast in X hour(s) - accepts 0 (this hour) through 47 (in ~2 days).",
 		"",
 
 		`<code>${prefix}weather (place) <b>day+X</b></code>`,
