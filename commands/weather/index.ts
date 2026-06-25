@@ -1,6 +1,6 @@
 import { declare } from "../../classes/command.js";
 import { getWeatherLocation } from "./location.js";
-import { Owm3WeatherProvider, Owm4WeatherProvider } from "./providers/owm.js";
+import { weatherProviders, getCurrentWeatherProvider } from "./providers/provider.js";
 import { formatWeatherReport } from "./formatting.js";
 
 const ALLOWED_FORMAT_TYPES = [
@@ -15,12 +15,6 @@ const ALLOWED_FORMAT_TYPES = [
 	"windGusts",
 	"windSpeed"
 ];
-const providers = {
-	owm3: new Owm3WeatherProvider(),
-	owm4: new Owm4WeatherProvider()
-};
-const currentProvider: keyof typeof providers = "owm3";
-
 const determineReportType = (args: readonly string[]) => {
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i];
@@ -74,7 +68,7 @@ export default declare({
 
 		const { coords, address, hidden, origin } = locationResult.location;
 		if (context.params.pollution) {
-			const pollution = await providers.owm3.fetchPollution(coords);
+			const pollution = await weatherProviders.owm3.fetchPollution(coords);
 			if ("success" in pollution) {
 				return pollution;
 			}
@@ -88,7 +82,7 @@ export default declare({
 			};
 		}
 		if (context.params.alerts) {
-			const alerts = await providers.owm3.fetchAlerts(coords);
+			const alerts = await weatherProviders.owm3.fetchAlerts(coords);
 			if ("success" in alerts) {
 				return alerts;
 			}
@@ -126,7 +120,9 @@ export default declare({
 		}
 
 		let data;
-		const provider = providers[currentProvider];
+		const currentProvider = await getCurrentWeatherProvider();
+		const provider = weatherProviders[currentProvider];
+
 		if (reportData.type === "current") {
 			data = await provider.getCurrent(coords);
 		}
@@ -174,7 +170,7 @@ export default declare({
 		"",
 
 		`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-		"weather forecast in X hour(s) - accepts 0 (this hour) through 47 (in ~2 days).",
+		"weather forecast in X hour(s) - accepts 0 (this hour) through 19.",
 		"",
 
 		`<code>${prefix}weather (place) <b>day+X</b></code>`,
