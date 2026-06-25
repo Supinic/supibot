@@ -1,6 +1,5 @@
 import { SupiDate } from "supi-core";
 import type { WeatherReport, WeatherReport as Report } from "./providers/provider.js";
-import type { ResultFailure } from "../../classes/command.js";
 
 export const WEATHER_FORMAT_KEYS = [
 	"cloudCover",
@@ -144,35 +143,31 @@ const createWeatherFormatObject = (report: Report, meta: WeatherFormatMeta): Wea
 	sun: formatSun(report, meta)
 });
 
-type WeatherFormatOptions = WeatherFormatMeta & { customFormat?: string; };
-type WeatherFormatResult = ResultFailure | { success: true; reply: string; };
-
-export const formatWeatherReport = (report: Report, options: WeatherFormatOptions): WeatherFormatResult => {
+type WeatherFormatOptions = WeatherFormatMeta & { customFormat?: string | WeatherFormatKey[]; };
+export const formatWeatherReport = (report: Report, options: WeatherFormatOptions): { formatted: string } => {
 	const obj = createWeatherFormatObject(report, options);
 	if (options.customFormat) {
-		const keys = options.customFormat.split(/\W/).filter(Boolean);
-		const reply = [];
+		const keys = (typeof options.customFormat === "string")
+			? options.customFormat.split(",").filter(Boolean)
+			: options.customFormat;
 
+		const reply = [];
 		for (const key of keys) {
 			if (!isWeatherFormatKey(key)) {
-				return {
-					success: false,
-					reply: `Cannot create custom weather format with the "${key}" element!`
-				};
+				reply.push(key);
+				continue;
 			}
 
 			reply.push(obj[key]);
 		}
 
 		return {
-			success: true,
-			reply: reply.filter(Boolean).join(" ")
+			formatted: reply.filter(Boolean).join(" ")
 		};
 	}
 
 	return {
-		success: true,
-		reply: core.Utils.tag.trim `
+		formatted: core.Utils.tag.trim `
 			${obj.place} ${formatReportTime(report)}:
 			${obj.icon}
 			${obj.temperature}

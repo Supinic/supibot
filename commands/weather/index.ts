@@ -137,14 +137,11 @@ export default declare({
 			return data;
 		}
 
-		const formatResult = formatWeatherReport(data, {
+		const { formatted } = formatWeatherReport(data, {
 			place: address,
 			hiddenLocation: hidden,
 			customFormat: context.params.format
 		});
-		if (!formatResult.success) {
-			return formatResult;
-		}
 
 		if (!hidden) {
 			const counter = this.registerMetric("Counter", "geomap_count", {
@@ -160,7 +157,7 @@ export default declare({
 
 		return {
 			success: true,
-			reply: formatResult.reply
+			reply: formatted
 		};
 	}),
 	Dynamic_Description: (prefix) => ([
