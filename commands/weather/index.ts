@@ -1,17 +1,7 @@
-import { SupiDate, SupiError } from "supi-core";
-
-import { getWeatherLocation } from "./location.js";
 import { declare } from "../../classes/command.js";
-import { postToHastebin } from "../../utils/command-utils.js";
-
-import {
-	getSunPosition,
-	isWeatherFormatKey,
-	type OwmPollutionResponse,
-	type OwmWeatherResponse,
-	type WeatherFormatObject,
-	WeatherItem
-} from "./helpers.js";
+import { getWeatherLocation } from "./location.js";
+import { Owm3WeatherProvider, Owm4WeatherProvider } from "./providers/owm.js";
+import { formatWeatherReport } from "./formatting.js";
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",
@@ -25,12 +15,39 @@ const ALLOWED_FORMAT_TYPES = [
 	"windGusts",
 	"windSpeed"
 ];
-const POLLUTION_INDEX_ICONS = {
-	1: "🔵",
-	2: "🟢",
-	3: "🟡",
-	4: "🟠",
-	5: "🔴"
+const providers = {
+	owm3: new Owm3WeatherProvider(),
+	owm4: new Owm4WeatherProvider()
+};
+const currentProvider: keyof typeof providers = "owm3";
+
+const determineReportType = (args: readonly string[]) => {
+	for (let i = 0; i < args.length; i++) {
+		const arg = args[i];
+		const hourMatch = arg.match(/^hour\+(\d+)/);
+		if (hourMatch) {
+			return {
+				type: "hourly",
+				offset: Number(hourMatch[1]),
+				args: [...args.slice(0, i), ...args.slice(i + 1)]
+			} as const;
+		}
+
+		const dayMatch = arg.match(/^day\+(\d+)/);
+		if (dayMatch) {
+			return {
+				type: "daily",
+				offset: Number(dayMatch[1]),
+				args: [...args.slice(0, i), ...args.slice(i + 1)]
+			} as const;
+		}
+	}
+
+	return {
+		type: "current",
+		offset: null,
+		args
+	} as const;
 };
 
 export default declare({
@@ -46,65 +63,9 @@ export default declare({
 		{ name: "status", type: "string" }
 	],
 	Whitelist_Response: null,
-	Code: (async function weather (context, ...args) {
-		if (!process.env.API_GOOGLE_GEOCODING) {
-			throw new SupiError({
-				message: "No Google geocoding key configured (API_GOOGLE_GEOCODING)"
-			});
-		}
-		if (!process.env.API_OPEN_WEATHER_MAP) {
-			throw new SupiError({
-				message: "No OpenWeatherMap key configured (API_OPEN_WEATHER_MAP)"
-			});
-		}
-
-		// @todo reformat this mess
-		let weatherTime:
-			| { number: null; type: "current"; }
-			| { number: number; type: "hourly" | "daily"; }
-				= { number: null, type: "current" };
-
-		const weatherRegex = /\b(hour|day)\+(\d+)$/;
-		const historyRegex = /-\s*\d/;
-
-		if (args.length > 0) {
-			const last = args.at(-1) as string; // Fully known because of array length check above
-			if (historyRegex.test(last)) {
-				return {
-					success: false,
-					reply: "Checking for weather history is not currently implemented"
-				};
-			}
-
-			const weatherMatch = last.match(weatherRegex);
-			if (weatherMatch) {
-				args.pop();
-
-				if (!weatherMatch[1] || !weatherMatch[2]) {
-					return {
-						success: false,
-						reply: `Invalid syntax of hour/day parameters!`
-					};
-				}
-
-				let type: "daily" | "hourly";
-				const number = Number(weatherMatch[2]);
-				if (weatherMatch[1] === "day") {
-					type = "daily";
-				}
-				else if (weatherMatch[1] === "hour") {
-					type = "hourly";
-				}
-				else {
-					return {
-						success: false,
-						reply: "Invalid combination of parameters! Use day+# or hour+#"
-					};
-				}
-
-				weatherTime = { type, number };
-			}
-		}
+	Code: (async function weather (context, ...args: readonly string[]) {
+		const reportData = determineReportType(args);
+		args = reportData.args;
 
 		const locationResult = await getWeatherLocation(context, args);
 		if ("command" in locationResult) {
@@ -113,227 +74,76 @@ export default declare({
 
 		const { coords, address, hidden, origin } = locationResult.location;
 		if (context.params.pollution) {
-			const response = await core.Got.get("GenericAPI")<OwmPollutionResponse>({
-				url: "https://api.openweathermap.org/data/2.5/air_pollution",
-				responseType: "json",
-				throwHttpErrors: false,
-				timeout: {
-					request: 60_000
-				},
-				searchParams: {
-					lat: coords.lat,
-					lon: coords.lng,
-					appid: process.env.API_OPEN_WEATHER_MAP
-				}
-			});
-
-			const [data] = response.body.list;
-			const pollutionIndex = data.main.aqi;
-			const { components } = data;
-			const icon = POLLUTION_INDEX_ICONS[pollutionIndex];
-
-			const componentsString = Object.entries(components)
-				.map(([type, value]) => `${type.toUpperCase().replace("_", ".")}: ${value.toFixed(3)}`)
-				.join(", ");
-
+			const pollution = await providers.owm3.fetchPollution(coords);
 			return {
+				success: true,
 				reply: core.Utils.tag.trim `
-					${address} current pollution index: ${pollutionIndex} ${icon}
-					Particles: ${componentsString}.				
+					${address} current pollution index: ${pollution.index} ${pollution.icon}
+					Particles: ${pollution.components}.				
 				`
 			};
 		}
-
-		const weatherKey = { type: "weather", coords: `${coords.lat}-${coords.lng}` };
-		let data = await this.getCacheData(weatherKey) as OwmWeatherResponse | undefined;
-		if (!data) {
-			const response = await core.Got.get("GenericAPI")<OwmWeatherResponse>({
-				url: "https://api.openweathermap.org/data/3.0/onecall",
-				responseType: "json",
-				throwHttpErrors: false,
-				timeout: {
-					request: 60_000
-				},
-				searchParams: {
-					lat: coords.lat,
-					lon: coords.lng,
-					units: "metric",
-					appid: process.env.API_OPEN_WEATHER_MAP
-				}
-			});
-
-			if (response.statusCode === 429) {
-				return {
-					success: false,
-					reply: `The weather API is currently unavailable due to too many requests! Try again later.`
-				};
-			}
-			else if (response.statusCode !== 200) {
-				return {
-					success: false,
-					reply: `The weather API is currently not available! Try again later.`
-				};
-			}
-
-			data = response.body;
-			await this.setCacheData(weatherKey, data, {
-				expiry: 10 * 60_000 // 10 minutes cache
-			});
-		}
-
 		if (context.params.alerts) {
-			if (!data.alerts || data.alerts.length === 0) {
+			const alerts = await providers.owm3.fetchAlerts(coords);
+			if ("success" in alerts) {
+				return alerts;
+			}
+			if (alerts.empty) {
 				return {
 					success: true,
 					reply: `Weather alert summary for ${address} - no alerts.`
 				};
 			}
 
-			const hastebinKey = { type: "hastebin", coords: `${coords.lat}-${coords.lng}` };
-			let hastebinLink = await this.getCacheData(hastebinKey) as string | undefined;
-			if (!hastebinLink) {
-				const text = data.alerts.map(i => {
-					const start = new SupiDate(i.start * 1000).setTimezoneOffset(data.timezone_offset / 60);
-					const end = new SupiDate(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
-					const tags = (!i.tags || i.tags.length === 0)
-						? ""
-						: `-- ${i.tags.sort().join(", ")}`;
-
-					return [
-						`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
-						(i.event ?? "(no event specified)"),
-						`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
-						(i.description ?? "(no description)")
-					].join("\n");
-				}).join("\n\n");
-
-				const paste = await postToHastebin(text, {
-					title: (hidden)
-						? `Weather alerts - private location`
-						: `Weather alerts - ${address}`
-				});
-
-				if (!paste.ok) {
-					return {
-						success: false,
-						reply: paste.reason
-					};
-				}
-
-				hastebinLink = paste.link;
-				await this.setCacheData(hastebinKey, hastebinLink, { expiry: 3_600_000 });
-			}
-
 			if (hidden) {
 				if (origin === "self") {
-					await context.platform.pm(
-						`Your location's weather alerts: ${hastebinLink}`,
-						context.user,
-						context.channel
-					);
-
+					await context.platform.pm(`Your location's weather alerts: ${alerts.link}`, context.user, context.channel);
 					return {
+						success: true,
 						reply: core.Utils.tag.trim `
-							Weather alert summary for your hidden location: ${data.alerts.length} alerts.
+							Weather alert summary for your hidden location: ${alerts.amount} alerts.
 							I sent you a private message with the link to the full description.
 						`
 					};
 				}
 				else {
 					return {
-						reply: `Weather alert summary for their hidden location: ${data.alerts.length} alerts.`
+						success: true,
+						reply: `Weather alert summary for their hidden location: ${alerts.amount} alerts.`
 					};
 				}
 			}
 			else {
 				return {
-					reply: core.Utils.tag.trim `
-						Weather alert summary for ${address} - 
-						${data.alerts.length} alerts -
-						full info: ${hastebinLink}
-					`
+					success: true,
+					reply: `Weather alert summary for ${address} - ${alerts.amount} alerts - full info: ${alerts.link}`
 				};
 			}
 		}
 
-		let target: WeatherItem;
-		if (weatherTime.type === "current") {
-			target = new WeatherItem(data.current, data.minutely ?? []);
+		let data;
+		const provider = providers[currentProvider];
+		if (reportData.type === "current") {
+			data = await provider.getCurrent(coords);
 		}
-		else if (weatherTime.type === "hourly") {
-			const hourlyTarget = data.hourly.at(weatherTime.number);
-			if (!hourlyTarget) {
-				return {
-					success: false,
-					reply: `Invalid hour offset provided! Use a number between 0 and ${data.hourly.length - 1}.`
-				};
-			}
-
-			target = new WeatherItem(hourlyTarget, data.minutely ?? []);
+		else if (reportData.type === "hourly") {
+			data = await provider.getHourly(coords, reportData.offset);
 		}
 		else {
-			const dailyTarget = data.daily.at(weatherTime.number);
-			if (!dailyTarget) {
-				return {
-					success: false,
-					reply: `Invalid day offset provided! Use a number between 0 and ${data.daily.length - 1}.`
-				};
-			}
-
-			target = new WeatherItem(dailyTarget, data.minutely ?? []);
+			data = await provider.getDaily(coords, reportData.offset);
 		}
 
-		const obj = {
+		if ("success" in data) {
+			return data;
+		}
+
+		const formatResult = formatWeatherReport(data, {
 			place: address,
-			icon: target.icon,
-			temperature: target.temperature,
-			cloudCover: target.cloudCover,
-			humidity: target.humidity,
-			pressure: target.pressure,
-			windSpeed: target.windSpeed,
-			windGusts: target.windGusts,
-			precipitation: target.precipitation,
-			sun: (weatherTime.type === "current" && !hidden) ? getSunPosition(data) : ""
-		} satisfies WeatherFormatObject;
-
-		let weatherAlert = "";
-		if (data.alerts && data.alerts.length !== 0) {
-			const targetTime = new SupiDate();
-			if (weatherTime.type === "hourly") {
-				targetTime.addHours(weatherTime.number);
-			}
-			else if (weatherTime.type === "daily") {
-				targetTime.addDays(weatherTime.number);
-			}
-
-			const relevantAlerts = data.alerts.filter(i => {
-				const start = new SupiDate(i.start * 1000);
-				const end = new SupiDate(i.end * 1000);
-
-				return (start <= targetTime && end >= targetTime);
-			});
-
-			const tagList = relevantAlerts.flatMap(i => i.tags ?? []).sort();
-			const tags = [...new Set(tagList)];
-
-			if (tags.length > 0) {
-				const plural = (tags.length > 1) ? "s" : "";
-				weatherAlert = `⚠️ Weather alert${plural}: ${tags.join(", ")}.`;
-			}
-		}
-
-		let plusTime;
-		if (typeof weatherTime.number === "number") {
-			const time = new SupiDate(target.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
-			if (weatherTime.type === "hourly") {
-				plusTime = ` (${time.format("H:00")} local time)`;
-			}
-			else {
-				plusTime = ` (${time.format("j.n.")} local date)`;
-			}
-		}
-		else {
-			plusTime = " (now)";
+			hiddenLocation: hidden,
+			customFormat: context.params.format
+		});
+		if (!formatResult.success) {
+			return formatResult;
 		}
 
 		if (!hidden) {
@@ -348,41 +158,10 @@ export default declare({
 			});
 		}
 
-		if (context.params.format) {
-			const format = new Set(context.params.format.split(/\W/).filter(Boolean));
-			const reply = [];
-
-			for (const element of format) {
-				if (!isWeatherFormatKey(element, obj)) {
-					return {
-						success: false,
-						reply: `Cannot create custom weather format with the "${element}" element!`
-					};
-				}
-
-				reply.push(obj[element]);
-			}
-
-			return {
-				reply: reply.join(" ")
-			};
-		}
-		else {
-			return {
-				reply: core.Utils.tag.trim `
-					${obj.place} ${plusTime}:
-					${obj.icon}
-					${obj.temperature}
-					${obj.cloudCover}
-					${obj.windSpeed} ${obj.windGusts}
-					${obj.humidity}
-					${obj.precipitation}
-					${obj.pressure}
-					${obj.sun}
-					${weatherAlert}
-				`
-			};
-		}
+		return {
+			success: true,
+			reply: formatResult.reply
+		};
 	}),
 	Dynamic_Description: (prefix) => ([
 		"Checks for current weather, or for hourly/daily forecast in a given location.",
@@ -409,20 +188,11 @@ export default declare({
 		"Posts a summary of the current pollution for the provided location.",
 		"",
 
-		`<code>${prefix}weather (place) status:text</code>`,
-		"Instead of posting an emoji signifying the current weather state, a brief text description will be used instead.",
-		"",
-
 		`<code>${prefix}weather (place) format:(custom format)</code>`,
 		`<code>${prefix}weather (place) format:temperature</code>`,
 		`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
 		"Lets you choose specific weather elements to show in the result.",
 		`Supported elements: <code>${ALLOWED_FORMAT_TYPES.join(", ")}</code>`,
-		"",
-
-		`<code>${prefix}weather latitude:(number) longitude:(number)</code>`,
-		`<code>${prefix}weather latitude:0.2998175 longitude:32.5394548</code>`,
-		"Allows you to query a location to find weather in by GPS coordinates precisely.",
 		"",
 
 		"",

@@ -2,7 +2,7 @@ import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { ResultFailure } from "../../../classes/command.js";
 
 export type WeatherReportType = "current" | "hourly" | "daily";
-type BaseReport = {
+type BaseWeatherReport = {
 	kind: WeatherReportType;
 	timestamp: number;
 	temperature: {
@@ -37,19 +37,15 @@ type BaseReport = {
 	pressure?: number;
 	uvi?: number;
 };
-type CurrentReport = BaseReport & {
+type CurrentWeatherReport = BaseWeatherReport & {
 	kind: "current";
-	sun: {
-		rise?: number;
-		set?: number;
-	};
 };
-type HourlyReport = BaseReport & {
+type HourlyWeatherReport = BaseWeatherReport & {
 	kind: "hourly";
 	offset: number;
 	time: string;
 };
-type DailyReport = BaseReport & {
+type DailyWeatherReport = BaseWeatherReport & {
 	kind: "daily";
 	offset: number;
 	date: string;
@@ -61,11 +57,13 @@ type DailyReport = BaseReport & {
 	}
 };
 
+export type WeatherReport = CurrentWeatherReport | HourlyWeatherReport | DailyWeatherReport;
+
 export interface WeatherProvider {
 	readonly id: string;
 	readonly name: string;
 
-	getCurrent (coords: NumericCoordinates): Promise<CurrentReport | ResultFailure>;
-	getHourly (coords: NumericCoordinates, offset: number): Promise<HourlyReport | ResultFailure>;
-	getDaily (coords: NumericCoordinates, offset: number): Promise<DailyReport | ResultFailure>;
+	getCurrent (coords: NumericCoordinates): Promise<CurrentWeatherReport | ResultFailure>;
+	getHourly (coords: NumericCoordinates, offset: number): Promise<HourlyWeatherReport | ResultFailure>;
+	getDaily (coords: NumericCoordinates, offset: number): Promise<DailyWeatherReport | ResultFailure>;
 }

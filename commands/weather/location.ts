@@ -4,8 +4,6 @@ import { exec } from "node:child_process";
 import type { Context, StrictResult } from "../../classes/command.js";
 import { fetchGeoLocationData } from "../../utils/command-utils.js";
 
-const shell = promisify(exec);
-
 type GeoCacheData = { empty: true } | {
 	empty: false;
 	formattedAddress: string;
@@ -23,9 +21,10 @@ type WeatherLocation = {
 type CommandResult = { command: StrictResult };
 type LocationResult = CommandResult | WeatherLocation;
 
+const shell = promisify(exec);
 const getGeoCacheKey = (query: string) => `weather-location-cache-${query.toLowerCase().trim()}`;
 
-export const getWeatherLocation = async (context: Context, args: string[]): Promise<LocationResult> => {
+export const getWeatherLocation = async (context: Context, args: readonly string[]): Promise<LocationResult> => {
 	let origin: "self" | "user" | "public";
 	let hidden = false;
 	let coords: { lat: number; lng: number };

@@ -4,6 +4,7 @@ import { degreeShape, percentShape, probabilityShape, unixTimestampShape } from 
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { WeatherProvider, WeatherReportType } from "./provider.js";
 import type { ResultFailure } from "../../../classes/command.js";
+import { postToHastebin } from "../../../utils/command-utils.js";
 
 const precipitationShape = z.object({
 	"1h": z.number().nonnegative()
@@ -77,9 +78,42 @@ const owmWeatherResponseSchema = z.object({
 	hourly: z.array(hourlyWeatherDataItemSchema),
 	minutely: z.array(minutelyWeatherDataItemSchema).optional(),
 	timezone: z.string(),
-	timezone_offset: z.number().int()
+	timezone_offset: z.number().int(),
+	alerts: z.array(z.object({
+		sender_name: z.string().optional(),
+		event: z.string().optional(),
+		description: z.string().optional(),
+		tags: z.array(z.string()).optional(),
+		start: unixTimestampShape,
+		end: unixTimestampShape
+	})).optional()
 });
 type Owm3Response = z.infer<typeof owmWeatherResponseSchema>;
+
+const owmPollutionResponseSchema = z.object({
+	list: z.array(z.object({
+		dt: unixTimestampShape,
+		main: z.object({
+			aqi: z.union([
+				z.literal(1),
+				z.literal(2),
+				z.literal(3),
+				z.literal(4),
+				z.literal(5)
+			])
+		}),
+		components: z.object({
+			co: z.number().positive(),
+			no: z.number().positive(),
+			no2: z.number().positive(),
+			o3: z.number().positive(),
+			so2: z.number().positive(),
+			pm2_5: z.number().positive(),
+			pm10: z.number().positive(),
+			nh3: z.number().positive()
+		})
+	}))
+});
 
 // Sourced from: https://openweathermap.org/weather-conditions
 const WEATHER_ICONS: Partial<Record<number, string>> = {
@@ -101,6 +135,13 @@ const WEATHER_ICONS: Partial<Record<number, string>> = {
 	802: "🌥️", // Scattered clouds (25-50%)
 	803: "☁️", // Broken clouds (51-84%)
 	804: "☁️" // Overcast clouds (85-100%)
+};
+const POLLUTION_INDEX_ICONS = {
+	1: "🔵",
+	2: "🟢",
+	3: "🟡",
+	4: "🟠",
+	5: "🔴"
 };
 
 const getIcon = (code: number, icon?: string) => {
@@ -238,6 +279,8 @@ const parseDailyReport = (items: z.infer<typeof dailyWeatherDataItemSchema>[], t
 	};
 };
 
+type AlertsData = { empty: true; } | { empty: false; amount: number; link: string; } | ResultFailure;
+
 export class Owm3WeatherProvider implements WeatherProvider {
 	readonly id = "owm3";
 	readonly name = "OpenWeatherMap 3.0";
@@ -256,7 +299,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 			return {
 				success: false,
 				reply: "Invalid hour offset provided! Use a value between 0 and 47."
-			} as const;
+			} as ResultFailure;
 		}
 
 		const data = await this.oneCall(coords);
@@ -281,6 +324,80 @@ export class Owm3WeatherProvider implements WeatherProvider {
 		}
 
 		return parseDailyReport(data.daily, data.timezone_offset, offset);
+	}
+
+	async fetchAlerts (coords: NumericCoordinates): Promise<AlertsData> {
+		const data = await this.oneCall(coords);
+		if ("success" in data) {
+			return data;
+		}
+
+		if (!data.alerts || data.alerts.length === 0) {
+			return {
+				empty: true
+			};
+		}
+
+		const text = data.alerts.map(i => {
+			const start = new SupiDate(i.start * 1000).setTimezoneOffset(data.timezone_offset / 60);
+			const end = new SupiDate(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
+			const tags = (!i.tags || i.tags.length === 0)
+				? ""
+				: `-- ${i.tags.sort().join(", ")}`;
+
+			return [
+				`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
+				(i.event ?? "(no event specified)"),
+				`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
+				(i.description ?? "(no description)")
+			].join("\n");
+		}).join("\n\n");
+
+		const paste = await postToHastebin(text, { title: `Weather alerts` });
+
+		if (!paste.ok) {
+			return {
+				success: false,
+				reply: paste.reason
+			} as ResultFailure;
+		}
+
+		return {
+			empty: false,
+			amount: data.alerts.length,
+			link: paste.link
+		};
+	}
+
+	async fetchPollution (coords: NumericCoordinates) {
+		const response = await core.Got.get("GenericAPI")({
+			url: "https://api.openweathermap.org/data/2.5/air_pollution",
+			responseType: "json",
+			throwHttpErrors: false,
+			timeout: {
+				request: 60_000
+			},
+			searchParams: {
+				lat: coords.lat,
+				lon: coords.lng,
+				appid: process.env.API_OPEN_WEATHER_MAP
+			}
+		});
+
+		const [data] = owmPollutionResponseSchema.parse(response.body).list;
+		const index = data.main.aqi;
+		const { components } = data;
+		const icon = POLLUTION_INDEX_ICONS[index];
+
+		const componentsString = Object.entries(components)
+			.map(([type, value]) => `${type.toUpperCase().replace("_", ".")}: ${value.toFixed(3)}`)
+			.join(", ");
+
+		return {
+			icon,
+			index,
+			components: componentsString
+		};
 	}
 
 	private async oneCall (coords: NumericCoordinates): Promise<Owm3Response | ResultFailure> {
