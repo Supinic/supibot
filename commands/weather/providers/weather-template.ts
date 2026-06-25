@@ -1,6 +1,5 @@
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { ResultFailure } from "../../../classes/command.js";
-import { Owm3WeatherProvider, Owm4WeatherProvider } from "./owm.js";
 
 export type WeatherReportType = "current" | "hourly" | "daily";
 type BaseWeatherReport = {
@@ -59,12 +58,7 @@ type DailyWeatherReport = BaseWeatherReport & {
 };
 export type WeatherReport = CurrentWeatherReport | HourlyWeatherReport | DailyWeatherReport;
 
-export const weatherProviders = {
-	owm3: new Owm3WeatherProvider(),
-	owm4: new Owm4WeatherProvider()
-};
-type WeatherProviderName = keyof typeof weatherProviders;
-
+export type WeatherProviderName = "owm3" | "owm4";
 const currentWeatherProviderCacheKey = "weather-current-provider";
 export const getCurrentWeatherProvider = async () => {
 	const value = await core.Cache.getByPrefix(currentWeatherProviderCacheKey) as WeatherProviderName | null;

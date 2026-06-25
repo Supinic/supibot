@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { WeatherReport, WeatherReport as Report } from "./providers/provider.js";
+import type { WeatherReport as Report } from "./providers/weather-template.js";
 
 export const WEATHER_FORMAT_KEYS = [
 	"cloudCover",
@@ -119,7 +119,7 @@ const formatSun = (report: Report, meta: WeatherFormatMeta) => {
 
 	return "";
 };
-const formatReportTime = (report: WeatherReport) => {
+const formatReportTime = (report: Report) => {
 	if (report.kind === "current") {
 		return "(now)";
 	}

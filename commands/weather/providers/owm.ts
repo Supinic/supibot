@@ -1,10 +1,10 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { degreeShape, percentShape, probabilityShape, unixTimestampShape } from "../../../utils/schemas.js";
-import type { NumericCoordinates } from "../../../utils/globals.js";
-import { setCurrentWeatherProvider, type WeatherProvider, type WeatherReportType } from "./provider.js";
-import type { ResultFailure } from "../../../classes/command.js";
 import { postToHastebin } from "../../../utils/command-utils.js";
+import type { NumericCoordinates } from "../../../utils/globals.js";
+import type { ResultFailure } from "../../../classes/command.js";
+import { setCurrentWeatherProvider, type WeatherProvider, type WeatherReportType } from "./weather-template.js";
 
 const precipitationShape = z.object({
 	"1h": z.number().nonnegative()

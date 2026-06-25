@@ -1,7 +1,8 @@
 import { declare } from "../../classes/command.js";
 import { getWeatherLocation } from "./location.js";
-import { weatherProviders, getCurrentWeatherProvider } from "./providers/provider.js";
+import { weatherProviders } from "./providers/index.js";
 import { formatWeatherReport } from "./formatting.js";
+import { getCurrentWeatherProvider } from "./providers/weather-template.js";
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",
