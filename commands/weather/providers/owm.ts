@@ -144,6 +144,100 @@ const getOwmApiKey = (): string => {
 const getOwm3CacheKey = (coords: NumericCoordinates) => `weather-cache-owm-3.0-${coords.lat}-${coords.lng}`;
 const getOwm4CacheKey = (coords: NumericCoordinates, report: WeatherReportType) => `weather-cache-owm-4.0-${coords.lat}-${coords.lng}-${report}`;
 
+const parseCommonReportFields = (item: z.infer<typeof baseWeatherDataItemSchema>) => {
+	const status = item.weather[0];
+	return {
+		timestamp: item.dt,
+
+		humidity: item.humidity,
+		cloudCover: item.clouds,
+		pressure: item.pressure,
+		uvi: item.uvi,
+
+		condition: {
+			code: status.id,
+			icon: getIcon(status.id, status.icon)
+		},
+
+		wind: {
+			speed: item.wind_speed,
+			gust: item.wind_gust,
+			direction: item.wind_deg
+		}
+	};
+};
+const parseCurrentReport = (item: z.infer<typeof currentWeatherDataItemSchema>, minutely?: z.infer<typeof minutelyWeatherDataItemSchema>[]) => ({
+	kind: "current" as const,
+	...parseCommonReportFields(item),
+	temperature: {
+		actual: item.temp,
+		feelsLike: item.feels_like
+	},
+	precipitation: {
+		rain: item.rain?.["1h"],
+		snow: item.snow?.["1h"],
+		timeUntil: (minutely) ? getClosestPrecipitation(minutely) : undefined
+	},
+	sun: {
+		rise: item.sunrise,
+		set: item.sunset
+	}
+});
+const parseHourlyReport = (items: z.infer<typeof hourlyWeatherDataItemSchema>[], timezoneOffset: number, offset: number) => {
+	const item = items.at(offset);
+	if (!item) {
+		return {
+			success: false,
+			reply: "No data found for this offset! Try a lower number."
+		} as const;
+	}
+
+	const date = new SupiDate(item.dt * 1000).setTimezoneOffset(timezoneOffset / 60);
+	return {
+		kind: "hourly" as const,
+		offset,
+		time: date.format("H:00"),
+		...parseCommonReportFields(item),
+		temperature: {
+			actual: item.temp,
+			feelsLike: item.feels_like
+		},
+		precipitation: {
+			rain: item.rain?.["1h"],
+			snow: item.snow?.["1h"],
+			probability: item.pop
+		}
+	};
+};
+const parseDailyReport = (items: z.infer<typeof dailyWeatherDataItemSchema>[], timezoneOffset: number, offset: number) => {
+	const item = items.at(offset);
+	if (!item) {
+		return {
+			success: false,
+			reply: "No data found for this offset! Try a lower number."
+		} as const;
+	}
+
+	const date = new SupiDate(item.dt * 1000).setTimezoneOffset(timezoneOffset / 60);
+	return {
+		kind: "daily" as const,
+		offset,
+		date: date.format("j.n."),
+		...parseCommonReportFields(item),
+		temperature: {
+			actual: item.temp.day,
+			feelsLike: item.feels_like.day,
+			min: item.temp.min,
+			max: item.temp.max
+		},
+		precipitation: {
+			rain: item.rain,
+			snow: item.snow,
+			probability: item.pop
+		}
+	};
+};
+
 export class Owm3WeatherProvider implements WeatherProvider {
 	readonly id = "owm3";
 	readonly name = "OpenWeatherMap 3.0";
@@ -154,39 +248,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 			return data;
 		}
 
-		const { current } = data;
-		const status = current.weather[0];
-		return {
-			kind: "current" as const,
-			timestamp: current.dt,
-
-			humidity: current.humidity,
-			cloudCover: current.clouds,
-			pressure: current.pressure,
-			uvi: current.uvi,
-			temperature: {
-				actual: current.temp,
-				feelsLike: current.feels_like
-			},
-			condition: {
-				code: status.id,
-				icon: getIcon(status.id, status.icon)
-			},
-			precipitation: {
-				rain: current.rain?.["1h"],
-				snow: current.snow?.["1h"],
-				timeUntil: (data.minutely) ? getClosestPrecipitation(data.minutely) : undefined
-			},
-			wind: {
-				speed: current.wind_speed,
-				gust: current.wind_gust,
-				direction: current.wind_deg
-			},
-			sun: {
-				rise: current.sunrise,
-				set: current.sunset
-			}
-		};
+		return parseCurrentReport(data.current);
 	}
 
 	async getHourly (coords: NumericCoordinates, offset: number) {
@@ -202,45 +264,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 			return data;
 		}
 
-		const hour = data.hourly.at(offset);
-		if (!hour) {
-			return {
-				success: false,
-				reply: "No data found for this offset! Try a lower number."
-			} as const;
-		}
-
-		const date = new SupiDate(hour.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
-		const status = hour.weather[0];
-		return {
-			kind: "hourly" as const,
-			offset,
-
-			timestamp: hour.dt,
-			time: date.format("H:00"),
-
-			humidity: hour.humidity,
-			cloudCover: hour.clouds,
-			pressure: hour.pressure,
-			uvi: hour.uvi,
-			temperature: {
-				actual: hour.temp,
-				feelsLike: hour.feels_like
-			},
-			condition: {
-				code: status.id,
-				icon: getIcon(status.id, status.icon)
-			},
-			precipitation: {
-				rain: hour.rain?.["1h"],
-				snow: hour.snow?.["1h"]
-			},
-			wind: {
-				speed: hour.wind_speed,
-				gust: hour.wind_gust,
-				direction: hour.wind_deg
-			}
-		};
+		return parseHourlyReport(data.hourly, data.timezone_offset, offset);
 	}
 
 	async getDaily (coords: NumericCoordinates, offset: number) {
@@ -256,48 +280,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 			return data;
 		}
 
-		const day = data.daily.at(offset);
-		if (!day) {
-			return {
-				success: false,
-				reply: "No data found for this offset! Try a lower number."
-			} as const;
-		}
-
-		const date = new SupiDate(day.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
-		const status = day.weather[0];
-		return {
-			kind: "daily" as const,
-			offset,
-
-			timestamp: day.dt,
-			date: date.format("j.n."),
-
-			humidity: day.humidity,
-			cloudCover: day.clouds,
-			pressure: day.pressure,
-			uvi: day.uvi,
-			temperature: {
-				actual: day.temp.day,
-				feelsLike: day.feels_like.day,
-				min: day.temp.min,
-				max: day.temp.max
-			},
-			condition: {
-				code: status.id,
-				icon: getIcon(status.id, status.icon)
-			},
-			precipitation: {
-				rain: day.rain,
-				snow: day.snow,
-				probability: day.pop
-			},
-			wind: {
-				speed: day.wind_speed,
-				gust: day.wind_gust,
-				direction: day.wind_deg
-			}
-		};
+		return parseDailyReport(data.daily, data.timezone_offset, offset);
 	}
 
 	private async oneCall (coords: NumericCoordinates): Promise<Owm3Response | ResultFailure> {
@@ -344,9 +327,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 }
 
 const current4ResponseSchema = z.object({
-	data: z.array(currentWeatherDataItemSchema),
-	timezone: z.string(),
-	timezone_offset: z.number().int()
+	data: z.array(currentWeatherDataItemSchema)
 });
 const hourly4ResponseSchema = z.object({
 	data: z.array(hourlyWeatherDataItemSchema),
@@ -388,37 +369,7 @@ export class Owm4WeatherProvider implements WeatherProvider {
 
 		await core.Cache.setByPrefix(cacheKey, data satisfies z.infer<typeof currentWeatherDataItemSchema>, { expiry: 10 * 60_000 });
 
-		const status = data.weather[0];
-		return {
-			kind: "current" as const,
-			timestamp: data.dt,
-
-			humidity: data.humidity,
-			cloudCover: data.clouds,
-			pressure: data.pressure,
-			uvi: data.uvi,
-			temperature: {
-				actual: data.temp,
-				feelsLike: data.feels_like
-			},
-			condition: {
-				code: status.id,
-				icon: getIcon(status.id, status.icon)
-			},
-			precipitation: {
-				rain: data.rain?.["1h"],
-				snow: data.snow?.["1h"]
-			},
-			wind: {
-				speed: data.wind_speed,
-				gust: data.wind_gust,
-				direction: data.wind_deg
-			},
-			sun: {
-				rise: data.sunrise,
-				set: data.sunset
-			}
-		};
+		return parseCurrentReport(data);
 	}
 
 	async getHourly (coords: NumericCoordinates, offset: number) {
@@ -453,45 +404,7 @@ export class Owm4WeatherProvider implements WeatherProvider {
 
 		await core.Cache.setByPrefix(cacheKey, data, { expiry: 10 * 60_000 });
 
-		const hour = data.data.at(offset);
-		if (!hour) {
-			return {
-				success: false,
-				reply: "No data found for this offset! Try a lower number."
-			} as const;
-		}
-
-		const date = new SupiDate(hour.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
-		const status = hour.weather[0];
-		return {
-			kind: "hourly" as const,
-			offset,
-
-			timestamp: hour.dt,
-			time: date.format("H:00"),
-
-			humidity: hour.humidity,
-			cloudCover: hour.clouds,
-			pressure: hour.pressure,
-			uvi: hour.uvi,
-			temperature: {
-				actual: hour.temp,
-				feelsLike: hour.feels_like
-			},
-			condition: {
-				code: status.id,
-				icon: getIcon(status.id, status.icon)
-			},
-			precipitation: {
-				rain: hour.rain?.["1h"],
-				snow: hour.snow?.["1h"]
-			},
-			wind: {
-				speed: hour.wind_speed,
-				gust: hour.wind_gust,
-				direction: hour.wind_deg
-			}
-		};
+		return parseHourlyReport(data.data, data.timezone_offset, offset);
 	}
 
 	async getDaily (coords: NumericCoordinates, offset: number) {
@@ -507,7 +420,7 @@ export class Owm4WeatherProvider implements WeatherProvider {
 		if (!data) {
 			const apiKey = getOwmApiKey();
 			const response = await core.Got.get("GenericAPI")({
-				url: "https://api.openweathermap.org/data/4.0/onecall/timeline/1h",
+				url: "https://api.openweathermap.org/data/4.0/onecall/timeline/1day",
 				responseType: "json",
 				throwHttpErrors: false,
 				timeout: {
@@ -526,47 +439,6 @@ export class Owm4WeatherProvider implements WeatherProvider {
 
 		await core.Cache.setByPrefix(cacheKey, data, { expiry: 10 * 60_000 });
 
-		const day = data.data.at(offset);
-		if (!day) {
-			return {
-				success: false,
-				reply: "No data found for this offset! Try a lower number."
-			} as const;
-		}
-
-		const date = new SupiDate(day.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
-		const status = day.weather[0];
-		return {
-			kind: "daily" as const,
-			offset,
-
-			timestamp: day.dt,
-			date: date.format("j.n."),
-
-			humidity: day.humidity,
-			cloudCover: day.clouds,
-			pressure: day.pressure,
-			uvi: day.uvi,
-			temperature: {
-				actual: day.temp.day,
-				feelsLike: day.feels_like.day,
-				min: day.temp.min,
-				max: day.temp.max
-			},
-			condition: {
-				code: status.id,
-				icon: getIcon(status.id, status.icon)
-			},
-			precipitation: {
-				rain: day.rain,
-				snow: day.snow,
-				probability: day.pop
-			},
-			wind: {
-				speed: day.wind_speed,
-				gust: day.wind_gust,
-				direction: day.wind_deg
-			}
-		};
+		return parseDailyReport(data.data, data.timezone_offset, offset);
 	}
 }

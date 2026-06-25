@@ -1,8 +1,9 @@
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { ResultFailure } from "../../../classes/command.js";
 
+export type WeatherReportType = "current" | "hourly" | "daily";
 type BaseReport = {
-	kind: "current" | "hourly" | "daily";
+	kind: WeatherReportType;
 	timestamp: number;
 	temperature: {
 		actual: number;
