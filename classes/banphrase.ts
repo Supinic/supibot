@@ -99,6 +99,7 @@ const ExternalBanphraseAPI = {
 	async pajbot (message: string, url: string) {
 		message = message.trim().replaceAll(/\s+/g, " ");
 
+		let err: Error | undefined;
 		let response;
 		try {
 			response = await core.Got.get("GenericAPI")<PajbotResponse>({
@@ -114,13 +115,17 @@ const ExternalBanphraseAPI = {
 			});
 		}
 		catch (e) {
+			if (e instanceof Error) {
+				err = e;
+			}
 			console.warn("Banphrase request failure", { e, url, message });
 		}
 
 		if (!response || !response.ok) {
 			throw new SupiError({
-				message: `Cannot request the "${url}" banphrase API`,
-				args: { message, url }
+				message: `Banphrase API "${url}" failed`,
+				args: { message, url },
+				cause: err
 			});
 		}
 
@@ -336,13 +341,14 @@ export class Banphrase extends TemplateWithId {
 			}
 		}
 		catch (e) {
-			if (!isGotRequestError(e)) {
+			if (!isGotRequestError(e) && !(e instanceof SupiError)) {
 				throw e;
 			}
 
+			const code = ("code" in e) ? e.code : "(N/A)";
 			await logger.log(
 				"System.Warning",
-				`Banphrase API fail - code: ${e.code}, message: ${e.message}`,
+				`Banphrase API fail - code: ${code}, message: ${e.message}`,
 				channelData
 			);
 
@@ -370,10 +376,10 @@ export class Banphrase extends TemplateWithId {
 
 				case "Refuse": {
 					let string;
-					if (e.code === "ETIMEDOUT") {
+					if (code === "ETIMEDOUT") {
 						string = `Cannot reply - banphrase API timed out.`;
 					}
-					else if (e.code === "HTTPError") {
+					else if (code === "HTTPError") {
 						const match = e.message.match(/Response code (\d+)/);
 						const statusString = (match)
 							? `(status code ${match[1]})`
@@ -438,24 +444,12 @@ export class Banphrase extends TemplateWithId {
 	static async executeExternalAPI (message: string, type: ExternalApiType, url: string, options?: { fullResponse?: false; }): Promise<false | string>;
 	static async executeExternalAPI (
 		message: string,
-		type: ExternalApiType,
+		_type: ExternalApiType, // reserved for future use when more than one API is supported
 		url: string,
 		options: ExternalExecuteOptions = {}
 	): Promise<string | false | ExternalApiResponse> {
-		let result: ExternalApiResponse | null = null;
-		// Likely unnecessary, since Pajbot is the only API type supported. But, could still be extended in the future.
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (type === "Pajbot") {
-			result = await ExternalBanphraseAPI.pajbot(message, url);
-		}
-
-		if (!result) {
-			throw new SupiError({
-				message: "Invalid external API type of response",
-				args: { message, type, url }
-			});
-		}
-
+		// Pajbot API is the only API type supported right now -  could still be extended in the future.
+		const result = await ExternalBanphraseAPI.pajbot(message, url);
 		if (options.fullResponse) {
 			return result;
 		}
