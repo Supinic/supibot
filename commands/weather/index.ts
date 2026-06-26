@@ -171,7 +171,7 @@ export default declare({
 		"",
 
 		`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-		"weather forecast in X hour(s) - accepts 0 (this hour) through 19.",
+		"weather forecast in X hour(s) - accepts 0 (this hour) through 47 (in ~2 days).",
 		"",
 
 		`<code>${prefix}weather (place) <b>day+X</b></code>`,

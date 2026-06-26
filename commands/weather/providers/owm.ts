@@ -493,19 +493,22 @@ export class Owm4WeatherProvider implements WeatherProvider {
 	}
 
 	async getHourly (coords: NumericCoordinates, offset: number) {
-		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 19) {
+		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 47) {
 			return {
 				success: false,
-				reply: "Invalid hour offset provided! Use a value between 0 and 20."
+				reply: "Invalid hour offset provided! Use a value between 0 and 47."
 			} as const;
 		}
 
-		const data = await this.fetch("hourly", coords);
+		// always shift the starting point to the given hour, and change the result offset to 0
+		const now = new SupiDate().discardTimeUnits("m", "s", "ms");
+		const start = Math.trunc(now.addHours(offset).valueOf() / 1000);
+		const data = await this.fetch("hourly", coords, start);
 		if ("success" in data) {
 			return data;
 		}
 
-		return parseHourlyReport(data.data, data.timezone_offset, offset);
+		return parseHourlyReport(data.data, data.timezone_offset, 0);
 	}
 
 	async getDaily (coords: NumericCoordinates, offset: number) {
@@ -525,9 +528,9 @@ export class Owm4WeatherProvider implements WeatherProvider {
 	}
 
 	private async fetch (type: "current", coords: NumericCoordinates): Promise<CurrentDataItem | ResultFailure>;
-	private async fetch (type: "hourly", coords: NumericCoordinates): Promise<Hourly4DataResponse | ResultFailure>;
+	private async fetch (type: "hourly", coords: NumericCoordinates, start?: number): Promise<Hourly4DataResponse | ResultFailure>;
 	private async fetch (type: "daily", coords: NumericCoordinates): Promise<Daily4DataResponse | ResultFailure>;
-	private async fetch (type: WeatherReportType, coords: NumericCoordinates): Promise<CurrentDataItem | Hourly4DataResponse | Daily4DataResponse | ResultFailure> {
+	private async fetch (type: WeatherReportType, coords: NumericCoordinates, start?: number): Promise<CurrentDataItem | Hourly4DataResponse | Daily4DataResponse | ResultFailure> {
 		const cacheKey = getOwm4CacheKey(coords, type);
 		const cacheData = await core.Cache.getByPrefix(cacheKey);
 		if (cacheData) {
@@ -561,6 +564,17 @@ export class Owm4WeatherProvider implements WeatherProvider {
 			});
 		}
 		else if (type === "hourly") {
+			const searchParams = new URLSearchParams({
+				lat: String(coords.lat),
+				lon: String(coords.lng),
+				units: "metric",
+				appid: apiKey
+			});
+
+			if (start) {
+				searchParams.set("start", String(start));
+			}
+
 			response = await core.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/4.0/onecall/timeline/1h",
 				responseType: "json",
@@ -568,12 +582,7 @@ export class Owm4WeatherProvider implements WeatherProvider {
 				timeout: {
 					request: 60_000
 				},
-				searchParams: {
-					lat: coords.lat,
-					lon: coords.lng,
-					units: "metric",
-					appid: apiKey
-				}
+				searchParams: searchParams.toString()
 			});
 		}
 		else {
