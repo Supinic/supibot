@@ -57,7 +57,7 @@ const dailyWeatherDataItemSchema = baseWeatherDataItemSchema.extend({
 	moon_phase: z.number().min(0).max(1),
 	moonrise: unixTimestampShape,
 	moonset: unixTimestampShape,
-	pop: probabilityShape,
+	pop: probabilityShape.optional(),
 	rain: z.number().nonnegative().optional(),
 	snow: z.number().nonnegative().optional(),
 	temp: z.object({
@@ -469,7 +469,8 @@ const hourly4ResponseSchema = z.object({
 });
 const daily4ResponseSchema = z.object({
 	data: z.array(dailyWeatherDataItemSchema.extend({
-		weather: z.null()
+		weather: z.null().optional(),
+		pop: z.number().optional() // is never present
 	})),
 	timezone: z.string(),
 	timezone_offset: z.number().int()
