@@ -19,14 +19,13 @@ const weatherConditionSchema = z.object({
 const baseWeatherDataItemSchema = z.object({
 	dt: unixTimestampShape,
 	clouds: percentShape,
-	dew_point: z.number(),
 	humidity: percentShape,
 	pressure: z.number().nonnegative(),
 	sunrise: unixTimestampShape.optional(),
 	sunset: unixTimestampShape.optional(),
 	uvi: z.number().nonnegative(),
 	// visibility: z.number().nonnegative().optional(), // not used at the moment
-	weather: z.array(weatherConditionSchema).nonempty(),
+	weather: z.array(weatherConditionSchema).nonempty().nullish(), // is null in OWM 4.0?
 	wind_deg: degreeShape,
 	wind_gust: z.number().nonnegative().optional(),
 	wind_speed: z.number().nonnegative()
@@ -191,20 +190,17 @@ const getOwm3CacheKey = (coords: NumericCoordinates) => `weather-cache-owm-3.0-$
 const getOwm4CacheKey = (coords: NumericCoordinates, report: WeatherReportType) => `weather-cache-owm-4.0-${coords.lat}-${coords.lng}-${report}`;
 
 const parseCommonReportFields = (item: BaseDataItem) => {
-	const status = item.weather[0];
+	const status = item.weather?.[0];
 	return {
 		timestamp: item.dt,
-
 		humidity: item.humidity,
 		cloudCover: item.clouds,
 		pressure: item.pressure,
 		uvi: item.uvi,
-
 		condition: {
-			code: status.id,
-			icon: getIcon(status.id, status.icon)
+			code: status?.id ?? 0,
+			icon: (status) ? getIcon(status.id, status.icon) : ""
 		},
-
 		wind: {
 			speed: item.wind_speed,
 			gust: item.wind_gust,
@@ -472,7 +468,9 @@ const hourly4ResponseSchema = z.object({
 	timezone_offset: z.number().int()
 });
 const daily4ResponseSchema = z.object({
-	data: z.array(dailyWeatherDataItemSchema),
+	data: z.array(dailyWeatherDataItemSchema.extend({
+		weather: z.null()
+	})),
 	timezone: z.string(),
 	timezone_offset: z.number().int()
 });
