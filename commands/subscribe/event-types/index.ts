@@ -14,6 +14,7 @@ import FactorioSubDefinition from "./factorio.js";
 import GithubBlogDefinition from "./github-blog.js";
 import GithubStatusDefinition from "./github-status.js";
 import GlobalTwitchEmotesDefinition from "./global-twitch-emotes.js";
+import KdeDefinition from "./kde.js";
 import MicrosoftCppSubDefinition from "./msvcpp.js";
 import NodeSubDefinition from "./nodejs.js";
 import OsrsSubDefinition from "./osrs.js";
@@ -40,6 +41,7 @@ export default [
 	GithubBlogDefinition,
 	GithubStatusDefinition,
 	GlobalTwitchEmotesDefinition,
+	KdeDefinition,
 	MicrosoftCppSubDefinition,
 	NodeSubDefinition,
 	OsrsSubDefinition,
