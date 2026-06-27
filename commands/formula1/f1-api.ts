@@ -3,7 +3,9 @@ import type formulaOneCommandDefinition from "./index.js";
 import { searchYoutube } from "../../utils/command-utils.js";
 
 import type { ExtractContext } from "../../classes/command.js";
-import type { Coordinates } from "../../utils/globals.js";
+import type { NumericCoordinates } from "../../utils/globals.js";
+import { Owm3WeatherProvider } from "../weather/providers/owm.js";
+import { formatWeatherReport } from "../weather/formatting.js";
 
 export const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
@@ -63,42 +65,42 @@ type YearResponse = {
 };
 
 type CommandContext = ExtractContext<typeof formulaOneCommandDefinition>;
-export const getWeather = async (context: CommandContext, sessionStart: number, coordinates: Coordinates) => {
-	const weatherCommand = sb.Command.get("weather");
-	if (!weatherCommand) {
-		return "Weather checking is not available!";
-	}
+const f1WeatherProvider = new Owm3WeatherProvider();
 
-	const fakeWeatherContext = sb.Command.createFakeContext(weatherCommand, {
-		user: context.user,
-		platform: context.platform,
-		platformSpecificData: context.platformSpecificData,
-		params: {
-			latitude: Number(coordinates.lat),
-			longitude: Number(coordinates.lng),
-			format: "icon,temperature,precipitation"
-		},
-		invocation: "weather"
-	});
-
+export const getWeather = async (sessionStart: number, coordinates: NumericCoordinates, place: string) => {
 	const now = SupiDate.now();
 	const hourDifference = Math.floor((sessionStart - now) / 36e5);
-	if (hourDifference <= 1) {
-		const result = await weatherCommand.execute(fakeWeatherContext);
-		return `Current weather: ${result.reply ?? "N/A"}`;
-	}
-	else if (hourDifference < 48) {
-		const result = await weatherCommand.execute(fakeWeatherContext, `hour+${hourDifference}`);
-		return `Weather forecast: ${result.reply ?? "N/A"}`;
-	}
-	else if (hourDifference < (7 * 24)) {
-		const dayDifference = Math.floor(hourDifference / 24);
-		const result = await weatherCommand.execute(fakeWeatherContext, `day+${dayDifference}`);
-		return `Weather forecast: ${result.reply ?? "N/A"}`;
-	}
-	else {
+	if (hourDifference > (7 * 24)) {
 		return "Weather forecast is not yet available.";
 	}
+
+	let result;
+	let prefix: string;
+	if (hourDifference <= 1) {
+		result = await f1WeatherProvider.getCurrent(coordinates);
+		prefix = "Current weather";
+	}
+	else if (hourDifference < 48) {
+		result = await f1WeatherProvider.getHourly(coordinates, hourDifference);
+		prefix = "3-day weather forecast";
+	}
+	else {
+		const dayDifference = Math.floor(hourDifference / 24);
+		result = await f1WeatherProvider.getDaily(coordinates, dayDifference);
+		prefix = "7-day weather forecast";
+	}
+
+	if ("success" in result) {
+		return "No weather forecast available at the moment.";
+	}
+
+	const { formatted } = formatWeatherReport(result, {
+		hiddenLocation: false,
+		place,
+		customFormat: ["icon", "temperature", "precipitation"]
+	});
+
+	return `${prefix}: ${formatted}`;
 };
 
 export async function fetchRace (year: number, searchType: "current"): Promise<Race | null>;
@@ -256,11 +258,6 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 		};
 	}
 
-	const coordinates: Coordinates = {
-		lat: race.Circuit.Location.lat,
-		lng: race.Circuit.Location.long
-	};
-
 	const now = new SupiDate();
 	const raceStart = new SupiDate(`${race.date} ${race.time}`);
 	const raceEnd = raceStart.clone().addHours(2); // Compensate for the race being underway
@@ -292,6 +289,11 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 		}
 	}
 
+	const coords = {
+		lat: Number(race.Circuit.Location.lat),
+		lng: Number(race.Circuit.Location.long)
+	};
+
 	if (nextSessionEnd && nextSessionType && now < nextSessionEnd) {
 		nextSessionString = `Next session: ${sessionNames[nextSessionType]}`;
 
@@ -303,7 +305,8 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 		}
 
 		if (context.params.weather) {
-			const weatherResult = await getWeather(context, nextSessionStart.valueOf(), coordinates);
+			const weatherResult = await getWeather(nextSessionStart.valueOf(), coords, race.Circuit.Location.locality);
+
 			nextSessionString += ` ${weatherResult}`;
 		}
 	}
@@ -323,7 +326,7 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 	}
 
 	if (context.params.weather) {
-		const weatherResult = await getWeather(context, raceStart.valueOf(), coordinates);
+		const weatherResult = await getWeather(raceStart.valueOf(), coords, race.Circuit.Location.locality);
 		raceString += ` ${weatherResult}`;
 	}
 
