@@ -5,6 +5,7 @@ import { postToHastebin } from "../../../utils/command-utils.js";
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { ResultFailure } from "../../../classes/command.js";
 import { setCurrentWeatherProvider, type WeatherProvider, type WeatherReportType } from "./weather-template.js";
+import { logger } from "../../../singletons/logger.js";
 
 const precipitationShape = z.object({
 	"1h": z.number().nonnegative()
@@ -452,9 +453,25 @@ export class Owm3WeatherProvider implements WeatherProvider {
 			};
 		}
 
-		const data = owmWeatherResponseSchema.parse(response.body);
-		await core.Cache.setByPrefix(cacheKey, data satisfies Owm3Response, { expiry: 10 * 60_000 });
+		const rawData = owmWeatherResponseSchema.safeParse(response.body);
+		if (!rawData.success) {
+			await logger.logError("Command", rawData.error, {
+				origin: "Internal", // Internal so it comes out as a notification in Error_Inbox
+				arguments: { coords },
+				context: {
+					cause: "OWM3 Zod error",
+					body: response.body
+				}
+			});
 
+			return {
+				success: false,
+				reply: "The weather provider returned invalid data! Try again after an hour or so, please."
+			};
+		}
+
+		const { data } = rawData;
+		await core.Cache.setByPrefix(cacheKey, data satisfies Owm3Response, { expiry: 10 * 60_000 });
 		return data;
 	}
 }
