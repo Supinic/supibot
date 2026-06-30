@@ -10,13 +10,13 @@ const edgesShape = z.array(z.object({
 
 type Edges = z.infer<typeof edgesShape>;
 const parseEdges = (user: User, name: string, edges: Edges, type: "channelFollower" | "followedChannel") => {
-	const who = (user.Name === name.toLowerCase()) ? "you" : "they";
 	if (!edges || edges.length === 0) {
 		return {
-			success: true,
-			reply: (type === "channelFollower")
-				? `${core.Utils.capitalize(who)} don't follow anyone.`
-				: `${core.Utils.capitalize(who)} don't have any followers.`
+			success: false,
+			reply: core.Utils.tag.trim `
+				Twitch did not return any data for this query!
+			 	Unfortunately, this command might be removed soon since there doesn't seem to be a way to fetch this data anymore.
+			`
 		};
 	}
 
@@ -34,6 +34,7 @@ const parseEdges = (user: User, name: string, edges: Edges, type: "channelFollow
 		? "you!"
 		: `@${followUsername}`;
 
+	const who = (user.Name === name.toLowerCase()) ? "you" : "they";
 	const delta = core.Utils.timeDelta(new SupiDate(date), false, true);
 	return {
 		success: true,
