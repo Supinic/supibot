@@ -376,7 +376,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 				return returnValue;
 			}
 		}),
-		get tee () { return Object.freeze([...context.tee]); },
+		get tee () { return (context.tee) ? [...context.tee] : []; },
 		_teePush (value) {
 			if (typeof value !== "string") {
 				throw new Error("Only string values can be pushed to tee");
