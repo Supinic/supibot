@@ -56,7 +56,6 @@ type ConstructorData = {
 	User_Alias: AwayFromKeyboard["User_Alias"];
 	Started: AwayFromKeyboard["Started"];
 	Text: AwayFromKeyboard["Text"] | null;
-	Silent?: AwayFromKeyboard["Silent"];
 	Status?: AwayFromKeyboard["Status"];
 };
 type DatabaseConstructorData = ConstructorData & { Active: boolean; };
@@ -70,8 +69,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 	readonly User_Alias: number;
 	readonly Started: SupiDate;
 	readonly Text: string;
-	readonly Silent: boolean; // @todo change to `never`, or flat-out remove, once fully removed from code base
-	readonly Status: Status | null;
+	readonly Status: Status;
 
 	static readonly data: Map<number, AwayFromKeyboard> = new Map();
 	static readonly uniqueIdentifier = "ID";
@@ -86,7 +84,6 @@ export class AwayFromKeyboard extends TemplateWithId {
 		this.User_Alias = data.User_Alias;
 		this.Started = data.Started;
 		this.Text = data.Text ?? "(no message)";
-		this.Silent = data.Silent ?? false;
 		this.Status = data.Status ?? DEFAULT_AFK_STATUS;
 	}
 
@@ -181,8 +178,8 @@ export class AwayFromKeyboard extends TemplateWithId {
 		AwayFromKeyboard.#activeGauge.dec(1);
 
 		let statusMessage;
-		const status = data.Status ?? DEFAULT_AFK_STATUS; // Fallback for old AFKs without `Status` property
-		const durationDefinitions = durationStatuses[status];
+		const status = data.Status;
+		const durationDefinitions = durationStatuses[data.Status];
 		if (durationDefinitions) {
 			const minutesDelta = (SupiDate.now() - data.Started.getTime()) / 60_000;
 			for (const definition of durationDefinitions) {
@@ -202,34 +199,28 @@ export class AwayFromKeyboard extends TemplateWithId {
 			statusMessage = core.Utils.randArray(staticResponses);
 		}
 
-		/**
-		 * @todo Whenever the AFK table is split into AFK and AFK_History (similar to Reminder), only keep the Silent
-		 * flag in the historical table and the active one should not have it. Then remove this condition.
- 		 */
-		if (!data.Silent) {
-			const platform = channelData.Platform;
-			const userMention = await platform.createUserMention(userData);
-			const preparedMessage = await channelData.prepareMessage(data.Text);
-			const fixedReminderText = (preparedMessage !== false) ? preparedMessage : configResponses.defaultBanphrase;
+		const platform = channelData.Platform;
+		const userMention = await platform.createUserMention(userData);
+		const preparedMessage = await channelData.prepareMessage(data.Text);
+		const fixedReminderText = (preparedMessage !== false) ? preparedMessage : configResponses.defaultBanphrase;
 
-			const message = `${userMention} ${statusMessage}: ${fixedReminderText} (${core.Utils.timeDelta(data.Started)})`;
-			if (channelData.Mirror) {
-				const mirroredMessage = `${userData.Name} ${statusMessage}: ${data.Text} (${core.Utils.timeDelta(data.Started)})`;
-				await channelData.mirror(mirroredMessage, null, { commandUsed: false });
-			}
+		const message = `${userMention} ${statusMessage}: ${fixedReminderText} (${core.Utils.timeDelta(data.Started)})`;
+		if (channelData.Mirror) {
+			const mirroredMessage = `${userData.Name} ${statusMessage}: ${data.Text} (${core.Utils.timeDelta(data.Started)})`;
+			await channelData.mirror(mirroredMessage, null, { commandUsed: false });
+		}
 
-			const unpingedMessage = await Filter.applyUnping({
-				command: "afk",
-				channel: channelData,
-				platform: channelData.Platform,
-				string: message,
-				executor: userData
-			});
+		const unpingedMessage = await Filter.applyUnping({
+			command: "afk",
+			channel: channelData,
+			platform: channelData.Platform,
+			string: message,
+			executor: userData
+		});
 
-			const fixedMessage = await channelData.prepareMessage(unpingedMessage);
-			if (fixedMessage) {
-				await channelData.send(fixedMessage);
-			}
+		const fixedMessage = await channelData.prepareMessage(unpingedMessage);
+		if (fixedMessage) {
+			await channelData.send(fixedMessage);
 		}
 	}
 
@@ -259,9 +250,8 @@ export class AwayFromKeyboard extends TemplateWithId {
 			Active: true,
 			User_Alias: userData.ID,
 			Text: data.Text ?? null,
-			Silent: Boolean(data.Silent),
 			Started: data.Started ?? now,
-			Status: data.Status ?? "afk",
+			Status: data.Status ?? DEFAULT_AFK_STATUS,
 			Interrupted_ID: data.Interrupted_ID ?? null
 		} as const;
 
@@ -274,9 +264,8 @@ export class AwayFromKeyboard extends TemplateWithId {
 			ID: row.values.ID,
 			User_Alias: userData.ID,
 			Text: data.Text ?? NO_TEXT_AFK,
-			Silent: Boolean(data.Silent),
 			Started: data.Started ?? now,
-			Status: data.Status ?? "afk"
+			Status: data.Status ?? DEFAULT_AFK_STATUS
 		});
 
 		AwayFromKeyboard.data.set(userData.ID, afk);

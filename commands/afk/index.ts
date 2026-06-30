@@ -48,7 +48,6 @@ export default declare({
 		await sb.AwayFromKeyboard.set(context.user, {
 			Text: core.Utils.wrapString(text, STATUS_LENGTH_CHARACTER_LIMIT, { keepWhitespace: false }),
 			Status: target.name,
-			Silent: false,
 			Interrupted_ID: null
 		});
 

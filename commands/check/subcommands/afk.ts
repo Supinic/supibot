@@ -1,7 +1,7 @@
 import type { CheckSubcommandDefinition } from "../index.js";
 import type { AwayFromKeyboard } from "../../../classes/afk.js";
 
-type AfkData = Pick<AwayFromKeyboard, "Text" | "Started" | "Silent" | "Status">;
+type AfkData = Pick<AwayFromKeyboard, "Text" | "Started" | "Status">;
 
 export default {
 	name: "afk",
@@ -42,7 +42,7 @@ export default {
 		}
 
 		const afkData = await core.Query.getRecordset<AfkData | undefined>(rs => rs
-			.select("Text", "Started", "Silent", "Status")
+			.select("Text", "Started", "Status")
 			.from("chat_data", "AFK")
 			.where("User_Alias = %n", targetUser.ID)
 			.where("Active = %b", true)
