@@ -298,7 +298,6 @@ export class Owm3WeatherProvider implements WeatherProvider {
 	}
 
 	async getHourly (coords: NumericCoordinates, offset: number) {
-		// OWM 3.0 supports values 0..47, but I'm too lazy to implement OWM 4.0 pagination so we just limit this instead
 		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 19) {
 			return {
 				success: false,

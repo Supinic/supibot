@@ -121,7 +121,7 @@ export default declare({
 		}
 
 		let data;
-		const currentProvider = await getCurrentWeatherProvider();
+		const currentProvider = getCurrentWeatherProvider();
 		const provider = weatherProviders[currentProvider];
 
 		if (reportData.type === "current") {
