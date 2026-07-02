@@ -53,7 +53,7 @@ const apiParams = {
 	},
 	daily: {
 		current: "",
-		daily: "temperature_2m_min,temperature_2m_max,weather_code,precipitation_probability,rain_sum,snowfall_sum,cloud_cover"
+		daily: "temperature_2m_min,temperature_2m_max,weather_code,precipitation_probability_max,rain_sum,snowfall_sum,cloud_cover"
 	}
 };
 
@@ -93,6 +93,7 @@ const dailySchema = z.object({
 		time: z.array(z.string()),
 		temperature_2m_min: z.array(z.number()),
 		temperature_2m_max: z.array(z.number()),
+		precipitation_probability_max: z.array(z.number()),
 		cloud_cover: z.array(z.number()),
 		rain_sum: z.array(z.number()),
 		snowfall_sum: z.array(z.number()),
@@ -190,7 +191,8 @@ export class OpenMeteoProvider implements WeatherProvider {
 			},
 			precipitation: {
 				rain: data.rain[off],
-				snow: data.snowfall[off]
+				snow: data.snowfall[off],
+				probability: data.precipitation_probability[off]
 			},
 			wind: {}
 		};
@@ -241,7 +243,8 @@ export class OpenMeteoProvider implements WeatherProvider {
 			},
 			precipitation: {
 				rain: data.rain_sum[off],
-				snow: data.snowfall_sum[off]
+				snow: data.snowfall_sum[off],
+				probability: data.precipitation_probability_max[off]
 			},
 			wind: {}
 		};
