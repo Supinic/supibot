@@ -196,7 +196,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 	}
 
 	async getDaily (coords: NumericCoordinates, offset: number) {
-		const body = await this.fetch(coords, "hourly", apiParams.daily);
+		const body = await this.fetch(coords, "daily", apiParams.daily);
 		if (isResultFailure(body)) {
 			return body;
 		}
