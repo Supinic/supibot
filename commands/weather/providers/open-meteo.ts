@@ -53,7 +53,7 @@ const apiParams = {
 	},
 	daily: {
 		current: "",
-		daily: "temperature_2m_min,temperature_2m_max,weather_code,precipitation_probability_max,rain_sum,snowfall_sum,cloud_cover"
+		daily: "temperature_2m_min,temperature_2m_max,weather_code,precipitation_probability_max,rain_sum,snowfall_sum"
 	}
 };
 
@@ -94,7 +94,6 @@ const dailySchema = z.object({
 		temperature_2m_min: z.array(z.number()),
 		temperature_2m_max: z.array(z.number()),
 		precipitation_probability_max: z.array(z.number()),
-		cloud_cover: z.array(z.number()),
 		rain_sum: z.array(z.number()),
 		snowfall_sum: z.array(z.number()),
 		weather_code: z.array(z.number())
