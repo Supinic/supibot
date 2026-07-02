@@ -189,7 +189,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 			precipitation: {
 				rain: data.rain[off],
 				snow: data.snowfall[off],
-				probability: data.precipitation_probability[off]
+				probability: data.precipitation_probability[off] / 100
 			},
 			wind: {}
 		};
@@ -241,7 +241,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 			precipitation: {
 				rain: data.rain_sum[off],
 				snow: data.snowfall_sum[off],
-				probability: data.precipitation_probability_max[off]
+				probability: data.precipitation_probability_max[off] / 100
 			},
 			wind: {}
 		};
