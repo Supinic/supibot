@@ -41,8 +41,6 @@ const getIcon = (code: number, isDay?: number) => {
 	return WEATHER_ICONS[code] ?? "";
 };
 
-// https://api.open-meteo.com/v1/forecast?latitude=41.1579438&longitude=-8.629105&daily=weather_code,temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&hourly=temperature_2m,precipitation_probability,rain,snowfall,weather_code,apparent_temperature&models=best_match&current=temperature_2m,apparent_temperature,weather_code,cloud_cover,precipitation,rain,snowfall,wind_speed_10m,wind_gusts_10m&wind_speed_unit=ms
-
 const apiParams = {
 	current: {
 		current: "temperature_2m,weather_code,rain,snowfall,cloud_cover,apparent_temperature,relative_humidity_2m,is_day,wind_speed_10m,wind_gusts_10m"
