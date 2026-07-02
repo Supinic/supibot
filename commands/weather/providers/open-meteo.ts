@@ -31,7 +31,7 @@ const WEATHER_ICONS: Partial<Record<number, string>> = {
 	86: "🌨️",
 	95: "⛈️",
 	96: "⛈️️🧊",
-	97: "⛈️️🧊"
+	99: "⛈️️🧊"
 };
 const getIcon = (code: number, isDay?: number) => {
 	if (code === 0) {
