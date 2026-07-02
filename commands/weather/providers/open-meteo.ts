@@ -45,7 +45,7 @@ const getIcon = (code: number, isDay?: number) => {
 
 const apiParams = {
 	current: {
-		current: "temperature_2m,weather_code,rain,snowfall,cloud_cover,apparent_temperature,relative_humidity_2m,is_day"
+		current: "temperature_2m,weather_code,rain,snowfall,cloud_cover,apparent_temperature,relative_humidity_2m,is_day,wind_speed_10m,wind_gusts_10m"
 	},
 	hourly: {
 		current: "",
@@ -58,6 +58,7 @@ const apiParams = {
 };
 
 const currentSchema = z.object({
+	utc_offset_seconds: z.number(),
 	current: z.object({
 		time: z.string(),
 		temperature_2m: z.number(),
@@ -73,6 +74,7 @@ const currentSchema = z.object({
 	})
 });
 const hourlySchema = z.object({
+	utc_offset_seconds: z.number(),
 	current: z.object({ time: z.string() }),
 	hourly: z.object({
 		time: z.array(z.string()),
@@ -85,6 +87,7 @@ const hourlySchema = z.object({
 	})
 });
 const dailySchema = z.object({
+	utc_offset_seconds: z.number(),
 	current: z.object({ time: z.string() }),
 	daily: z.object({
 		time: z.array(z.string()),
@@ -147,10 +150,10 @@ export class OpenMeteoProvider implements WeatherProvider {
 			return body;
 		}
 
-		const { hourly: data, current } = hourlySchema.parse(body);
+		const { hourly: data, current, utc_offset_seconds: timezoneOffset } = hourlySchema.parse(body);
 
 		let startIndex = 0;
-		const startDate = new SupiDate(`${current.time}Z`);
+		const startDate = new SupiDate(current.time);
 		for (let i = 0; i < data.time.length; i++) {
 			const utcTime = new SupiDate(data.time[i]).valueOf();
 			if (utcTime >= startDate.valueOf()) {
@@ -169,12 +172,14 @@ export class OpenMeteoProvider implements WeatherProvider {
 			} as ResultFailure;
 		}
 
-		const timestamp = new SupiDate(startDate).addHours(offset);
+		const base = new SupiDate(startDate).addHours(offset);
+		const time = base.format("H:00");
+		const timestamp = base.setTimezoneOffset(timezoneOffset).valueOf();
 		return {
 			kind: "hourly" as const,
 			offset,
-			time: timestamp.format("H:00"),
-			timestamp: timestamp.valueOf(),
+			time,
+			timestamp,
 			temperature: {
 				actual: data.temperature_2m[off],
 				feels_like: data.apparent_temperature[off]
@@ -197,7 +202,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 			return body;
 		}
 
-		const { daily: data, current } = dailySchema.parse(body);
+		const { daily: data, current, utc_offset_seconds: timezoneOffset } = dailySchema.parse(body);
 
 		let startIndex = 0;
 		const startDate = new SupiDate(`${current.time}Z`);
@@ -218,12 +223,14 @@ export class OpenMeteoProvider implements WeatherProvider {
 			} as ResultFailure;
 		}
 
-		const timestamp = new SupiDate(startDate).addDays(offset);
+		const base = new SupiDate(startDate).addHours(offset);
+		const date = base.format("j.n.");
+		const timestamp = base.setTimezoneOffset(timezoneOffset).valueOf();
 		return {
 			kind: "daily" as const,
 			offset,
-			date: timestamp.format("j.n."),
-			timestamp: timestamp.valueOf(),
+			date,
+			timestamp,
 			temperature: {
 				min: data.temperature_2m_min[off],
 				max: data.temperature_2m_max[off]
