@@ -224,7 +224,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 			} as ResultFailure;
 		}
 
-		const base = new SupiDate(startDate).addHours(offset);
+		const base = new SupiDate(startDate).addDays(offset);
 		const date = base.format("j.n.");
 		const timestamp = base.setTimezoneOffset(timezoneOffset).valueOf();
 		return {
