@@ -2,7 +2,7 @@ import * as z from "zod";
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import { type WeatherProvider, type WeatherReportType } from "./weather-template.js";
 import type { ResultFailure } from "../../../classes/command.js";
-import { SupiDate } from "supi-core";
+import { type CacheValue, SupiDate } from "supi-core";
 
 const WEATHER_ICONS: Partial<Record<number, string>> = {
 	1: "🌤️️",
@@ -281,6 +281,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 			};
 		}
 
+		await core.Cache.setByPrefix(cacheKey, response.body as CacheValue, { expiry: 600_000 });
 		return response.body;
 	}
 }
