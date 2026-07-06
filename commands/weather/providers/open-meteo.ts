@@ -1,8 +1,9 @@
 import * as z from "zod";
-import type { NumericCoordinates } from "../../../utils/globals.js";
-import { type WeatherProvider, type WeatherReportType } from "./weather-template.js";
-import type { ResultFailure } from "../../../classes/command.js";
 import { type CacheValue, SupiDate } from "supi-core";
+import { typedKeys } from "../../../utils/ts-helpers.js";
+import type { ResultFailure } from "../../../classes/command.js";
+import type { NumericCoordinates } from "../../../utils/globals.js";
+import type { WeatherProvider, WeatherReportType } from "./weather-template.js";
 
 const WEATHER_ICONS: Partial<Record<number, string>> = {
 	1: "🌤️️",
@@ -41,17 +42,49 @@ const getIcon = (code: number, isDay?: number) => {
 	return WEATHER_ICONS[code] ?? "";
 };
 
+const openMeteoFields = {
+	current: {
+		temperature_2m: z.number(),
+		weather_code: z.number(),
+		rain: z.number(),
+		snowfall: z.number(),
+		cloud_cover: z.number(),
+		apparent_temperature: z.number(),
+		relative_humidity_2m: z.number(),
+		is_day: z.number(),
+		wind_speed_10m: z.number(),
+		wind_gusts_10m: z.number()
+	},
+	hourly: {
+		temperature_2m: z.array(z.number()),
+		weather_code: z.array(z.number()),
+		precipitation_probability: z.array(z.number()),
+		rain: z.array(z.number()),
+		snowfall: z.array(z.number()),
+		cloud_cover: z.array(z.number()),
+		apparent_temperature: z.array(z.number())
+	},
+	daily: {
+		temperature_2m_min: z.array(z.number()),
+		temperature_2m_max: z.array(z.number()),
+		weather_code: z.array(z.number()),
+		precipitation_probability_max: z.array(z.number()),
+		rain_sum: z.array(z.number()),
+		snowfall_sum: z.array(z.number())
+	}
+} as const;
+
 const apiParams = {
 	current: {
-		current: "temperature_2m,weather_code,rain,snowfall,cloud_cover,apparent_temperature,relative_humidity_2m,is_day,wind_speed_10m,wind_gusts_10m"
+		current: typedKeys(openMeteoFields.current).join(",")
 	},
 	hourly: {
 		current: "",
-		hourly: "temperature_2m,weather_code,precipitation_probability,rain,snowfall,cloud_cover,apparent_temperature"
+		hourly: typedKeys(openMeteoFields.hourly).join(",")
 	},
 	daily: {
 		current: "",
-		daily: "temperature_2m_min,temperature_2m_max,weather_code,precipitation_probability_max,rain_sum,snowfall_sum"
+		daily: typedKeys(openMeteoFields.daily).join(",")
 	}
 };
 
@@ -59,16 +92,7 @@ const currentSchema = z.object({
 	utc_offset_seconds: z.number(),
 	current: z.object({
 		time: z.string(),
-		temperature_2m: z.number(),
-		apparent_temperature: z.number(),
-		relative_humidity_2m: z.number(),
-		cloud_cover: z.number(),
-		rain: z.number(),
-		snowfall: z.number(),
-		wind_speed_10m: z.number(),
-		wind_gusts_10m: z.number(),
-		weather_code: z.number(),
-		is_day: z.number() // 0 or 1
+		...openMeteoFields.current
 	})
 });
 const hourlySchema = z.object({
@@ -76,12 +100,7 @@ const hourlySchema = z.object({
 	current: z.object({ time: z.string() }),
 	hourly: z.object({
 		time: z.array(z.string()),
-		temperature_2m: z.array(z.number()),
-		apparent_temperature: z.array(z.number()),
-		precipitation_probability: z.array(z.number()),
-		rain: z.array(z.number()),
-		snowfall: z.array(z.number()),
-		weather_code: z.array(z.number())
+		...openMeteoFields.hourly
 	})
 });
 const dailySchema = z.object({
@@ -89,12 +108,7 @@ const dailySchema = z.object({
 	current: z.object({ time: z.string() }),
 	daily: z.object({
 		time: z.array(z.string()),
-		temperature_2m_min: z.array(z.number()),
-		temperature_2m_max: z.array(z.number()),
-		precipitation_probability_max: z.array(z.number()),
-		rain_sum: z.array(z.number()),
-		snowfall_sum: z.array(z.number()),
-		weather_code: z.array(z.number())
+		...openMeteoFields.daily
 	})
 });
 
