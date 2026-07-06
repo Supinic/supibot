@@ -151,7 +151,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 		const { hourly: data, current, utc_offset_seconds: timezoneOffset } = hourlySchema.parse(body);
 
 		let startIndex = 0;
-		const startDate = new SupiDate(current.time);
+		const startDate = new SupiDate(current.time).discardTimeUnits("m", "s", "ms");
 		for (let i = 0; i < data.time.length; i++) {
 			const utcTime = new SupiDate(data.time[i]).valueOf();
 			if (utcTime >= startDate.valueOf()) {
@@ -201,20 +201,8 @@ export class OpenMeteoProvider implements WeatherProvider {
 			return body;
 		}
 
-		const { daily: data, current, utc_offset_seconds: timezoneOffset } = dailySchema.parse(body);
-
-		let startIndex = 0;
-		const startDate = new SupiDate(`${current.time}Z`);
-		for (let i = 0; i < data.time.length; i++) {
-			const utcTime = new SupiDate(data.time[i]).valueOf();
-			if (utcTime >= startDate.valueOf()) {
-				startIndex = i;
-				break;
-			}
-		}
-
-		const off = startIndex + offset;
-		const day = data.time.at(off);
+		const { daily: data, utc_offset_seconds: timezoneOffset } = dailySchema.parse(body);
+		const day = data.time.at(offset);
 		if (!day) {
 			return {
 				success: false,
@@ -222,7 +210,8 @@ export class OpenMeteoProvider implements WeatherProvider {
 			} as ResultFailure;
 		}
 
-		const base = new SupiDate(startDate).addDays(offset);
+		const off = offset;
+		const base = new SupiDate(data.time[off]);
 		const date = base.format("j.n.");
 		const timestamp = base.setTimezoneOffset(timezoneOffset).valueOf();
 		return {
