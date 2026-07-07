@@ -175,7 +175,7 @@ const getClosestPrecipitation = (minutes: z.infer<typeof minutelyWeatherDataItem
 		}
 	}
 
-	return "No precipitation expected";
+	return "No precipitation expected.";
 };
 
 const getOwmApiKey = (): string => {
