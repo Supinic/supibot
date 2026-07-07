@@ -69,7 +69,7 @@ export default {
 			const supinicLink = `https://supinic.com/data/suggestion/${newRow.ID}`;
 			const extraInfoString = (oldRow.Notes === newRow.Notes)
 				? `Details: ${supinicLink}`
-				: `There are notes for you! Make sure you check them here: ${supinicLink}`;
+				: `⚠️ Notes have been added to your suggestion ⚠️ Check them here: ${supinicLink}`;
 
 			await sb.Reminder.create({
 				Channel: null,
