@@ -34,7 +34,6 @@ export default declare({
 			url: "https://api.coingecko.com/api/v3/simple/price",
 			searchParams: {
 				symbols: symbol,
-				names: symbol,
 				vs_currencies: "USD,EUR"
 			},
 			headers: {
