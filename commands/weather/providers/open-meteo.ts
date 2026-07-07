@@ -187,8 +187,11 @@ export class OpenMeteoProvider implements WeatherProvider {
 		}
 
 		const base = new SupiDate(startDate).addHours(offset);
-		const time = base.format("H:00");
-		const timestamp = base.setTimezoneOffset(timezoneOffset).valueOf();
+		const timestamp = new SupiDate(base).setTimezoneOffset(timezoneOffset / 60).valueOf();
+		const time = (offset > 24)
+			? base.format("j.n. H:00")
+			: base.format("H:00");
+
 		return {
 			kind: "hourly" as const,
 			offset,
@@ -229,7 +232,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 		const off = offset;
 		const base = new SupiDate(data.time[off]);
 		const date = base.format("j.n.");
-		const timestamp = base.setTimezoneOffset(timezoneOffset).valueOf();
+		const timestamp = new SupiDate(base).setTimezoneOffset(timezoneOffset / 60).valueOf();
 		return {
 			kind: "daily" as const,
 			offset,
