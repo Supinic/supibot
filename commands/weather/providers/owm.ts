@@ -2,10 +2,10 @@ import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { degreeShape, percentShape, probabilityShape, unixTimestampShape } from "../../../utils/schemas.js";
 import { postToHastebin } from "../../../utils/command-utils.js";
+import { logger } from "../../../singletons/logger.js";
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { ResultFailure } from "../../../classes/command.js";
-import { setCurrentWeatherProvider, type WeatherProvider, type WeatherReportType } from "./weather-template.js";
-import { logger } from "../../../singletons/logger.js";
+import type { WeatherProvider, WeatherReportType } from "./weather-template.js";
 
 const precipitationShape = z.object({
 	"1h": z.number().nonnegative()
@@ -175,7 +175,7 @@ const getClosestPrecipitation = (minutes: z.infer<typeof minutelyWeatherDataItem
 		}
 	}
 
-	return "No precipitation expected";
+	return "No precipitation expected.";
 };
 
 const getOwmApiKey = (): string => {
@@ -298,7 +298,6 @@ export class Owm3WeatherProvider implements WeatherProvider {
 	}
 
 	async getHourly (coords: NumericCoordinates, offset: number) {
-		// OWM 3.0 supports values 0..47, but I'm too lazy to implement OWM 4.0 pagination so we just limit this instead
 		if (!Number.isSafeInteger(offset) || offset < 0 || offset > 19) {
 			return {
 				success: false,
@@ -440,7 +439,6 @@ export class Owm3WeatherProvider implements WeatherProvider {
 		});
 
 		if (response.statusCode === 429) {
-			await setCurrentWeatherProvider("owm4");
 			return {
 				success: false,
 				reply: `The weather API is currently unavailable due to too many requests! Try again later.`
@@ -620,7 +618,6 @@ export class Owm4WeatherProvider implements WeatherProvider {
 		}
 
 		if (response.statusCode === 429) {
-			await setCurrentWeatherProvider("owm3");
 			return {
 				success: false,
 				reply: `The weather API is currently unavailable due to too many requests! Try again later.`

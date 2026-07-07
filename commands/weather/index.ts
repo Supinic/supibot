@@ -2,7 +2,7 @@ import { declare } from "../../classes/command.js";
 import { getWeatherLocation } from "./location.js";
 import { weatherProviders } from "./providers/index.js";
 import { formatWeatherReport } from "./formatting.js";
-import { getCurrentWeatherProvider } from "./providers/weather-template.js";
+import { getDefaultProvider, isValidWeatherProviderName } from "./providers/weather-template.js";
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",
@@ -55,7 +55,7 @@ export default declare({
 		{ name: "alerts", type: "boolean" },
 		{ name: "format", type: "string" },
 		{ name: "pollution", type: "boolean" },
-		{ name: "status", type: "string" }
+		{ name: "provider", type: "string" }
 	],
 	Whitelist_Response: null,
 	Code: (async function weather (context, ...args: readonly string[]) {
@@ -120,10 +120,16 @@ export default declare({
 			}
 		}
 
-		let data;
-		const currentProvider = await getCurrentWeatherProvider();
-		const provider = weatherProviders[currentProvider];
+		const providerName = context.params.provider ?? getDefaultProvider();
+		if (!isValidWeatherProviderName(providerName)) {
+			return {
+				success: false,
+				reply: "Invalid weather provider provided!"
+			};
+		}
 
+		let data;
+		const provider = weatherProviders[providerName];
 		if (reportData.type === "current") {
 			data = await provider.getCurrent(coords);
 		}
@@ -163,20 +169,29 @@ export default declare({
 	}),
 	Dynamic_Description: (prefix) => ([
 		"Checks for current weather, or for hourly/daily forecast in a given location.",
-		"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
+		"If you, or a given user have set their location with the <code>set</code> command, this command can use that location directly.",
+		`Check the <a href="/bot/command/detail/set">${prefix}set location</a> command's detailed help on how to set it, and make it private if needed.`,
 		"",
+
+		"<h5>Current weather</h5>",
 
 		`<code>${prefix}weather (place)</code>`,
-		"current weather in given location",
+		`<code>${prefix}weather Berlin</code>`,
+		`<code>${prefix}weather Norway, Michigan, US</code>`,
+		"Posts the current weather in a given location.",
 		"",
 
+		"<h5>Weather forecast</h5>",
+
 		`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-		"weather forecast in X hour(s) - accepts 0 (this hour) through 47 (in ~2 days).",
+		"Posts the weather forecast in X hour(s) - accepts numbers from 0 (summary for the current hour) to 48 (in ~2 days).",
 		"",
 
 		`<code>${prefix}weather (place) <b>day+X</b></code>`,
-		"weather forecast in X day(s) - accepts 0 (today) through 7 (next week).",
+		"Posts the weather forecast in X day(s) - accepts numbers from 0 (summary for today) through 7 (next week).",
 		"",
+
+		"<h5>Pollution and alerts</h5>",
 
 		`<code>${prefix}weather (place) alerts:true</code>`,
 		"Posts a summary of all weather alerts for the provided location - for the next 7 days.",
@@ -186,39 +201,43 @@ export default declare({
 		"Posts a summary of the current pollution for the provided location.",
 		"",
 
+		"<h5>Weather for your own location</h5>",
+
+		`<code>${prefix}weather</code>`,
+		`<code>${prefix}weather alerts:true</code>`,
+		`<code>${prefix}weather pollution:true</code>`,
+		"If you set your own weather location, show its weather.",
+		"Works the same for the hourly, daily, alerts, pollution and format usages.",
+		"",
+
+		"<h5>Weather for others' locations</h5>",
+
+		`<code>${prefix}weather @User</code>`,
+		`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
+		`<code>${prefix}weather @User alerts:true</code>`,
+		`<code>${prefix}weather @User pollution:true</code>`,
+		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
+		"Again, as above, works the same for the hourly, daily, alerts, pollution and format usages as well.",
+		"",
+
+		"<h5>Weather providers</h5>",
+		`<code>${prefix}weather provider:(provider)</code>`,
+		`<code>${prefix}weather provider:owm3</code>`,
+		`<code>${prefix}weather provider:owm4</code>`,
+		`<code>${prefix}weather provider:open-meteo</code>`,
+		"If you are unhappy with the default weather provider's accuracy, you can choose others specifically.",
+		`The default provider is <a href="//open-meteo.com">Open-Meteo.com</a>, but you can also use <a href="//openweathermap.org">OpenWeatherMap</a>'s 3.0 or 4.0 forecast APIs.`,
+		"",
+
+		"<h5>Custom weather format</h5>",
+
 		`<code>${prefix}weather (place) format:(custom format)</code>`,
 		`<code>${prefix}weather (place) format:temperature</code>`,
 		`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
+		`<code>${prefix}weather (place) format:temperature,humidity,pressure hour+X</code>`,
+		`<code>${prefix}weather format:temperature,humidity,pressure hour+X</code>`,
 		"Lets you choose specific weather elements to show in the result.",
-		`Supported elements: <code>${ALLOWED_FORMAT_TYPES.join(", ")}</code>`,
-		"",
-
-		"",
-		"=".repeat(20),
-		"",
-
-		`<code>${prefix}weather</code>`,
-		"If you set your own weather location, show its weather.",
-		"",
-
-		`<code>${prefix}weather alerts:true</code>`,
-		"Posts a summary of all weather alerts for your location - for the next 7 days, if you have set it up.",
-		"",
-
-		`<code>${prefix}weather @User</code>`,
-		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
-		"",
-
-		`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
-		"Similar to above, shows the user's weather, but uses the hour/day specifier.",
-		"",
-
-		`<code>${prefix}weather @User alerts:true</code>`,
-		"Posts a summary of all weather alerts for the user's location - for the next 7 days.",
-		"",
-
-		`<code>${prefix}weather pollution:true</code>`,
-		`<code>${prefix}weather @User pollution:true</code>`,
-		"Posts a summary of the current pollution for your or the provided user's location."
+		"Works for all above forecasts (not alerts and pollution)",
+		`Supported elements: <code>${ALLOWED_FORMAT_TYPES.join(", ")}</code>`
 	])
 });

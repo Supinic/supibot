@@ -6,7 +6,7 @@ type BaseWeatherReport = {
 	kind: WeatherReportType;
 	timestamp: number;
 	temperature: {
-		actual: number;
+		actual?: number;
 		feelsLike?: number;
 		min?: number;
 		max?: number;
@@ -39,39 +39,32 @@ type BaseWeatherReport = {
 };
 type CurrentWeatherReport = BaseWeatherReport & {
 	kind: "current";
+	temperature: { actual: number; }
 };
 type HourlyWeatherReport = BaseWeatherReport & {
 	kind: "hourly";
 	offset: number;
 	time: string;
+	temperature: { actual: number; }
 };
 type DailyWeatherReport = BaseWeatherReport & {
 	kind: "daily";
 	offset: number;
 	date: string;
 	temperature: {
-		actual: number;
-		feelsLike: number;
 		min: number;
 		max: number;
 	}
 };
 export type WeatherReport = CurrentWeatherReport | HourlyWeatherReport | DailyWeatherReport;
 
-export type WeatherProviderName = "owm3" | "owm4";
-const currentWeatherProviderCacheKey = "weather-current-provider";
-export const getCurrentWeatherProvider = async () => {
-	const value = await core.Cache.getByPrefix(currentWeatherProviderCacheKey) as WeatherProviderName | null;
-	if (value) {
-		return value;
-	}
+const weatherProviders = ["owm3", "owm4", "open-meteo"] as const;
+export type WeatherProviderName = (typeof weatherProviders)[number];
+export const getDefaultProvider = () => "open-meteo" as const;
 
-	await setCurrentWeatherProvider("owm3");
-	return "owm3";
-};
-export const setCurrentWeatherProvider = async (name: WeatherProviderName) => {
-	await core.Cache.setByPrefix(currentWeatherProviderCacheKey, name);
-};
+export const isValidWeatherProviderName = (input: string): input is WeatherProviderName => (
+	weatherProviders.includes(input as WeatherProviderName)
+);
 
 export interface WeatherProvider {
 	readonly id: string;

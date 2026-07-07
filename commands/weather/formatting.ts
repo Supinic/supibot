@@ -52,6 +52,9 @@ const formatHumidity = (report: Report) => (typeof report.humidity === "number")
 const formatPressure = (report: Report) => (typeof report.pressure === "number") ? `Air pressure: ${report.pressure} hPa.` : "";
 const formatWindSpeed = (report: Report) => {
 	const speed = report.wind?.speed;
+	if (typeof speed !== "number") {
+		return "";
+	}
 	if (!speed) {
 		return "No wind.";
 	}
@@ -60,7 +63,17 @@ const formatWindSpeed = (report: Report) => {
 	const directionText = (typeof direction === "number") ? `${getWindDirection(direction)} wind` : "Wind";
 	return `${directionText} speed: ${speed} m/s.`;
 };
-const formatWindGusts = (report: Report) => (report.wind?.gust) ? `Wind gusts: ${report.wind.gust} m/s.` : "No wind gusts.";
+const formatWindGusts = (report: Report) => {
+	const gust = report.wind?.gust;
+	if (typeof gust !== "number") {
+		return "";
+	}
+	if (!gust) {
+		return "No wind gusts.";
+	}
+
+	return `Wind gusts: ${gust} m/s.`;
+};
 const formatPrecipitation = (report: Report) => {
 	const precipitation = report.precipitation;
 	if (!precipitation) {
@@ -178,5 +191,5 @@ export const formatWeatherReport = (report: Report, options: WeatherFormatOption
 			${obj.pressure}
 			${obj.sun}
 		`
-	} as const;
+	};
 };
