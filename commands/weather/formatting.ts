@@ -191,5 +191,5 @@ export const formatWeatherReport = (report: Report, options: WeatherFormatOption
 			${obj.pressure}
 			${obj.sun}
 		`
-	} as const;
+	};
 };
