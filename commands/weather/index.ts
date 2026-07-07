@@ -184,11 +184,11 @@ export default declare({
 		"<h5>Weather forecast</h5>",
 
 		`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-		"Posts the weather forecast in X hour(s) - accepts numbers from 0 (summary for the current hour) to 48 (in ~2 days).",
+		"Posts the weather forecast in X hour(s) - accepts numbers from 0 (summary for the current hour) to 72 (in 3 days).",
 		"",
 
 		`<code>${prefix}weather (place) <b>day+X</b></code>`,
-		"Posts the weather forecast in X day(s) - accepts numbers from 0 (summary for today) through 7 (next week).",
+		"Posts the weather forecast in X day(s) - accepts numbers from 0 (summary for today) through 14 (in two week).",
 		"",
 
 		"<h5>Pollution and alerts</h5>",
@@ -227,6 +227,7 @@ export default declare({
 		`<code>${prefix}weather provider:open-meteo</code>`,
 		"If you are unhappy with the default weather provider's accuracy, you can choose others specifically.",
 		`The default provider is <a href="//open-meteo.com">Open-Meteo.com</a>, but you can also use <a href="//openweathermap.org">OpenWeatherMap</a>'s 3.0 or 4.0 forecast APIs.`,
+		"Keep in mind that OpenWeatherMap has different ranges on hourly (0-47) and daily (0-7) forecasts, usually lower than Open-Meteo.",
 		"",
 
 		"<h5>Custom weather format</h5>",

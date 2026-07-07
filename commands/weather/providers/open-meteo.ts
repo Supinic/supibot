@@ -80,11 +80,13 @@ const apiParams = {
 	},
 	hourly: {
 		current: "",
-		hourly: typedKeys(openMeteoFields.hourly).join(",")
+		hourly: typedKeys(openMeteoFields.hourly).join(","),
+		forecast_days: "4" // 72-hour forecast + 1 day offset (today)
 	},
 	daily: {
 		current: "",
-		daily: typedKeys(openMeteoFields.daily).join(",")
+		daily: typedKeys(openMeteoFields.daily).join(","),
+		forecast_days: "15" // 14-day forecast + 1 day offset (today)
 	}
 };
 
