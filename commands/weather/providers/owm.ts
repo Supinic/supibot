@@ -2,10 +2,10 @@ import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { degreeShape, percentShape, probabilityShape, unixTimestampShape } from "../../../utils/schemas.js";
 import { postToHastebin } from "../../../utils/command-utils.js";
+import { logger } from "../../../singletons/logger.js";
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { ResultFailure } from "../../../classes/command.js";
-import { setCurrentWeatherProvider, type WeatherProvider, type WeatherReportType } from "./weather-template.js";
-import { logger } from "../../../singletons/logger.js";
+import type { WeatherProvider, WeatherReportType } from "./weather-template.js";
 
 const precipitationShape = z.object({
 	"1h": z.number().nonnegative()
@@ -439,7 +439,6 @@ export class Owm3WeatherProvider implements WeatherProvider {
 		});
 
 		if (response.statusCode === 429) {
-			await setCurrentWeatherProvider("owm4");
 			return {
 				success: false,
 				reply: `The weather API is currently unavailable due to too many requests! Try again later.`
@@ -619,7 +618,6 @@ export class Owm4WeatherProvider implements WeatherProvider {
 		}
 
 		if (response.statusCode === 429) {
-			await setCurrentWeatherProvider("owm3");
 			return {
 				success: false,
 				reply: `The weather API is currently unavailable due to too many requests! Try again later.`
