@@ -58,22 +58,13 @@ type DailyWeatherReport = BaseWeatherReport & {
 };
 export type WeatherReport = CurrentWeatherReport | HourlyWeatherReport | DailyWeatherReport;
 
-export type WeatherProviderName = "owm3" | "owm4" | "open-meteo";
-const currentWeatherProviderCacheKey = "weather-current-provider";
+const weatherProviders = ["owm3", "owm4", "open-meteo"] as const;
+export type WeatherProviderName = (typeof weatherProviders)[number];
+export const getDefaultProvider = () => "open-meteo" as const;
 
-export const getCurrentWeatherProvider = () => "open-meteo" as const;
-// export const getCurrentWeatherProvider = async () => {
-// 	const value = await core.Cache.getByPrefix(currentWeatherProviderCacheKey) as WeatherProviderName | null;
-// 	if (value) {
-// 		return value;
-// 	}
-//
-// 	await setCurrentWeatherProvider("owm3");
-// 	return "owm3";
-// };
-export const setCurrentWeatherProvider = async (name: WeatherProviderName) => {
-	await core.Cache.setByPrefix(currentWeatherProviderCacheKey, name);
-};
+export const isValidWeatherProviderName = (input: string): input is WeatherProviderName => (
+	weatherProviders.includes(input as WeatherProviderName)
+);
 
 export interface WeatherProvider {
 	readonly id: string;
