@@ -26,17 +26,17 @@ export default async (cron) => {
 		}).json();
 	});
 
-	const [cryptoData, currencyData, goldData, silverData] = await Promise.allSettled([
+	const [rawCryptoData, currencyData, goldData, silverData] = await Promise.allSettled([
 		core.Got.get("GenericAPI")({
-			url: "https://min-api.cryptocompare.com/data/price",
+			url: "https://api.coingecko.com/api/v3/simple/price",
 			searchParams: {
-				fsym: "EUR",
-				tsyms: "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL,SHIB"
+				vs_currencies: "EUR",
+				symbols: "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,SHIB"
 			},
 			headers: {
-				Authorization: `Apikey ${process.env.API_CRYPTO_COMPARE}`
+				"x-cg-demo-api-key": process.env.API_CRYPTO_GECKO
 			}
-		}).json(),
+		}),
 
 		conditionalFixerIo(),
 
@@ -48,6 +48,11 @@ export default async (cron) => {
 			url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAG/EUR"
 		}).json()
 	]);
+
+	const cryptoData = {};
+	for (const [key, value] of Object.entries(rawCryptoData.value.body)) {
+		cryptoData[key.toUpperCase()] = value.eur;
+	}
 
 	const totalData = {
 		...cryptoData?.value,

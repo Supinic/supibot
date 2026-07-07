@@ -2,13 +2,15 @@ import * as z from "zod";
 import { SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
 
-const cryptoSchema = z.union([
-	z.object({ Response: z.literal("Error"), Message: z.string() }),
+// nonexistent symbol = empty object as response
+// otherwise, the record keys will be the requested symbols
+const cryptoSchema = z.record(
+	z.string(),
 	z.object({
-		USD: z.number().optional(),
-		EUR: z.number().optional()
+		usd: z.number().optional(),
+		eur: z.number().optional()
 	})
-]);
+);
 
 export default declare({
 	Name: "crypto",
@@ -19,40 +21,41 @@ export default declare({
 	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function crypto (context, symbol = "BTC") {
-		if (!process.env.API_CRYPTO_COMPARE) {
+	Code: (async function crypto (context, symbol = "btc") {
+		if (!process.env.API_CRYPTO_GECKO) {
 			throw new SupiError({
-				message: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
+				message: "No CryptoCompare key configured (API_CRYPTO_GECKO)"
 			});
 		}
 
 		symbol = symbol.toUpperCase();
 
 		const response = await core.Got.get("GenericAPI")({
-			url: "https://min-api.cryptocompare.com/data/price",
+			url: "https://api.coingecko.com/api/v3/simple/price",
 			searchParams: {
-				fsym: symbol,
-				tsyms: "USD,EUR"
-			},
-			timeout: {
-				request: 10000
+				symbols: symbol,
+				names: symbol,
+				vs_currencies: "USD,EUR"
 			},
 			headers: {
-				Authorization: `Apikey ${process.env.API_CRYPTO_COMPARE}`
+				"x-cg-demo-api-key": process.env.API_CRYPTO_GECKO
 			}
 		});
 
-		const data = cryptoSchema.parse(response.body);
-		if ("Response" in data) {
+		const apiData = cryptoSchema.parse(response.body);
+		const symbolKey = Object.keys(apiData).at(0);
+		if (!symbolKey) {
 			return {
 				success: false,
-				reply: `Could not fetch price data! Error: ${data.Message}`
+				reply: `Your provided symbol was not found on the CryptoGecko API!`
 			};
 		}
-		else if (!data.USD && !data.EUR) {
+
+		const data = apiData[symbolKey];
+		if (!data.usd && !data.eur) {
 			return {
 				success: false,
-				reply: `No known prices found for that currency!`
+				reply: `No known prices found for that cryptocurrency!`
 			};
 		}
 
@@ -74,7 +77,13 @@ export default declare({
 					}
 				});
 
-				url = response.url;
+				const coin = response.url.split("/").at(-1);
+				if (coin) {
+					url = `https://www.coingecko.com/en/coins/${coin}`;
+				}
+				else {
+					url = response.url;
+				}
 			}
 			catch {
 				url = null;
@@ -85,8 +94,8 @@ export default declare({
 			? `Check recent history for ${symbol} here: ${url}`
 			: "";
 
-		const usd = (data.USD) ? `$${data.USD}` : "";
-		const eur = (data.EUR) ? `€${data.EUR}` : "";
+		const usd = (data.usd) ? `$${data.usd}` : "";
+		const eur = (data.eur) ? `€${data.eur}` : "";
 		return {
 			success: true,
 			reply: `Current price of ${symbol}: ${usd} ${eur} ${link}`,
