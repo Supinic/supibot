@@ -158,20 +158,21 @@ export class AwayFromKeyboard extends TemplateWithId {
 	}
 
 	static async checkActive (userData: User, channelData: Channel) {
-		if (!AwayFromKeyboard.data.has(userData.ID)) {
+		// Extract the AFK data synchronously, *FIRST*, before anything else is awaited!
+		// This makes sure that no more (possibly incorrect) messages are sent before the response is put together.
+		const data = AwayFromKeyboard.data.get(userData.ID);
+		if (!data) {
 			return;
 		}
 
-		// Extract the AFK data *FIRST*, before anything else is awaited!
-		// This makes sure that no more (possibly incorrect) messages are sent before the response is put together.
-
-		const data = AwayFromKeyboard.data.get(userData.ID) as AwayFromKeyboard; // Type cast due to condition above
+		// Very important to immediately remove the AFK status from the AFK data Map
 		AwayFromKeyboard.data.delete(userData.ID);
 
 		// This should only ever update one row, if everything is working properly.
 		await core.Query.getRecordUpdater(ru => ru
 			.update("chat_data", "AFK")
 			.set("Active", false)
+			.set("Ended", new SupiDate())
 			.where("ID = %n", data.ID)
 		);
 

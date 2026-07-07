@@ -1,6 +1,7 @@
 import { SupiDate } from "supi-core";
 import type { StatsSubcommandDefinition } from "../index.js";
 import { afkStatuses } from "../../../classes/afk.js";
+import * as tty from "node:tty";
 
 export const AfkStatistic = {
 	name: "afk",
@@ -62,24 +63,20 @@ export const AfkStatistic = {
 			};
 		}
 
-		const interruptedAmount = await core.Query.getRecordset<number>(rs => rs
-			.select("COUNT(*) AS Amount")
-			.from("chat_data", "AFK")
-			.where("User_Alias = %n", targetUser.ID)
-			.where("Interrupted_ID IS NOT NULL")
-			.where(
-				{ condition: (type === "afk") },
-				"Status = %s OR Status IS NULL",
-				type
-			)
-			.where(
-				{ condition: (type !== "afk" && type !== "total-afk") },
-				"Status = %s",
-				type
-			)
-			.flat("Amount")
-			.single()
-		);
+		const interruptedAmount = await core.Query.getRecordset<number>(rs => {
+			rs.select("COUNT(*) AS Amount")
+				.from("chat_data", "AFK")
+				.where("User_Alias = %n", targetUser.ID)
+				.where("Interrupted_ID IS NOT NULL")
+				.flat("Amount")
+				.single();
+
+			if (type !== "total-afk") {
+				rs.where("Status = %s", type);
+			}
+
+			return rs;
+		});
 
 		const delta = core.Utils.timeDelta(SupiDate.now() + (data.Delta * 1000), true);
 		const average = core.Utils.timeDelta(SupiDate.now() + (data.Delta * 1000 / Number(data.Amount)), true);
