@@ -31,12 +31,12 @@ export default declare({
 			user = context.user.Name;
 		}
 		else if (args.length === 1) {
-			channel = args[0];
+			channel = sb.User.normalizeUsername(args[0]);
 			user = context.user.Name;
 		}
 		else {
-			user = args[0];
-			channel = args[1];
+			user = sb.User.normalizeUsername(args[0]);
+			channel = sb.User.normalizeUsername(args[1]);
 		}
 
 		if (user === channel.toLowerCase()) {
