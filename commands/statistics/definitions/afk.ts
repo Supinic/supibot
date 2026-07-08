@@ -1,7 +1,6 @@
 import { SupiDate } from "supi-core";
-import type { StatsSubcommandDefinition } from "../index.js";
 import { afkStatuses } from "../../../classes/afk.js";
-import * as tty from "node:tty";
+import type { StatsSubcommandDefinition } from "../index.js";
 
 export const AfkStatistic = {
 	name: "afk",
@@ -119,7 +118,7 @@ export const LongestAfkStatistic = {
 			.where("User_Alias = %n", targetUser.ID)
 			.where("Interrupted_ID IS NULL")
 			.where("NOT EXISTS(SELECT 1 FROM chat_data.AFK AS SubAFK WHERE AFK.ID = SubAFK.Interrupted_ID LIMIT 1)")
-			.orderBy("(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) DESC")
+			.orderBy("Duration_MS DESC")
 			.limit(1)
 			.single()
 		);
