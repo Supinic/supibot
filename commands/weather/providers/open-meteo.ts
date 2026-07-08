@@ -65,10 +65,10 @@ const openMeteoFields = {
 		apparent_temperature: z.array(z.number())
 	},
 	daily: {
-		temperature_2m_min: z.array(z.number()),
-		temperature_2m_max: z.array(z.number()),
+		temperature_2m_min: z.array(z.union([z.number(), z.null()])),
+		temperature_2m_max: z.array(z.union([z.number(), z.null()])),
 		weather_code: z.array(z.number()),
-		precipitation_probability_max: z.array(z.number()),
+		precipitation_probability_max: z.array(z.union([z.number(), z.null()])),
 		rain_sum: z.array(z.number()),
 		snowfall_sum: z.array(z.number())
 	}
@@ -233,14 +233,24 @@ export class OpenMeteoProvider implements WeatherProvider {
 		const base = new SupiDate(data.time[off]);
 		const date = base.format("j.n.");
 		const timestamp = new SupiDate(base).setTimezoneOffset(timezoneOffset / 60).valueOf();
+
+		const tempMin = data.temperature_2m_min[off];
+		const tempMax = data.temperature_2m_max[off];
+		if (tempMin === null || tempMax === null) {
+			return {
+				success: false,
+				reply: "The forecast is missing temperature data for this far into the future! Try a lower day offset."
+			} as ResultFailure;
+		}
+
 		return {
 			kind: "daily" as const,
 			offset,
 			date,
 			timestamp,
 			temperature: {
-				min: data.temperature_2m_min[off],
-				max: data.temperature_2m_max[off]
+				min: tempMin,
+				max: tempMax
 			},
 			condition: {
 				code: data.weather_code[off],
@@ -249,7 +259,9 @@ export class OpenMeteoProvider implements WeatherProvider {
 			precipitation: {
 				rain: data.rain_sum[off],
 				snow: data.snowfall_sum[off],
-				probability: data.precipitation_probability_max[off] / 100
+				probability: (typeof data.precipitation_probability_max[off] === "number")
+					? data.precipitation_probability_max[off] / 100
+					: undefined
 			},
 			wind: {}
 		};
