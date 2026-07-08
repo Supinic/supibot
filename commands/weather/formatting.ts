@@ -95,7 +95,7 @@ const formatPrecipitation = (report: Report) => {
 			return timeUntil;
 		}
 
-		return "No precipitation expected.";
+		return "No precipitation right now.";
 	}
 
 	if (!probability) {
@@ -144,7 +144,7 @@ const formatReportTime = (report: Report) => {
 };
 
 const createWeatherFormatObject = (report: Report, meta: WeatherFormatMeta): WeatherFormatObject => ({
-	place: meta.hiddenLocation ? "(location hidden)" : meta.place,
+	place: (meta.hiddenLocation) ? "(location hidden)" : meta.place,
 	icon: report.condition.icon ?? "",
 	temperature: formatTemperature(report),
 	cloudCover: formatCloudCover(report),

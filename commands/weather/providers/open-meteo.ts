@@ -139,7 +139,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 			timestamp: new SupiDate(data.time).valueOf(),
 			temperature: {
 				actual: data.temperature_2m,
-				feels_like: data.apparent_temperature
+				feelsLike: data.apparent_temperature
 			},
 			condition: {
 				code: data.weather_code,
@@ -199,7 +199,7 @@ export class OpenMeteoProvider implements WeatherProvider {
 			timestamp,
 			temperature: {
 				actual: data.temperature_2m[off],
-				feels_like: data.apparent_temperature[off]
+				feelsLike: data.apparent_temperature[off]
 			},
 			condition: {
 				code: data.weather_code[off],
