@@ -11,16 +11,33 @@ export default {
 	set: async (context, ...args) => {
 		let hidden = false;
 		let visibilityType = null;
-		if (args[0] === "private" || args[0] === "hidden") {
-			hidden = true;
-			visibilityType = args.shift();
-		}
-		else if (args[0] === "public" || args[0] === "visible") {
+
+		const first = args.at(0);
+		const last = args.at(-1);
+		const resultArgs = [...args];
+
+		if (first === "public" || last === "public") {
 			hidden = false;
-			visibilityType = args.shift();
+			visibilityType = "public";
+			if (first === "public") {
+				resultArgs.shift();
+			}
+			else {
+				resultArgs.pop();
+			}
+		}
+		else if (first === "private" || last === "private") {
+			hidden = true;
+			visibilityType = "private";
+			if (first === "private") {
+				resultArgs.shift();
+			}
+			else {
+				resultArgs.pop();
+			}
 		}
 
-		if (args.length === 0) {
+		if (resultArgs.length === 0) {
 			const location = await context.user.getDataProperty("location");
 			if (location && visibilityType !== null) {
 				if (location.hidden === hidden) {
@@ -33,7 +50,8 @@ export default {
 					location.hidden = hidden;
 					await context.user.setDataProperty("location", location);
 					return {
-						reply: `Your location is now ${visibilityType}!`
+						success: true,
+						reply: `Your location has been set to ${visibilityType}.`
 					};
 				}
 			}
@@ -73,7 +91,8 @@ export default {
 		});
 
 		return {
-			reply: `Successfully set your ${hidden ? "private" : "public"} location!`
+			success: true,
+			reply: `Successfully set your ${visibilityType} location.`
 		};
 	},
 	unset: async (context) => {
@@ -87,7 +106,8 @@ export default {
 
 		await context.user.setDataProperty("location", null);
 		return {
-			reply: "Your location has been unset successfully!"
+			success: true,
+			reply: "Your location has been unset successfully."
 		};
 	}
 };
