@@ -1,48 +1,49 @@
 [
   {
-    "name": "abkhaz",
     "group": "Northwest Caucasian",
-    "names": {
-      "native": {
-        "short": "аԥсшәа",
-        "long": "аԥсуа бызшәа"
-      },
-      "english": {
-        "short": "abkhaz",
-        "long": "abhkazian"
-      },
-      "transliterations": [
-        "apsua byzshwa",
-        "apsshwa"
-      ],
-      "other": [
-        "abxaz"
-      ]
-    },
+    "names": [
+      "abhkaz",
+      "abhkazian",
+      "аԥсшәа",
+      "аԥсуа бызшәа",
+      "apsua byzshwa",
+      "apsshwa",
+      "abxaz"
+    ],
     "iso6391": "ab",
     "iso6392": "abk",
     "iso6393": "abk",
     "glottolog": "abkh1244"
   },
   {
-    "name": "afar",
+    "group": "Austronesian",
+    "names": [
+      "acehnese",
+      "achinese"
+    ],
+    "iso6391": null,
+    "iso6392": "ace",
+    "iso6393": "ace"
+  },
+  {
+    "group": "Nilo-Saharan",
+    "names": [
+      "acholi",
+      "acoli"
+    ],
+    "iso6391": null,
+    "iso6392": "ach",
+    "iso6393": "ach"
+  },
+  {
     "group": "Afro-Asiatic",
-    "names": {
-      "native": {
-        "short": "qafaraf",
-        "long": "qafaraf"
-      },
-      "english": {
-        "short": "afar",
-        "long": "afar"
-      },
-      "transliterations": [],
-      "other": [
-        "'afar af",
-        "afaraf",
-        "qafar af"
-      ]
-    },
+    "names": [
+      "afar",
+      "afaraf",
+      "qafaraf",
+      "'afar af",
+      "qafar af"
+    ],
     "iso6391": "aa",
     "iso6392": "aar",
     "iso6393": "aar",
@@ -75,6 +76,15 @@
     "iso6391": "sq",
     "iso6392": "sqi",
     "iso6393": "alb"
+  },
+  {
+    "group": "Nilo-Saharan",
+    "names": [
+      "alur"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "alz"
   },
   {
     "group": "Afro-Asiatic",
@@ -131,7 +141,8 @@
     "names": [
       "avaric",
       "авар мацӏ",
-      "магӏарул мацӏ"
+      "магӏарул мацӏ",
+      "avar"
     ],
     "iso6391": "av",
     "iso6392": "ava",
@@ -146,6 +157,15 @@
     "iso6391": "ae",
     "iso6392": "ave",
     "iso6393": "ave"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "awadhi"
+    ],
+    "iso6391": null,
+    "iso6392": "awa",
+    "iso6393": "awa"
   },
   {
     "group": "Aymaran",
@@ -168,6 +188,25 @@
     "iso6393": "aze"
   },
   {
+    "group": "Austronesian",
+    "names": [
+      "balinese"
+    ],
+    "iso6391": null,
+    "iso6392": "ban",
+    "iso6393": "ban"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "baluchi",
+      "balochi"
+    ],
+    "iso6391": null,
+    "iso6392": "bal",
+    "iso6393": "bal"
+  },
+  {
     "group": "Niger–Congo",
     "names": [
       "bambara",
@@ -176,6 +215,15 @@
     "iso6391": "bm",
     "iso6392": "bam",
     "iso6393": "bam"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "baoulé"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "bci"
   },
   {
     "group": "Turkic",
@@ -198,6 +246,33 @@
     "iso6393": "baq"
   },
   {
+    "group": "Austronesian",
+    "names": [
+      "batak karo"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "btx"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "batak simalungun"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "bts"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "batak toba"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "bbc"
+  },
+  {
     "group": "Indo-European",
     "names": [
       "belarusian",
@@ -209,15 +284,13 @@
     "iso6393": "bel"
   },
   {
-    "group": "Afro-Asiatic",
+    "group": "Niger–Congo",
     "names": [
-      "berber",
-      "tamazight",
-      "amazigh"
+      "bemba"
     ],
     "iso6391": null,
-    "iso6392": "ber",
-    "iso6393": null
+    "iso6392": "bem",
+    "iso6393": "bem"
   },
   {
     "group": "Indo-European",
@@ -230,20 +303,32 @@
     "iso6393": "ben"
   },
   {
-    "name": "bhojpuri",
+    "group": "Afro-Asiatic",
+    "names": [
+      "berber",
+      "tamazight",
+      "amazigh",
+      "tamazight (tifinagh)"
+    ],
+    "iso6391": null,
+    "iso6392": "ber",
+    "iso6393": null
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "betawi"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "bew"
+  },
+  {
     "group": "Indo-Aryan",
-    "names": {
-      "native": {
-        "short": "भोजपुरी",
-        "long": "भोजपुरी"
-      },
-      "english": {
-        "short": "bhojpuri",
-        "long": "bhojpuri"
-      },
-      "transliterations": [],
-      "other": []
-    },
+    "names": [
+      "bhojpuri",
+      "भोजपुरी"
+    ],
     "iso6392": "bho",
     "iso6393": "bho",
     "glottolog": "bhoj1246"
@@ -258,6 +343,15 @@
     "iso6391": "bh",
     "iso6392": "bih",
     "iso6393": "bih"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "bikol"
+    ],
+    "iso6391": null,
+    "iso6392": "bik",
+    "iso6393": "bik"
   },
   {
     "group": "Creole",
@@ -304,11 +398,33 @@
     "group": "Sino-Tibetan",
     "names": [
       "burmese",
-      "ဗမာစာ"
+      "ဗမာစာ",
+      "myanmar (burmese)"
     ],
     "iso6391": "my",
     "iso6392": "mya",
     "iso6393": "bur"
+  },
+  {
+    "group": "Mongolic",
+    "names": [
+      "buryat",
+      "buriat"
+    ],
+    "iso6391": null,
+    "iso6392": "bua",
+    "iso6393": "bua"
+  },
+  {
+    "group": "Sino-Tibetan",
+    "names": [
+      "cantonese",
+      "yue",
+      "yue chinese"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "yue"
   },
   {
     "group": "Indo-European",
@@ -369,11 +485,36 @@
     "names": [
       "chinese",
       "zhōngwén",
-      "中文 (zhōngwén) 汉语 漢語"
+      "中文 (zhōngwén) 汉语 漢語",
+      "chinese (simplified)",
+      "chinese (traditional)"
     ],
     "iso6391": "zh",
     "iso6392": "zho",
     "iso6393": "chi"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "church slavic",
+      "old slavonic",
+      "church slavonic",
+      "old bulgarian",
+      "old church slavonic",
+      "ѩзыкъ словѣньскъ"
+    ],
+    "iso6391": "cu",
+    "iso6392": "chu",
+    "iso6393": "chu"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "chuukese"
+    ],
+    "iso6391": null,
+    "iso6392": "chk",
+    "iso6393": "chk"
   },
   {
     "group": "Turkic",
@@ -416,6 +557,18 @@
     "iso6393": "cre"
   },
   {
+    "group": "Turkic",
+    "names": [
+      "crimean tatar",
+      "crimean tatar (cyrillic)",
+      "crimean tatar (latin)",
+      "crimean turkish"
+    ],
+    "iso6391": null,
+    "iso6392": "crh",
+    "iso6393": "crh"
+  },
+  {
     "group": "Indo-European",
     "names": [
       "croatian",
@@ -450,9 +603,29 @@
   {
     "group": "Indo-European",
     "names": [
+      "dari",
+      "afghan persian"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "prs"
+  },
+  {
+    "group": "Nilo-Saharan",
+    "names": [
+      "dinka"
+    ],
+    "iso6391": null,
+    "iso6392": "din",
+    "iso6393": "din"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
       "divehi",
       "dhivehi maldivian",
-      "ދިވެހި"
+      "ދިވެހި",
+      "dhivehi"
     ],
     "iso6391": "dv",
     "iso6392": "div",
@@ -461,24 +634,25 @@
   {
     "name": "dogri",
     "group": "Indo-Aryan",
-    "names": {
-      "native": {
-        "short": "\uD806\uDC16\uD806\uDC35\uD806\uDC0C\uD806\uDC24\uD806\uDC2E",
-        "long": "\uD806\uDC16\uD806\uDC35\uD806\uDC0C\uD806\uDC24\uD806\uDC2E"
-      },
-      "english": {
-        "short": "dogri",
-        "long": "dogri"
-      },
-      "transliterations": [],
-      "other": [
-        "डोगरी",
-        "ڈوگری"
-      ]
-    },
+    "names": [
+      "dogri",
+      "𑠖𑠵𑠌𑠤𑠮",
+      "डोगरी",
+      "ڈوگری"
+    ],
     "iso6392": "doi",
     "iso6393": "doi",
     "glottolog": "indo1311"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "dombe",
+      "toka-leya-dombe"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "dov"
   },
   {
     "group": "Indo-European",
@@ -493,6 +667,17 @@
     "iso6391": "nl",
     "iso6392": "nld",
     "iso6393": "dut"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "dyula",
+      "dioula",
+      "jula"
+    ],
+    "iso6391": null,
+    "iso6392": "dyu",
+    "iso6393": "dyu"
   },
   {
     "group": "Sino-Tibetan",
@@ -564,6 +749,16 @@
     "iso6393": "fij"
   },
   {
+    "group": "Austronesian",
+    "names": [
+      "filipino",
+      "pilipino"
+    ],
+    "iso6391": null,
+    "iso6392": "fil",
+    "iso6393": "fil"
+  },
+  {
     "group": "Uralic",
     "names": [
       "finnish",
@@ -575,25 +770,65 @@
     "iso6393": "fin"
   },
   {
+    "group": "Niger–Congo",
+    "names": [
+      "fon"
+    ],
+    "iso6391": null,
+    "iso6392": "fon",
+    "iso6393": "fon"
+  },
+  {
     "group": "Indo-European",
     "names": [
       "french",
       "français",
-      "langue française"
+      "langue française",
+      "french (canada)"
     ],
     "iso6391": "fr",
     "iso6392": "fra",
     "iso6393": "fre"
   },
   {
+    "group": "Indo-European",
+    "names": [
+      "friulian"
+    ],
+    "iso6391": null,
+    "iso6392": "fur",
+    "iso6393": "fur"
+  },
+  {
     "group": "Niger–Congo",
     "names": [
       "fulah",
-      "fulfulde pulaar pular"
+      "fulfulde pulaar pular",
+      "fulani"
     ],
     "iso6391": "ff",
     "iso6392": "ful",
     "iso6393": "ful"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "ga"
+    ],
+    "iso6391": null,
+    "iso6392": "gaa",
+    "iso6393": "gaa"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "gaelic scottish gaelic",
+      "gàidhlig",
+      "scots gaelic"
+    ],
+    "iso6391": "gd",
+    "iso6392": "gla",
+    "iso6393": "gla"
   },
   {
     "group": "Indo-European",
@@ -604,6 +839,16 @@
     "iso6391": "gl",
     "iso6392": "glg",
     "iso6393": "glg"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "ganda",
+      "luganda"
+    ],
+    "iso6391": "lg",
+    "iso6392": "lug",
+    "iso6393": "lug"
   },
   {
     "group": "Kartvelian",
@@ -628,7 +873,9 @@
   {
     "name": "goan konkani",
     "group": "Indo-Aryan",
-    "names": [],
+    "names": [
+      "konkani"
+    ],
     "iso6393": "gom",
     "glottolog": "goan1235"
   },
@@ -641,6 +888,17 @@
     "iso6391": "el",
     "iso6392": "ell",
     "iso6393": "gre"
+  },
+  {
+    "group": "Eskimo–Aleut",
+    "names": [
+      "greenlandic",
+      "kalaallisut",
+      "kalaallit oqaasii"
+    ],
+    "iso6391": "kl",
+    "iso6392": "kal",
+    "iso6393": "kal"
   },
   {
     "group": "Tupian",
@@ -674,6 +932,16 @@
     "iso6393": "hat"
   },
   {
+    "group": "Sino-Tibetan",
+    "names": [
+      "hakha chin",
+      "haka chin"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "cnh"
+  },
+  {
     "group": "Afro-Asiatic",
     "names": [
       "hausa",
@@ -682,6 +950,16 @@
     "iso6391": "ha",
     "iso6392": "hau",
     "iso6393": "hau"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "hawaiian",
+      "olelo hawai'i"
+    ],
+    "iso6391": null,
+    "iso6392": "haw",
+    "iso6393": "haw"
   },
   {
     "group": "Afro-Asiatic",
@@ -705,6 +983,15 @@
     "iso6391": "hz",
     "iso6392": "her",
     "iso6393": "her"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "hiligaynon"
+    ],
+    "iso6391": null,
+    "iso6392": "hil",
+    "iso6393": "hil"
   },
   {
     "group": "Indo-European",
@@ -747,24 +1034,66 @@
     "iso6393": "hun"
   },
   {
-    "group": "Austronesian",
+    "group": "Indo-European",
     "names": [
-      "hawaiian",
-      "olelo hawai'i"
+      "hunsrik"
     ],
     "iso6391": null,
-    "iso6392": "haw",
-    "iso6393": "haw"
+    "iso6392": null,
+    "iso6393": "hrx"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "iban"
+    ],
+    "iso6391": null,
+    "iso6392": "iba",
+    "iso6393": "iba"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "icelandic",
+      "íslenska"
+    ],
+    "iso6391": "is",
+    "iso6392": "isl",
+    "iso6393": "ice"
   },
   {
     "group": "Constructed",
     "names": [
-      "international auxiliary language association",
-      "interlingua"
+      "ido"
     ],
-    "iso6391": "ia",
-    "iso6392": "ina",
-    "iso6393": "ina"
+    "iso6391": "io",
+    "iso6392": "ido",
+    "iso6393": "ido"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "igbo",
+      "asụsụ igbo"
+    ],
+    "iso6391": "ig",
+    "iso6392": "ibo",
+    "iso6393": "ibo"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "ilocano",
+      "iloko",
+      "pagsasao nga ilokano",
+      "ilokano",
+      "iluko",
+      "samtoy",
+      "sao mi ditoy"
+    ],
+    "iso6392": "ilo",
+    "iso6393": "ilo",
+    "glottolog": "ilok1237"
   },
   {
     "group": "Austronesian",
@@ -790,48 +1119,26 @@
     "iso6393": "ile"
   },
   {
-    "name": "ilocano",
-    "group": "Austronesian",
-    "names": {
-      "native": {
-        "short": "iloko",
-        "long": "pagsasao nga ilokano"
-      },
-      "english": {
-        "short": "ilocano",
-        "long": "ilocano"
-      },
-      "transliterations": [],
-      "other": [
-        "ilokano",
-        "iluko",
-        "samtoy",
-        "sao mi ditoy"
-      ]
-    },
-    "iso6392": "ilo",
-    "iso6393": "ilo",
-    "glottolog": "ilok1237"
+    "group": "Constructed",
+    "names": [
+      "international auxiliary language association",
+      "interlingua"
+    ],
+    "iso6391": "ia",
+    "iso6392": "ina",
+    "iso6393": "ina"
   },
   {
-    "group": "Indo-European",
+    "group": "Eskimo–Aleut",
     "names": [
-      "irish",
-      "gaeilge"
+      "inuktitut",
+      "ᐃᓄᒃᑎᑐᑦ",
+      "inuktut (latin)",
+      "inuktut (syllabics)"
     ],
-    "iso6391": "ga",
-    "iso6392": "gle",
-    "iso6393": "gle"
-  },
-  {
-    "group": "Niger–Congo",
-    "names": [
-      "igbo",
-      "asụsụ igbo"
-    ],
-    "iso6391": "ig",
-    "iso6392": "ibo",
-    "iso6393": "ibo"
+    "iso6391": "iu",
+    "iso6392": "iku",
+    "iso6393": "iku"
   },
   {
     "group": "Eskimo–Aleut",
@@ -844,23 +1151,14 @@
     "iso6393": "ipk"
   },
   {
-    "group": "Constructed",
-    "names": [
-      "ido"
-    ],
-    "iso6391": "io",
-    "iso6392": "ido",
-    "iso6393": "ido"
-  },
-  {
     "group": "Indo-European",
     "names": [
-      "icelandic",
-      "íslenska"
+      "irish",
+      "gaeilge"
     ],
-    "iso6391": "is",
-    "iso6392": "isl",
-    "iso6393": "ice"
+    "iso6391": "ga",
+    "iso6392": "gle",
+    "iso6393": "gle"
   },
   {
     "group": "Indo-European",
@@ -873,14 +1171,15 @@
     "iso6393": "ita"
   },
   {
-    "group": "Eskimo–Aleut",
+    "group": "Creole",
     "names": [
-      "inuktitut",
-      "ᐃᓄᒃᑎᑐᑦ"
+      "jamaican patois",
+      "jamaican creole",
+      "jamaican creole english"
     ],
-    "iso6391": "iu",
-    "iso6392": "iku",
-    "iso6393": "iku"
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "jam"
   },
   {
     "group": "Japonic",
@@ -908,15 +1207,15 @@
     "iso6393": "jav"
   },
   {
-    "group": "Eskimo–Aleut",
+    "group": "Sino-Tibetan",
     "names": [
-      "greenlandic",
-      "kalaallisut",
-      "kalaallit oqaasii"
+      "jingpo",
+      "jingpho",
+      "kachin"
     ],
-    "iso6391": "kl",
-    "iso6392": "kal",
-    "iso6393": "kal"
+    "iso6391": null,
+    "iso6392": "kac",
+    "iso6393": "kac"
   },
   {
     "group": "Dravidian",
@@ -936,6 +1235,16 @@
     "iso6391": "kr",
     "iso6392": "kau",
     "iso6393": "kau"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "kapampangan",
+      "pampanga"
+    ],
+    "iso6391": null,
+    "iso6392": "pam",
+    "iso6393": "pam"
   },
   {
     "group": "Indo-European",
@@ -962,6 +1271,15 @@
   {
     "group": "Austroasiatic",
     "names": [
+      "khasi"
+    ],
+    "iso6391": null,
+    "iso6392": "kha",
+    "iso6393": "kha"
+  },
+  {
+    "group": "Austroasiatic",
+    "names": [
       "khmer",
       "central khmer",
       "ខ្មែរ ខេមរភាសា ភាសាខ្មែរ"
@@ -969,6 +1287,17 @@
     "iso6391": "km",
     "iso6392": "khm",
     "iso6393": "khm"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "kiga",
+      "chiga",
+      "rukiga"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "cgg"
   },
   {
     "group": "Niger–Congo",
@@ -1003,6 +1332,27 @@
     "iso6393": "kir"
   },
   {
+    "group": "Creole",
+    "names": [
+      "kituba",
+      "kikongo ya leta"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "ktu"
+  },
+  {
+    "group": "Sino-Tibetan",
+    "names": [
+      "kokborok",
+      "kok borok",
+      "tripuri"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "trp"
+  },
+  {
     "group": "Uralic",
     "names": [
       "komi",
@@ -1011,25 +1361,6 @@
     "iso6391": "kv",
     "iso6392": "kom",
     "iso6393": "kom"
-  },
-  {
-    "name": "konkani",
-    "group": "Indo-Aryan",
-    "names": {
-      "native": {
-        "short": "कोंकणी",
-        "long": "कोंकणी"
-      },
-      "english": {
-        "short": "konkani",
-        "long": "konkani"
-      },
-      "transliterations": [],
-      "other": []
-    },
-    "iso6392": "kok",
-    "iso6393": "kok",
-    "glottolog": "konk1267"
   },
   {
     "group": "Niger–Congo",
@@ -1042,6 +1373,16 @@
     "iso6393": "kon"
   },
   {
+    "group": "Indo-Aryan",
+    "names": [
+      "konkani",
+      "कोंकणी"
+    ],
+    "iso6392": "kok",
+    "iso6393": "kok",
+    "glottolog": "konk1267"
+  },
+  {
     "group": "Koreanic",
     "names": [
       "korean",
@@ -1052,20 +1393,11 @@
     "iso6393": "kor"
   },
   {
-    "name": "krio",
     "group": "Creole",
-    "names": {
-      "native": {
-        "short": "krio",
-        "long": "krio"
-      },
-      "english": {
-        "short": "krio",
-        "long": "sierra leonean creole"
-      },
-      "transliterations": [],
-      "other": []
-    },
+    "names": [
+      "krio",
+      "sierra leona creole"
+    ],
     "iso6392": null,
     "iso6393": "kri",
     "glottolog": "krio1253"
@@ -1077,7 +1409,8 @@
       "kurdî",
       "کوردی‎",
       "kurmanji",
-      "northern kurdish"
+      "northern kurdish",
+      "kurdish (kurmanji)"
     ],
     "iso6391": "ku",
     "iso6392": "kur",
@@ -1094,6 +1427,25 @@
     "iso6393": "kua"
   },
   {
+    "group": "Tai–Kadai",
+    "names": [
+      "lao",
+      "ພາສາລາວ"
+    ],
+    "iso6391": "lo",
+    "iso6392": "lao",
+    "iso6393": "lao"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "latgalian"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "ltg"
+  },
+  {
     "group": "Indo-European",
     "names": [
       "latin",
@@ -1107,23 +1459,22 @@
   {
     "group": "Indo-European",
     "names": [
-      "luxembourgish",
-      "letzeburgesch",
-      "lëtzebuergesch"
+      "latvian",
+      "latviešu",
+      "latviešu valoda"
     ],
-    "iso6391": "lb",
-    "iso6392": "ltz",
-    "iso6393": "ltz"
+    "iso6391": "lv",
+    "iso6392": "lav",
+    "iso6393": "lav"
   },
   {
-    "group": "Niger–Congo",
+    "group": "Indo-European",
     "names": [
-      "ganda",
-      "luganda"
+      "ligurian"
     ],
-    "iso6391": "lg",
-    "iso6392": "lug",
-    "iso6393": "lug"
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "lij"
   },
   {
     "group": "Indo-European",
@@ -1148,16 +1499,6 @@
     "iso6393": "lin"
   },
   {
-    "group": "Tai–Kadai",
-    "names": [
-      "lao",
-      "ພາສາລາວ"
-    ],
-    "iso6391": "lo",
-    "iso6392": "lao",
-    "iso6393": "lao"
-  },
-  {
     "group": "Indo-European",
     "names": [
       "lithuanian",
@@ -1169,57 +1510,44 @@
     "iso6393": "lit"
   },
   {
+    "group": "Indo-European",
+    "names": [
+      "lombard"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "lmo"
+  },
+  {
     "group": "Niger–Congo",
     "names": [
       "luba-katanga",
-      "kiluba"
+      "kiluba",
+      "tshiluba"
     ],
     "iso6391": "lu",
     "iso6392": "lub",
     "iso6393": "lub"
   },
   {
-    "name": "mizo",
-    "group": "Sino-Tibetan",
-    "names": {
-      "native": {
-        "short": "mizo",
-        "long": "mizo ṭawng"
-      },
-      "english": {
-        "short": "mizo",
-        "long": "mizo"
-      },
-      "transliterations": [],
-      "other": [
-        "duhlian",
-        "lushai"
-      ]
-    },
-    "iso6392": "lus",
-    "iso6393": "lus",
-    "glottolog": "lush1249"
+    "group": "Nilo-Saharan",
+    "names": [
+      "luo"
+    ],
+    "iso6391": null,
+    "iso6392": "luo",
+    "iso6393": "luo"
   },
   {
     "group": "Indo-European",
     "names": [
-      "latvian",
-      "latviešu",
-      "latviešu valoda"
+      "luxembourgish",
+      "letzeburgesch",
+      "lëtzebuergesch"
     ],
-    "iso6391": "lv",
-    "iso6392": "lav",
-    "iso6393": "lav"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
-      "manx",
-      "gaelg gailck"
-    ],
-    "iso6391": "gv",
-    "iso6392": "glv",
-    "iso6393": "glv"
+    "iso6391": "lb",
+    "iso6392": "ltz",
+    "iso6393": "ltz"
   },
   {
     "group": "Indo-European",
@@ -1233,23 +1561,34 @@
     "iso6393": "mac"
   },
   {
-    "name": "maithili",
+    "group": "Austronesian",
+    "names": [
+      "madurese",
+      "madura"
+    ],
+    "iso6391": null,
+    "iso6392": "mad",
+    "iso6393": "mad"
+  },
+  {
     "group": "Indo-Aryan",
-    "names": {
-      "native": {
-        "short": "मैथिली",
-        "long": "मैथिली"
-      },
-      "english": {
-        "short": "maithili",
-        "long": "maithili"
-      },
-      "transliterations": [],
-      "other": []
-    },
+    "names": [
+      "maithili",
+      "मैथिली"
+    ],
     "iso6392": "mai",
     "iso6393": "mai",
     "glottolog": "mait1250"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "makassar",
+      "makasar"
+    ],
+    "iso6391": null,
+    "iso6392": "mak",
+    "iso6393": "mak"
   },
   {
     "group": "Austronesian",
@@ -1262,35 +1601,11 @@
     "iso6393": "mlg"
   },
   {
-    "name": "meitei",
-    "group": "Sino-Tibetan",
-    "names": {
-      "native": {
-        "short": "ꯃꯤꯇꯩꯂꯣꯟ",
-        "long": "ꯃꯤꯇꯩꯂꯣꯟ"
-      },
-      "english": {
-        "short": "meitei",
-        "long": "meitheilon"
-      },
-      "transliterations": [],
-      "other": [
-        "meetei",
-        "manipuri",
-        "meeteilon",
-        "meeʁteilon",
-        "kathe"
-      ]
-    },
-    "iso6392": "mni",
-    "iso6393": "mni",
-    "glottolog": "mani1292"
-  },
-  {
     "group": "Austronesian",
     "names": [
       "malay",
-      "bahasa melayu بهاس ملايو‎"
+      "bahasa melayu بهاس ملايو‎",
+      "malay (jawi)"
     ],
     "iso6391": "ms",
     "iso6392": "msa",
@@ -1315,6 +1630,25 @@
     "iso6391": "mt",
     "iso6392": "mlt",
     "iso6393": "mlt"
+  },
+  {
+    "group": "Mayan",
+    "names": [
+      "mam"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "mam"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "manx",
+      "gaelg gailck"
+    ],
+    "iso6391": "gv",
+    "iso6392": "glv",
+    "iso6393": "glv"
   },
   {
     "group": "Austronesian",
@@ -1348,6 +1682,76 @@
     "iso6393": "mah"
   },
   {
+    "group": "Indo-European",
+    "names": [
+      "marwadi",
+      "marwari"
+    ],
+    "iso6391": null,
+    "iso6392": "mwr",
+    "iso6393": "mwr"
+  },
+  {
+    "group": "Creole",
+    "names": [
+      "mauritian creole",
+      "morisyen"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "mfe"
+  },
+  {
+    "group": "Uralic",
+    "names": [
+      "meadow mari",
+      "eastern mari"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "mhr"
+  },
+  {
+    "name": "",
+    "group": "Sino-Tibetan",
+    "names": [
+      "meitei",
+      "ꯃꯤꯇꯩꯂꯣꯟ",
+      "meitheilon",
+      "meetei",
+      "manipuri",
+      "meeteilon",
+      "meeʁteilon",
+      "kathe",
+      "meiteilon (manipuri)"
+    ],
+    "iso6392": "mni",
+    "iso6393": "mni",
+    "glottolog": "mani1292"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "minang",
+      "minangkabau"
+    ],
+    "iso6391": null,
+    "iso6392": "min",
+    "iso6393": "min"
+  },
+  {
+    "group": "Sino-Tibetan",
+    "names": [
+      "mizo",
+      "mizo ṭawng",
+      "duhlian",
+      "lushai"
+    ],
+    "iso6392": "lus",
+    "iso6393": "lus",
+    "glottolog": "lush1249"
+  },
+  {
     "group": "Mongolic",
     "names": [
       "mongolian",
@@ -1357,6 +1761,15 @@
     "iso6391": "mn",
     "iso6392": "mon",
     "iso6393": "mon"
+  },
+  {
+    "group": "Uto-Aztecan",
+    "names": [
+      "nahuatl (eastern huasteca)"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "nhe"
   },
   {
     "group": "Austronesian",
@@ -1383,12 +1796,33 @@
   {
     "group": "Niger–Congo",
     "names": [
-      "north ndebele",
-      "isindebele"
+      "ndau"
     ],
-    "iso6391": "nd",
-    "iso6392": "nde",
-    "iso6393": "nde"
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "ndc"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "ndonga",
+      "owambo"
+    ],
+    "iso6391": "ng",
+    "iso6392": "ndo",
+    "iso6393": "ndo"
+  },
+  {
+    "group": "Sino-Tibetan",
+    "names": [
+      "nepalbhasa (newari)",
+      "newari",
+      "nepal bhasa",
+      "newar"
+    ],
+    "iso6391": null,
+    "iso6392": "new",
+    "iso6393": "new"
   },
   {
     "group": "Indo-European",
@@ -1401,14 +1835,57 @@
     "iso6393": "nep"
   },
   {
+    "group": "Constructed",
+    "names": [
+      "nko",
+      "n'ko"
+    ],
+    "iso6391": null,
+    "iso6392": "nqo",
+    "iso6393": "nqo"
+  },
+  {
     "group": "Niger–Congo",
     "names": [
-      "ndonga",
-      "owambo"
+      "north ndebele",
+      "isindebele"
     ],
-    "iso6391": "ng",
-    "iso6392": "ndo",
-    "iso6393": "ndo"
+    "iso6391": "nd",
+    "iso6392": "nde",
+    "iso6393": "nde"
+  },
+  {
+    "group": "Uralic",
+    "names": [
+      "northern sami",
+      "davvisámegiella",
+      "sami (north)"
+    ],
+    "iso6391": "se",
+    "iso6392": "sme",
+    "iso6393": "sme"
+  },
+  {
+    "group": "Niger-Congo",
+    "names": [
+      "northern sotho",
+      "pedi",
+      "sesotho sa leboa",
+      "sepedi"
+    ],
+    "iso6392": "nso",
+    "iso6393": "nso",
+    "glottolog": "north3233"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "norwegian",
+      "norsk"
+    ],
+    "iso6391": "no",
+    "iso6392": "nor",
+    "iso6393": "nor"
   },
   {
     "group": "Indo-European",
@@ -1431,56 +1908,13 @@
     "iso6393": "nno"
   },
   {
-    "group": "Indo-European",
+    "group": "Nilo-Saharan",
     "names": [
-      "norwegian",
-      "norsk"
+      "nuer"
     ],
-    "iso6391": "no",
-    "iso6392": "nor",
-    "iso6393": "nor"
-  },
-  {
-    "name": "northern sotho",
-    "group": "Niger-Congo",
-    "names": {
-      "native": {
-        "short": "pedi",
-        "long": "sesotho sa leboa"
-      },
-      "english": {
-        "short": "northern sotho",
-        "long": "northern sotho"
-      },
-      "transliterations": [],
-      "other": [
-        "sepedi"
-      ]
-    },
-    "iso6392": "nso",
-    "iso6393": "nso",
-    "glottolog": "north3233"
-  },
-  {
-    "group": "Sino-Tibetan",
-    "names": [
-      "sichuan",
-      "sichuan yi nuosu",
-      "ꆈꌠ꒿ nuosuhxop"
-    ],
-    "iso6391": "ii",
-    "iso6392": "iii",
-    "iso6393": "iii"
-  },
-  {
-    "group": "Niger–Congo",
-    "names": [
-      "south ndebele",
-      "isindebele"
-    ],
-    "iso6391": "nr",
-    "iso6392": "nbl",
-    "iso6393": "nbl"
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "nus"
   },
   {
     "group": "Indo-European",
@@ -1493,6 +1927,18 @@
     "iso6393": "oci"
   },
   {
+    "group": "Indo-European",
+    "names": [
+      "odia",
+      "oriya",
+      "ଓଡ଼ିଆ",
+      "odia (oriya)"
+    ],
+    "iso6391": "or",
+    "iso6392": "ori",
+    "iso6393": "ori"
+  },
+  {
     "group": "Algonquian",
     "names": [
       "ojibwa",
@@ -1501,20 +1947,6 @@
     "iso6391": "oj",
     "iso6392": "oji",
     "iso6393": "oji"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
-      "church slavic",
-      "old slavonic",
-      "church slavonic",
-      "old bulgarian",
-      "old church slavonic",
-      "ѩзыкъ словѣньскъ"
-    ],
-    "iso6391": "cu",
-    "iso6392": "chu",
-    "iso6393": "chu"
   },
   {
     "group": "Afro-Asiatic",
@@ -1529,34 +1961,13 @@
   {
     "group": "Indo-European",
     "names": [
-      "odia",
-      "oriya",
-      "ଓଡ଼ିଆ"
-    ],
-    "iso6391": "or",
-    "iso6392": "ori",
-    "iso6393": "ori"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
       "ossetian ossetic",
-      "ирон æвзаг"
+      "ирон æвзаг",
+      "ossetian"
     ],
     "iso6391": "os",
     "iso6392": "oss",
     "iso6393": "oss"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
-      "punjabi",
-      "panjabi",
-      "ਪੰਜਾਬੀ پنجابی‎"
-    ],
-    "iso6391": "pa",
-    "iso6392": "pan",
-    "iso6393": "pan"
   },
   {
     "group": "Indo-European",
@@ -1567,6 +1978,35 @@
     "iso6391": "pi",
     "iso6392": "pli",
     "iso6393": "pli"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "pangasinan"
+    ],
+    "iso6391": null,
+    "iso6392": "pag",
+    "iso6393": "pag"
+  },
+  {
+    "group": "Creole",
+    "names": [
+      "papiamento"
+    ],
+    "iso6391": null,
+    "iso6392": "pap",
+    "iso6393": "pap"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "pashto",
+      "pashto pushto",
+      "پښتو"
+    ],
+    "iso6391": "ps",
+    "iso6392": "pus",
+    "iso6393": "pus"
   },
   {
     "group": "Indo-European",
@@ -1592,23 +2032,37 @@
   {
     "group": "Indo-European",
     "names": [
-      "pashto",
-      "pashto pushto",
-      "پښتو"
-    ],
-    "iso6391": "ps",
-    "iso6392": "pus",
-    "iso6393": "pus"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
       "portuguese",
-      "português"
+      "português",
+      "portuguese (brazil)",
+      "portuguese (portugal)"
     ],
     "iso6391": "pt",
     "iso6392": "por",
     "iso6393": "por"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "punjabi",
+      "panjabi",
+      "ਪੰਜਾਬੀ پنجابی‎",
+      "punjabi (gurmukhi)",
+      "punjabi (shahmukhi)"
+    ],
+    "iso6391": "pa",
+    "iso6392": "pan",
+    "iso6393": "pan"
+  },
+  {
+    "group": "Mayan",
+    "names": [
+      "qʼeqchiʼ",
+      "kekchi"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "kek"
   },
   {
     "group": "Quechuan",
@@ -1619,6 +2073,31 @@
     "iso6391": "qu",
     "iso6392": "que",
     "iso6393": "que"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "romani",
+      "romany"
+    ],
+    "iso6391": null,
+    "iso6392": "rom",
+    "iso6393": "rom"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "romanian",
+      "moldavian",
+      "moldovan",
+      "română"
+    ],
+    "deprecated": {
+      "iso6391": "mo"
+    },
+    "iso6391": "ro",
+    "iso6392": "ron",
+    "iso6393": "rum"
   },
   {
     "group": "Indo-European",
@@ -1643,67 +2122,12 @@
   {
     "group": "Indo-European",
     "names": [
-      "romanian",
-      "moldavian",
-      "moldovan",
-      "română"
-    ],
-    "deprecated": {
-      "iso6391": "mo"
-    },
-    "iso6391": "ro",
-    "iso6392": "ron",
-    "iso6393": "rum"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
       "russian",
       "русский"
     ],
     "iso6391": "ru",
     "iso6392": "rus",
     "iso6393": "rus"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
-      "sanskrit",
-      "संस्कृतम्"
-    ],
-    "iso6391": "sa",
-    "iso6392": "san",
-    "iso6393": "san"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
-      "sardinian",
-      "sardu"
-    ],
-    "iso6391": "sc",
-    "iso6392": "srd",
-    "iso6393": "srd"
-  },
-  {
-    "group": "Indo-European",
-    "names": [
-      "sindhi",
-      "सिन्धी سنڌي، سندھی‎"
-    ],
-    "iso6391": "sd",
-    "iso6392": "snd",
-    "iso6393": "snd"
-  },
-  {
-    "group": "Uralic",
-    "names": [
-      "northern sami",
-      "davvisámegiella"
-    ],
-    "iso6391": "se",
-    "iso6392": "sme",
-    "iso6393": "sme"
   },
   {
     "group": "Austronesian",
@@ -1728,6 +2152,37 @@
   {
     "group": "Indo-European",
     "names": [
+      "sanskrit",
+      "संस्कृतम्"
+    ],
+    "iso6391": "sa",
+    "iso6392": "san",
+    "iso6393": "san"
+  },
+  {
+    "group": "Austroasiatic",
+    "names": [
+      "santali",
+      "santali (latin)",
+      "santali (ol chiki)"
+    ],
+    "iso6391": null,
+    "iso6392": "sat",
+    "iso6393": "sat"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "sardinian",
+      "sardu"
+    ],
+    "iso6391": "sc",
+    "iso6392": "srd",
+    "iso6393": "srd"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
       "serbian",
       "српски",
       "српски језик"
@@ -1737,14 +2192,34 @@
     "iso6393": "srp"
   },
   {
-    "group": "Indo-European",
+    "group": "Niger–Congo",
     "names": [
-      "gaelic scottish gaelic",
-      "gàidhlig"
+      "sesotho",
+      "southern sotho"
     ],
-    "iso6391": "gd",
-    "iso6392": "gla",
-    "iso6393": "gla"
+    "iso6391": "st",
+    "iso6392": "sot",
+    "iso6393": "sot"
+  },
+  {
+    "group": "Creole",
+    "names": [
+      "seychellois creole",
+      "seselwa",
+      "seselwa creole french"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "crs"
+  },
+  {
+    "group": "Tai–Kadai",
+    "names": [
+      "shan"
+    ],
+    "iso6391": null,
+    "iso6392": "shn",
+    "iso6393": "shn"
   },
   {
     "group": "Niger–Congo",
@@ -1755,6 +2230,45 @@
     "iso6391": "sn",
     "iso6392": "sna",
     "iso6393": "sna"
+  },
+  {
+    "group": "Sino-Tibetan",
+    "names": [
+      "sichuan",
+      "sichuan yi nuosu",
+      "ꆈꌠ꒿ nuosuhxop"
+    ],
+    "iso6391": "ii",
+    "iso6392": "iii",
+    "iso6393": "iii"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "sicilian"
+    ],
+    "iso6391": null,
+    "iso6392": "scn",
+    "iso6393": "scn"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "silesian"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "szl"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "sindhi",
+      "सिन्धी سنڌي، سندھی‎"
+    ],
+    "iso6391": "sd",
+    "iso6392": "snd",
+    "iso6393": "snd"
   },
   {
     "group": "Indo-European",
@@ -1803,19 +2317,21 @@
     "group": "Indo-European",
     "names": [
       "sorani",
-      "central kurdish"
+      "central kurdish",
+      "kurdish (sorani)"
     ],
     "iso6393": "ckb"
   },
   {
     "group": "Niger–Congo",
     "names": [
-      "sesotho",
-      "southern sotho"
+      "south ndebele",
+      "isindebele",
+      "ndebele (south)"
     ],
-    "iso6391": "st",
-    "iso6392": "sot",
-    "iso6393": "sot"
+    "iso6391": "nr",
+    "iso6392": "nbl",
+    "iso6393": "nbl"
   },
   {
     "group": "Indo-European",
@@ -1837,6 +2353,15 @@
     "iso6391": "su",
     "iso6392": "sun",
     "iso6393": "sun"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "susu"
+    ],
+    "iso6391": null,
+    "iso6392": "sus",
+    "iso6393": "sus"
   },
   {
     "group": "Niger–Congo",
@@ -1869,24 +2394,24 @@
     "iso6393": "swe"
   },
   {
-    "group": "Dravidian",
+    "group": "Austronesian",
     "names": [
-      "tamil",
-      "தமிழ்"
+      "tagalog",
+      "wikang tagalog"
     ],
-    "iso6391": "ta",
-    "iso6392": "tam",
-    "iso6393": "tam"
+    "iso6391": "tl",
+    "iso6392": "tgl",
+    "iso6393": "tgl"
   },
   {
-    "group": "Dravidian",
+    "group": "Austronesian",
     "names": [
-      "telugu",
-      "తెలుగు"
+      "tahitian",
+      "reo tahiti"
     ],
-    "iso6391": "te",
-    "iso6392": "tel",
-    "iso6393": "tel"
+    "iso6391": "ty",
+    "iso6392": "tah",
+    "iso6393": "tah"
   },
   {
     "group": "Indo-European",
@@ -1901,95 +2426,14 @@
     "iso6393": "tgk"
   },
   {
-    "group": "Tai–Kadai",
+    "group": "Dravidian",
     "names": [
-      "thai",
-      "ไทย"
+      "tamil",
+      "தமிழ்"
     ],
-    "iso6391": "th",
-    "iso6392": "tha",
-    "iso6393": "tha"
-  },
-  {
-    "group": "Afro-Asiatic",
-    "names": [
-      "tigrinya",
-      "ትግርኛ"
-    ],
-    "iso6391": "ti",
-    "iso6392": "tir",
-    "iso6393": "tir"
-  },
-  {
-    "group": "Sino-Tibetan",
-    "names": [
-      "tibetan",
-      "བོད་ཡིག"
-    ],
-    "iso6391": "bo",
-    "iso6392": "bod",
-    "iso6393": "tib"
-  },
-  {
-    "group": "Turkic",
-    "names": [
-      "turkmen",
-      "türkmen",
-      "түркмен"
-    ],
-    "iso6391": "tk",
-    "iso6392": "tuk",
-    "iso6393": "tuk"
-  },
-  {
-    "group": "Austronesian",
-    "names": [
-      "tagalog",
-      "wikang tagalog"
-    ],
-    "iso6391": "tl",
-    "iso6392": "tgl",
-    "iso6393": "tgl"
-  },
-  {
-    "group": "Niger–Congo",
-    "names": [
-      "tswana",
-      "setswana"
-    ],
-    "iso6391": "tn",
-    "iso6392": "tsn",
-    "iso6393": "tsn"
-  },
-  {
-    "group": "Austronesian",
-    "names": [
-      "tonga",
-      "faka tonga"
-    ],
-    "iso6391": "to",
-    "iso6392": "ton",
-    "iso6393": "ton"
-  },
-  {
-    "group": "Turkic",
-    "names": [
-      "turkish",
-      "türkçe"
-    ],
-    "iso6391": "tr",
-    "iso6392": "tur",
-    "iso6393": "tur"
-  },
-  {
-    "group": "Niger–Congo",
-    "names": [
-      "tsonga",
-      "xitsonga"
-    ],
-    "iso6391": "ts",
-    "iso6392": "tso",
-    "iso6393": "tso"
+    "iso6391": "ta",
+    "iso6392": "tam",
+    "iso6393": "tam"
   },
   {
     "group": "Turkic",
@@ -2004,6 +2448,153 @@
     "iso6393": "tat"
   },
   {
+    "group": "Dravidian",
+    "names": [
+      "telugu",
+      "తెలుగు"
+    ],
+    "iso6391": "te",
+    "iso6392": "tel",
+    "iso6393": "tel"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "tetum"
+    ],
+    "iso6391": null,
+    "iso6392": "tet",
+    "iso6393": "tet"
+  },
+  {
+    "group": "Tai–Kadai",
+    "names": [
+      "thai",
+      "ไทย"
+    ],
+    "iso6391": "th",
+    "iso6392": "tha",
+    "iso6393": "tha"
+  },
+  {
+    "group": "Sino-Tibetan",
+    "names": [
+      "tibetan",
+      "བོད་ཡིག"
+    ],
+    "iso6391": "bo",
+    "iso6392": "bod",
+    "iso6393": "tib"
+  },
+  {
+    "group": "Afro-Asiatic",
+    "names": [
+      "tigrinya",
+      "ትግርኛ"
+    ],
+    "iso6391": "ti",
+    "iso6392": "tir",
+    "iso6393": "tir"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "tiv"
+    ],
+    "iso6391": null,
+    "iso6392": "tiv",
+    "iso6393": "tiv"
+  },
+  {
+    "group": "Creole",
+    "names": [
+      "tok pisin"
+    ],
+    "iso6391": null,
+    "iso6392": "tpi",
+    "iso6393": "tpi"
+  },
+  {
+    "group": "Austronesian",
+    "names": [
+      "tonga",
+      "faka tonga",
+      "tongan"
+    ],
+    "iso6391": "to",
+    "iso6392": "ton",
+    "iso6393": "ton"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "tsonga",
+      "xitsonga"
+    ],
+    "iso6391": "ts",
+    "iso6392": "tso",
+    "iso6393": "tso"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "tswana",
+      "setswana"
+    ],
+    "iso6391": "tn",
+    "iso6392": "tsn",
+    "iso6393": "tsn"
+  },
+  {
+    "group": "Dravidian",
+    "names": [
+      "tulu"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "tcy"
+  },
+  {
+    "group": "Niger–Congo",
+    "names": [
+      "tumbuka"
+    ],
+    "iso6391": null,
+    "iso6392": "tum",
+    "iso6393": "tum"
+  },
+  {
+    "group": "Turkic",
+    "names": [
+      "turkish",
+      "türkçe"
+    ],
+    "iso6391": "tr",
+    "iso6392": "tur",
+    "iso6393": "tur"
+  },
+  {
+    "group": "Turkic",
+    "names": [
+      "turkmen",
+      "türkmen",
+      "түркмен"
+    ],
+    "iso6391": "tk",
+    "iso6392": "tuk",
+    "iso6393": "tuk"
+  },
+  {
+    "group": "Turkic",
+    "names": [
+      "tuvan",
+      "tuvinian"
+    ],
+    "iso6391": null,
+    "iso6392": "tyv",
+    "iso6393": "tyv"
+  },
+  {
     "group": "Niger–Congo",
     "names": [
       "twi"
@@ -2013,14 +2604,13 @@
     "iso6393": "twi"
   },
   {
-    "group": "Austronesian",
+    "group": "Uralic",
     "names": [
-      "tahitian",
-      "reo tahiti"
+      "udmurt"
     ],
-    "iso6391": "ty",
-    "iso6392": "tah",
-    "iso6393": "tah"
+    "iso6391": null,
+    "iso6392": "udm",
+    "iso6393": "udm"
   },
   {
     "group": "Turkic",
@@ -2077,6 +2667,15 @@
     "iso6393": "ven"
   },
   {
+    "group": "Indo-European",
+    "names": [
+      "venetian"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "vec"
+  },
+  {
     "group": "Austroasiatic",
     "names": [
       "vietnamese",
@@ -2106,6 +2705,15 @@
     "iso6393": "wln"
   },
   {
+    "group": "Austronesian",
+    "names": [
+      "waray"
+    ],
+    "iso6391": null,
+    "iso6392": "war",
+    "iso6393": "war"
+  },
+  {
     "group": "Indo-European",
     "names": [
       "welsh",
@@ -2114,6 +2722,17 @@
     "iso6391": "cy",
     "iso6392": "cym",
     "iso6393": "wel"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "western frisian",
+      "frysk",
+      "frisian"
+    ],
+    "iso6391": "fy",
+    "iso6392": "fry",
+    "iso6393": "fry"
   },
   {
     "group": "Niger–Congo",
@@ -2126,16 +2745,6 @@
     "iso6393": "wol"
   },
   {
-    "group": "Indo-European",
-    "names": [
-      "western frisian",
-      "frysk"
-    ],
-    "iso6391": "fy",
-    "iso6392": "fry",
-    "iso6393": "fry"
-  },
-  {
     "group": "Niger–Congo",
     "names": [
       "xhosa",
@@ -2144,6 +2753,16 @@
     "iso6391": "xh",
     "iso6392": "xho",
     "iso6393": "xho"
+  },
+  {
+    "group": "Turkic",
+    "names": [
+      "yakut",
+      "sakha"
+    ],
+    "iso6391": null,
+    "iso6392": "sah",
+    "iso6393": "sah"
   },
   {
     "group": "Indo-European",
@@ -2167,6 +2786,24 @@
     "iso6391": "yo",
     "iso6392": "yor",
     "iso6393": "yor"
+  },
+  {
+    "group": "Mayan",
+    "names": [
+      "yucatec maya"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "yua"
+  },
+  {
+    "group": "Oto-Manguean",
+    "names": [
+      "zapotec"
+    ],
+    "iso6391": null,
+    "iso6392": "zap",
+    "iso6393": "zap"
   },
   {
     "group": "Tai–Kadai",
