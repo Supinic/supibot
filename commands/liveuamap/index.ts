@@ -23,14 +23,11 @@ export default declare({
 	Params: [{ name: "lang", type: "language" }],
 	Whitelist_Response: null,
 	Code: (async function liveUaMap (context) {
-		const languageCode = (context.params.lang)
-			? context.params.lang.getIsoCode(2)
-			: "en";
-
+		const languageCode = (context.params.lang) ? context.params.lang.iso6392 : "en";
 		if (!languageCode) {
 			return {
 				success: false,
-				reply: `Could not parse your provided language!`
+				reply: `Your provided language could not be parsed!`
 			};
 		}
 		else if (!SUPPORTED_LANGUAGE_CODES.includes(languageCode)) {

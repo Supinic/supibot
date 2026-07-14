@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { getCode, getName } from "../../utils/languages.js";
+import { getName } from "../../utils/languages.js";
 import { declare } from "../../classes/command.js";
 import RAW_OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
 
@@ -37,7 +37,7 @@ export default declare({
 	Params: [
 		{ name: "engine", type: "number" },
 		{ name: "force", type: "boolean" },
-		{ name: "lang", type: "string" }
+		{ name: "lang", type: "language" }
 	],
 	Whitelist_Response: null,
 	Code: async function ocr (context, ...args) {
@@ -49,21 +49,22 @@ export default declare({
 
 		let languageCode: string | null = "eng";
 		if (context.params.lang) {
-			languageCode = getCode(context.params.lang, "iso6393");
-		}
+			const code = context.params.lang.iso6393;
+			if (!code) {
+				return {
+					success: false,
+					reply: "Your provided language could not be parsed!"
+				};
+			}
 
-		if (!languageCode) {
-			return {
-				success: false,
-				reply: "Provided language could not be parsed!"
-			};
+			languageCode = code;
 		}
 
 		const language = ocrLanguages.get(languageCode);
 		if (!language) {
 			return {
 				success: false,
-				reply: `Language is not supported! Use one of these: ${ocrLanguageNames.join(", ")}`,
+				reply: `This language is not supported! Use one of these: ${ocrLanguageNames.join(", ")}`,
 				cooldown: 2500
 			};
 		}

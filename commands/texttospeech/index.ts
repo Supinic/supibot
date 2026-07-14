@@ -79,7 +79,7 @@ export default declare({
 				if (!languageCode) {
 					return {
 						success: false,
-						reply: "Provided language does not exist!"
+						reply: "Your provided language was not recognized!"
 					};
 				}
 

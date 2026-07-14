@@ -329,6 +329,7 @@
       "bhojpuri",
       "भोजपुरी"
     ],
+    "iso6391": null,
     "iso6392": "bho",
     "iso6393": "bho",
     "glottolog": "bhoj1246"
@@ -632,7 +633,6 @@
     "iso6393": "div"
   },
   {
-    "name": "dogri",
     "group": "Indo-Aryan",
     "names": [
       "dogri",
@@ -640,6 +640,7 @@
       "डोगरी",
       "ڈوگری"
     ],
+    "iso6391": null,
     "iso6392": "doi",
     "iso6393": "doi",
     "glottolog": "indo1311"
@@ -871,11 +872,13 @@
     "iso6393": "ger"
   },
   {
-    "name": "goan konkani",
     "group": "Indo-Aryan",
     "names": [
+      "goan konkani",
       "konkani"
     ],
+    "iso6391": null,
+    "iso6392": null,
     "iso6393": "gom",
     "glottolog": "goan1235"
   },
@@ -1091,6 +1094,7 @@
       "samtoy",
       "sao mi ditoy"
     ],
+    "iso6391": null,
     "iso6392": "ilo",
     "iso6393": "ilo",
     "glottolog": "ilok1237"
@@ -1378,6 +1382,7 @@
       "konkani",
       "कोंकणी"
     ],
+    "iso6391": null,
     "iso6392": "kok",
     "iso6393": "kok",
     "glottolog": "konk1267"
@@ -1398,6 +1403,7 @@
       "krio",
       "sierra leona creole"
     ],
+    "iso6391": null,
     "iso6392": null,
     "iso6393": "kri",
     "glottolog": "krio1253"
@@ -1576,6 +1582,7 @@
       "maithili",
       "मैथिली"
     ],
+    "iso6391": null,
     "iso6392": "mai",
     "iso6393": "mai",
     "glottolog": "mait1250"
@@ -1712,7 +1719,6 @@
     "iso6393": "mhr"
   },
   {
-    "name": "",
     "group": "Sino-Tibetan",
     "names": [
       "meitei",
@@ -1725,6 +1731,7 @@
       "kathe",
       "meiteilon (manipuri)"
     ],
+    "iso6391": null,
     "iso6392": "mni",
     "iso6393": "mni",
     "glottolog": "mani1292"
@@ -1747,6 +1754,7 @@
       "duhlian",
       "lushai"
     ],
+    "iso6391": null,
     "iso6392": "lus",
     "iso6393": "lus",
     "glottolog": "lush1249"
@@ -1873,6 +1881,7 @@
       "sesotho sa leboa",
       "sepedi"
     ],
+    "iso6391": null,
     "iso6392": "nso",
     "iso6393": "nso",
     "glottolog": "north3233"
@@ -2320,6 +2329,8 @@
       "central kurdish",
       "kurdish (sorani)"
     ],
+    "iso6391": null,
+    "iso6392": null,
     "iso6393": "ckb"
   },
   {

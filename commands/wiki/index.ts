@@ -44,7 +44,7 @@ export default declare({
 			};
 		}
 
-		const languageCode = context.params.lang?.getIsoCode(1) ?? "en";
+		const languageCode = context.params.lang?.iso6391 ?? "en";
 		let query = args.join(" ");
 
 		if (query.toLowerCase() === "random") {
