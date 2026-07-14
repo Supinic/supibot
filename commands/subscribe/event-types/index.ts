@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { SupiError } from "supi-core";
 import type { EventDefinition } from "../generic-event.js";
 
 import BrighterShoresSubDefinition from "./brighter-shores.js";
@@ -42,6 +43,27 @@ const definitions = [
 		names: z.array(z.string().lowercase()).min(1)
 	}));
 	checkLowercaseNamesSchema.parse(definitions);
+
+	const names = new Set();
+	const titles = new Set();
+	for (const definition of definitions) {
+		if (titles.has(definition.title)) {
+			throw new SupiError({
+				message: `Assert error: Repeated $subscribe title "${definition.title}"`
+			});
+		}
+		titles.add(definition.title);
+
+		for (const name of definition.names) {
+			if (names.has(name)) {
+				throw new SupiError({
+					message: `Assert error: Repeated $subscribe name "${name}"`
+				});
+			}
+
+			names.add(name);
+		}
+	}
 }
 
 export default definitions;
