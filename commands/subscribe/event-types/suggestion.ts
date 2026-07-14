@@ -1,10 +1,9 @@
 import type { SpecialEventDefinition } from "../generic-event.js";
 
 export default {
-	name: "Suggestion",
-	aliases: ["suggestions"],
+	title: "Suggestion",
+	names: ["suggestion", "suggestions"],
 	type: "special",
-	generic: false,
 	notes: "Whenever a suggestion you've made is updated, you will receive a reminder.",
 	channelSpecificMention: false,
 	response: {

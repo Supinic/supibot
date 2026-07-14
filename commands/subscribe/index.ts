@@ -4,8 +4,9 @@ import { type Context, declare } from "../../classes/command.js";
 import subscriptions from "./event-types/index.js";
 import { type EventSubscription, handleGenericSubscription, isGenericSubscriptionDefinition } from "./generic-event.js";
 
-const crons: Set<CronJob> = new Set();
+const DEFAULT_CRON_EXPRESSION = "0 */5 * * * *";
 
+const crons: Set<CronJob> = new Set();
 const subscribeCommandParams = [{ name: "skipPrivateReminder", type: "boolean" }] as const;
 export type SubscribeCommandContext = Context<typeof subscribeCommandParams>;
 
@@ -23,7 +24,7 @@ export default declare({
 				continue;
 			}
 
-			const cronJob = new CronJob(def.cronExpression, () => handleGenericSubscription(def));
+			const cronJob = new CronJob(def.cronExpression ?? DEFAULT_CRON_EXPRESSION, () => handleGenericSubscription(def));
 			cronJob.start();
 			crons.add(cronJob);
 		}
@@ -45,13 +46,8 @@ export default declare({
 
 		type = type.toLowerCase();
 
-		const event = subscriptions.find(i => {
-			const lowerName = i.name.toLowerCase();
-			const lowerAliases = i.aliases.map(j => j.toLowerCase());
-
-			return (lowerName === type || lowerAliases.includes(type));
-		});
-
+		// `i.names` is guaranteed by Zod to be always lowercase
+		const event = subscriptions.find(i => i.names.includes(type));
 		if (!event) {
 			return {
 				success: false,
@@ -63,7 +59,7 @@ export default declare({
 			.select("ID", "Active", "Channel", "Platform", "Flags")
 			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
-			.where("Type = %s", event.name)
+			.where("Type = %s", event.title)
 			.limit(1)
 			.single()
 		);
@@ -78,10 +74,19 @@ export default declare({
 		}
 
 		const { invocation } = context;
-		const response = (invocation === "subscribe") ? event.response.added : event.response.removed;
+		let response: string;
+		if ("response" in event && event.response) {
+			response = (invocation === "subscribe") ? event.response.added : event.response.removed;
+		}
+		else {
+			response = (invocation === "subscribe")
+				? `You are now subscribed to ${event.title}.`
+				: `You have unsubscribed from ${event.title}.`;
+		}
 
 		let locationWithSpace = "";
-		if (event.channelSpecificMention) {
+		const channelSpecificMention = ("channelSpecificMention" in event) ? event.channelSpecificMention : true;
+		if (channelSpecificMention) {
 			locationWithSpace = (context.channel)
 				? " in this channel"
 				: ` in ${context.platform.Name} PMs`;
@@ -103,7 +108,7 @@ export default declare({
 			// but rather update the channel/platform combo.
 			const currentChannelID = context.channel?.ID ?? null;
 			if (
-				event.channelSpecificMention
+				channelSpecificMention
 				&& invocation === "subscribe"
 				&& subData.Active
 				&& (subData.Channel !== currentChannelID || subData.Platform !== context.platform.ID)
@@ -135,7 +140,8 @@ export default declare({
 				}
 
 				return {
-					reply: `Moved your subscription to ${event.name} from ${previousString} to ${currentString}.${flagAppendix}`
+					success: true,
+					reply: `Moved your ${event.title} subscription from ${previousString} to ${currentString}.${flagAppendix}`
 				};
 			}
 
@@ -173,6 +179,7 @@ export default declare({
 			});
 
 			return {
+				success: true,
 				reply: `Successfully ${invocationString}d${locationWithSpace}. ${response}`
 			};
 		}
@@ -189,27 +196,28 @@ export default declare({
 				User_Alias: context.user.ID,
 				Platform: context.platform.ID,
 				Channel: context.channel?.ID ?? null,
-				Type: event.name,
+				Type: event.title,
 				Flags: JSON.stringify(flags),
 				Active: true
 			});
 
 			await row.save({ skipLoad: true });
 			return {
+				success: true,
 				reply: `Successfully subscribed${locationWithSpace}. ${response}${flagAppendix}`
 			};
 		}
 	},
 	Dynamic_Description: (prefix) => {
 		const tableBody = subscriptions.map(i => {
+			const namesString = i.names.join(", ");
 			const urlString = ("url" in i) ? `<a href="${i.url}">RSS</a>` : "N/A";
-			const aliasString = (i.aliases.length !== 0) ? i.aliases.join(", ") : "N/A";
 			const notesString = ("notes" in i && i.notes) ? i.notes : "";
 
 			return core.Utils.tag.trim `
 				<tr>
-					<td>${i.name}</td>
-					<td>${aliasString}</td>
+					<td>${i.title}</td>
+					<td>${namesString}</td>
 					<td>${urlString}</td>
 					<td>${notesString}			
 				</tr>
@@ -221,22 +229,22 @@ export default declare({
 			"Depending on the event, you will be notified in different ways.",
 			"",
 
-			`<code>${prefix}subscribe (type)</code>`,
-			"You will be subscribed to a given event.",
+			`<code>${prefix}subscribe (name)</code>`,
+			"You will be subscribed to the given event.",
 			"You can re-subscribe in a different channel (without un-subcribing) if you want a specific event to mention you elsewhere",
 			"",
 
-			`<code>${prefix}subscribe (type) <u>skipPrivateReminder:(true|false)</u></code>`,
-			"You will be subscribed to a given event with the private reminders skipped or unskipped per your choice.",
+			`<code>${prefix}subscribe (name) <u>skipPrivateReminder:(true|false)</u></code>`,
+			"You will be subscribed to the given event with the private reminders skipped or unskipped per your choice.",
 			"You can also use this on an existing event to change your setting without changing the subscription itself",
 			"",
 
-			`<code>${prefix}unsubscribe (type)</code>`,
-			"You will be unsubscribed from a given event.",
+			`<code>${prefix}unsubscribe (name)</code>`,
+			"You will be unsubscribed from the given event.",
 			"",
 
 			"List of available events:",
-			`<table><thead><th style="min-width:50px">Name</th><th>Aliases</th><th style="min-width:45px">Source</th><th>Notes</th></thead>${tableBody}</table>`,
+			`<table><thead><th style="min-width:50px">Title</th><th>Name</th><th style="min-width:45px">Source</th><th>Notes</th></thead>${tableBody}</table>`,
 			""
 		];
 	}

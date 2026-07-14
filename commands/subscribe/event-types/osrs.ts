@@ -35,16 +35,13 @@ type OsrsResponse = {
 };
 
 export default {
-	name: "OSRS",
-	aliases: [],
-	channelSpecificMention: true,
+	title: "OSRS",
+	names: ["osrs", "osrs-news"],
 	response: {
 		added: "You will now be pinged whenever a new OSRS article is published.",
 		removed: "You will no longer receive pings when a new OSRS article is published."
 	},
-	generic: true,
 	cronExpression: "0 */1 * * * *",
-	subName: "OSRS article",
 	type: "custom",
 	process: async () => {
 		const response = await core.Got.get("GenericAPI")<OsrsResponse>({

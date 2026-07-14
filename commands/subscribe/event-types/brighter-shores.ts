@@ -16,18 +16,10 @@ type SteamApiResponse = {
 };
 
 const definition: CustomEventDefinition = {
-	name: "Brighter Shores",
-	aliases: ["BS"],
-	channelSpecificMention: true,
-	notes: `Checks for Brighter Shores updates on <a href="//store.steampowered.com/app/2791440">its Steam page</a>.`,
-	response: {
-		added: "You will now be pinged whenever a new BS update is published.",
-		removed: "You will no longer receive pings when a new BS update is published."
-	},
-	generic: true,
-	cronExpression: "0 */5 * * * *",
-	subName: "BS update",
 	type: "custom",
+	title: "Brighter Shores",
+	names: ["bs", "brighter-shores"],
+	notes: `Checks for Brighter Shores updates on <a href="//store.steampowered.com/app/2791440">its Steam page</a>.`,
 	process: async () => {
 		const response = await core.Got.get("GenericAPI")<SteamApiResponse>({
 			url: steamNewsUrl,
@@ -76,7 +68,6 @@ const definition: CustomEventDefinition = {
 
 		const updateString = newUpdates.map(i => `${i.title} ${i.url}`).join(" -- ");
 		const noun = (newUpdates.length === 1) ? "update" : "updates";
-
 		return {
 			message: `New Brighter Shores ${noun}! ${updateString}`
 		};
