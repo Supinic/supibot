@@ -17,7 +17,7 @@
   },
   {
     "title": "Bun",
-    "names": [],
+    "names": ["bun"],
     "item": "blogpost",
     "url": "https://bun.sh/rss.xml"
   },
@@ -90,14 +90,14 @@
   },
   {
     "title": "Runelite",
-    "names": [],
+    "names": ["runelite"],
     "item": "version",
     "notes": "Notifies about new releases of Runelite.",
     "url": "https://runelite.net/atom.xml"
   },
   {
     "title": "Rust",
-    "names": [],
+    "names": ["rust"],
     "url": "https://blog.rust-lang.org/feed.xml"
   },
   {

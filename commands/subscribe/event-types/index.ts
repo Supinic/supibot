@@ -37,10 +37,10 @@ const definitions = [
 ] satisfies EventDefinition[];
 
 {
-	// Validates every definition to have a non-empty, all-lowercase name array
-	const checkLowercaseNamesSchema = z.object({
+	// Validates every definition to have a non-empty, all-lowercase `names` array
+	const checkLowercaseNamesSchema = z.array(z.object({
 		names: z.array(z.string().lowercase()).min(1)
-	});
+	}));
 	checkLowercaseNamesSchema.parse(definitions);
 }
 
