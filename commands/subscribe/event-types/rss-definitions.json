@@ -12,7 +12,7 @@
   {
     "title": "Asahi Linux",
     "names": ["asahi"],
-    "item": "blog",
+    "item": "blogpost",
     "url": "https://asahilinux.org/blog/index.xml"
   },
   {
@@ -23,7 +23,7 @@
   },
   {
     "title": "Cloudflare Developer Products",
-    "names": ["cfedev"],
+    "names": ["cfdev"],
     "item": "update",
     "url": "https://developers.cloudflare.com/changelog/rss/developer-platform.xml"
   },

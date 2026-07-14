@@ -278,7 +278,7 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 		}
 
 		const suffix = (result.length === 1) ? "" : "s";
-		message = `New ${item}${suffix}! ${emote} 👉 ${result.join(" -- ")}`;
+		message = `New ${title} ${item}${suffix}! ${emote} 👉 ${result.join(" -- ")}`;
 	}
 	else {
 		const { process } = definition;
