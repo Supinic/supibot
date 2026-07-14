@@ -74,6 +74,12 @@
     "url": "https://kde.org/index.xml"
   },
   {
+    "title": "Linux Kernel",
+    "names": ["linux", "linux-kernel"],
+    "item": "version",
+    "url": "https://www.kernel.org/feeds/kdist.xml"
+  },
+  {
     "title": "MSVC++",
     "names": ["msvcpp"],
     "item": "devblog",
