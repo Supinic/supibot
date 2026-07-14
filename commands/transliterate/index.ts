@@ -162,7 +162,7 @@ export default declare({
 			};
 		}
 
-		const isoCode = lang.getIsoCode(1);
+		const isoCode = lang.iso6391;
 		if (isoCode === "ja") {
 			return await transliterateJapanese(query);
 		}

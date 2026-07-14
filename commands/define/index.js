@@ -9,7 +9,7 @@ export default {
 	Description: "Combines multiple ways of fetching a definition of a word or a phrase, and picks the best result.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "lang", type: "string" }
+		{ name: "lang", type: "language" }
 	],
 	Whitelist_Response: null,
 	Code: (async function define (context, ...args) {
@@ -25,7 +25,7 @@ export default {
 
 		let languageCode = "en";
 		if (context.params.lang) {
-			languageCode = getCode(context.params.lang, "iso6391");
+			languageCode = context.params.lang.iso6391;
 			if (!languageCode) {
 				return {
 					success: false,

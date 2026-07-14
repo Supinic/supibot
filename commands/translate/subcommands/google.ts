@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import { get as getLanguage, getName } from "../../../utils/languages.js";
+import { hasDefinition, getName, getDefinition } from "../../../utils/languages.js";
 import type { TranslateSubcommandDefinition } from "../index.js";
 
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
@@ -25,7 +25,7 @@ export const getGoogleLanguageList = async () => {
 				return false;
 			}
 
-			return Boolean(getLanguage(i));
+			return hasDefinition(i);
 		}));
 
 		codeList = [...list];
@@ -110,12 +110,12 @@ export default {
 				lang = core.Utils.randArray(codeList);
 			}
 
-			const newLang = getLanguage(lang);
+			const newLang = getDefinition(lang);
 			const code = newLang?.iso6391 ?? newLang?.iso6392 ?? newLang?.iso6393 ?? null;
 			if (!code) {
 				return {
 					success: false,
-					reply: `Language "${lang}" was not recognized!`
+					reply: `Could not recognize language "${lang}"!`
 				};
 			}
 
@@ -124,10 +124,7 @@ export default {
 
 		if (!context.params.to && options.to === "en") {
 			const userDefaultLanguage = await context.user.getDataProperty("defaultUserLanguage");
-
-			options.to = (userDefaultLanguage)
-				? userDefaultLanguage.code.toLowerCase()
-				: "en";
+			options.to = (userDefaultLanguage) ? userDefaultLanguage.code.toLowerCase() : "en";
 		}
 
 		const response = await core.Got.get("FakeAgent")<GoogleTranslateResponse>({

@@ -28,7 +28,7 @@ import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
 import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
 import CooldownManager from "../utils/cooldown-manager.js";
-import { type Language, getLanguage } from "../utils/languages.js";
+import { getDefinition as getLanguageDefinition, type LanguageDefinition } from "../utils/languages.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import type { Emote } from "../utils/globals.js";
@@ -47,7 +47,7 @@ type ParameterValueMap = {
 	date: SupiDate;
 	object: Record<string, string>;
 	regex: RegExp;
-	language: Language;
+	language: LanguageDefinition;
 };
 export type ParameterType = keyof ParameterValueMap;
 type ParameterValue = ParameterValueMap[ParameterType];
@@ -1265,7 +1265,7 @@ export class Command extends TemplateWithoutId {
 			}
 
 			case "language": {
-				return getLanguage(value);
+				return getLanguageDefinition(value);
 			}
 		}
 
