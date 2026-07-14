@@ -161,9 +161,9 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 	}
 
 	const [topArticle] = eligibleArticles;
-	await core.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf(), {
-		expiry: 7 * 864e5 // 7 days
-	});
+
+	// No expiry date - prevents hibernated feeds from skipping their next update later on (used to be 7 days)
+	await core.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf());
 
 	// Skip posting too many articles if it's the first time running
 	if (eligibleArticles.length > 1 && lastPublishDate === 0) {
