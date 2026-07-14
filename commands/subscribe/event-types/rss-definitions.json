@@ -86,7 +86,8 @@
     "title": "Python",
     "names": ["4head"],
     "item": "version",
-    "url": "https://blog.python.org/feeds/posts/default"
+    "url": "https://blog.python.org/feeds/posts/default",
+    "emote": "4HEad"
   },
   {
     "title": "Runelite",
@@ -98,7 +99,8 @@
   {
     "title": "Rust",
     "names": ["rust"],
-    "url": "https://blog.rust-lang.org/feed.xml"
+    "url": "https://blog.rust-lang.org/feed.xml",
+    "emote": "\uD83E\uDD80"
   },
   {
     "title": "Steam Giveaways",
