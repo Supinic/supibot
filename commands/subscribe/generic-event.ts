@@ -140,18 +140,18 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 	const feed = await parseRSS(xml);
 	const lastPublishDate = (await core.Cache.getByPrefix(cacheKey) ?? 0) as number;
 
-	const skippedCategories = (options.ignoredCategories ?? []).map(i => i.toLowerCase());
+	const { ignoredCategories } = options;
 	const eligibleArticles = feed.items
 		.filter(article => new SupiDate(article.pubDate).valueOf() > lastPublishDate)
 		.filter(article => {
-			if (skippedCategories.length === 0) {
+			if (!ignoredCategories) {
 				return true;
 			}
 
 			const categories = (article.categories ?? []) as Category[];
 			return categories.every(cat => {
 				const category = (typeof cat === "string") ? cat : cat._;
-				return !skippedCategories.includes(category);
+				return !ignoredCategories.includes(category.toLowerCase());
 			});
 		})
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
@@ -224,6 +224,7 @@ export type RssEventDefinition = BaseEventDefinition & {
 	cronExpression?: string;
 	item?: string;
 	options?: {
+		// Always lowercase due to zod validation
 		ignoredCategories?: string[];
 	};
 };
