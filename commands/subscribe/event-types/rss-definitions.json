@@ -1,0 +1,133 @@
+[
+  {
+    "title": "Apple Newsroom",
+    "names": ["apple"],
+    "url": "https://www.apple.com/newsroom/rss-feed.rss"
+  },
+  {
+    "title": "Arch Linux",
+    "names": ["arch"],
+    "url": "https://archlinux.org/feeds/news"
+  },
+  {
+    "title": "Asahi Linux",
+    "names": ["asahi"],
+    "item": "blogpost",
+    "url": "https://asahilinux.org/blog/index.xml"
+  },
+  {
+    "title": "Bun",
+    "names": ["bun"],
+    "item": "blogpost",
+    "url": "https://bun.sh/rss.xml"
+  },
+  {
+    "title": "Cloudflare Developer Products",
+    "names": ["cfdev"],
+    "item": "update",
+    "url": "https://developers.cloudflare.com/changelog/rss/developer-platform.xml"
+  },
+  {
+    "title": "Deno",
+    "names": ["deno"],
+    "url": "https://deno.com/feed"
+  },
+  {
+    "title": ".NET",
+    "names": [".net", "dotnet"],
+    "url": "https://devblogs.microsoft.com/dotnet/feed",
+    "options": {
+      "ignoredCategories": ["copilot"]
+    }
+  },
+  {
+    "title": "Emojipedia",
+    "names": ["emoji", "emojipedia"],
+    "item": "blogpost",
+    "url": "https://blog.emojipedia.org/rss"
+  },
+  {
+    "title": "Factorio",
+    "names": ["factorio"],
+    "item": "blogpost",
+    "url": "https://factorio.com/blog/rss"
+  },
+  {
+    "title": "GitHub Blog",
+    "names": ["github"],
+    "item": "post",
+    "url": "https://github.blog/changelog/rss",
+    "options": {
+      "ignoredCategories": ["copilot"]
+    }
+  },
+  {
+    "title": "GitHub Status",
+    "names": ["github-status"],
+    "item": "update",
+    "url": "https://www.githubstatus.com/history.rss",
+    "emote": "Clueless"
+  },
+  {
+    "title": "KDE news",
+    "names": ["kde", "kde-news"],
+    "url": "https://kde.org/index.xml"
+  },
+  {
+    "title": "MSVC++",
+    "names": ["msvcpp"],
+    "item": "devblog",
+    "url": "https://devblogs.microsoft.com/cppblog/feed",
+    "options": {
+      "ignoredCategories": ["copilot"]
+    }
+  },
+  {
+    "title": "Python",
+    "names": ["4head"],
+    "item": "version",
+    "url": "https://blog.python.org/feeds/posts/default",
+    "emote": "4HEad"
+  },
+  {
+    "title": "Runelite",
+    "names": ["runelite"],
+    "item": "version",
+    "notes": "Notifies about new releases of Runelite.",
+    "url": "https://runelite.net/atom.xml"
+  },
+  {
+    "title": "Rust",
+    "names": ["rust"],
+    "url": "https://blog.rust-lang.org/feed.xml",
+    "emote": "\uD83E\uDD80"
+  },
+  {
+    "title": "Steam Giveaways",
+    "names": ["steam-giveaway", "steam-giveaways"],
+    "notes": "Notifies about new Steam giveaways on the GamerPower website.",
+    "item": "update",
+    "url": "https://www.gamerpower.com/rss/steam"
+  },
+  {
+    "title": "Twitch Developer Changelog",
+    "names": ["twitchdev"],
+    "item": "update",
+    "url": "https://dev.twitch.tv/docs/rss/change-log.xml"
+  },
+  {
+    "title": "Typescript",
+    "names": ["typescript", "ts"],
+    "item": "devblog",
+    "url": "https://devblogs.microsoft.com/typescript/feed",
+    "options": {
+      "ignoredCategories": ["copilot"]
+    }
+  },
+  {
+    "title": "V8",
+    "names": ["v8"],
+    "item": "version",
+    "url": "https://v8.dev/blog.atom"
+  }
+]

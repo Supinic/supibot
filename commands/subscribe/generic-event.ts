@@ -1,6 +1,5 @@
 import { Date as SupiDate, type Row } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
-
 import type { User } from "../../classes/user.js";
 import type { Channel } from "../../classes/channel.js";
 import type { Platform } from "../../platforms/template.js";
@@ -141,18 +140,18 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 	const feed = await parseRSS(xml);
 	const lastPublishDate = (await core.Cache.getByPrefix(cacheKey) ?? 0) as number;
 
-	const skippedCategories = (options.ignoredCategories ?? []).map(i => i.toLowerCase());
+	const { ignoredCategories } = options;
 	const eligibleArticles = feed.items
 		.filter(article => new SupiDate(article.pubDate).valueOf() > lastPublishDate)
 		.filter(article => {
-			if (skippedCategories.length === 0) {
+			if (!ignoredCategories) {
 				return true;
 			}
 
 			const categories = (article.categories ?? []) as Category[];
 			return categories.every(cat => {
 				const category = (typeof cat === "string") ? cat : cat._;
-				return !skippedCategories.includes(category);
+				return !ignoredCategories.includes(category.toLowerCase());
 			});
 		})
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
@@ -162,9 +161,9 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 	}
 
 	const [topArticle] = eligibleArticles;
-	await core.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf(), {
-		expiry: 7 * 864e5 // 7 days
-	});
+
+	// No expiry date - prevents hibernated feeds from skipping their next update later on (used to be 7 days)
+	await core.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf());
 
 	// Skip posting too many articles if it's the first time running
 	if (eligibleArticles.length > 1 && lastPublishDate === 0) {
@@ -185,15 +184,6 @@ type CommandResult = { // @todo import from Command when supi-core has type expo
 	reply: string;
 };
 
-type BaseEventDefinition = {
-	type: "rss" | "custom" | "special";
-	name: string;
-	aliases: string[];
-	notes?: string;
-	channelSpecificMention?: boolean;
-	generic: boolean;
-};
-
 export type EventSubscription = {
 	ID: number;
 	User_Alias: User["ID"];
@@ -204,59 +194,68 @@ export type EventSubscription = {
 	Flags: string;
 	Active: boolean;
 };
-export type SpecialEventDefinition = BaseEventDefinition & {
-	name: string;
-	aliases: string[];
-	notes: string;
-	type: "special";
-	generic: false,
-	channelSpecificMention: boolean;
-	response?: {
-		added: string;
-		removed: string;
-	};
-	handler?: (context: SubscribeCommandContext, subscription: Row<EventSubscription>, ...args: string[]) => Promise<CommandResult>;
+
+type BaseEventDefinition = {
+	type: "rss" | "custom" | "special";
+	title: string;
+	names: string[];
+	notes?: string;
+	channelSpecificMention?: boolean;
 };
 
-export type RssEventDefinition = BaseEventDefinition & {
-	type: "rss";
-	cronExpression: string;
-	subName: string;
-	url: string;
-	cacheKey: string;
+type SpecialBaseEventDefinition = BaseEventDefinition & {
+	type: "special";
+	notes: string;
+};
+type SpecialHandlerEventDefinition = SpecialBaseEventDefinition & {
+	handler: (context: SubscribeCommandContext, subscription: Row<EventSubscription>, ...args: string[]) => Promise<CommandResult>;
+};
+type SpecialResponseEventDefinition = SpecialBaseEventDefinition & {
 	response: {
 		added: string;
 		removed: string;
 	};
+};
+export type SpecialEventDefinition = SpecialHandlerEventDefinition | SpecialResponseEventDefinition;
+export type RssEventDefinition = BaseEventDefinition & {
+	type: "rss";
+	url: string;
+	emote?: string;
+	cronExpression?: string;
+	item?: string;
 	options?: {
+		// Always lowercase due to zod validation
 		ignoredCategories?: string[];
 	};
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
-	cronExpression: string;
-	subName: string;
-	response: {
+	process: () => Promise<null | { message: string }>;
+	cronExpression?: string;
+	response?: {
 		added: string;
 		removed: string;
 	};
-	process: () => Promise<null | { message: string }>;
 };
 export type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
 
 export type EventDefinition = RssEventDefinition | CustomEventDefinition | SpecialEventDefinition;
 
-export const isGenericSubscriptionDefinition = (input: EventDefinition): input is GenericEventDefinition => (input.generic);
+export const isGenericSubscriptionDefinition = (input: EventDefinition): input is GenericEventDefinition => (input.type === "rss" || input.type === "custom");
+
+const makeGenericCacheKey = (name: string) => `${name.toLowerCase().replaceAll(/\s+/g, "-")}-last-publish-date`;
 
 /**
  * For a given definition of a subscription event, fetches the newest item and handles the subscription if a new is found.
  */
 export const handleGenericSubscription = async (definition: GenericEventDefinition) => {
-	const { name, subName, type } = definition;
+	const { title, type } = definition;
 
 	let message;
 	if (type === "rss") {
-		const { cacheKey, options, url } = definition;
+		const { options, item = "article", url, emote = "PagChomp" } = definition;
+		const cacheKey = makeGenericCacheKey(title);
+
 		const response = await core.Got.get("GenericAPI")({
 			url,
 			responseType: "text",
@@ -279,7 +278,7 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 		}
 
 		const suffix = (result.length === 1) ? "" : "s";
-		message = `New ${subName}${suffix}! PagChomp 👉 ${result.join(" -- ")}`;
+		message = `New ${title} ${item}${suffix}! ${emote} 👉 ${result.join(" -- ")}`;
 	}
 	else {
 		const { process } = definition;
@@ -291,5 +290,5 @@ export const handleGenericSubscription = async (definition: GenericEventDefiniti
 		message = result.message;
 	}
 
-	await handleEventSubscription(name, message);
+	await handleEventSubscription(title, message);
 };

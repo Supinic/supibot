@@ -1,10 +1,9 @@
 import type { SpecialEventDefinition } from "../generic-event.js";
 
 export default {
-	name: "Global Twitch emotes",
-	aliases: ["global-twitch-emotes"],
+	title: "Global Twitch emotes",
+	names: ["global-twitch-emotes"],
 	type: "special",
-	generic: false,
 	notes: "Notifies when Twitch adds, changes or removes global emotes.",
 	channelSpecificMention: false,
 	response: {

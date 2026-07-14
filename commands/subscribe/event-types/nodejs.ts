@@ -14,17 +14,13 @@ type GithubRepoResponse = {
 };
 
 export default {
-	name: "Node.js updates",
-	aliases: ["node", "nodejs", "node.js"],
-	channelSpecificMention: true,
+	title: "Node.js updates",
+	names: ["node", "nodejs", "node.js"],
+	type: "custom",
 	response: {
 		added: "You will now be pinged whenever a new version of Node.js is detected.",
 		removed: "You will no longer receive pings when Node.js is updated."
 	},
-	generic: true,
-	cronExpression: "0 */5 * * * *",
-	subName: "Node.js version",
-	type: "custom",
 	process: async () => {
 		const response = await core.Got.get("GitHub")({
 			url: "repos/nodejs/node/releases"

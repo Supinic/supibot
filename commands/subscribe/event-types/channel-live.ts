@@ -6,11 +6,10 @@ type ChannelsSubData = {
 };
 
 export default {
-	name: "Channel live",
-	aliases: ["live", "online"],
+	title: "Channel live",
+	names: ["live", "online"],
 	notes: "Usage: <code>subscribe/unsubscribe live (channel)</code> When a channel with Supibot in their chat goes live, you will be notified via PMs.",
 	channelSpecificMention: false,
-	generic: false,
 	type: "special",
 	handler: async function (context, subscription, ...args) {
 		const { invocation } = context;

@@ -153,7 +153,7 @@ export default {
 			.select("User_Alias.Name AS name", "Channel AS channel")
 			.from("data", "Event_Subscription")
 			.join("chat_data", "User_Alias")
-			.where("Type = %s", subscriptionDefinition.name)
+			.where("Type = %s", subscriptionDefinition.title)
 			.where("Active = %b", true)
 		);
 
