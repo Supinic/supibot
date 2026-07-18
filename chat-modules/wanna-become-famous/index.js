@@ -39,6 +39,9 @@ export default {
 		else if (msg.includes("ai") && msg.includes("view")) {
 			reason = "vibe coding an audience";
 		}
+		else if (msg.includes("ꜰᴏʟʟᴏᴡ ʏᴏᴜ") || msg.includes("ꜰᴇʟʟᴏᴡ ꜱᴛʀᴇᴀᴍᴇʀ")) {
+			reason = "yoo buddy";
+		}
 		else if (basicRegex.test(msg)) {
 			reason = "no more spam";
 		}
