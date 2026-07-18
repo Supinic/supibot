@@ -11,8 +11,7 @@ const formulaOneCommandDefinition = declare({
 	Flags: ["mention", "pipe"],
 	Params: [
 		{ name: "season", type: "number" },
-		{ name: "year", type: "number" },
-		{ name: "weather", type: "boolean" }
+		{ name: "year", type: "number" }
 	],
 	Whitelist_Response: null,
 	Code: (async function formula1 (context, ...args) {

@@ -32,7 +32,7 @@ export default {
 	],
 	execute: async (context, type, ...rest) => {
 		if (rest.length === 0) {
-			return await fetchNextRaceDetail(context);
+			return await fetchNextRaceDetail();
 		}
 
 		const now = new SupiDate();

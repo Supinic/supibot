@@ -1,13 +1,10 @@
 import { SupiDate, SupiError } from "supi-core";
-import type formulaOneCommandDefinition from "./index.js";
 import { searchYoutube } from "../../utils/command-utils.js";
-
-import type { ExtractContext } from "../../classes/command.js";
-import type { NumericCoordinates } from "../../utils/globals.js";
-import { Owm3WeatherProvider } from "../weather/providers/owm.js";
 import { formatWeatherReport } from "../weather/formatting.js";
+import { openMeteoWeatherProvider } from "../weather/providers/index.js";
+import type { NumericCoordinates } from "../../utils/globals.js";
 
-export const url = "https://api.jolpi.ca/ergast/f1/";
+const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
 const sprintSessionTypes = ["FirstPractice", "SprintQualifying", "Sprint", "Qualifying"] as const;
 type SessionType = (typeof regularSessionTypes)[number] | (typeof sprintSessionTypes)[number];
@@ -64,30 +61,27 @@ type YearResponse = {
 	};
 };
 
-type CommandContext = ExtractContext<typeof formulaOneCommandDefinition>;
-const f1WeatherProvider = new Owm3WeatherProvider();
-
-export const getWeather = async (sessionStart: number, coordinates: NumericCoordinates, place: string) => {
+export const getF1Weather = async (sessionStart: number, coordinates: NumericCoordinates, place: string) => {
 	const now = SupiDate.now();
 	const hourDifference = Math.floor((sessionStart - now) / 36e5);
-	if (hourDifference > (7 * 24)) {
+	if (hourDifference > (14 * 24)) {
 		return "Weather forecast is not yet available.";
 	}
 
 	let result;
 	let prefix: string;
 	if (hourDifference <= 1) {
-		result = await f1WeatherProvider.getCurrent(coordinates);
+		result = await openMeteoWeatherProvider.getCurrent(coordinates);
 		prefix = "Current weather";
 	}
-	else if (hourDifference < 48) {
-		result = await f1WeatherProvider.getHourly(coordinates, hourDifference);
-		prefix = "3-day weather forecast";
+	else if (hourDifference < 72) {
+		result = await openMeteoWeatherProvider.getHourly(coordinates, hourDifference);
+		prefix = "Forecast";
 	}
 	else {
 		const dayDifference = Math.floor(hourDifference / 24);
-		result = await f1WeatherProvider.getDaily(coordinates, dayDifference);
-		prefix = "7-day weather forecast";
+		result = await openMeteoWeatherProvider.getDaily(coordinates, dayDifference);
+		prefix = "Long-term forecast";
 	}
 
 	if ("success" in result) {
@@ -248,7 +242,7 @@ export const fetchRaceResults = async (year: number, round: number) => {
 	return response.body.MRData.RaceTable.Races[0].Results;
 };
 
-export const fetchNextRaceDetail = async (context: CommandContext) => {
+export const fetchNextRaceDetail = async () => {
 	const { year } = new SupiDate();
 	const race = await fetchRace(year, "current");
 	if (!race) {
@@ -304,11 +298,8 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 			nextSessionString += ` is currently underway.`;
 		}
 
-		if (context.params.weather) {
-			const weatherResult = await getWeather(nextSessionStart.valueOf(), coords, race.Circuit.Location.locality);
-
-			nextSessionString += ` ${weatherResult}`;
-		}
+		const weatherResult = await getF1Weather(nextSessionStart.valueOf(), coords, race.Circuit.Location.locality);
+		nextSessionString += ` ${weatherResult}`;
 	}
 
 	let raceString: string;
@@ -325,10 +316,8 @@ export const fetchNextRaceDetail = async (context: CommandContext) => {
 		});
 	}
 
-	if (context.params.weather) {
-		const weatherResult = await getWeather(raceStart.valueOf(), coords, race.Circuit.Location.locality);
-		raceString += ` ${weatherResult}`;
-	}
+	const weatherResult = await getF1Weather(raceStart.valueOf(), coords, race.Circuit.Location.locality);
+	raceString += ` ${weatherResult}`;
 
 	return {
 		reply: core.Utils.tag.trim `
