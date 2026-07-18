@@ -18,6 +18,7 @@ const rssDefinitionSchema = z.object({
 	url: z.string(),
 	channelSpecificMention: z.boolean().optional(),
 	cronExpression: z.string().optional(),
+	emote: z.string().optional(),
 	item: z.string().optional(),
 	options: z.object({
 		ignoredCategories: z.array(z.string().lowercase()).min(1)

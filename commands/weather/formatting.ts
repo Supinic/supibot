@@ -10,6 +10,7 @@ export const WEATHER_FORMAT_KEYS = [
 	"pressure",
 	"sun",
 	"temperature",
+	"apparentTemperature",
 	"windGusts",
 	"windSpeed"
 ] as const;
@@ -37,15 +38,17 @@ type WeatherFormatMeta = {
 	hiddenLocation?: boolean;
 };
 
-const formatTemperature = (report: Report) => {
-	if (report.kind === "daily") {
-		return `${report.temperature.min}°C to ${report.temperature.max}°C.`;
+const formatTemperature = (report: Report, type: "real" | "apparent") => {
+	if (type === "real") {
+		return (report.kind === "daily")
+			? `${report.temperature.min}°C to ${report.temperature.max}°C.`
+			: `${report.temperature.actual}°C.`;
 	}
-
-	const actual = `${report.temperature.actual}°C`;
-	return (typeof report.temperature.feelsLike === "number")
-		? `${actual}, feels like ${report.temperature.feelsLike}°C.`
-		: `${actual}.`;
+	else {
+		return (report.kind !== "daily" && typeof report.temperature.feelsLike === "number")
+			? `Feels like ${report.temperature.feelsLike}°C.`
+			: "";
+	}
 };
 const formatCloudCover = (report: Report) => (typeof report.cloudCover === "number") ? `Cloud cover: ${report.cloudCover}%.` : "";
 const formatHumidity = (report: Report) => (typeof report.humidity === "number") ? `Humidity: ${report.humidity}%.` : "";
@@ -146,7 +149,8 @@ const formatReportTime = (report: Report) => {
 const createWeatherFormatObject = (report: Report, meta: WeatherFormatMeta): WeatherFormatObject => ({
 	place: (meta.hiddenLocation) ? "(location hidden)" : meta.place,
 	icon: report.condition.icon ?? "",
-	temperature: formatTemperature(report),
+	temperature: formatTemperature(report, "real"),
+	apparentTemperature: formatTemperature(report, "apparent"),
 	cloudCover: formatCloudCover(report),
 	humidity: formatHumidity(report),
 	pressure: formatPressure(report),
@@ -183,7 +187,7 @@ export const formatWeatherReport = (report: Report, options: WeatherFormatOption
 		formatted: core.Utils.tag.trim `
 			${obj.place} ${formatReportTime(report)}:
 			${obj.icon}
-			${obj.temperature}
+			${obj.temperature} ${obj.apparentTemperature}
 			${obj.cloudCover}
 			${obj.windSpeed} ${obj.windGusts}
 			${obj.humidity}
