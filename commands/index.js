@@ -159,7 +159,6 @@ import TranslateCommand from "./translate/index.js";
 import TransliterateCommand from "./transliterate/index.js";
 import TuckCommand from "./tuck/index.js";
 import TwitchLottoCommand from "./twitchlotto/index.js";
-import TwitchLottoExplainCommand from "./twitchlottoexplain/index.js";
 import TwitterCommand from "./twitter/index.js";
 import UnmentionCommand from "./unmention/index.js";
 import UnpingCommand from "./unping/index.js";
@@ -338,7 +337,6 @@ export default [
 	TransliterateCommand,
 	TuckCommand,
 	TwitchLottoCommand,
-	TwitchLottoExplainCommand,
 	TwitterCommand,
 	UnmentionCommand,
 	UnpingCommand,
