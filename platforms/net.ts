@@ -30,6 +30,7 @@ const exitCommands = new Set(["exit", "quit"]);
 export class NetPlatform extends Platform<NetConfig> {
 	private server: Server | null = null;
 	private clients = new Map<User, NetClient>();
+	public readonly debug = true;
 
 	constructor (config: NetConfig) {
 		super("net", NetConfigSchema.parse(config));

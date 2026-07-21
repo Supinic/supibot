@@ -337,7 +337,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	#websocketLatency: number | null = null;
 	#unsuccessfulRenameChannels = new Set();
 
-	public readonly debug = TwitchUtils;
+	public readonly debugUtils = TwitchUtils;
 	private client: WebSocket | null = null;
 
 	constructor (config: TwitchConfig) {

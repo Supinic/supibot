@@ -715,8 +715,11 @@ export class Command extends TemplateWithoutId {
 		// If skipPending flag is set, do not set the pending status at all.
 		// Used in pipe command, for instance.
 		// Administrators are not affected by Pending - this is expected to be used for debugging.
+		// Same for debug-only platforms, no cooldown applies in those.
 		const isAdmin = await userData.getDataProperty("administrator") as boolean;
-		if (!options.skipPending && !isAdmin) {
+		const isDebugPlatform = platformData.debug;
+
+		if (!options.skipPending && !isAdmin && !isDebugPlatform) {
 			const sourceName = channelData?.Name ?? `${platformData.name} PMs`;
 			Command.#cooldownManager.setPending(
 				userData.ID,
@@ -966,7 +969,7 @@ export class Command extends TemplateWithoutId {
 			}
 			else {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
-				const reply = (channelHasFullErrorMessage)
+				const reply = (channelHasFullErrorMessage ?? isDebugPlatform)
 					? `Error ID ${errorID} - ${e.message}`
 					: `${configResponses.commandErrorResponse} (error ID ${errorID})`;
 
@@ -989,7 +992,10 @@ export class Command extends TemplateWithoutId {
 			};
 		}
 
-		Command.handleCooldown(channelData, userData, command, execution.cooldown, identifier);
+		// Don't set cooldowns in debug-only platforms to ease testing
+		if (!isDebugPlatform) {
+			Command.handleCooldown(channelData, userData, command, execution.cooldown, identifier);
+		}
 
 		if (typeof execution.reply !== "string" && !execution.partialReplies) {
 			return execution;

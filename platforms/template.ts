@@ -54,6 +54,7 @@ export type GenericSendOptions = Record<string, unknown>;
 
 export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public readonly name: string;
+	public readonly debug: boolean = false;
 
 	public readonly ID: T["ID"];
 	public readonly host: T["host"];
