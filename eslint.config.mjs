@@ -253,6 +253,7 @@ export default tseslint.config(
 			"@stylistic/no-extra-semi": "warn",
 			"@stylistic/no-mixed-operators": "warn",
 			"@stylistic/no-mixed-spaces-and-tabs": "warn",
+			"@stylistic/no-multiple-empty-lines": ["warn", { max: 1 }],
 			"@stylistic/no-multi-spaces": "warn",
 			"@stylistic/semi": "warn",
 		}
