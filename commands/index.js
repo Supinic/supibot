@@ -47,7 +47,6 @@ import DownloadClipCommand from "./downloadclip/index.js";
 import EpalCommand from "./epal/index.js";
 import EspnCommand from "./espn/index.js";
 import ExternalBotCommand from "./externalbot/index.js";
-import FaceItCommand from "./faceit/index.js";
 import FakeNewsCommand from "./fakenews/index.js";
 import FaqCommand from "./faq/index.js";
 import FillCommand from "./fill/index.js";
@@ -224,7 +223,6 @@ export default [
 	EpalCommand,
 	EspnCommand,
 	ExternalBotCommand,
-	FaceItCommand,
 	FakeNewsCommand,
 	FaqCommand,
 	FillCommand,
