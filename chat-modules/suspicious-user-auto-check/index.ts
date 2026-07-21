@@ -123,6 +123,7 @@ export default {
 			const resultMessage = core.Utils.tag.trim `
 				Hey @${raw.user}, I'd like to verify whether ${hintMessage}
 				Use the "Reply to message" Twitch function to this message with "me" or "not me" accordingly.
+				How to reply: https://kappa.lol/XkY0rB
 			`;
 
 			const messageResult = await (platform as TwitchPlatform).send(resultMessage, channel);
