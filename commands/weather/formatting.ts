@@ -137,7 +137,8 @@ const formatSun = (report: Report, meta: WeatherFormatMeta) => {
 };
 const formatReportTime = (report: Report) => {
 	if (report.kind === "current") {
-		return "(now)";
+		const delta = core.Utils.timeDelta(report.timestamp);
+		return `(${delta})`;
 	}
 	if (report.kind === "hourly") {
 		return `(${report.time} local time)`;

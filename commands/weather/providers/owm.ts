@@ -193,7 +193,7 @@ const getOwm4CacheKey = (coords: NumericCoordinates, report: WeatherReportType) 
 const parseCommonReportFields = (item: BaseDataItem) => {
 	const status = item.weather?.[0];
 	return {
-		timestamp: item.dt,
+		timestamp: (item.dt * 1000),
 		humidity: item.humidity,
 		cloudCover: item.clouds,
 		pressure: item.pressure,
