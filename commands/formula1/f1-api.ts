@@ -1,4 +1,6 @@
+import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
+
 import { searchYoutube } from "../../utils/command-utils.js";
 import { formatWeatherReport } from "../weather/formatting.js";
 import { openMeteoWeatherProvider } from "../weather/providers/index.js";
@@ -97,6 +99,39 @@ export const getF1Weather = async (sessionStart: number, coordinates: NumericCoo
 	return `${prefix}: ${formatted}`;
 };
 
+const formulaOneSessionInfoShape = z.object({
+	Type: z.string(),
+	Path: z.string(),
+	StartDate: z.string()
+});
+const formulaOneStatusShape = z.object({
+	Status: z.string()
+});
+
+const fetchOfficalRaceStatusFinished = async (race: Race): Promise<boolean | null> => {
+	const cacheBust = Math.floor(SupiDate.now() / 15_000);
+	const sessionResponse = await core.Got.get("GenericAPI")({
+		url: `https://livetiming.formula1.com/static/SessionInfo.json?v=${cacheBust}`,
+		responseType: "text"
+	});
+
+	// The LiveTiming Formula One API returns JSON with a leading BOM -> `trim()` call gets rid of it
+	const cleanedSessionBody = sessionResponse.body.trim();
+	const session = formulaOneSessionInfoShape.parse(JSON.parse(cleanedSessionBody));
+	if (session.Type !== "Race" || session.StartDate.slice(0, 10) !== race.date) {
+		return null;
+	}
+
+	const statusResponse = await core.Got.get("GenericAPI")({
+		url: `https://livetiming.formula1.com/static/${session.Path}SessionStatus.json?v=${cacheBust}`,
+		responseType: "text"
+	});
+
+	const cleanedStatusBody = statusResponse.body.trim();
+	const data = formulaOneStatusShape.parse(JSON.parse(cleanedStatusBody));
+	return (data.Status === "Finished" || data.Status === "Finalised" || data.Status === "Ends");
+};
+
 export async function fetchRace (year: number, searchType: "current"): Promise<Race | null>;
 export async function fetchRace (year: number, searchType: "index", searchValue: number): Promise<Race | null>;
 export async function fetchRace (year: number, searchType: "name", searchValue: string): Promise<Race | null>;
@@ -117,17 +152,30 @@ export async function fetchRace (year: number, searchType: string, searchValue?:
 		let resultRace;
 
 		for (const race of races) {
-			const raceDate = (race.time)
+			const raceStart = (race.time)
 				? new SupiDate(`${race.date} ${race.time}`)
 				: new SupiDate(race.date);
 
-			// Add 2 hours to compensate for the race being underway
-			raceDate.addHours(2);
-
-			if (now < raceDate) {
+			if (now < raceStart) {
 				resultRace = race;
 				break;
 			}
+
+			// Check whether at least 3 hours passed since the start (the maximum racing window limit)
+			const paddedEnd = raceStart.clone().addHours(3);
+			if (now >= paddedEnd) {
+				// More time passed - skip this race and continue
+				continue;
+			}
+
+			// Range of <race start, race start + 3 hours> - check whether the race is still officially running
+			const raceFinished = await fetchOfficalRaceStatusFinished(race);
+			if (raceFinished === true) {
+				continue; // Race is labelled as finished in the F1 API - skip and continue
+			}
+
+			resultRace = race;
+			break;
 		}
 
 		return resultRace ?? null;
