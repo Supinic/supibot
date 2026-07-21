@@ -120,7 +120,6 @@ import RandomPastebinCommand from "./randompastebin/index.js";
 import RandomSadCatCommand from "./randomsadcat/index.js";
 import RandomScpCommand from "./randomscp/index.js";
 import RandomWordCommand from "./randomword/index.js";
-import RecordCommand from "./record/index.js";
 import ReloadCommand from "./reload/index.js";
 import RemindCommand from "./remind/index.js";
 import RestartCommand from "./restart/index.js";
@@ -300,7 +299,6 @@ export default [
 	RandomSadCatCommand,
 	RandomScpCommand,
 	RandomWordCommand,
-	RecordCommand,
 	ReloadCommand,
 	RemindCommand,
 	RestartCommand,
