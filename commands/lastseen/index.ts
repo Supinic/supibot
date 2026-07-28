@@ -1,12 +1,13 @@
 import { logger } from "../../singletons/logger.js";
+import { declare } from "../../classes/command.js";
+import type { SupiDate } from "supi-core";
 
-export default {
+export default declare({
 	Name: "lastseen",
 	Aliases: ["ls"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "For a given user, this command tells you when they were last seen - based on their chat activity.",
-	Flags: ["block","mention","opt-out","pipe"],
+	Flags: ["block", "mention", "opt-out", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
 	Code: (async function lastSeen (context, user) {
@@ -22,11 +23,11 @@ export default {
 		if (!targetUser) {
 			return {
 				success: false,
-				reply: "User not found in the database!"
+				reply: "I have not seen that user before!"
 			};
 		}
 		else if (targetUser.ID === context.user.ID && context.channel) {
-			// Only post the "easter egg" message if used on the executing user in a channel chat
+			// Only post the "Easter egg" message if used on the executing user in a channel chat
 			const emote = await context.randomEmote("PepeLaugh", "pepeLaugh", "LULW", "LuL", "😆");
 			return {
 				success: false,
@@ -41,9 +42,9 @@ export default {
 			};
 		}
 
-		let date = logger.getUserLastSeen(targetUser.ID);
+		let date: SupiDate | undefined | null = logger.getUserLastSeen(targetUser.ID);
 		if (!date) {
-			date = await core.Query.getRecordset(rs => rs
+			const databaseDate = await core.Query.getRecordset<SupiDate | undefined>(rs => rs
 				.select("Last_Message_Posted AS Date")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", targetUser.ID)
@@ -52,23 +53,24 @@ export default {
 				.single()
 				.flat("Date")
 			);
-		}
-		if (!date) {
-			return {
-				reply: core.Utils.tag.trim `
-					That user is in the database, but never showed up in chat.
-					They were first spotted ${core.Utils.timeDelta(targetUser.Started_Using)}.
-				`
-			};
+			if (!databaseDate) {
+				return {
+					success: true,
+					reply: core.Utils.tag.trim `
+						I have seen this user appear, but they never showed up in chat.
+						They were first spotted ${core.Utils.timeDelta(targetUser.Started_Using)}.
+					`
+				};
+			}
+
+			date = databaseDate;
 		}
 
-		const who = (context.user === targetUser)
-			? "You were"
-			: "That user was";
-
+		const who = (context.user === targetUser) ? "You were" : "That user was";
 		return {
+			success: true,
 			reply: `${who} last seen in chat ${core.Utils.timeDelta(date)}.`
 		};
 	}),
 	Dynamic_Description: null
-};
+});
