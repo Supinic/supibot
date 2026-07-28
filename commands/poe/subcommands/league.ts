@@ -64,7 +64,7 @@ export default {
 			const launchDate = new SupiDate(launch);
 
 			if (revealDate && revealDate.valueOf() > now) {
-				result.push(`The ${formatLeagueName(nextLeague)} league will be revealed ${core.Utils.timeDelta(revealDate)}.`);
+				result.push(`The ${name} league will be revealed ${core.Utils.timeDelta(revealDate)}.`);
 			}
 			else if (launchDate.valueOf() > now) {
 				result.push(`The ${name} league will start ${core.Utils.timeDelta(launchDate)}.`);
@@ -78,6 +78,9 @@ export default {
 				else {
 					result.push(`The ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`);
 				}
+			}
+			else {
+				result.push(`The ${name} league has launched - go and play.`);
 			}
 		}
 
