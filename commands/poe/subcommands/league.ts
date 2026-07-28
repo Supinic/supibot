@@ -68,7 +68,7 @@ export default {
 			else if (launchDate.valueOf() > now) {
 				result.push(`The ${patch} ${name ?? ""} league will start ${core.Utils.timeDelta(launchDate)}.`);
 			}
-			else {
+			else if (invocation === "poe") { // Only apply the 4 months runtime estimate for PoE 1 leagues (for now)
 				const possibleEnd = launchDate.clone().addMonths(4);
 				if (possibleEnd.valueOf() > now) {
 					const delta = core.Utils.timeDelta(possibleEnd, true);
