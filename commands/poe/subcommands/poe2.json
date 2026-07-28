@@ -1,0 +1,39 @@
+{
+  "leagues": [
+    {
+      "patch": "0.1",
+      "name": "Early Access",
+      "reveal": null,
+      "launch": "2024-12-07",
+      "end": "2025-04-02"
+    },
+    {
+      "patch": "0.2",
+      "name": "Dawn of the Hunt",
+      "reveal": null,
+      "launch": "2025-04-05",
+      "end": "2025-08-27"
+    },
+    {
+      "patch": "0.3",
+      "name": "Rise of the Abyssal",
+      "reveal": null,
+      "launch": "2025-08-30",
+      "end": "2025-12-09"
+    },
+    {
+      "patch": "0.4",
+      "name": "Fate of the Vaal",
+      "reveal": null,
+      "launch": "2025-12-13",
+      "end": "2026-05-27"
+    },
+    {
+      "patch": "0.5",
+      "name": "Runes of Aldur",
+      "reveal": null,
+      "launch": "2026-05-30",
+      "end": null
+    }
+  ]
+}
