@@ -58,24 +58,25 @@ export default {
 			: leagues.find(i => !i.end || new SupiDate(i.end).valueOf() > now);
 
 		if (nextLeague) {
-			const { name, patch, reveal, launch } = nextLeague;
+			const { reveal, launch } = nextLeague;
+			const name = formatLeagueName(nextLeague);
 			const revealDate = (reveal) ? new SupiDate(reveal) : null;
 			const launchDate = new SupiDate(launch);
 
 			if (revealDate && revealDate.valueOf() > now) {
-				result.push(`The ${patch} ${name ?? ""} league will be revealed ${core.Utils.timeDelta(revealDate)}.`);
+				result.push(`The ${formatLeagueName(nextLeague)} league will be revealed ${core.Utils.timeDelta(revealDate)}.`);
 			}
 			else if (launchDate.valueOf() > now) {
-				result.push(`The ${patch} ${name ?? ""} league will start ${core.Utils.timeDelta(launchDate)}.`);
+				result.push(`The ${name} league will start ${core.Utils.timeDelta(launchDate)}.`);
 			}
 			else if (invocation === "poe") { // Only apply the 4 months runtime estimate for PoE 1 leagues (for now)
 				const possibleEnd = launchDate.clone().addMonths(4);
 				if (possibleEnd.valueOf() > now) {
 					const delta = core.Utils.timeDelta(possibleEnd, true);
-					result.push(`The ${patch} ${name} league has launched - go and play. It will last for roughly ${delta}.`);
+					result.push(`The ${name} league has launched - go and play. It will last for roughly ${delta}.`);
 				}
 				else {
-					result.push(`The ${patch} ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`);
+					result.push(`The ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`);
 				}
 			}
 		}
