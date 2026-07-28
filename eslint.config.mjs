@@ -199,6 +199,7 @@ export default tseslint.config(
 			"unicorn/prefer-date-now": "warn",
 			"unicorn/prefer-includes": "warn",
 			"unicorn/prefer-math-trunc": "warn",
+			"unicorn/prefer-number-is-safe-integer": "warn",
 			"unicorn/prefer-string-starts-ends-with": "warn",
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",

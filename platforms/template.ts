@@ -84,7 +84,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 				message: "Platform ID must be configured"
 			});
 		}
-		else if (!Number.isInteger(this.ID)) {
+		else if (!Number.isSafeInteger(this.ID)) {
 			throw new SupiError({
 				message: "Platform ID must be an integer"
 			});
@@ -115,7 +115,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			});
 		}
 
-		if (!Number.isInteger(this.messageLimit) || this.messageLimit <= 0) {
+		if (!Number.isSafeInteger(this.messageLimit) || this.messageLimit <= 0) {
 			throw new SupiError({
 				message: "Invalid Platform property: messageLimit",
 				args: { id: this.id, name: this.name, messageLimit: this.messageLimit }

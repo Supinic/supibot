@@ -6,17 +6,17 @@
     "@jprochazk/roll-dice": "^0.4.2",
     "acorn-node": "^2.0.1",
     "async-markov": "supinic/async-markov",
-    "chrono-node": "^2.9.1",
+    "chrono-node": "^2.10.1",
     "cron": "^4.4.0",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "14.26.4",
+    "discord.js": "14.27.0",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.6.1",
     "vm2": "^3.11.5",
-    "ws": "^8.21.0",
+    "ws": "^8.21.1",
     "zod": "^4.4.3"
   },
   "engines": {
@@ -45,12 +45,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "eslint": "^10.5.0",
-    "eslint-plugin-unicorn": "^67.0.0",
-    "globals": "^17.6.0",
+    "eslint": "^10.7.0",
+    "eslint-plugin-unicorn": "^72.0.0",
+    "globals": "^17.7.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.1"
+    "typescript-eslint": "^8.65.0"
   },
   "nyc": {
     "all": false,

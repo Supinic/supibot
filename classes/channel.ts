@@ -148,7 +148,7 @@ export class Channel extends TemplateWithId {
 	getFullName () {
 		if (this.Platform.Name === "discord") {
 			if (this.Description) {
-				const [guild] = this.Description.split("-");
+				const [guild] = this.Description.split("-", 1);
 				return `${this.Platform.Name}-${guild.trim()}`;
 			}
 			else {

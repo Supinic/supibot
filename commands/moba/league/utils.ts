@@ -332,7 +332,7 @@ export const parseUserIdentifier = async (context: Context, regionName?: string,
 	let gameName;
 	let tagLine;
 	if (identifier.includes("#")) {
-		[gameName, tagLine] = identifier.split("#");
+		[gameName, tagLine] = identifier.split("#", 2);
 	}
 	else {
 		gameName = identifier;

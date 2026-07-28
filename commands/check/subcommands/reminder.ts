@@ -15,7 +15,6 @@ export default {
 		`Check the status and info of a reminder created by you or for you. You can use "last" instead of an ID to check the last one you made.`,
 		"",
 
-
 		`<code>${prefix}check reminder last</code>`,
 		`Checks the last reminder you've created.`
 	],

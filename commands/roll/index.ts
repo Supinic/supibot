@@ -31,7 +31,7 @@ export default declare({
 
 		const firstNum = Number(args[0]);
 		const secondNum = Number(args[1]);
-		if (args[0] && args[1] && Number.isInteger(firstNum) && Number.isInteger(secondNum)) {
+		if (args[0] && args[1] && Number.isSafeInteger(firstNum) && Number.isSafeInteger(secondNum)) {
 			if (firstNum > Number.MAX_SAFE_INTEGER || secondNum > Number.MAX_SAFE_INTEGER) {
 				return {
 					success: false,
@@ -61,7 +61,7 @@ export default declare({
 			}
 		}
 
-		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/);
+		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/, 1);
 		const hexStringSeed = randomBytes(64).toString("hex");
 		const seed = BigInt(`0x${hexStringSeed}`);
 

@@ -99,7 +99,7 @@ export default declare({
 				};
 			}
 			else if (nullCommand && commandData.Flags.includes("non-nullable") && invocations[i + 1]) {
-				const [nextCommandString] = invocations[i + 1].split(" ");
+				const [nextCommandString] = invocations[i + 1].split(" ", 1);
 				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
 				if (nextCommand && nextCommand.Name === nullCommand.Name) {
 					return {

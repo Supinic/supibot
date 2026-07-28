@@ -151,7 +151,7 @@ export default declare({
 		const link = `https://supinic.com/data/origin/detail/${data.ID}`;
 
 		let type;
-		const [provider, providerType = ""] = data.type.split(" - ");
+		const [provider, providerType = ""] = data.type.split(" - ", 2);
 		if (data.type === "Twitch - Bits" && data.tier !== null) {
 			const thousandBits = Number(data.tier) / 1000;
 			type = `${thousandBits}k bits ${provider}`;

@@ -1231,7 +1231,7 @@ export class Command extends TemplateWithoutId {
 			}
 
 			case "object": {
-				const [key, outputValue] = value.split("=");
+				const [key, outputValue] = value.split("=", 2);
 				return { key, value: outputValue };
 			}
 

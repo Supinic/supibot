@@ -61,7 +61,7 @@ export const getWeatherLocation = async (context: Context, args: readonly string
 			let temperature;
 			try {
 				const result = await shell("vcgencmd measure_temp");
-				const temperatureMatch = result.stdout.toString().match(/([\d.]+)/);
+				const temperatureMatch = result.stdout.match(/([\d.]+)/);
 				if (temperatureMatch) {
 					temperature = `${temperatureMatch[1]}°C`;
 				}

@@ -265,7 +265,7 @@ export class LoggerSingleton {
 			return;
 		}
 
-		const [parentTag, childTag = null] = tag.split(".");
+		const [parentTag, childTag = null] = tag.split(".", 2);
 		const row = await core.Query.getRow("chat_data", "Log");
 
 		row.setValues({

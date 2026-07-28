@@ -28,7 +28,6 @@ export default {
 			.replaceAll(".", "")
 			.trim();
 
-
 		const word = $("div#definition-word").text();
 		if (context.params.wordOnly) {
 			return {
