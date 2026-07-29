@@ -22,6 +22,7 @@ export default declare({
 				.select("Bot_Alias AS ID", "Prefix as prefix")
 				.from("bot_data", "Bot")
 				.where("Prefix IS NOT NULL")
+				.where("Active = %b", true)
 				.orderBy("LENGTH(Prefix) DESC")
 			);
 		}
