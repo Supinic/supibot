@@ -4,7 +4,7 @@ import { TemplateWithoutId } from "./template.js";
 import { Channel, type Like as ChannelLike } from "./channel.js";
 
 import type { User } from "./user.js";
-import { Platform } from "../platforms/template.js";
+import { Platform, type Like as PlatformLike } from "../platforms/template.js";
 import type { SimpleGenericData, XOR } from "../utils/globals.js";
 import type { TwitchPlatform } from "../platforms/twitch.js";
 import type { MessageNotification as TwitchMessageNotification } from "../platforms/twitch-utils.js";
@@ -13,7 +13,7 @@ type TwitchMessageData = TwitchMessageNotification["payload"]["event"];
 
 export type ChatModuleDefinition = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
 	Description: string | null;
-	Platform: Platform["ID"] | null;
+	Platform: PlatformLike | null;
 };
 
 export type Event = "message" | "online" | "offline" | "raid" | "subscription";
@@ -59,7 +59,6 @@ export type TwitchMessageEventData = GenericMessageEventData & {
 
 type EventData = GenericMessageEventData | TwitchMessageEventData; // @todo expand for other event types
 
-type PlatformLike = number | string | Platform; // @todo move to Platform
 type PlatformOption = {
 	platform: PlatformLike | PlatformLike[];
 };
