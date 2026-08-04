@@ -1,5 +1,6 @@
 import type { CronDefinition } from "../index.js";
 import { logger } from "../../singletons/logger.js";
+import { CHANNEL_LIVE_SUBSCRIPTION_TITLE } from "../../commands/subscribe/event-types/channel-live.js";
 
 type SubscriptionRow = {
 	ID: number;
@@ -39,7 +40,7 @@ export default {
 		const subscriptions = await core.Query.getRecordset<SubTableData[]>(rs => rs
 			.select("ID", "User_Alias")
 			.from("data", "Event_Subscription")
-			.where("Type NOT IN %s+", ["Suggestion", "Channel live"])
+			.where("Type NOT IN %s+", ["Suggestion", CHANNEL_LIVE_SUBSCRIPTION_TITLE])
 			.where("Active = %b", true)
 			// this should technically check other platforms but is so infrequent it's probably not worth it
 			.where("Platform = %n", twitch.ID)

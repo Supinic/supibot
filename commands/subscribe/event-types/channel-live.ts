@@ -5,8 +5,10 @@ type ChannelsSubData = {
 	channels?: Channel["ID"][];
 };
 
+export const CHANNEL_LIVE_SUBSCRIPTION_TITLE = "Channel live";
+
 export default {
-	title: "Channel live",
+	title: CHANNEL_LIVE_SUBSCRIPTION_TITLE,
 	names: ["live", "online"],
 	notes: "Usage: <code>subscribe/unsubscribe live (channel)</code> When a channel with Supibot in their chat goes live, you will be notified via PMs.",
 	channelSpecificMention: false,
@@ -19,7 +21,7 @@ export default {
 					User_Alias: context.user.ID,
 					Channel: null,
 					Platform: context.platform.ID,
-					Type: "Channel live",
+					Type: CHANNEL_LIVE_SUBSCRIPTION_TITLE,
 					Data: "{}",
 					Active: true
 				});
