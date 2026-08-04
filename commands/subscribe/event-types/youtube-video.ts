@@ -14,7 +14,7 @@ export const YOUTUBE_VIDEO_SUBSCRIPTION_TITLE = "YouTube video";
 export default {
 	title: YOUTUBE_VIDEO_SUBSCRIPTION_TITLE,
 	names: ["youtube-video"],
-	notes: "Usage: <code>subscribe/unsubscribe youtube-video (channel handle)</code> When the given YouTube channel uploads a new video, you will be reminded. Can support multiple.",
+	notes: "Usage: <code>subscribe/unsubscribe youtube-video (channel handle)</code> When the given YouTube channel uploads a new video, Supibot will PM you with the news. Can support multiple.",
 	channelSpecificMention: false,
 	type: "special",
 	handler: async function (context, subscription, ...args) {
@@ -83,7 +83,7 @@ export default {
 			}
 			else {
 				data.channels.push({ handle, id: channelId });
-				response = `Successfully subscribed to ${handle}. You're now subscribed to ${channelIds.size + 1} YouTube channel(s).`;
+				response = `Successfully subscribed to ${handle}. You will be PM'd when a new video is uploaded. You're now subscribed to ${channelIds.size + 1} YouTube channel(s).`;
 			}
 		}
 		else {
