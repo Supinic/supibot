@@ -19,9 +19,9 @@ type ConfirmedYtChannelSubData = {
 
 export default {
 	name: "youtube-rss-video-checker",
-	expression: "0 */10 * * * *",
+	expression: "0 */5 * * * *",
 	description: "Works in tandem with the `youtube-video` subscription to check for new YouTube videos and announce them for subscribed users.",
-	code: (async function yoinkSoundcloudClientID () {
+	code: (async function fetchYoutubeRssVideos () {
 		const subs = await core.Query.getRecordset<SubData[]>(rs => rs
 			.select("User_Alias as userId", "Data as rawData", "Platform as platform")
 			.from("data", "Event_Subscription")
@@ -88,7 +88,7 @@ export default {
 				continue;
 			}
 
-			const newItems = items.filter(i => new SupiDate(i.isoDate).valueOf() >= latestCachePublish);
+			const newItems = items.filter(i => new SupiDate(i.isoDate).valueOf() > latestCachePublish);
 			if (newItems.length === 0) {
 				continue;
 			}
