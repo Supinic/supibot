@@ -55,11 +55,14 @@ export default {
 
 		const updatedChannels = new Set<string>();
 		const channelVideosMap = new Map<string, string[]>();
+		const ts = SupiDate.now() % 15;
+
 		for (const channelId of uniqueChannelIds) {
 			const response = await core.Got.get("GenericAPI")({
 				url: `https://www.youtube.com/feeds/videos.xml`,
 				searchParams: {
-					channel_id: channelId
+					channel_id: channelId,
+					ts
 				},
 				responseType: "text",
 				timeout: {
@@ -143,7 +146,8 @@ export default {
 				});
 			}
 
-			await platform.pm(userStrings.join(" -- "), userData, null);
+			const content = userStrings.join(" -- ");
+			await platform.pm(`New YouTube video(s)! ${content}`, userData, null);
 		}
 	})
 } satisfies CronDefinition;
