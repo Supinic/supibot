@@ -9,6 +9,7 @@ import GlobalTwitchEmotesDefinition from "./global-twitch-emotes.js";
 import NodeSubDefinition from "./nodejs.js";
 import OsrsSubDefinition from "./osrs.js";
 import SuggestionSubDefinition from "./suggestion.js";
+import YoutubeVideoSubDefinition from "./youtube-video.js";
 
 import rawRssDefinitions from "./rss-definitions.json" with { type: "json" };
 
@@ -38,6 +39,7 @@ const definitions = [
 	NodeSubDefinition,
 	OsrsSubDefinition,
 	SuggestionSubDefinition,
+	YoutubeVideoSubDefinition,
 	...rssDefinitions
 ] satisfies EventDefinition[];
 

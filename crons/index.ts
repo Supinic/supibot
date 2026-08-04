@@ -15,6 +15,7 @@ import SuggestionNotificator from "./suggestion-notification-system/index.js";
 import SupinicAdvertiser from "./supinic-advert/index.js";
 import TitlechangeBotAnnouncer from "./supinic-tcb/index.js";
 import SoundcloudClientIdFetcher from "./yoink-soundcloud-client-id/index.js";
+import YoutubeRssVideoChecker from "./youtube-rss-video-checker/index.js";
 
 const definitions = [
 	ActiveChattersLog,
@@ -31,7 +32,8 @@ const definitions = [
 	StreamSilencePreventer,
 	SupinicAdvertiser,
 	TitlechangeBotAnnouncer,
-	SoundcloudClientIdFetcher
+	SoundcloudClientIdFetcher,
+	YoutubeRssVideoChecker
 ];
 
 export type CronDefinition = {

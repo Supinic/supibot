@@ -645,6 +645,42 @@ export const fetchYoutubePlaylist = async (options: YoutubePlaylistOptions): Pro
 	};
 };
 
+const channelSchema = z.object({
+	items: z.array(z.object({
+		id: z.string()
+	})).optional()
+});
+export const fetchYoutubeChannelId = async (handle: string): Promise<string | null> => {
+	if (!process.env.API_GOOGLE_YOUTUBE) {
+		throw new SupiError({
+			message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+		});
+	}
+
+	const response = await core.Got.get("GenericAPI")({
+		url: "https://www.googleapis.com/youtube/v3/channels",
+		searchParams: {
+			part: "id",
+			key: process.env.API_GOOGLE_YOUTUBE,
+			forHandle: handle
+		},
+		throwHttpErrors: false,
+		responseType: "json"
+	});
+
+	if (!response.ok) {
+		return null;
+	}
+
+	const { items = [] } = channelSchema.parse(response.body);
+	const item = items.at(0);
+	if (!item) {
+		return null;
+	}
+
+	return item.id;
+};
+
 type TwitchGameDetail = {
 	box_art_url: string;
 	id: string;
