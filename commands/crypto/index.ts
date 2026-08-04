@@ -12,6 +12,11 @@ const cryptoSchema = z.record(
 	})
 );
 
+const commonSymbolsMap = new Map<string, string>([
+	["BTC", "bitcoin"],
+	["ETH", "ethereum"]
+]);
+
 export default declare({
 	Name: "crypto",
 	Aliases: null,
@@ -21,19 +26,22 @@ export default declare({
 	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function crypto (context, symbol = "btc") {
+	Code: (async function crypto (context, input = "bitcoin") {
 		if (!process.env.API_CRYPTO_GECKO) {
 			throw new SupiError({
 				message: "No CryptoCompare key configured (API_CRYPTO_GECKO)"
 			});
 		}
 
-		symbol = symbol.toUpperCase();
+		input = input.toUpperCase();
+		const name = commonSymbolsMap.get(input) ?? input;
 
 		const response = await core.Got.get("GenericAPI")({
 			url: "https://api.coingecko.com/api/v3/simple/price",
 			searchParams: {
-				symbols: symbol,
+				ids: name,
+				symbols: name,
+				names: name,
 				vs_currencies: "USD,EUR"
 			},
 			headers: {
@@ -63,7 +71,7 @@ export default declare({
 			try {
 				const response = await core.Got.get("Global")({
 					method: "HEAD",
-					url: `https://www.coindesk.com/price/${symbol.toLowerCase()}`,
+					url: `https://www.coindesk.com/price/${input.toLowerCase()}`,
 					throwHttpErrors: false,
 					timeout: {
 						request: 10_000
@@ -90,14 +98,14 @@ export default declare({
 		}
 
 		const link = (url)
-			? `Check recent history for ${symbol} here: ${url}`
+			? `Check recent history for ${input} here: ${url}`
 			: "";
 
 		const usd = (data.usd) ? `$${data.usd}` : "";
 		const eur = (data.eur) ? `€${data.eur}` : "";
 		return {
 			success: true,
-			reply: `Current price of ${symbol}: ${usd} ${eur} ${link}`,
+			reply: `Current price of ${input}: ${usd} ${eur} ${link}`,
 			removeEmbeds: true
 		};
 	}),
