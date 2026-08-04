@@ -651,9 +651,17 @@ const channelSchema = z.object({
 	})).optional()
 });
 export const fetchYoutubeChannelId = async (handle: string): Promise<string | null> => {
+	if (!process.env.API_GOOGLE_YOUTUBE) {
+		throw new SupiError({
+			message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+		});
+	}
+
 	const response = await core.Got.get("GenericAPI")({
 		url: "https://www.googleapis.com/youtube/v3/channels",
 		searchParams: {
+			part: "id",
+			key: process.env.API_GOOGLE_YOUTUBE,
 			forHandle: handle
 		},
 		throwHttpErrors: false,
