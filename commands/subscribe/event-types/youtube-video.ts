@@ -83,7 +83,7 @@ export default {
 			}
 			else {
 				data.channels.push({ handle, id: channelId });
-				response = `Successfully subscribed to ${handle}. You're now subscribed to ${channelIds.size + 1} YouTube channels.`;
+				response = `Successfully subscribed to ${handle}. You're now subscribed to ${channelIds.size + 1} YouTube channel(s).`;
 			}
 		}
 		else {
@@ -97,7 +97,7 @@ export default {
 				}
 
 				data.channels.splice(index, 1);
-				response = `Successfully unsubscribed from ${handle}. You're now subscribed to ${channelIds.size - 1} YouTube channels.`;
+				response = `Successfully unsubscribed from ${handle}. You're now subscribed to ${channelIds.size - 1} YouTube channel(s).`;
 			}
 			else {
 				response = "You did not unsubscribe from any channels.";
