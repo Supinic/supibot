@@ -134,7 +134,8 @@ export class OpenMeteoProvider implements WeatherProvider {
 		}
 
 		const { current: data, utc_offset_seconds: timezoneOffset } = currentSchema.parse(body);
-		const timestamp = new SupiDate(data.time).setTimezoneOffset(-timezoneOffset / 60).valueOf();
+		const localOffset = new SupiDate().getTimezoneOffset();
+		const timestamp = new SupiDate(`${data.time}Z`).setTimezoneOffset((-timezoneOffset / 60) - localOffset).valueOf();
 
 		return {
 			kind: "current" as const,
