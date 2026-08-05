@@ -64,6 +64,7 @@ export default {
 					channel_id: channelId,
 					ts
 				},
+				throwHttpErrors: false,
 				responseType: "text",
 				timeout: {
 					request: 10_000
@@ -74,6 +75,7 @@ export default {
 				}
 			});
 			if (!response.ok) {
+				console.log(`Couldn't fetch channel ${channelHandleMap.get(channelId)} (${channelId})`, response.statusCode, response.statusMessage);
 				continue;
 			}
 
