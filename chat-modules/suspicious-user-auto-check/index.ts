@@ -169,7 +169,7 @@ export default {
 			}
 			else {
 				description = `Name: ${row.values.Name} -> _INACTIVE_${row.values.Name}`;
-				row.setValues({ Name: `_INACTIVE_${row.values.Name}}` });
+				row.setValues({ Name: `_INACTIVE_${row.values.Name}` });
 			}
 
 			const json = JSON.stringify({ description, raw, reply: messageData.reply }, null, 4);
