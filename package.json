@@ -15,7 +15,7 @@
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.6.1",
-    "vm2": "^3.11.5",
+    "vm2": "^3.11.6",
     "ws": "^8.21.1",
     "zod": "^4.4.3"
   },
