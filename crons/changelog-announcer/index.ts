@@ -1,10 +1,10 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
+import { createRelayLink } from "../../utils/command-utils.js";
 import type { CronDefinition } from "../index.js";
 
 let isTableAvailable: boolean | undefined;
 let latestID: number | undefined;
-const linkSchema = z.object({ data: z.object({ link: z.string() }) });
 const flagsSchema = z.object({ skipPrivateReminders: z.boolean().optional() });
 
 type ChangelogRow = { ID: number; Created: SupiDate; Title: string; Type: string; Description: string; };
@@ -60,21 +60,14 @@ export default {
 			}
 			else {
 				const params = data.map(i => `ID=${i.ID}`).join("&");
-				const relay = await core.Got.get("Supinic")({
-					method: "POST",
-					url: "relay",
-					throwHttpErrors: false,
-					json: {
-						url: `/data/changelog/lookup?${params}`
-					}
-				});
+				const relayResult = await createRelayLink(`/data/changelog/lookup?${params}`);
 
 				let link;
-				if (relay.statusCode === 200) {
-					link = linkSchema.parse(relay.body).data.link;
+				if (!relayResult.success) {
+					link = `Multiple IDs: ${data.map(i => i.ID).join(", ")}`;
 				}
 				else {
-					link = `Multiple IDs: ${data.map(i => i.ID).join(", ")}`;
+					link = relayResult.link;
 				}
 
 				message = `New changelog entries detected! Details: ${link}`;
