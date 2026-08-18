@@ -716,7 +716,6 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				statusCode: response.statusCode,
 				message: trimmedMessage,
 				rawMessage: message,
-				// eslint-disable-next-line unicorn/error-message
 				stack: new Error().stack?.split(/\r?\n/)
 			});
 

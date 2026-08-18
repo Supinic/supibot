@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-process-exit */
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -22,6 +21,7 @@ catch (e) {
 	}
 
 	console.error("config invalid");
+
 	for (const issue of e.issues) {
 		console.error(
 			`• [${issue.path.join(".") || "(root)"}] ${issue.message}`

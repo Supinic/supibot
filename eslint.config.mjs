@@ -6,13 +6,13 @@ import globals from "globals";
 
 export default tseslint.config(
 	eslintJs.configs.recommended,
-	unicornPlugin.configs.unopinionated,
 	tseslint.configs.strictTypeChecked,
 	{
 		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
 	},
 	{
 		plugins: {
+			unicorn: unicornPlugin,
 			"@stylistic": stylistic
 		},
 		languageOptions: {
@@ -21,8 +21,6 @@ export default tseslint.config(
 				tsconfigRootDir: import.meta.dirname
 			},
 			globals: {
-				...globals.browser,
-				...globals.es2025,
 				...globals.node,
 				core: "readonly",
 				sb: "readonly"
@@ -32,36 +30,18 @@ export default tseslint.config(
 		},
 		rules: {
 			// JavaScript rules
-			"array-bracket-newline": ["warn", "consistent"],
-			"array-bracket-spacing": ["warn", "never"],
 			"array-element-newline": ["warn", "consistent"],
 			"arrow-body-style": ["warn", "as-needed"],
-			"arrow-spacing": ["warn", {
-				after: true,
-				before: true
-			}],
-			"brace-style": ["warn", "stroustrup", {
-				allowSingleLine: true
-			}],
-			"comma-dangle": ["warn", "never"],
 			curly: ["warn", "all"],
 			"dot-location": ["warn", "property"],
 			"dot-notation": "warn",
-			"eol-last": ["warn", "always"],
 			eqeqeq: "error",
 			"function-call-argument-newline": ["warn", "consistent"],
 			"implicit-arrow-linebreak": ["error", "beside"],
-			indent: ["warn", "tab", {
-				SwitchCase: 1
-			}],
 			"key-spacing": ["warn", {
 				afterColon: true,
 				beforeColon: false,
 				mode: "strict"
-			}],
-			"keyword-spacing": ["warn", {
-				after: true,
-				before: true
 			}],
 			"lines-between-class-members": ["warn", "always", {
 				exceptAfterSingleLine: true
@@ -75,7 +55,6 @@ export default tseslint.config(
 				newIsCap: true,
 				properties: false
 			}],
-			"new-parens": ["error", "always"],
 			"newline-per-chained-call": ["warn", {
 				ignoreChainWithDepth: 3
 			}],
@@ -85,21 +64,8 @@ export default tseslint.config(
 			"no-duplicate-imports": "error",
 			"no-empty-pattern": "error",
 			"no-lonely-if": "warn",
-			"no-mixed-operators": ["error", {
-				groups: [
-					["&&", "||"],
-					["&", "|", "^", "~", "<<", ">>", ">>>"],
-					["==", "!=", "===", "!==", ">", ">=", "<", "<="]
-				]
-			}],
 			"no-multi-assign": "error",
-			"no-multi-spaces": "warn",
 			"no-multi-str": "warn",
-			"no-multiple-empty-lines": ["warn", {
-				max: 2,
-				maxBOF: 0,
-				maxEOF: 0
-			}],
 			"no-nested-ternary": "off",
 			"no-new": "warn",
 			"no-new-object": "error",
@@ -150,7 +116,6 @@ export default tseslint.config(
 				allowTemplateLiterals: true
 			}],
 			"rest-spread-spacing": ["warn", "never"],
-			semi: ["warn", "always"],
 			"semi-spacing": ["warn", {
 				before: false,
 				after: true
@@ -242,36 +207,20 @@ export default tseslint.config(
 			"@stylistic/array-bracket-spacing": ["warn", "never"],
 			"@stylistic/arrow-spacing": ["warn", { before: true, after: true }],
 			"@stylistic/block-spacing": ["warn", "always"],
+			"@stylistic/brace-style": ["warn", "stroustrup", { allowSingleLine: true }],
 			"@stylistic/comma-dangle": ["warn", "never"],
 			"@stylistic/comma-spacing": ["warn", { before: false, after: true }],
-			"@stylistic/brace-style": ["warn", "stroustrup", { allowSingleLine: true }],
 			"@stylistic/eol-last": ["warn", "always"],
-			"@stylistic/indent": ["warn", "tab"],
+			"@stylistic/indent": ["warn", "tab", { SwitchCase: 1 }],
 			"@stylistic/keyword-spacing": "warn",
 			"@stylistic/new-parens": ["warn", "always"],
 			"@stylistic/no-extra-semi": "warn",
 			"@stylistic/no-floating-decimal": "warn",
-			"@stylistic/no-extra-semi": "warn",
 			"@stylistic/no-mixed-operators": "warn",
 			"@stylistic/no-mixed-spaces-and-tabs": "warn",
 			"@stylistic/no-multiple-empty-lines": ["warn", { max: 1 }],
 			"@stylistic/no-multi-spaces": "warn",
 			"@stylistic/semi": "warn",
-		}
-	},
-	{
-		files: ["tests/**/*.{test,spec}.ts", "**/*.test.ts"],
-		languageOptions: {},
-		rules: {
-			"max-nested-callbacks": "off", // There is a ton of nesting within test suites
-			"max-statements-per-line": ["warn", { max: 2 }], // Tests sometimes stack up two statements to save space
-			"unicorn/prefer-module": "off", // Different importing system (because of loaders)
-			"unicorn/consistent-function-scoping": "off",
-			"unicorn/no-useless-undefined": "off",
-			"unicorn/no-await-expression-member": "off",
-			"@typescript-eslint/no-floating-promises": "off",
-			"@typescript-eslint/no-unused-vars": "off",
-			"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }]
 		}
 	}
 );

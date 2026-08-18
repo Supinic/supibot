@@ -51,9 +51,6 @@ export default declare({
 		}
 
 		await context.sendIntermediateMessage("Restarting...");
-
-		// It is fully intended to exit the process here.
-		// eslint-disable-next-line unicorn/no-process-exit
 		setTimeout(() => process.exit(0), 1000);
 
 		return {

@@ -135,9 +135,7 @@ export default {
 				client: "gtx",
 				dt: "t",
 				// Correct usage, the API expects this
-				// eslint-disable-next-line unicorn/text-encoding-identifier-case
 				ie: "UTF-8",
-				// eslint-disable-next-line unicorn/text-encoding-identifier-case
 				oe: "UTF-8",
 				sl: options.from,
 				tl: options.to,

@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-global-object-property-assignment */
 import * as supiCore from "supi-core";
 import type { GotInstanceDefinition } from "supi-core";
 import { getConfig } from "./config.js";
