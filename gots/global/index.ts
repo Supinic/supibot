@@ -1,11 +1,12 @@
-import { Agent } from "http2-wrapper";
-import type { Http2Session } from "node:http2";
+// import { Agent } from "http2-wrapper";
+// import type { Http2Session } from "node:http2";
 import { type GotInstanceDefinition, isGotRequestError } from "supi-core";
 
 import { getConfig } from "../../config.js";
 import { logger } from "../../singletons/logger.js";
 const { defaultUserAgent } = getConfig().modules.gots;
 
+/*
 const agent = new Agent({
 	timeout: 10_000,
 	maxEmptySessions: 10,
@@ -22,14 +23,15 @@ agent.on("session", (session: Http2Session) => {
 		}, 30_000).unref();
 	});
 });
+*/
 
 export default {
 	name: "Global",
 	optionsType: "function",
 	options: (() => ({
 		responseType: "json",
-		http2: true,
-		agent: { http2: agent },
+		// http2: false,
+		// agent: { http2: agent },
 		retry: {
 			limit: 2,
 			methods: ["GET", "PUT", "HEAD", "DELETE", "OPTIONS", "TRACE"],
@@ -80,18 +82,18 @@ export default {
 							cause: String(cause),
 							responseType: options.responseType,
 							timeout: options.timeout,
-							http2: options.http2,
+							// http2: options.http2,
 							retry: options.retry,
-							timings,
-							agentsStatus: {
-								sessionCount: agent.sessionCount,
-								emptySessionCount: agent.emptySessionCount,
-								pendingSessionCount: agent.pendingSessionCount
-							}
+							timings
+							// agentsStatus: {
+							// 	sessionCount: agent.sessionCount,
+							// 	emptySessionCount: agent.emptySessionCount,
+							// 	pendingSessionCount: agent.pendingSessionCount
+							// }
 						}
 					});
 
-					agent.closeEmptySessions();
+					// agent.closeEmptySessions();
 
 					return err;
 				}

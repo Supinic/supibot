@@ -10,7 +10,6 @@ export default {
 
 		return {
 			prefixUrl: "https://api.twitch.tv/helix",
-			http2: true,
 			headers: {
 				"Client-ID": process.env.TWITCH_CLIENT_ID
 			},
