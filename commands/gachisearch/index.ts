@@ -1,10 +1,27 @@
-export default {
+import * as z from "zod";
+import { declare } from "../../classes/command.js";
+import { createRelayLink } from "../../utils/command-utils.js";
+
+const authorShape = z.object({
+	id: z.number(),
+	name: z.string()
+});
+const authorsSchema = z.array(authorShape);
+type Author = z.infer<typeof authorShape>;
+
+const trackShape = z.object({
+	id: z.number(),
+	name: z.string(),
+	isTodo: z.literal(1).nullish()
+});
+const trackSchema = z.array(trackShape);
+
+export default declare({
 	Name: "gachisearch",
-	Aliases: ["gs","gsa","gachiauthorsearch"],
-	Author: "supinic",
+	Aliases: ["gs", "gsa", "gachiauthorsearch"],
 	Cooldown: 15000,
 	Description: "Searches for a given track in the gachi list, and attempts to post a link.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention", "pipe"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" }
 	],
@@ -28,7 +45,7 @@ export default {
 		const escaped = core.Query.escapeLikeString(query);
 		if (invocation === "gsa" || invocation === "gachiauthorseach") {
 			const data = await core.Query.raw(core.Utils.tag.trim `
-				SELECT ID, Name
+				SELECT ID AS id, Name AS name
 				FROM music.Author
 				WHERE 
 					Name LIKE '%${escaped}%' 
@@ -43,7 +60,8 @@ export default {
 					)
 				`);
 
-			const [author, ...rest] = data;
+			const authors = authorsSchema.parse(data);
+			const author = authors.at(0);
 			if (!author) {
 				return {
 					success: false,
@@ -51,24 +69,25 @@ export default {
 				};
 			}
 
-			const link = `https://supinic.com/track/author/${author.ID}`;
+			const link = `https://supinic.com/track/author/${author.id}`;
 			if (context.params.linkOnly) {
 				return {
 					reply: link
 				};
 			}
 
+			const rest = authors.slice(1);
 			const others = (rest.length === 0)
 				? ""
-				: `More results: ${rest.map(i => `${i.Name} (ID ${i.ID})`).join("; ")}`;
+				: `More results: ${rest.map(i => `${i.name} (ID ${i.id})`).join("; ")}`;
 
 			return {
-				reply: `"${author.Name}" - ${link} ${others}`
+				reply: `"${author.name}" - ${link} ${others}`
 			};
 		}
 
-		const directMatch = await core.Query.getRecordset(rs => rs
-			.select("ID", "Name")
+		const directMatch = await core.Query.getRecordset<Author | undefined>(rs => rs
+			.select("ID AS id", "Name AS name")
 			.from("music", "Track")
 			.where("Link = %s", query)
 			.limit(1)
@@ -76,19 +95,19 @@ export default {
 		);
 
 		if (directMatch) {
-			const link = `https://supinic.com/track/detail/${directMatch.ID}`;
+			const link = `https://supinic.com/track/detail/${directMatch.id}`;
 			return {
 				reply: (context.params.linkOnly)
 					? link
-					: `${directMatch.Name} ${link}`
+					: `${directMatch.name} ${link}`
 			};
 		}
 
-		const data = await core.Query.raw(core.Utils.tag.trim `
+		const rawData = await core.Query.raw(core.Utils.tag.trim `
 			SELECT
-				ID,
-				Name,
-				EXISTS (SELECT 1 FROM music.Track_Tag WHERE Track_Tag.Track = Track.ID AND Track_Tag.Tag = 20) AS Is_Todo
+				ID AS id,
+				Name AS name,
+				EXISTS (SELECT 1 FROM music.Track_Tag WHERE Track_Tag.Track = Track.ID AND Track_Tag.Tag = 20) AS isTodo
 			FROM music.Track
 			WHERE
 				Track.ID IN (
@@ -119,6 +138,8 @@ export default {
 					)
 				)
 		`);
+
+		const data = trackSchema.parse(rawData);
 		if (data.length === 0) {
 			return {
 				success: false,
@@ -130,25 +151,26 @@ export default {
 		let link;
 		if (data.length === 1) {
 			const [first] = data;
-			reply = `"${first.Name}" - ${first.Is_Todo ? "🚧" : ""} https://supinic.com/track/detail/${first.ID}`;
-			link = `https://supinic.com/track/detail/${first.ID}`;
+			reply = `"${first.name}" - ${first.isTodo ? "🚧" : ""} https://supinic.com/track/detail/${first.id}`;
+			link = `https://supinic.com/track/detail/${first.id}`;
 		}
 		else {
-			const params = data.map(i => `ID=${i.ID}`).join("&");
-			const listLink = `/track/lookup?${params}`;
-			const relay = await core.Got.get("Supinic")({
-				method: "POST",
-				url: "relay",
-				json: { url: listLink }
-			});
+			const params = data.map(i => `ID=${i.id}`).join("&");
+			const relayResult = await createRelayLink(`/track/lookup?${params}`);
+			if (!relayResult.success) {
+				return {
+					success: false,
+					reply: `Could not create a relay link! Try again later.`
+				};
+			}
 
-			link = relay.body.data.link;
-			reply = `Search result: ${link}`;
+			reply = `Search result: ${relayResult.link}`;
 		}
 
 		return {
+			success: true,
 			reply: (context.params.linkOnly) ? link : reply
 		};
 	}),
 	Dynamic_Description: null
-};
+});
