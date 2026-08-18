@@ -2,8 +2,8 @@ import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { logger } from "../../singletons/logger.js";
 import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
-import type { ResultFailure, StrictResult } from "../../classes/command.js";
-import type { NewsOptions } from "./news-helpers.js";
+import { isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.js";
+import { fetchEligibleArticle, type NewsOptions } from "./news-helpers.js";
 
 import rawDefinitions from "./definitions.json" with { type: "json" };
 const rssDefinitionSchema = z.array(z.strictObject({
@@ -114,21 +114,12 @@ export const fetch = async (options: NewsOptions, code: string, query: string): 
 		resultArticles = articles;
 	}
 
-	let article: Article | undefined;
-	if (options.params.latest) {
-		article = resultArticles.sort((a, b) => b.published - a.published).at(0);
-	}
-	else {
-		article = core.Utils.randArray(resultArticles);
+	const articleResult = fetchEligibleArticle(resultArticles, options);
+	if (isResultFailure(articleResult)) {
+		return articleResult;
 	}
 
-	if (!article) {
-		return {
-			success: false,
-			reply: "No relevant articles found!"
-		};
-	}
-
+	const { article } = articleResult;
 	const { content, title, published, link } = article;
 	const separator = (title && content) ? " - " : "";
 	const delta = (published) ? `(published ${core.Utils.timeDelta(new SupiDate(published))})` : "";

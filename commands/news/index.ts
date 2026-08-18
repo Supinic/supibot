@@ -92,9 +92,15 @@ const newsCommandDefinition = declare({
 		"Fetches special news, usually from a specific source. Consult the table below.",
 		"",
 
+		`<code>${prefix}news <u>latest:true</u></code>`,
 		`<code>${prefix}news (code) <u>latest:true</u></code>`,
-		`<code>${prefix}news SK <u>link:true</u></code>`,
-		"Fetches the news along with a link to the article, if available.",
+		"Fetches the most recent news article for the given source.",
+		"",
+
+		`<code>${prefix}news <u>period:(period)</u></code>`,
+		`<code>${prefix}news (code) <u>period:(period)</u></code>`,
+		"Fetches the news within the provided time period.",
+		"Allowed period are: day, week, month, year.",
 		"",
 
 		`<code>${prefix}news (code) <u>link:true</u></code>`,

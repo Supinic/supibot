@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
 import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
-import type { ResultFailure, StrictResult } from "../../classes/command.js";
-import type { NewsOptions } from "./news-helpers.js";
+import { isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.js";
+import { type NewsOptions, fetchEligibleArticle } from "./news-helpers.js";
 
 export const fetchGoogleNews = async (options: NewsOptions, query?: string): Promise<ResultFailure | StrictResult> => {
 	if (options.params.link) {
@@ -53,10 +53,12 @@ export const fetchGoogleNews = async (options: NewsOptions, query?: string): Pro
 		});
 	}
 
-	const article = (options.params.latest)
-		? articles.sort((a, b) => b.published - a.published)[0]
-		: core.Utils.randArray(articles);
+	const articleResult = fetchEligibleArticle(articles, options);
+	if (isResultFailure(articleResult)) {
+		return articleResult;
+	}
 
+	const { article } = articleResult;
 	const { content, title, published } = article;
 	const separator = (title && content) ? " - " : "";
 	const delta = `(published ${core.Utils.timeDelta(new SupiDate(published))})`;

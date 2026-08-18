@@ -63,6 +63,13 @@ export type ParamFromDefinition<T extends ParameterDefinitions> = {
 type AppendedParameters = Record<string, ParameterValue>;
 export type ResultFailure = { success: false; reply: string; };
 
+export const isResultFailure = (input: unknown): input is ResultFailure => (
+	input !== null
+	&& typeof input === "object"
+	&& "success" in input && input.success === false
+	&& "reply" in input && typeof input.reply === "string"
+);
+
 export type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
