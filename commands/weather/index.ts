@@ -1,4 +1,4 @@
-import { declare } from "../../classes/command.js";
+import { declare, isResultFailure } from "../../classes/command.js";
 import { getWeatherLocation } from "./location.js";
 import { weatherProviders } from "./providers/index.js";
 import { formatWeatherReport } from "./formatting.js";
@@ -70,7 +70,7 @@ export default declare({
 		const { coords, address, hidden, origin } = locationResult.location;
 		if (context.params.pollution) {
 			const pollution = await weatherProviders.owm3.fetchPollution(coords);
-			if ("success" in pollution) {
+			if (isResultFailure(pollution)) {
 				return pollution;
 			}
 
@@ -84,7 +84,7 @@ export default declare({
 		}
 		if (context.params.alerts) {
 			const alerts = await weatherProviders.owm3.fetchAlerts(coords);
-			if ("success" in alerts) {
+			if (isResultFailure(alerts)) {
 				return alerts;
 			}
 			if (alerts.empty) {
@@ -140,7 +140,7 @@ export default declare({
 			data = await provider.getDaily(coords, reportData.offset);
 		}
 
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 

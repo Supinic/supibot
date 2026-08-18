@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { type CacheValue, SupiDate } from "supi-core";
 import { typedKeys } from "../../../utils/ts-helpers.js";
-import type { ResultFailure } from "../../../classes/command.js";
+import { isResultFailure, type ResultFailure } from "../../../classes/command.js";
 import type { NumericCoordinates } from "../../../utils/globals.js";
 import type { WeatherProvider, WeatherReportType } from "./weather-template.js";
 
@@ -113,12 +113,6 @@ const dailySchema = z.object({
 		...openMeteoFields.daily
 	})
 });
-
-const isResultFailure = (input: unknown): input is ResultFailure => (
-	input !== null && typeof input === "object"
-	&& ("success" in input) && typeof input.success === "boolean"
-	&& ("reply" in input) && typeof input.reply === "string"
-);
 
 const getCacheKey = (coords: NumericCoordinates, report: WeatherReportType) => `weather-cache-open-meteo-${report}-${coords.lat}-${coords.lng}`;
 

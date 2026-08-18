@@ -5,6 +5,7 @@ import { searchYoutube } from "../../utils/command-utils.js";
 import { formatWeatherReport } from "../weather/formatting.js";
 import { openMeteoWeatherProvider } from "../weather/providers/index.js";
 import type { NumericCoordinates } from "../../utils/globals.js";
+import { isResultFailure } from "../../classes/command.js";
 
 const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
@@ -86,7 +87,7 @@ export const getF1Weather = async (sessionStart: number, coordinates: NumericCoo
 		prefix = "Long-term forecast";
 	}
 
-	if ("success" in result) {
+	if (isResultFailure(result)) {
 		return "No weather forecast available at the moment.";
 	}
 

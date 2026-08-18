@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { transliterate as executeGenericTransliteration } from "transliteration";
-import { declare, type StrictResult } from "../../classes/command.js";
+import { declare, isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.js";
 
 const nakdanSchema = z.object({
 	data: z.array(z.object({
@@ -14,8 +14,8 @@ const nakdanSchema = z.object({
 });
 const hebrewSchema = z.object({ result: z.string().optional() });
 
-const getHebrewSiteData = async () => {
-	type PageData = { token: string; cookie: string; };
+type PageData = { token: string; cookie: string; };
+const getHebrewSiteData = async (): Promise<PageData | ResultFailure> => {
 	const cacheKey = "alittlehebrew-page-data";
 
 	const cacheData = await core.Cache.getByPrefix(cacheKey) as PageData | undefined;
@@ -77,7 +77,7 @@ const transliterateHebrew = async (query: string): Promise<StrictResult> => {
 	const vocalizedString = nakdanData.map(i => i.nakdan.options[0]?.w ?? i.nakdan.word).join(" ");
 
 	const pageData = await getHebrewSiteData();
-	if ("success" in pageData) {
+	if (isResultFailure(pageData)) {
 		return pageData;
 	}
 

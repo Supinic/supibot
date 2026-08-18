@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare, isResultFailure } from "../../classes/command.js";
 
 const HLTB_TOKEN_CACHE_KEY = "hltb-token-cache";
 const HLTB_ENDPOINT_CACHE_KEY = "hltb-api-endpoint";
@@ -232,7 +232,7 @@ export default declare({
 		}
 
 		let response = await fetchData(endpoint, args);
-		if ("success" in response) {
+		if (isResultFailure(response)) {
 			return response;
 		}
 
@@ -240,7 +240,7 @@ export default declare({
 			await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, null);
 			response = await fetchData(endpoint, args);
 
-			if ("success" in response) {
+			if (isResultFailure(response)) {
 				return response;
 			}
 			else if (!response.ok) {
@@ -253,7 +253,7 @@ export default declare({
 				}
 
 				response = await fetchData(newEndpoint, args);
-				if ("success" in response) {
+				if (isResultFailure(response)) {
 					return response;
 				}
 

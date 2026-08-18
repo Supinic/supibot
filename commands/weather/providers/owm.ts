@@ -4,7 +4,7 @@ import { degreeShape, percentShape, probabilityShape, unixTimestampShape } from 
 import { postToHastebin } from "../../../utils/command-utils.js";
 import { logger } from "../../../singletons/logger.js";
 import type { NumericCoordinates } from "../../../utils/globals.js";
-import type { ResultFailure } from "../../../classes/command.js";
+import { isResultFailure, type ResultFailure } from "../../../classes/command.js";
 import type { WeatherProvider, WeatherReportType } from "./weather-template.js";
 
 const precipitationShape = z.object({
@@ -290,7 +290,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 
 	async getCurrent (coords: NumericCoordinates) {
 		const data = await this.oneCall(coords);
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 
@@ -306,7 +306,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 		}
 
 		const data = await this.oneCall(coords);
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 
@@ -322,7 +322,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 		}
 
 		const data = await this.oneCall(coords);
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 
@@ -331,7 +331,7 @@ export class Owm3WeatherProvider implements WeatherProvider {
 
 	async fetchAlerts (coords: NumericCoordinates): Promise<AlertsData> {
 		const data = await this.oneCall(coords);
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 
@@ -500,7 +500,7 @@ export class Owm4WeatherProvider implements WeatherProvider {
 
 	async getCurrent (coords: NumericCoordinates) {
 		const data = await this.fetch("current", coords);
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 
@@ -519,7 +519,7 @@ export class Owm4WeatherProvider implements WeatherProvider {
 		const now = new SupiDate().discardTimeUnits("m", "s", "ms");
 		const start = Math.trunc(now.addHours(offset).valueOf() / 1000);
 		const data = await this.fetch("hourly", coords, start);
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 
@@ -535,7 +535,7 @@ export class Owm4WeatherProvider implements WeatherProvider {
 		}
 
 		const data = await this.fetch("daily", coords);
-		if ("success" in data) {
+		if (isResultFailure(data)) {
 			return data;
 		}
 
