@@ -196,6 +196,8 @@ const RegularIvrUserDataSchema = BaseIvrUserDataSchema.extend({
 });
 
 const BannedIvrUserDataSchema = BaseIvrUserDataSchema.extend({
+	followers: z.number().nullish(),
+	emotePrefix: z.string().nullish(),
 	banned: z.literal(true),
 	banReason: z.union([
 		z.literal("TOS_INDEFINITE"),
