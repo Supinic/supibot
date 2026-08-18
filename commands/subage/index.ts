@@ -91,7 +91,7 @@ export default declare({
 				extensions: {
 					persistedQuery: {
 						version: 1,
-						sha256Hash: "80c53fe04c79a6414484104ea573c28d6a8436e031a235fc6908de63f51c74fd"
+						sha256Hash: "9e08e838121c9ee00afbcb29e4789a6b8e7e3a93e5878a179ed2def8868c32c0"
 					}
 				},
 				variables: {
@@ -101,7 +101,6 @@ export default declare({
 					badgeSourceChannelLogin: channelName,
 					giftRecipientLogin: username,
 					hasChannelID: true,
-					isViewerBadgeCollectionEnabled: true,
 					withStandardGifting: true
 				}
 			}])
