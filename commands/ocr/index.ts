@@ -14,7 +14,7 @@ const ocrLanguageSchema = z.array(z.tuple([
 ]));
 const ocrRequestSchema = z.object({
 	ErrorMessage: z.array(z.string()).optional(),
-	OCRExitCode: z.number(),
+	OCRExitCode: z.number().nullish(),
 	ParsedResults: z.array(z.object({
 		ErrorMessage: z.string(), // empty string on success
 		ParsedText: z.string()
