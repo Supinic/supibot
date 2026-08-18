@@ -100,7 +100,12 @@ const sendChannelSubscriptionMessage = async (message: string, channelID: number
 		return;
 	}
 
-	await channelData.send(`${chatPing.join(" ")} ${message}`);
+	const preparedMessage = await channelData.prepareMessage(`${chatPing.join(" ")} ${message}`);
+	if (!preparedMessage) {
+		return;
+	}
+
+	await channelData.send(preparedMessage);
 };
 
 export const handleEventSubscription = async function (subscriptionType: SubscriptionType, message: string, options: HandleOptions = {}) {
