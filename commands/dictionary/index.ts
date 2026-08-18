@@ -2,7 +2,11 @@ import * as z from "zod";
 import { declare } from "../../classes/command.js";
 
 const dictSchema = z.union([
-	z.object({ title: z.string(), message: z.string(), resolution: z.string() }), // Failure
+	z.object({
+		title: z.string(),
+		message: z.string().nullish(),
+		resolution: z.string().nullish()
+	}), // Failure
 	z.array(z.object({
 		word: z.string(),
 		phonetic: z.string().optional(),
@@ -53,10 +57,10 @@ export default declare({
 		});
 
 		const rawData = dictSchema.parse(response.body);
-		if ("message" in rawData) {
+		if (!Array.isArray(rawData)) {
 			return {
 				success: false,
-				reply: rawData.message
+				reply: rawData.message ?? rawData.title
 			};
 		}
 
