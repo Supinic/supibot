@@ -188,7 +188,7 @@ export default declare({
 		"",
 
 		`<code>${prefix}weather (place) <b>day+X</b></code>`,
-		"Posts the weather forecast in X day(s) - accepts numbers from 0 (summary for today) through 14 (in two week).",
+		"Posts the weather forecast in X day(s) - accepts numbers from 0 (summary for today) through 13 (in ~2 weeks).",
 		"",
 
 		"<h5>Pollution and alerts</h5>",

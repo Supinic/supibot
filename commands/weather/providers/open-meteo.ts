@@ -86,7 +86,7 @@ const apiParams = {
 	daily: {
 		current: "",
 		daily: typedKeys(openMeteoFields.daily).join(","),
-		forecast_days: "15" // 14-day forecast + 1 day offset (today)
+		forecast_days: "14" // 14-day forecast, no offset (because some fields become nullable at day #14)
 	}
 };
 
