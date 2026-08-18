@@ -19,6 +19,13 @@ export default declare({
 			searchParams: { login }
 		});
 
+		if (!response.ok) {
+			return {
+				success: false,
+				reply: `No such user found!`
+			};
+		}
+
 		const user = ivrUserDataSchema.parse(response.body).at(0);
 		if (!user) {
 			return {
