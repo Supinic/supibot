@@ -1,6 +1,6 @@
-import * as z from "zod";
+import { SupiError } from "supi-core";
 import { declare } from "../../classes/command.js";
-import { ivrUserDataSchema } from "../../utils/schemas.js";
+import { ivrErrorSchema, ivrSubAgeSchema } from "../../utils/schemas.js";
 import type { Platform } from "../../platforms/template.js";
 import type { User } from "../../classes/user.js";
 
@@ -15,24 +15,6 @@ const getTargetName = (username: string, user: User, platform: Platform) => {
 		return `User ${username} is`;
 	}
 };
-
-const querySchema = z.array(z.object({
-	data: z.object({
-		targetUser: z.object({
-			relationship: z.object({
-				cumulativeTenure: z.object({
-					daysRemaining: z.int(),
-					months: z.int()
-				}).nullable(),
-				subscriptionBenefit: z.object({
-					gift: z.object({ isGift: z.boolean() }),
-					purchasedWithPrime: z.boolean(),
-					tier: z.string()
-				}).nullable()
-			})
-		}).nullable()
-	}).optional()
-}));
 
 export default declare({
 	Name: "subage",
@@ -81,83 +63,25 @@ export default declare({
 			};
 		}
 
-		const response = await core.Got.get("TwitchGQL")({
-			responseType: "json",
-			headers: {
-				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${username}`
-			},
-			body: JSON.stringify([{
-				operationName: "ViewerCard",
-				extensions: {
-					persistedQuery: {
-						version: 1,
-						sha256Hash: "9e08e838121c9ee00afbcb29e4789a6b8e7e3a93e5878a179ed2def8868c32c0"
-					}
-				},
-				variables: {
-					channelID,
-					channelLogin: channelName,
-					badgeSourceChannelID: channelID,
-					badgeSourceChannelLogin: channelName,
-					giftRecipientLogin: username,
-					hasChannelID: true,
-					withStandardGifting: true
-				}
-			}])
+		const response = await core.Got.get("IVR")({
+			url: `v2/twitch/subage/${username}/${channelName}`
 		});
 
-		const sub = querySchema.parse(response.body).at(0);
-		if (!sub) {
-			return {
-				success: false,
-				reply: `No subscription data available!`
-			};
-		}
-		else if (!sub.data) {
-			return {
-				success: false,
-				reply: "Could not load subscription status! Try again later."
-			};
-		}
-		else if (!sub.data.targetUser) {
-			return {
-				success: false,
-				reply: `Target user does not exist!`
-			};
-		}
+		if (!response.ok) {
+			const { data } = ivrErrorSchema.safeParse(response.body);
+			const { message = "(no error message)" } = data?.error ?? {};
 
-		const { relationship } = sub.data.targetUser;
-		if (!relationship.cumulativeTenure) {
-			// No tenure -> either the target channel isn't affiliated, is banned, or is hiding subscription status
-			const response = await core.Got.get("IVR")({
-				url: "v2/twitch/user",
-				searchParams: { login: channelName }
-			});
-
-			const channelNameString = getTargetName(channelName, context.user, context.platform);
-			if (response.statusCode === 200 && response.body.length !== 0) {
-				const [channelInfo] = ivrUserDataSchema.parse(response.body);
-				const { banned } = channelInfo;
-				const { isAffiliate, isPartner } = channelInfo.roles;
-
-				if (!isAffiliate && !isPartner) {
-					return {
-						success: false,
-						reply: `${channelNameString} not affiliated nor partnered!`
-					};
-				}
-				else if (banned) {
-					const { banReason } = channelInfo;
-					return {
-						success: false,
-						reply: `${channelNameString} currently banned (${banReason})!`
-					};
-				}
+			let resultMessage = message;
+			if (message.startsWith("Channel has been banned")) {
+				resultMessage = `@${channelName} is currently banned`;
+			}
+			else if (message.startsWith("User has been banned")) {
+				resultMessage = `@${username} is currently banned`;
 			}
 
 			return {
 				success: false,
-				reply: `You are currently hiding subscription statuses!`
+				reply: `Could not check for followage! Reason: ${resultMessage}`
 			};
 		}
 
@@ -178,38 +102,58 @@ export default declare({
 			channelString = channelName;
 		}
 
-		const userString = getTargetName(username, context.user, context.platform);
-		const { daysRemaining, months } = relationship.cumulativeTenure;
-		if (!relationship.subscriptionBenefit) {
-			if (daysRemaining === 0 && months === 0) {
-				const verb = (userString.startsWith("User")) ? "has" : "have";
-				return {
-					success: true,
-					reply: `${userString} not subscribed to ${channelString}, and never ${verb} been.`
-				};
-			}
-			else {
-				return {
-					success: true,
-					reply: `${userString} not subscribed to ${channelString}, but used to be subscribed for ${months} months.`
-				};
-			}
+		const { streak, cumulative, meta, statusHidden } = ivrSubAgeSchema.parse(response.body);
+		const who = getTargetName(username, context.user, context.platform);
+		if (statusHidden) {
+			return {
+				success: true,
+				reply: `${who} currently hiding subscription status.`
+			};
+		}
+		else if (statusHidden === null) {
+			return {
+				success: false,
+				reply: `Channel ${channelName} is not affliated nor partnered!`
+			};
 		}
 
-		const benefit = relationship.subscriptionBenefit;
-		const giftString = (benefit.gift.isGift) ? "gifted" : "";
-		const primeString = (benefit.purchasedWithPrime) ? "Prime" : "";
-		const tier = benefit.tier.replace("000", "");
-		const remainingString = (daysRemaining === 0)
-			? "less than 24 hours"
-			: `${daysRemaining} days`;
+		// Not currently subscribed
+		if (!streak || !meta) {
+			const verb = (who.startsWith("User")) ? "has" : "have";
+			if (!cumulative) {
+				return {
+					success: true,
+					reply: `${who} not subscribed to ${channelString}, and never ${verb} been.`
+				};
+			}
+
+			const { months } = cumulative;
+			return {
+				success: false,
+				reply: `${who} not subscribed to ${channelString}, but used to be subscribed for ${months} months.`
+			};
+		}
+
+		if (!cumulative) {
+			throw new SupiError({
+				message: "Assert error: `cumulative` does not exist"
+			});
+		}
+
+		let giftString = "";
+		const { months } = cumulative;
+		const { giftMeta, tier } = meta;
+		if (giftMeta) {
+			giftString = (giftMeta.gifter)
+				? ` gifted by ${giftMeta.gifter.displayName}`
+				: ` gifted by anonymous gifter`;
+		}
 
 		return {
 			reply: core.Utils.tag.trim `
-				${userString} subscribed to ${channelString}
+				${who} subscribed to ${channelString}
 				for ${months} months in total
-				with a Tier ${tier} ${giftString} ${primeString} subscription.
-				Next Sub anniversary: in ${remainingString}.
+				with a Tier ${tier} subscription${giftString}.
 			`
 		};
 	},

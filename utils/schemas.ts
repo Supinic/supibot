@@ -279,7 +279,14 @@ export const ivrSubAgeSchema = z.object({
 		tier: z.string(),
 		renewsAt: z.iso.datetime().nullish(),
 		endsAt: z.iso.datetime().nullish(),
-		gitMeta: z.unknown().nullish()
+		giftMeta: z.object({
+			giftDate: z.string(),
+			gifter: z.object({
+				id: z.string(),
+				login: z.string(),
+				displayName: z.string()
+			}).nullish()
+		}).nullish()
 	}).nullish()
 });
 
