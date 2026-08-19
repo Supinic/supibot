@@ -12,7 +12,7 @@ type Author = z.infer<typeof authorShape>;
 const trackShape = z.object({
 	id: z.number(),
 	name: z.string(),
-	isTodo: z.literal(1).nullish()
+	isTodo: z.union([z.literal(0), z.literal(1)])
 });
 const trackSchema = z.array(trackShape);
 
