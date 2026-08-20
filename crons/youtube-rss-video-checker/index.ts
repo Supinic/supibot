@@ -7,6 +7,9 @@ import {
 	YOUTUBE_VIDEO_SUBSCRIPTION_TITLE,
 	type YoutubeChannelSubData
 } from "../../commands/subscribe/event-types/youtube-video.js";
+import chan from "../../commands/chan/index.js";
+import { logger } from "../../singletons/logger.js";
+import debug from "../../commands/debug/index.js";
 
 type SubData = {
 	userId: User["ID"];
@@ -56,6 +59,8 @@ export default {
 		const updatedChannels = new Set<string>();
 		const channelVideosMap = new Map<string, string[]>();
 		const ts = SupiDate.now() % 15;
+
+		const debugData: unknown[] = [];
 
 		for (const channelId of uniqueChannelIds) {
 			const response = await core.Got.get("GenericAPI")({
@@ -114,11 +119,20 @@ export default {
 
 			channelVideosMap.set(channelId, strings);
 			updatedChannels.add(channelId);
+			debugData.push({
+				channel: channelHandleMap.get(channelId),
+				items,
+				latestCachePublish,
+				newItems,
+				strings
+			});
 		}
 
 		if (channelVideosMap.size === 0) {
 			return;
 		}
+
+		void logger.log("Module.Other", `YouTube RSS debug data: ${JSON.stringify(debugData)}`);
 
 		for (const [userId, channelIds] of userChannelMap) {
 			const relevantChannelIds = channelIds.intersection(updatedChannels);
@@ -137,7 +151,7 @@ export default {
 					});
 				}
 
-				userStrings.push(`${handle}: ${channelStrings.length} new videos: ${channelStrings.join(" ")}`);
+				userStrings.push(`${handle}: ${channelStrings.length}: ${channelStrings.join(" ")}`);
 			}
 
 			const userData = await sb.User.getAsserted(userId);
