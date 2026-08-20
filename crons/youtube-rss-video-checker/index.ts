@@ -7,9 +7,7 @@ import {
 	YOUTUBE_VIDEO_SUBSCRIPTION_TITLE,
 	type YoutubeChannelSubData
 } from "../../commands/subscribe/event-types/youtube-video.js";
-import chan from "../../commands/chan/index.js";
 import { logger } from "../../singletons/logger.js";
-import debug from "../../commands/debug/index.js";
 
 type SubData = {
 	userId: User["ID"];
