@@ -88,15 +88,19 @@ export default {
 			}
 
 			const key = `youtube-latest-publish-date-${channelId}`;
-			const latestCachePublish = await core.Cache.getByPrefix(key) as number | null;
-			const [latestItem] = items.toSorted((a, b) => new SupiDate(b.isoDate).valueOf() - new SupiDate(a.isoDate).valueOf());
-			await core.Cache.setByPrefix(key, new SupiDate(latestItem.isoDate).valueOf());
+			const latestCachePublishDate = await core.Cache.getByPrefix(key) as number | null;
 
-			if (!latestCachePublish) {
+			const [latestItem] = items.toSorted((a, b) => new SupiDate(b.isoDate).valueOf() - new SupiDate(a.isoDate).valueOf());
+			const latestItemPublishDate = new SupiDate(latestItem.isoDate).valueOf();
+
+			if (!latestCachePublishDate || latestItemPublishDate > latestCachePublishDate) {
+				await core.Cache.setByPrefix(key, new SupiDate(latestItem.isoDate).valueOf());
+			}
+			if (!latestCachePublishDate) {
 				continue;
 			}
 
-			const newItems = items.filter(i => new SupiDate(i.isoDate).valueOf() > latestCachePublish);
+			const newItems = items.filter(i => new SupiDate(i.isoDate).valueOf() > latestCachePublishDate);
 			if (newItems.length === 0) {
 				continue;
 			}
@@ -117,20 +121,11 @@ export default {
 
 			channelVideosMap.set(channelId, strings);
 			updatedChannels.add(channelId);
-			debugData.push({
-				channel: channelHandleMap.get(channelId),
-				items,
-				latestCachePublish,
-				newItems,
-				strings
-			});
 		}
 
 		if (channelVideosMap.size === 0) {
 			return;
 		}
-
-		void logger.log("Module.Other", `YouTube RSS debug data: ${JSON.stringify(debugData)}`);
 
 		for (const [userId, channelIds] of userChannelMap) {
 			const relevantChannelIds = channelIds.intersection(updatedChannels);
