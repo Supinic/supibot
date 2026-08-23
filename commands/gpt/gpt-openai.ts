@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { type GotResponse, SupiError } from "supi-core";
 import {
 	checkInputLimits,
@@ -10,30 +11,41 @@ import GptHistory from "./history-control.js";
 import type { GptContext } from "./index.js";
 import type { ModelData } from "./config-schema.js";
 
+const openAiChatResponseSchema = z.object({
+	object: z.literal("chat.completion"),
+	choices: z.array(z.object({
+		message: z.object({
+			content: z.string()
+		})
+	})),
+	usage: z.object({
+		completion_tokens: z.number(),
+		prompt_tokens: z.number(),
+		total_tokens: z.number()
+	})
+});
+const openAiResponsesResponseSchema = z.object({
+	object: z.literal("response"),
+	output: z.array(z.object({
+		type: z.string(),
+		content: z.array(z.object({
+			type: z.string(),
+			text: z.string().optional()
+		})).optional()
+	})),
+	usage: z.object({
+		input_tokens: z.number(),
+		output_tokens: z.number(),
+		total_tokens: z.number()
+	})
+});
+const openAiResponseSchema = z.discriminatedUnion("object", [
+	openAiChatResponseSchema,
+	openAiResponsesResponseSchema
+]);
+
 const DEFAULT_SYSTEM_MESSAGE = "Be extremely concise. Do not add URLs to the response.";
 
-type OpenAiMessage = {
-	annotations: unknown[];
-	content: string;
-	refusal: null;
-	role: "assistant";
-};
-type OpenAiResponse = {
-	choices: {
-		finish_reason: "stop";
-		index: number;
-		message: OpenAiMessage;
-	}[];
-	created: number;
-	id: string;
-	model: string;
-	object: string;
-	usage: {
-		completion_tokens: number;
-		prompt_tokens: number;
-		total_tokens: number;
-	}
-};
 type OpenAiPayload = {
 	model: string;
 	messages: unknown[];
@@ -116,13 +128,14 @@ export const GptOpenAI = {
 			}
 		}
 
+		const isSearch = (modelData.search === true);
 		const json: OpenAiPayload = {
 			model: modelData.url,
 			messages,
 			user: getUserHash(context)
 		};
 
-		if (modelData.search !== true) {
+		if (!isSearch) {
 			json.top_p = 1;
 			json.frequency_penalty = 0;
 			json.presence_penalty = 0;
@@ -130,20 +143,34 @@ export const GptOpenAI = {
 		if (modelData.flexProcessing === true) {
 			json.service_tier = "flex";
 		}
-
 		if (modelData.usesCompletionTokens === true) {
 			json.reasoning_effort = "low";
 			json.max_completion_tokens = 2500;
 		}
 
-		const response = await core.Got.get("GenericAPI")<OpenAiResponse>({
+		const response = await core.Got.get("GenericAPI")<unknown>({ // unknown - will be zod-validated later
 			method: "POST",
 			throwHttpErrors: false,
-			url: `https://api.openai.com/v1/chat/completions`,
+			url: (isSearch)
+				? "https://api.openai.com/v1/responses"
+				: "https://api.openai.com/v1/chat/completions",
 			headers: {
 				Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 			},
-			json
+			json: (isSearch)
+				? {
+					model: modelData.url,
+					input: messages,
+					tools: [{
+						type: "web_search",
+						search_context_size: "low"
+					}],
+					tool_choice: "required",
+					max_tool_calls: 1,
+					reasoning: { effort: "low" },
+					safety_identifier: getUserHash(context)
+				}
+				: json
 		});
 
 		return {
@@ -152,24 +179,39 @@ export const GptOpenAI = {
 		};
 	},
 
-	getUsageRecord (response: GotResponse<OpenAiResponse>) {
-		return response.body.usage.total_tokens;
+	getUsageRecord (response: GotResponse) {
+		return openAiResponseSchema.parse(response.body).usage.total_tokens;
 	},
-	getPromptTokens (response: GotResponse<OpenAiResponse>) {
-		return response.body.usage.prompt_tokens;
+	getPromptTokens (response: GotResponse) {
+		const data = openAiResponseSchema.parse(response.body);
+		return (data.object === "response")
+			? data.usage.input_tokens
+			: data.usage.prompt_tokens;
 	},
-	getCompletionTokens (response: GotResponse<OpenAiResponse>) {
-		return response.body.usage.completion_tokens;
+	getCompletionTokens (response: GotResponse) {
+		const data = openAiResponseSchema.parse(response.body);
+		return (data.object === "response")
+			? data.usage.output_tokens
+			: data.usage.completion_tokens;
 	},
-	getProcessingTime (response: GotResponse<OpenAiResponse>) {
+	getProcessingTime (response: GotResponse) {
 		if (!response.headers["openai-processing-ms"]) {
 			return null;
 		}
 
 		return Number(response.headers["openai-processing-ms"]);
 	},
-	extractMessage (context, response: GotResponse<OpenAiResponse>) {
-		const message = response.body.choices[0].message.content.trim();
+	extractMessage (context, response: GotResponse) {
+		const data = openAiResponseSchema.parse(response.body);
+		const message = (data.object === "response")
+			? data.output
+				.flatMap(i => i.content ?? [])
+				.filter(i => i.type === "output_text")
+				.map(i => i.text ?? "")
+				.join("")
+				.trim()
+			: data.choices[0].message.content.trim();
+
 		if (context.platform.name === "twitch") {
 			return (context.append.pipe)
 				? trimMarkdownLinks(message)

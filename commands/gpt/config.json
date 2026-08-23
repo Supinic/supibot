@@ -22,7 +22,7 @@
   },
   "models": {
     "base": {
-      "url": "gpt-5.4",
+      "url": "gpt-5.6-sol",
       "type": "openai",
       "default": true,
       "inputLimit": 1500,
@@ -42,17 +42,17 @@
       "noTemperature": true
     },
     "nano": {
-      "url": "gpt-5.4-nano",
+      "url": "gpt-5.6-luna",
       "type": "openai",
       "default": false,
       "inputLimit": 1500,
-      "pricePerMtoken": 0.25,
+      "pricePerMtoken": 0.04,
       "usesCompletionTokens": true,
       "flexProcessing": false,
       "noTemperature": true
     },
     "search": {
-      "url": "gpt-4o-mini-search-preview",
+      "url": "gpt-5.6-luna",
       "type": "openai",
       "default": false,
       "inputLimit": 1000,
@@ -62,7 +62,7 @@
       },
       "search": true,
       "pricePerMtoken": 0.12,
-      "flatCost": 3000
+      "flatCost": 500
     },
     "mixtral": {
       "url": "mistralai/Mixtral-8x22B-Instruct-v0.1",
