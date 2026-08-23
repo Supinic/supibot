@@ -7,7 +7,6 @@ import {
 	YOUTUBE_VIDEO_SUBSCRIPTION_TITLE,
 	type YoutubeChannelSubData
 } from "../../commands/subscribe/event-types/youtube-video.js";
-import { logger } from "../../singletons/logger.js";
 
 type SubData = {
 	userId: User["ID"];
@@ -57,8 +56,6 @@ export default {
 		const updatedChannels = new Set<string>();
 		const channelVideosMap = new Map<string, string[]>();
 		const ts = SupiDate.now() % 15;
-
-		const debugData: unknown[] = [];
 
 		for (const channelId of uniqueChannelIds) {
 			const response = await core.Got.get("GenericAPI")({
