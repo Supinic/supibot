@@ -1,10 +1,17 @@
+import * as z from "zod";
 import { SupiError } from "supi-core";
 import { hasDefinition, getName, getDefinition } from "../../../utils/languages.js";
 import type { TranslateSubcommandDefinition } from "../index.js";
 
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
+const resultSchema = z.union([
+	z.tuple([z.string()]),
+	z.tuple([
+		z.tuple([z.string(), z.string()])
+	])
+]);
 
-export const getGoogleLanguageList = async () => {
+const getGoogleLanguageList = async () => {
 	let codeList = await core.Cache.getByPrefix(LANGUAGE_LIST_KEY) as string[] | null;
 	if (!codeList) {
 		const response = await core.Got.get("FakeAgent")({
@@ -38,47 +45,17 @@ export const getGoogleLanguageList = async () => {
 	return codeList;
 };
 
-type GoogleTranslateResponse = [
-	[
-		string,
-		string,
-		unknown,
-		unknown,
-		number,
-		unknown,
-		unknown,
-		[string, string],
-		[string, string]
-	][],
-	unknown,
-	string,
-	unknown,
-	unknown,
-	unknown,
-	number | null,
-	[]
-];
-
 export default {
 	name: "google",
 	title: "Google",
 	aliases: [],
 	default: true,
 	description: [],
-	getDescription: async (prefix) => {
+	getDescription: async () => {
 		const rawList = await getGoogleLanguageList();
 		const list = rawList.sort();
 
 		return [
-			`<code>${prefix}translate confidence:(true | false) (text)</code>`,
-			"<b>Only works for the Google translation engine!</b>",
-			"Translates the text, and outputs the result text with direction, but without the confidence percentage.",
-			"",
-
-			"See examples:",
-			`<code>${prefix}translate confidence:true FeelsDankMan</code> => English (51%) -> English: FeelsDankMan`,
-			`<code>${prefix}translate confidence:false FeelsDankMan</code> => English -> English: FeelsDankMan`,
-
 			"List of supported language codes, as provided by Google:",
 			`<code>${list.join(" ")}</code>`
 		];
@@ -95,8 +72,7 @@ export default {
 		const textOnly = context.params.textOnly ?? context.append.pipe;
 		const options = {
 			from: "auto",
-			to: "en",
-			confidence: context.params.confidence ?? !textOnly
+			to: "en"
 		};
 
 		for (const option of ["from", "to"] as const) {
@@ -127,14 +103,16 @@ export default {
 			options.to = (userDefaultLanguage) ? userDefaultLanguage.code.toLowerCase() : "en";
 		}
 
-		const response = await core.Got.get("FakeAgent")<GoogleTranslateResponse>({
-			url: "https://translate.googleapis.com/translate_a/single",
+		const response = await core.Got.get("FakeAgent")({
+			url: "https://clients5.google.com/translate_a/t",
 			responseType: "json",
+			headers: {
+				"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"
+			},
 			throwHttpErrors: false,
 			searchParams: {
-				client: "gtx",
+				client: "dict-chrome-ex",
 				dt: "t",
-				// Correct usage, the API expects this
 				ie: "UTF-8",
 				oe: "UTF-8",
 				sl: options.from,
@@ -158,25 +136,26 @@ export default {
 			};
 		}
 
-		const data = response.body;
-		const text = data[0].map(i => i[0]).join(" ");
+		let text: string;
+		let fromLanguageId: string = options.from;
+		const data = resultSchema.parse(response.body);
+		if (Array.isArray(data[0])) {
+			text = data[0][0];
+			fromLanguageId = data[0][1];
+		}
+		else {
+			text = data[0];
+		}
 
-		const languageID = data[2].replace(/-.*/, "");
-		let fromLanguageName = getName(languageID);
+		let fromLanguageName = getName(fromLanguageId);
 		if (!fromLanguageName) {
-			console.warn("$translate - could not get language name", { data, options, languageID, query });
-			fromLanguageName = `(language code: ${languageID})`;
+			console.warn("$translate - could not get language name", { data, options, fromLanguageId, query });
+			fromLanguageName = `(language code: ${fromLanguageId})`;
 		}
 
 		const additionalInfo = [];
 		if (!textOnly) {
 			additionalInfo.push(core.Utils.capitalize(fromLanguageName));
-
-			if (options.confidence && data[6] && data[6] !== 1) {
-				const confidence = `${core.Utils.round(data[6] * 100, 0)}%`;
-				additionalInfo.push(`(${confidence})`);
-			}
-
 			const toLanguageName = core.Utils.capitalize(getName(options.to) ?? "(unknown)");
 			additionalInfo.push("→", `${toLanguageName}:`);
 		}
