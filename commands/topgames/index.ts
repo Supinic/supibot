@@ -27,11 +27,13 @@ export default declare({
 	Whitelist_Response: null,
 	Code: async function topGames () {
 		const response = await core.Got.get("TwitchGQL")({
+			url: "gql",
 			responseType: "json",
 			headers: {
 				Referer: "https://www.twitch.tv/"
 			},
 			body: JSON.stringify([{
+				operationName: "BrowsePage_AllDirectories",
 				extensions: {
 					persistedQuery: {
 						version: 1,
@@ -40,6 +42,7 @@ export default declare({
 				},
 				variables: {
 					limit: 10,
+					tags: [],
 					options: {
 						sort: "VIEWER_COUNT"
 					}

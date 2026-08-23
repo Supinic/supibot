@@ -1492,6 +1492,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 	async fetchChannelPointsData (channelLogin: string): Promise<ChannelPointsData | null> {
 		const response = await core.Got.get("TwitchGQL")({
+			url: "gql",
 			responseType: "json",
 			headers: {
 				Referer: "https://www.twitch.tv/"
