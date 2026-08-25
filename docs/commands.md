@@ -72,7 +72,7 @@ This can be different for each platform, hence why this level of abstraction exi
 
 ### Command code API
 The entirety of each command's code consists of a single function. 
-This function will be `await`-ed in `checkAndExecute` regardless of whether it is sync or async, so if asynchronous behaviour is requred, the function should be declared as `async`.
+This function will be `await`-ed in `checkAndExecute` regardless of whether it is sync or async, so if asynchronous behaviour is required, the function should be declared as `async`.
 
 All command functions are await-ed.
 So, if asynchronous operation is required, feel free to make the function `async` and use `await` inside of it.
