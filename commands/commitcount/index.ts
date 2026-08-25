@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
 import { gitHandlerMap, defaultGitProvider, gitHandlerNames } from "./providers/index.js";
-import { declare } from "../../classes/command.js";
+import { declare, isResultFailure } from "../../classes/command.js";
 
 export default declare({
 	Name: "commitcount",
@@ -14,7 +14,7 @@ export default declare({
 		{ name: "host", type: "string" }
 	],
 	Whitelist_Response: null,
-	Code: (async function commitCount (context, username) {
+	Code: (async function commitCount (context, username?: string) {
 		const provider = (context.params.type)
 			? gitHandlerMap.get(context.params.type)
 			: defaultGitProvider;
@@ -36,12 +36,12 @@ export default declare({
 
 		const result = await provider.execute({
 			user: context.user,
-			username,
+			username: username ?? null,
 			threshold,
 			host: context.params.host ?? null
 		});
 
-		if (!result.success) {
+		if (isResultFailure(result)) {
 			return result;
 		}
 
@@ -55,18 +55,14 @@ export default declare({
 			since = "in the past 24 hours";
 		}
 
-		let who;
-		result.self ??= (context.user.Name === sb.User.normalizeUsername(username));
-
-		if (result.self) {
-			who = "You have";
-		}
-		else {
-			who = `${provider.prettyName} user ${username} has`;
-		}
+		result.self ??= (!username || context.user.Name === sb.User.normalizeUsername(username));
+		const who = (result.self)
+			? "You have"
+			: `${provider.prettyName} user ${username} has`;
 
 		const suffix = (result.commitCount === 1) ? "" : "s";
 		return {
+			success: true,
 			reply: `${who} created ${result.commitCount} commit${suffix} ${since}.`
 		};
 	}),
