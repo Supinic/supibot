@@ -44,7 +44,6 @@ export default {
 	title: "Shooting Stars",
 	aliases: ["star"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		"<u>Shooting Stars</u>",
 		`<code>${prefix}osrs stars</code>`,

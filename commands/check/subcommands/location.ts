@@ -4,7 +4,6 @@ export default {
 	name: "location",
 	title: "User location",
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check location</code>`,
 		`Checks your location, as set up within Supibot. Respects private locations.`,

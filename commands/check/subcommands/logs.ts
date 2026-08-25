@@ -6,7 +6,6 @@ export default {
 	name: "logs",
 	title: "Supibot channel logging",
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check logs</code>`,
 		`Checks the Supibot chat line logging status of the current channel.`

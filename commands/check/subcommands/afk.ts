@@ -7,7 +7,6 @@ export default {
 	name: "afk",
 	title: "AFK status",
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check afk (username)</code>`,
 		`Checks if the specified user is currently AFK.`,

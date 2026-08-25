@@ -15,7 +15,6 @@ export default {
 	title: "Kill count",
 	aliases: ["kill-count"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}osrs kc activity:"(activity name)" (username)</code>`,
 		`<code>${prefix}osrs kill-count activity:"(activity name)" (username)</code>`,

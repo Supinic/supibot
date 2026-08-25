@@ -9,7 +9,6 @@ export default {
 	title: "Online player count",
 	aliases: ["pc"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}osrs playercount</code>`,
 		"Fetches the current amount of players online for OSRS",

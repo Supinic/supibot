@@ -71,7 +71,6 @@ export default {
 	title: "Link/unlink Twitch redemptions",
 	aliases: [],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		"Links or unlinks the <code>add</code> command from being usable only via a given Twitch channel point reward.",
 		`When linked, the <code>${prefix}7tv add</code> command will only be usable when the given points reward is used alongside the command.`,

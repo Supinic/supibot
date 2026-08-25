@@ -7,7 +7,6 @@ export default {
 	name: "error",
 	title: "Inspect a Supibot Error by its ID",
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check error (ID)</code>`,
 		`If you have been granted access, you can check the full text of an error within Supibot, based on its ID.`

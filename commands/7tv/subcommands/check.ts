@@ -6,7 +6,6 @@ export default {
 	title: "Check current emotes",
 	aliases: ["list"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		"Posts the list of the rotating 7TV emotes in the current channel.",
 		"The emotes will be posted oldest to newest.",

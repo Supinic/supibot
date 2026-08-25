@@ -6,7 +6,6 @@ export default {
 	title: "Remove an emote",
 	aliases: [],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		"Removes an emote that's currently in the list.",
 		"Users can only remove emotes added by themselves; ambassadors and channel owners can remove any of them.",

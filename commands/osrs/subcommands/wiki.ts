@@ -5,7 +5,6 @@ export default {
 	title: "Search the Wiki",
 	aliases: ["search"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		"<u>Search the Wiki</u>",
 		`<code>${prefix}osrs search (query)</code>`,

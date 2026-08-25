@@ -329,16 +329,17 @@ type CooldownDefinition = number | null | CooldownObject;
 
 export type ExtractContext <T extends CommandDefinition> = Parameters<T["Code"]>[0];
 
-export interface SubcommandDefinition<T extends CommandDefinition = CommandDefinition> {
+type SubcommandDescription =
+	| { description: string[]; getDescription?: never; }
+	| { description?: never; getDescription: (prefix: string) => string[] | Promise<string[]>; };
+export type SubcommandDefinition <T extends CommandDefinition = CommandDefinition> = {
 	name: string;
 	title: string;
 	aliases: string[];
-	description: string[];
-	getDescription?: (prefix: string) => string[] | Promise<string[]>;
 	default?: boolean;
 	flags?: Record<string, boolean>;
 	execute: (this: Command, context: ExtractContext<T>, ...args: string[]) => StrictResult | Promise<StrictResult>;
-}
+} & SubcommandDescription;
 
 export class SubcommandCollection {
 	public readonly name: string;
@@ -386,7 +387,7 @@ export class SubcommandCollection {
 	async createDescription () {
 		const result: string[] = [];
 		for (const subcommand of this.subcommands) {
-			const description = (subcommand.getDescription)
+			const description = (typeof subcommand.getDescription === "function")
 				? await subcommand.getDescription(Command.prefix)
 				: subcommand.description;
 

@@ -6,7 +6,6 @@ export const AfkStatistic = {
 	name: "afk",
 	aliases: ["total-afk", ...afkStatuses],
 	title: "Away from keyboard statuses",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats afk</code>`,
 		`<code>${prefix}stats (other types)</code>`,
@@ -97,7 +96,6 @@ export const LongestAfkStatistic = {
 	name: "longest-afk",
 	title: "Away from keyboard statuses",
 	aliases: ["longestafk"],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats longest-afk</code>`,
 		`<code>${prefix}stats longestafk</code>`,

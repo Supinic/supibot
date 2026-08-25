@@ -18,7 +18,6 @@ export default {
 	name: "add",
 	title: "Add emote",
 	aliases: ["replace"],
-	description: [],
 	default: true,
 	getDescription: (prefix) => [
 		"Adds or replaces an emote to the current channel's rotating list.",

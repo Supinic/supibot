@@ -15,7 +15,6 @@ export default {
 	name: "suggest",
 	aliases: ["suggestion", "suggestions"],
 	title: "Details and info about suggestions",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check suggest</code>`,
 		`<code>${prefix}check suggestion</code>`,

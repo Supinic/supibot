@@ -27,7 +27,6 @@ export default {
 	title: "Item prices",
 	aliases: [],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}osrs price (item)</code>`,
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`

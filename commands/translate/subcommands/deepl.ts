@@ -37,7 +37,6 @@ export default {
 	title: "DeepL",
 	aliases: [],
 	default: false,
-	description: [],
 	getDescription: (prefix) => {
 		formalitySupportedLanguageNames ??= formalitySupportedLanguages.map(i => {
 			const name = getName(i);

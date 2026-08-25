@@ -8,7 +8,6 @@ export default {
 	title: "Change the amount of emotes",
 	aliases: ["amount"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		"Adjusts the amount (or limit) of emotes in the rotating list.",
 		"",

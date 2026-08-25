@@ -4,7 +4,6 @@ export const UserCookieCountStatistic = {
 	name: "cookiecount",
 	aliases: ["cc", "cookie", "cookies"],
 	title: "Cookies eaten",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats cc</code>`,
 		`<code>${prefix}stats cookies</code>`,
@@ -101,7 +100,6 @@ export const TotalCookieCountStatistic = {
 	name: "totalcookiecount",
 	aliases: ["tcc"],
 	title: "Total cookies eaten",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats tcc</code>`,
 		`<code>${prefix}stats totalcookiecount</code>`,

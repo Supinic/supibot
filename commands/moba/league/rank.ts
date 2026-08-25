@@ -8,7 +8,6 @@ export default {
 	name: "rank",
 	title: "Rank",
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}league (region) (username)</code>`,
 		`<code>${prefix}league rank (region) (username)</code>`,

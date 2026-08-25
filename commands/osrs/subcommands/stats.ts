@@ -8,7 +8,6 @@ export default {
 	title: "Skill levels",
 	aliases: [],
 	default: true,
-	description: [],
 	getDescription: (prefix) => [
 		"Skill level overview",
 		`<code>${prefix}osrs (username)</code>`,

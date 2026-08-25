@@ -4,7 +4,6 @@ export default {
 	name: "active-chatters",
 	title: "Active chatters",
 	aliases: ["ac"],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats active-chatters</code>`,
 		`<code>${prefix}stats ac</code>`,

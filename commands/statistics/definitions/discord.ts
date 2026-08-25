@@ -4,7 +4,6 @@ export default {
 	name: "discord",
 	aliases: [],
 	title: "Discord server count",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats discord</code>`,
 		"Posts how many Discord servers Supibot is currently in."

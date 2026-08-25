@@ -28,7 +28,6 @@ export default {
 	title: "Current leagues",
 	default: true,
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		"Posts data about the upcoming or current league.",
 		"",

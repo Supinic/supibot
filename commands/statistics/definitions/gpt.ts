@@ -8,7 +8,6 @@ export default {
 	name: "gpt",
 	aliases: [],
 	title: "ChatGPT usage",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats gpt</code>`,
 		`Checks how many queries and tokens have been used in the <a href="/bot/command/detail/gpt">$gpt command</a> this month.`
