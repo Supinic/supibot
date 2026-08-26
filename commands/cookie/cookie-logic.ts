@@ -3,6 +3,7 @@ import { randomInt } from "../../utils/command-utils.js";
 import fortuneCookieData from "./fortune-cookies.json" with { type: "json" };
 import type { UserDataPropertyMap } from "../../classes/custom-data-properties.js";
 import type { ResultFailure } from "../../classes/command.js";
+import type User from "../../classes/user.js";
 
 type CookieData = NonNullable<UserDataPropertyMap["cookie"]>;
 type UserOptions = {
@@ -39,17 +40,26 @@ const basicStats = {
 	}
 } satisfies CookieData;
 
-const getInitialStats = () => structuredClone(basicStats);
+export const getInitialCookieStats = () => structuredClone(basicStats);
+
+export const getValidUserCookieData = async (user: User): Promise<CookieData> => {
+	const cookieData = await user.getDataProperty("cookie") ?? getInitialCookieStats();
+	if (hasOutdatedDailyCookieStats(cookieData)) {
+		resetDailyCookieStats(cookieData);
+	}
+
+	return cookieData;
+};
 
 /**
  * Determines if the cookie data has an outdated daily property.
  */
-const hasOutdatedDailyStats = (data: CookieData): boolean => {
+export const hasOutdatedDailyCookieStats = (data: CookieData): boolean => {
 	const today = SupiDate.getTodayUTC();
 	return (data.lastTimestamp.daily < today);
 };
 
-const resetDailyStats = (data: CookieData): void => {
+export const resetDailyCookieStats = (data: CookieData): void => {
 	data.lastTimestamp.daily = 0;
 	data.today.donated = 0;
 	data.today.received = 0;
@@ -60,7 +70,7 @@ const resetDailyStats = (data: CookieData): void => {
 /**
  * Determines if an extra cookie is available to be eaten today.
  */
-const hasExtraCookieAvailable = (data: CookieData, options: UserOptions = {}): boolean => {
+export const hasExtraCookieAvailable = (data: CookieData, options: UserOptions = {}): boolean => {
 	if (options.hasDoubleCookieAccess !== true) {
 		return false;
 	}
@@ -72,7 +82,7 @@ const hasExtraCookieAvailable = (data: CookieData, options: UserOptions = {}): b
 /**
  * Determines what type of cookie is available to be eaten today.
  */
-const determineAvailableDailyCookieType = (data: CookieData, options: UserOptions = {}): "daily" | "golden" | "none" => {
+export const determineAvailableDailyCookieType = (data: CookieData, options: UserOptions = {}): "daily" | "golden" | "none" => {
 	const today = SupiDate.getTodayUTC();
 	if (options.hasDoubleCookieAccess === true) {
 		const used = data.today.eaten.daily + data.today.donated;
@@ -98,7 +108,7 @@ const determineAvailableDailyCookieType = (data: CookieData, options: UserOption
 /**
  * Determines if a cookie is available to be eaten today.
  */
-const canEatDailyCookie = (data: CookieData, options: UserOptions = {}): boolean => {
+export const canEatDailyCookie = (data: CookieData, options: UserOptions = {}): boolean => {
 	const today = SupiDate.getTodayUTC();
 	if (options.hasDoubleCookieAccess === true) {
 		const used = data.today.eaten.daily + data.today.donated;
@@ -111,7 +121,7 @@ const canEatDailyCookie = (data: CookieData, options: UserOptions = {}): boolean
 /**
  * Determines if a cookie (whether received from someone else as a gift) is available to be eaten.
  */
-const canEatReceivedCookie = (data: CookieData): boolean => {
+export const canEatReceivedCookie = (data: CookieData): boolean => {
 	const today = SupiDate.getTodayUTC();
 	return (data.lastTimestamp.received === today);
 };
@@ -119,7 +129,7 @@ const canEatReceivedCookie = (data: CookieData): boolean => {
 /**
  * Determines if the user has donated their cookie(s) today.
  */
-const hasDonatedDailyCookie = (data: CookieData): boolean => {
+export const hasDonatedDailyCookie = (data: CookieData): boolean => {
 	const today = SupiDate.getTodayUTC();
 	return (data.lastTimestamp.daily === today && data.today.donated !== 0);
 };
@@ -129,7 +139,7 @@ const hasDonatedDailyCookie = (data: CookieData): boolean => {
  * @param {ExtraUserOptions} [options]
  * @returns {boolean} `false` if unable to eat, `true` if the process succeeded.
  */
-const eatDailyCookie = (data: CookieData, options: UserOptions = {}) => {
+export const eatDailyCookie = (data: CookieData, options: UserOptions = {}) => {
 	const today = SupiDate.getTodayUTC();
 	if (!canEatDailyCookie(data, options)) {
 		return false;
@@ -151,7 +161,7 @@ const eatDailyCookie = (data: CookieData, options: UserOptions = {}) => {
 /**
  * @returns `false` if unable to eat, `true` if the process succeeded.
  */
-const eatReceivedCookie = (data: CookieData): boolean => {
+export const eatReceivedCookie = (data: CookieData): boolean => {
 	if (!canEatReceivedCookie(data)) {
 		return false;
 	}
@@ -163,7 +173,7 @@ const eatReceivedCookie = (data: CookieData): boolean => {
 	return true;
 };
 
-const eatCookie = (data: CookieData, options: UserOptions = {}): CookieLogicResponse => {
+export const eatCookie = (data: CookieData, options: UserOptions = {}): CookieLogicResponse => {
 	if (canEatDailyCookie(data, options)) {
 		eatDailyCookie(data, options);
 
@@ -200,7 +210,7 @@ const eatCookie = (data: CookieData, options: UserOptions = {}): CookieLogicResp
  * Attempts to donate a cookie to another user.
  * @returns {CookieLogicResponse}
  */
-const donateCookie = (donator: CookieData, receiver: CookieData, donatorOptions: UserOptions = {}, receiverOptions: UserOptions = {}): CookieLogicResponse => {
+export const donateCookie = (donator: CookieData, receiver: CookieData, donatorOptions: UserOptions = {}, receiverOptions: UserOptions = {}): CookieLogicResponse => {
 	if (canEatReceivedCookie(donator)) { // Got donated cookie, can't donate those
 		return {
 			success: false,
@@ -256,22 +266,7 @@ const donateCookie = (donator: CookieData, receiver: CookieData, donatorOptions:
 };
 
 /* istanbul ignore next */
-const fetchRandomCookieText = (): string => {
+export const fetchRandomCookieText = (): string => {
 	const cookie = core.Utils.randArray(fortuneCookieData);
 	return cookie.text;
-};
-
-export default {
-	determineAvailableDailyCookieType,
-	canEatDailyCookie,
-	canEatReceivedCookie,
-	donateCookie,
-	eatCookie,
-	eatDailyCookie,
-	eatReceivedCookie,
-	fetchRandomCookieText,
-	getInitialStats,
-	hasDonatedDailyCookie,
-	hasOutdatedDailyStats,
-	resetDailyStats
 };

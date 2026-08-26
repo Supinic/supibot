@@ -1,16 +1,19 @@
-import CookieLogic from "../cookie-logic.js";
+import { canEatDailyCookie, canEatReceivedCookie, donateCookie, getValidUserCookieData } from "../cookie-logic.js";
+import type { CookieSubcommandDefinition } from "../index.js";
 
 export default {
 	name: "donate",
+	title: "Donate cookie to someone else",
+	default: false,
 	aliases: ["gift", "give"],
-	description: [
-		`<code>$cookie donate (user)</code>`,
-		`<code>$cookie gift (user)</code>`,
-		`<code>$cookie give (user)</code>`,
+	getDescription: (prefix) => [
+		`<code>${prefix}cookie donate (user)</code>`,
+		`<code>${prefix}cookie gift (user)</code>`,
+		`<code>${prefix}cookie give (user)</code>`,
 		"Gives your daily cookie to another other user, if you so wish.",
 		"Cookies received in this fashion cannot be passed to someone else."
 	],
-	execute: async (context, cookieData, subcommandName, receiver) => {
+	execute: async (context, subcommandName, receiver) => {
 		if (!receiver) {
 			return {
 				success: false,
@@ -18,6 +21,7 @@ export default {
 			};
 		}
 
+		const cookieData = await getValidUserCookieData(context.user);
 		const receiverUserData = await sb.User.get(receiver);
 		if (!receiverUserData) {
 			return {
@@ -27,44 +31,41 @@ export default {
 		}
 		else if (receiverUserData.Name === context.platform.Self_Name) {
 			return {
+				success: false,
 				reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
 			};
 		}
 		else if (context.user === receiverUserData) {
 			return {
-				reply: (!CookieLogic.canEatDailyCookie(cookieData) && !CookieLogic.canEatReceivedCookie(cookieData))
+				success: false,
+				reply: (!canEatDailyCookie(cookieData) && !canEatReceivedCookie(cookieData))
 					? "You already ate or donated your daily cookie today, so you can't donate it, not even to yourself!"
 					: "Okay...! So you passed the cookie from one hand to the other... Now what?"
 			};
 		}
 
-		const platform = sb.Platform.get("twitch");
-		const receiverHasDoubleCookieAccess = await platform.fetchUserAdminSubscription(receiverUserData);
-		const receiverOptions = {
-			hasDoubleCookieAccess: receiverHasDoubleCookieAccess
-		};
+		const platform = sb.Platform.getAsserted("twitch");
+		const receiverCookieData = await getValidUserCookieData(receiverUserData);
+		const result = donateCookie(
+			cookieData,
+			receiverCookieData,
+			{ hasDoubleCookieAccess: await platform.fetchUserAdminSubscription(context.user) },
+			{ hasDoubleCookieAccess: await platform.fetchUserAdminSubscription(receiverUserData) }
+		);
 
-		const { transaction } = context;
-		/** @type {CookieData} */
-		const receiverCookieData = await receiverUserData.getDataProperty("cookie", { transaction }) ?? CookieLogic.getInitialStats();
-		if (CookieLogic.hasOutdatedDailyStats(receiverCookieData)) {
-			CookieLogic.resetDailyStats(receiverCookieData);
-		}
-
-		const hasDoubleCookieAccess = await platform.fetchUserAdminSubscription(context.user);
-		const result = CookieLogic.donateCookie(cookieData, receiverCookieData, { hasDoubleCookieAccess }, receiverOptions);
 		if (!result.success) {
 			return result;
 		}
 
 		await Promise.all([
-			context.user.setDataProperty("cookie", cookieData, { transaction }),
-			receiverUserData.setDataProperty("cookie", receiverCookieData, { transaction })
+			context.user.setDataProperty("cookie", cookieData),
+			receiverUserData.setDataProperty("cookie", receiverCookieData)
 		]);
 
 		const emote = await context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "😊");
 		return {
+			success: true,
 			reply: `Successfully given your cookie for today to ${receiverUserData.Name} ${emote}`
 		};
 	}
-};
+} satisfies CookieSubcommandDefinition;
