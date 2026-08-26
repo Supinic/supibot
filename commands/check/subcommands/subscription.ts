@@ -4,7 +4,6 @@ export default {
 	name: "subscription",
 	aliases: ["subscriptions", "sub", "subs"],
 	title: "Subscription events within Supibot",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check subs</code>`,
 		`<code>${prefix}check subscriptions</code>`,

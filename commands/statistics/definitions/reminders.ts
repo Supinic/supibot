@@ -5,7 +5,6 @@ export default {
 	name: "reminders",
 	aliases: [],
 	title: "Reminders",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats reminders</code>`,
 		"Shows how many times you or someone else have reminded someone."

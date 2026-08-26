@@ -6,7 +6,6 @@ export default {
 	name: "top-chatters",
 	aliases: ["topchatters"],
 	title: "Top 10 chatters by chat lines",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats top-chatters</code>`,
 		`Posts the top ${BASE_LIMIT} users by chat lines sent in the context of the current channel.`,

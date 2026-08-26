@@ -12,7 +12,6 @@ export default {
 	title: "Tears of Guthix",
 	aliases: ["tears", "tog"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}osrs tog</code>`,
 		`<code>${prefix}osrs tears</code>`,

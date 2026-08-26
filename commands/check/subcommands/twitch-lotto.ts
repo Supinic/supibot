@@ -7,7 +7,6 @@ export const TwitchLottoBlacklistSubcommand = {
 	name: "twitchlottoblacklist",
 	aliases: ["tlbl"],
 	title: "TwitchLotto blacklist info",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check tlbl</code>`,
 		`<code>${prefix}check twitchlottoblacklist</code>`,
@@ -35,7 +34,6 @@ export const TwitchLottoDescriptionSubcommand = {
 	name: "twitchlottodescription",
 	aliases: ["tld"],
 	title: "Description of a TwitchLotto link",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check tld</code>`,
 		`<code>${prefix}check twitchlottodescription</code>`,

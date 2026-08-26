@@ -6,7 +6,6 @@ export default {
 	name: "cookie",
 	title: "Cookie status",
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		`Checks the availability of fortune cookies as used in the <a href="/bot/command/detail/cookie">${prefix}cookie</a> command.`,
 		"",

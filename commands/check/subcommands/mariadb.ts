@@ -13,7 +13,6 @@ export default {
 	name: "mariadb",
 	title: "MariaDB process memory usage",
 	aliases: ["maria"],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check mariadb</code>`,
 		`Checks for the current memory usage of the MariaDB database process, running on Supinic's Raspberry Pi 4.`

@@ -6,7 +6,6 @@ export default {
 	title: "Item IDs",
 	aliases: ["item-id"],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}osrs itemid (item name)</code>`,
 		`Posts the item's in-game ID. Shows up to 5 best matching results.`

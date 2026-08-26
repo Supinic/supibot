@@ -97,7 +97,7 @@ const fetchEndpoint = async (force?: boolean) => {
 		scriptUrls.add(src.replace(/^\//, ""));
 	}
 
-	const regex = /\/api\/(\w+)\/init\?t=/i;
+	const regex = /\/api\/(.+?)\/init\?t=/i;
 	for (const url of scriptUrls) {
 		const response = await core.Got.get("FakeAgent")({
 			prefixUrl: "https://howlongtobeat.com",

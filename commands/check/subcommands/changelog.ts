@@ -4,7 +4,6 @@ export default {
 	name: "changelog",
 	title: "Supibot changelog",
 	aliases: [],
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check changelog</code>`,
 		`Posts a link to the Supibot changelog on Discord and on the website.`,

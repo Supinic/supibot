@@ -4,7 +4,6 @@ export default {
 	name: "aliases",
 	aliases: ["alias"],
 	title: "Aliases",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}stats aliases</code>`,
 		"Checks the statistics of all aliases globally.",

@@ -5,7 +5,6 @@ export default {
 	name: "ambassador",
 	aliases: ["ambassadors"],
 	title: "Channel ambassadors",
-	description: [],
 	getDescription: (prefix) => [
 		`<code>${prefix}check ambassadors</code>`,
 		`Posts a list of Supibot Ambassadors in the current channel.`,

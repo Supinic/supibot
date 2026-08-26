@@ -50,7 +50,6 @@ export default {
 	title: "Google",
 	aliases: [],
 	default: true,
-	description: [],
 	getDescription: async () => {
 		const rawList = await getGoogleLanguageList();
 		const list = rawList.sort();

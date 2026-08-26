@@ -16,7 +16,6 @@ export default {
 	title: "Game status",
 	aliases: [],
 	default: false,
-	description: [],
 	getDescription: (prefix) => [
 		"Game status",
 		`<code>${prefix}osrs status</code>`,

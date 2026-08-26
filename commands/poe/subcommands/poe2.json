@@ -33,6 +33,13 @@
       "name": "Runes of Aldur",
       "reveal": null,
       "launch": "2026-05-30",
+      "end": "2026-12-07"
+    },
+    {
+      "patch": "1.0",
+      "name": null,
+      "reveal": "2026-08-25",
+      "launch": "2026-12-11",
       "end": null
     }
   ]
