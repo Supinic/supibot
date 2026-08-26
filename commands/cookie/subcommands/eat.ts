@@ -1,4 +1,5 @@
 import { eatCookie, fetchRandomCookieText, getValidUserCookieData } from "../cookie-logic.js";
+import { isResultFailure } from "../../../classes/command.js";
 import type { CookieSubcommandDefinition } from "../index.js";
 
 export default {
@@ -17,7 +18,7 @@ export default {
 		const hasDoubleCookieAccess = await platform.fetchUserAdminSubscription(context.user);
 
 		const result = eatCookie(cookieData, { hasDoubleCookieAccess });
-		if (!result.success) {
+		if (isResultFailure(result)) {
 			return result;
 		}
 
@@ -26,6 +27,7 @@ export default {
 		const cookieText = fetchRandomCookieText();
 		const string = `Your ${result.type} cookie:`;
 		return {
+			success: true,
 			reply: `${string} ${cookieText}`
 		};
 	}

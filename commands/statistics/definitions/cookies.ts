@@ -1,7 +1,7 @@
 import type { StatsSubcommandDefinition } from "../index.js";
 import type { Context } from "../../../classes/command.js";
 
-export const getUserCookieCountStatistics = async (context: Context, user: string) => {
+export const getUserCookieCountStatistics = async (context: Context, user?: string) => {
 	const targetUser = (user) ? await sb.User.get(user) : context.user;
 	if (!targetUser) {
 		return {
@@ -96,7 +96,7 @@ export const UserCookieCountStatistic = {
 		`<code>${prefix}stats cookies (user)</code>`,
 		"Checks the cookies eaten for someone else, with the same karma check as above."
 	],
-	execute: async (context, type, user) => await getUserCookieCountStatistics(context, user)
+	execute: async (context, type, user?: string) => await getUserCookieCountStatistics(context, user)
 } satisfies StatsSubcommandDefinition;
 
 export const TotalCookieCountStatistic = {

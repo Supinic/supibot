@@ -1,4 +1,5 @@
 import { canEatDailyCookie, canEatReceivedCookie, donateCookie, getValidUserCookieData } from "../cookie-logic.js";
+import { isResultFailure } from "../../../classes/command.js";
 import type { CookieSubcommandDefinition } from "../index.js";
 
 export default {
@@ -13,11 +14,11 @@ export default {
 		"Gives your daily cookie to another other user, if you so wish.",
 		"Cookies received in this fashion cannot be passed to someone else."
 	],
-	execute: async (context, subcommandName, receiver) => {
+	execute: async (context, type, receiver) => {
 		if (!receiver) {
 			return {
 				success: false,
-				reply: `No user provided! Who do you want to ${subcommandName} the cookie to?`
+				reply: `No user provided! Who do you want to ${type} the cookie to?`
 			};
 		}
 
@@ -53,7 +54,7 @@ export default {
 			{ hasDoubleCookieAccess: await platform.fetchUserAdminSubscription(receiverUserData) }
 		);
 
-		if (!result.success) {
+		if (isResultFailure(result)) {
 			return result;
 		}
 

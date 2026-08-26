@@ -12,26 +12,26 @@ const cookieCommandDefinition = declare({
 	Flags: ["mention", "pipe", "rollback"],
 	Params: [],
 	Whitelist_Response: null,
-	Code: (async function cookie (context, subcommandName, receiver) {
-		const subcommand = (subcommandName)
-			? subcommands.find(i => i.name === subcommandName || i.aliases?.includes(subcommandName))
-			: defaultSubcommand;
+	Code: (async function cookie (context, type, ...args) {
+		const subcommand = (type)
+			? CookieSubcommands.get(type)
+			: CookieSubcommands.default;
 
-		if (subcommand) {
-			return await subcommand.execute(context, cookieData, subcommandName, receiver);
-		}
-		else {
+		if (!subcommand) {
 			return {
 				success: false,
-				reply: `Unrecognized subcommand! Use one of: ${subcommandNames}; or just use $cookie with no text behind.`
+				reply: `Unrecognized subcommand! Use one of: ${CookieSubcommands.names.join(", ")}; or just use $cookie with no text behind.`
 			};
 		}
+
+		return await subcommand.execute.call(this, context, type, ...args);
 	}),
-	Dynamic_Description: (async function (prefix) {
+	Dynamic_Description: async () => {
 		const utcMidnightToday = SupiDate.getTodayUTC();
 		const nextUtcMidnightDate = new SupiDate(utcMidnightToday).addHours(24);
 		const delta = core.Utils.timeDelta(nextUtcMidnightDate);
 
+		const subcommandDescriptions = await CookieSubcommands.createDescription();
 		return [
 			"Fetches a daily fortune cookie and read its wisdom!",
 			`Only available once per day, and resets at midnight UTC - which, from now, is ${delta}`,
@@ -39,7 +39,7 @@ const cookieCommandDefinition = declare({
 
 			...subcommandDescriptions
 		];
-	})
+	}
 });
 
 export default cookieCommandDefinition;
