@@ -1,7 +1,7 @@
 import { it, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert";
 
-import Logic from "../../../commands/cookie/cookie-logic.js";
+import * as Logic from "../../../commands/cookie/cookie-logic.js";
 import { TestWorld } from "../../test-utils.js";
 
 // Allow proper object cloning when `structuredClone` is not available
@@ -19,7 +19,7 @@ describe("cookie logic", () => {
 
 	describe("initial logic", () => {
 		it("can eat daily cookie", () => {
-			const data = Logic.getInitialStats();
+			const data = Logic.getInitialCookieStats();
 			const canEat = Logic.canEatDailyCookie(data);
 			assert.strictEqual(canEat, true);
 
@@ -40,15 +40,15 @@ describe("cookie logic", () => {
 		});
 
 		it("can not eat received cookie", () => {
-			const data = Logic.getInitialStats();
+			const data = Logic.getInitialCookieStats();
 			const canEat = Logic.canEatReceivedCookie(data);
 
 			assert.strictEqual(canEat, false);
 		});
 
 		it("can not donate a cookie if the daily one is not eaten", () => {
-			const donator = Logic.getInitialStats();
-			const receiver = Logic.getInitialStats();
+			const donator = Logic.getInitialCookieStats();
+			const receiver = Logic.getInitialCookieStats();
 
 			const result = Logic.donateCookie(donator, receiver);
 			const dump = JSON.stringify({ donator, receiver, result });
@@ -58,7 +58,7 @@ describe("cookie logic", () => {
 
 	describe("multi-step logic", () => {
 		it("can eat golden cookie if privileged", () => {
-			const data = Logic.getInitialStats();
+			const data = Logic.getInitialCookieStats();
 			assert.strictEqual(data.today.eaten.daily, 0);
 			assert.strictEqual(data.total.eaten.daily, 0);
 
@@ -74,10 +74,10 @@ describe("cookie logic", () => {
 		});
 
 		it("can donate, then eat golden cookie if privileged", () => {
-			const receiver = Logic.getInitialStats();
+			const receiver = Logic.getInitialCookieStats();
 			Logic.eatCookie(receiver);
 
-			const donator = Logic.getInitialStats();
+			const donator = Logic.getInitialCookieStats();
 			Logic.donateCookie(donator, receiver);
 
 			const result = Logic.eatCookie(donator, privileged);
@@ -87,7 +87,7 @@ describe("cookie logic", () => {
 		});
 
 		it("can not donate golden cookie if privileged", () => {
-			const donator = Logic.getInitialStats();
+			const donator = Logic.getInitialCookieStats();
 			const options = { hasDoubleCookieAccess: true };
 			assert.strictEqual(donator.today.eaten.daily, 0);
 			assert.strictEqual(donator.total.eaten.daily, 0);
@@ -97,7 +97,7 @@ describe("cookie logic", () => {
 			assert.strictEqual(donator.today.eaten.daily, 1);
 			assert.strictEqual(donator.total.eaten.daily, 1);
 
-			const receiver = Logic.getInitialStats();
+			const receiver = Logic.getInitialCookieStats();
 			const secondResult = Logic.donateCookie(donator, receiver, options);
 			assert.strictEqual(secondResult.success, false);
 
@@ -106,8 +106,8 @@ describe("cookie logic", () => {
 		});
 
 		it("can donate cookie and eat it", () => {
-			const donator = Logic.getInitialStats();
-			const receiver = Logic.getInitialStats();
+			const donator = Logic.getInitialCookieStats();
+			const receiver = Logic.getInitialCookieStats();
 			Logic.eatCookie(receiver);
 
 			const result = Logic.donateCookie(donator, receiver);
@@ -146,8 +146,8 @@ describe("cookie logic", () => {
 		});
 
 		it("can gift a cookie, eat one, but not two - if privileged", () => {
-			const donator = Logic.getInitialStats();
-			const receiver = Logic.getInitialStats();
+			const donator = Logic.getInitialCookieStats();
+			const receiver = Logic.getInitialCookieStats();
 
 			Logic.eatCookie(receiver);
 			const donateResult = Logic.donateCookie(donator, receiver);
@@ -162,8 +162,8 @@ describe("cookie logic", () => {
 		});
 
 		it("cannot donate an already donated cookie", () => {
-			const userOne = Logic.getInitialStats();
-			const userTwo = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
+			const userTwo = Logic.getInitialCookieStats();
 
 			Logic.eatCookie(userOne);
 			Logic.donateCookie(userTwo, userOne);
@@ -173,9 +173,9 @@ describe("cookie logic", () => {
 		});
 
 		it("cannot donate cookie to someone who already has a donated cookie pending", () => {
-			const userOne = Logic.getInitialStats();
-			const userTwo = Logic.getInitialStats();
-			const userThree = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
+			const userTwo = Logic.getInitialCookieStats();
+			const userThree = Logic.getInitialCookieStats();
 
 			Logic.eatCookie(userOne);
 			Logic.donateCookie(userTwo, userOne);
@@ -185,8 +185,8 @@ describe("cookie logic", () => {
 		});
 
 		it("cannot donate cookie to privileged user who didn't eat their golden cookie", () => {
-			const userOne = Logic.getInitialStats();
-			const userTwo = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
+			const userTwo = Logic.getInitialCookieStats();
 
 			Logic.eatCookie(userOne, privileged);
 
@@ -195,8 +195,8 @@ describe("cookie logic", () => {
 		});
 
 		it("cannot donate if already eaten", () => {
-			const userOne = Logic.getInitialStats();
-			const userTwo = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
+			const userTwo = Logic.getInitialCookieStats();
 
 			Logic.eatCookie(userOne);
 
@@ -205,8 +205,8 @@ describe("cookie logic", () => {
 		});
 
 		it("cannot donate if already donated", () => {
-			const userOne = Logic.getInitialStats();
-			const userTwo = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
+			const userTwo = Logic.getInitialCookieStats();
 
 			Logic.donateCookie(userOne, userTwo, notPrivileged, notPrivileged);
 
@@ -219,20 +219,20 @@ describe("cookie logic", () => {
 
 	describe("meta operations", () => {
 		it("properly resets daily stats after usage", () => {
-			const data = Logic.getInitialStats();
+			const data = Logic.getInitialCookieStats();
 
 			Logic.eatCookie(data);
 
-			const isOutdated = Logic.hasOutdatedDailyStats(data);
+			const isOutdated = Logic.hasOutdatedDailyCookieStats(data);
 			assert.strictEqual(isOutdated, false);
 
 			// Pretend that the timestamp has aged 1 day
 			data.lastTimestamp.daily -= 864e5;
 
-			const isOutdatedAfter = Logic.hasOutdatedDailyStats(data);
+			const isOutdatedAfter = Logic.hasOutdatedDailyCookieStats(data);
 			assert.strictEqual(isOutdatedAfter, true);
 
-			Logic.resetDailyStats(data);
+			Logic.resetDailyCookieStats(data);
 			assert.strictEqual(data.lastTimestamp.daily, 0);
 			assert.strictEqual(data.today.donated, 0);
 			assert.strictEqual(data.today.received, 0);
@@ -241,10 +241,10 @@ describe("cookie logic", () => {
 		});
 
 		it("allows eating a cookie after stats are reset", () => {
-			const data = Logic.getInitialStats();
+			const data = Logic.getInitialCookieStats();
 			Logic.eatCookie(data, notPrivileged);
 
-			Logic.resetDailyStats(data);
+			Logic.resetDailyCookieStats(data);
 
 			const canEat = Logic.canEatDailyCookie(data, notPrivileged);
 			assert.strictEqual(canEat, true);
@@ -254,12 +254,12 @@ describe("cookie logic", () => {
 		});
 
 		it("allows donating a cookie after stats are reset", () => {
-			const userOne = Logic.getInitialStats();
-			const userTwo = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
+			const userTwo = Logic.getInitialCookieStats();
 			Logic.eatCookie(userOne, notPrivileged);
 			Logic.eatCookie(userTwo, notPrivileged);
 
-			Logic.resetDailyStats(userOne);
+			Logic.resetDailyCookieStats(userOne);
 
 			const canEat = Logic.hasDonatedDailyCookie(userOne);
 			assert.strictEqual(canEat, false);
@@ -269,7 +269,7 @@ describe("cookie logic", () => {
 		});
 
 		it("cannot execute `Logic.eatDailyCookie` if already eaten", () => {
-			const userOne = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
 
 			Logic.eatCookie(userOne, notPrivileged);
 
@@ -278,7 +278,7 @@ describe("cookie logic", () => {
 		});
 
 		it("cannot execute `Logic.eatReceivedCookie` if none is available", () => {
-			const userOne = Logic.getInitialStats();
+			const userOne = Logic.getInitialCookieStats();
 			const result = Logic.eatReceivedCookie(userOne);
 			assert.strictEqual(result, false);
 		});
