@@ -4,9 +4,7 @@ import assert from "node:assert";
 import * as Logic from "../../../commands/cookie/cookie-logic.js";
 import { TestWorld } from "../../test-utils.js";
 
-// Allow proper object cloning when `structuredClone` is not available
-// E.g. in workers or in GitHub CI
-// eslint-disable-next-line
+// Allow proper simple object cloning when `structuredClone` is not available, e.g. in workers or in GitHub CI
 globalThis.structuredClone ??= (input) => JSON.parse(JSON.stringify(input));
 
 const notPrivileged = Object.freeze({ hasDoubleCookieAccess: false });

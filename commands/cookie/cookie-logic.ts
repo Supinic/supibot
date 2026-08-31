@@ -9,7 +9,9 @@ type CookieData = NonNullable<UserDataPropertyMap["cookie"]>;
 type UserOptions = {
 	hasDoubleCookieAccess?: boolean;
 };
-type CookieLogicResponse = { success: boolean; type: string; } | ResultFailure;
+
+type CookieType = "none" | "daily" | "golden" | "passed" | "received";
+type CookieLogicResponse = { success: boolean; type: CookieType; } | ResultFailure;
 
 const basicStats = {
 	lastTimestamp: {
@@ -17,7 +19,6 @@ const basicStats = {
 		received: 0
 	},
 	today: {
-		timestamp: 0,
 		donated: 0,
 		received: 0,
 		eaten: {
@@ -82,7 +83,7 @@ export const hasExtraCookieAvailable = (data: CookieData, options: UserOptions =
 /**
  * Determines what type of cookie is available to be eaten today.
  */
-export const determineAvailableDailyCookieType = (data: CookieData, options: UserOptions = {}): "daily" | "golden" | "none" => {
+export const determineAvailableDailyCookieType = (data: CookieData, options: UserOptions = {}): CookieType => {
 	const today = SupiDate.getTodayUTC();
 	if (options.hasDoubleCookieAccess === true) {
 		const used = data.today.eaten.daily + data.today.donated;
@@ -135,11 +136,9 @@ export const hasDonatedDailyCookie = (data: CookieData): boolean => {
 };
 
 /**
- * @param {CookieData} data
- * @param {ExtraUserOptions} [options]
- * @returns {boolean} `false` if unable to eat, `true` if the process succeeded.
+ * @returns `false` if unable to eat, `true` if the process succeeded.
  */
-export const eatDailyCookie = (data: CookieData, options: UserOptions = {}) => {
+export const eatDailyCookie = (data: CookieData, options: UserOptions = {}): boolean => {
 	const today = SupiDate.getTodayUTC();
 	if (!canEatDailyCookie(data, options)) {
 		return false;
@@ -265,7 +264,6 @@ export const donateCookie = (donator: CookieData, receiver: CookieData, donatorO
 	};
 };
 
-/* istanbul ignore next */
 export const fetchRandomCookieText = (): string => {
 	const cookie = core.Utils.randArray(fortuneCookieData);
 	return cookie.text;
