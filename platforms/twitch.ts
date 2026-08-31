@@ -37,6 +37,7 @@ import { SupiDate, SupiError } from "supi-core";
 import type { Emote, ThirdPartyEmote } from "../utils/globals.js";
 import type { TwitchSubscriberData } from "../utils/schemas.js";
 import { logger } from "../singletons/logger.js";
+import { supibotRegex } from "../utils/regexes.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -847,35 +848,38 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			// user's username, or that there is a different mishap happening. This case is unfortunately exceptional
 			// for the current user-database structure and the event handler must be aborted.
 			const channelData = (channelName) ? sb.Channel.get(channelName, this) : null;
+			const isEligibleMessage = sb.Command.is(messageData.text) || supibotRegex.test(messageData.text);
 
-			if (!channelName || (channelData && sb.Command.is(messageData.text))) {
-				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification") as boolean | undefined;
-				if (!notified) {
-					const replyMessage = core.Utils.tag.trim `
-						@${userData.Name}, I can't reply to your commands any more. 
-						This is because I have seen your username used on a different account.
-						To fix this: Go into my chat at twitch.tv/supibot then say the word "username" and I'll guide you through.
-						This takes just a minute at most :)
-					`;
+			const cacheKey = `twitch-recent-mismatch-notification-${userData.ID}`;
+			const notifiedRecently = await core.Cache.getByPrefix(cacheKey) as boolean | null;
 
-					if (channelData) {
-						const finalMessage = await this.prepareMessage(replyMessage, channelData);
-						if (!finalMessage) {
-							await this.pm(replyMessage, userData);
-						}
-						else {
-							await channelData.send(finalMessage);
-						}
-					}
-					else {
+			if (!notifiedRecently && (!channelData || isEligibleMessage)) {
+				const replyMessage = core.Utils.tag.trim `
+					@${userData.Name}, I can't reply to your commands any more. 
+					This is because I have seen your username used on a different account.
+					To fix this: Go into my chat at twitch.tv/supibot then say the word "username" and I'll guide you through.
+					This takes just a minute at most :)
+				`;
+
+				if (channelData) {
+					const finalMessage = await this.prepareMessage(replyMessage, channelData);
+					if (!finalMessage) {
 						await this.pm(replyMessage, userData);
 					}
-
-					await Promise.all([
-						logger.log("Twitch.Other", `Suspicious user: ${userData.Name} - ${userData.Twitch_ID}`, null, userData),
-						userData.setDataProperty("twitch-userid-mismatch-notification", true)
-					]);
+					else {
+						await channelData.send(finalMessage);
+					}
 				}
+				else {
+					await this.pm(replyMessage, userData);
+				}
+
+				await logger.log(
+					"Twitch.Other",
+					`User mismatch notified: ${userData.Name} - ${userData.Twitch_ID}`,
+					channelData,
+					userData
+				);
 			}
 
 			TwitchUtils.emitRawUserMessageEvent(senderUsername, senderUserId, channelName, this, messageData);

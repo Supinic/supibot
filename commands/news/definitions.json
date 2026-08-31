@@ -1118,5 +1118,31 @@
         "helpers": ["l7mon"]
       }
     ]
+  },
+  {
+    "code": "sm",
+    "language": "Italian",
+    "sources": [
+      {
+        "name": "GiornaleSM",
+        "url": "https://www.giornalesm.com",
+        "path": "category/san-marino",
+        "endpoints": ["feed"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "mc",
+    "language": "French",
+    "sources": [
+      {
+        "name": "Nice-Matin",
+        "url": "https://www.nicematin.com",
+        "path": null,
+        "endpoints": ["monaco/rss"],
+        "helpers": ["supinic"]
+      }
+    ]
   }
 ]

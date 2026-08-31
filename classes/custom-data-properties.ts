@@ -213,23 +213,13 @@ const userDataSchema = {
 	},
 	noAbbChatter: "boolean",
 	osrsGameUsername: "string",
-	pathOfExile: {} as {
-		uniqueTabs: string;
-	},
 	platformVerification: {} as Record<number, {
 		active?: boolean;
 		notificationSent?: boolean;
 	}>,
-	previousUserID: "string",
-	skipGlobalPing: "boolean",
-	supinicStreamSongRequestExtension: "number",
-	supiPoints: "number",
-	/** @deprecated */
-	timers: {} as Record<string, { date: number; }>,
-	trackLevel: "string",
 	trackListHelper: "boolean",
 	trustedTwitchLottoFlagger: "boolean",
-	"twitch-userid-mismatch-notification": "boolean"
+	twitchUseridMismatchData: {} as { timestamp: number; channel: Channel["ID"] | null; }
 } as const;
 
 export type ChannelDataPropertyMap = ConvertSchemaToType<typeof channelDataSchema>;
