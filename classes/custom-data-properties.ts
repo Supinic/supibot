@@ -214,9 +214,8 @@ const userDataSchema = {
 	},
 	noAbbChatter: "boolean",
 	osrsGameUsername: "string",
-	pathOfExile: {} as {
-		uniqueTabs: string;
-	},
+	/** @deprecated */
+	pathOfExile: {} as { uniqueTabs: string; },
 	platformVerification: {} as Record<number, {
 		active?: boolean;
 		notificationSent?: boolean;
@@ -230,6 +229,8 @@ const userDataSchema = {
 	trackLevel: "string",
 	trackListHelper: "boolean",
 	trustedTwitchLottoFlagger: "boolean",
+	twitchUseridMismatchData: {} as { timestamp: number; channel: Channel["ID"] | null; },
+	/** @deprecated */
 	"twitch-userid-mismatch-notification": "boolean"
 } as const;
 
