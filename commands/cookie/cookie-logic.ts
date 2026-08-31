@@ -3,15 +3,16 @@ import { randomInt } from "../../utils/command-utils.js";
 import fortuneCookieData from "./fortune-cookies.json" with { type: "json" };
 import type { UserDataPropertyMap } from "../../classes/custom-data-properties.js";
 import type { ResultFailure } from "../../classes/command.js";
-import type User from "../../classes/user.js";
+import type { User } from "../../classes/user.js";
 
 type CookieData = NonNullable<UserDataPropertyMap["cookie"]>;
 type UserOptions = {
 	hasDoubleCookieAccess?: boolean;
 };
 
-type CookieType = "none" | "daily" | "golden" | "passed" | "received";
-type CookieLogicResponse = { success: boolean; type: CookieType; } | ResultFailure;
+type CookieType = "daily" | "golden" | "received";
+type SimpleResponse = { success: true; } | ResultFailure;
+type TypeResponse = { success: true; type: CookieType; } | ResultFailure;
 
 const basicStats = {
 	lastTimestamp: {
@@ -83,7 +84,7 @@ export const hasExtraCookieAvailable = (data: CookieData, options: UserOptions =
 /**
  * Determines what type of cookie is available to be eaten today.
  */
-export const determineAvailableDailyCookieType = (data: CookieData, options: UserOptions = {}): CookieType => {
+export const determineAvailableDailyCookieType = (data: CookieData, options: UserOptions = {}): CookieType | null => {
 	const today = SupiDate.getTodayUTC();
 	if (options.hasDoubleCookieAccess === true) {
 		const used = data.today.eaten.daily + data.today.donated;
@@ -94,7 +95,7 @@ export const determineAvailableDailyCookieType = (data: CookieData, options: Use
 			return "golden";
 		}
 		else {
-			return "none";
+			return null;
 		}
 	}
 
@@ -102,7 +103,7 @@ export const determineAvailableDailyCookieType = (data: CookieData, options: Use
 		return "daily";
 	}
 	else {
-		return "none";
+		return null;
 	}
 };
 
@@ -172,7 +173,7 @@ export const eatReceivedCookie = (data: CookieData): boolean => {
 	return true;
 };
 
-export const eatCookie = (data: CookieData, options: UserOptions = {}): CookieLogicResponse => {
+export const eatCookie = (data: CookieData, options: UserOptions = {}): TypeResponse => {
 	if (canEatDailyCookie(data, options)) {
 		eatDailyCookie(data, options);
 
@@ -207,9 +208,9 @@ export const eatCookie = (data: CookieData, options: UserOptions = {}): CookieLo
 
 /**
  * Attempts to donate a cookie to another user.
- * @returns {CookieLogicResponse}
+ * @returns {TypeResponse}
  */
-export const donateCookie = (donator: CookieData, receiver: CookieData, donatorOptions: UserOptions = {}, receiverOptions: UserOptions = {}): CookieLogicResponse => {
+export const donateCookie = (donator: CookieData, receiver: CookieData, donatorOptions: UserOptions = {}, receiverOptions: UserOptions = {}): SimpleResponse => {
 	if (canEatReceivedCookie(donator)) { // Got donated cookie, can't donate those
 		return {
 			success: false,
@@ -259,7 +260,6 @@ export const donateCookie = (donator: CookieData, receiver: CookieData, donatorO
 	receiver.total.received++;
 
 	return {
-		type: "passed",
 		success: true
 	};
 };

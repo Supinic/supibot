@@ -24,6 +24,7 @@ describe("cookie logic", () => {
 
 			const result = Logic.eatCookie(data, notPrivileged);
 			assert.ok(!isResultFailure(result));
+			assert.strictEqual(result.type, "daily");
 
 			assert.strictEqual(data.today.eaten.daily, 1);
 			assert.strictEqual(data.today.eaten.received, 0);
@@ -62,19 +63,22 @@ describe("cookie logic", () => {
 
 			const firstResult = Logic.eatCookie(data, privileged);
 			assert.ok(!isResultFailure(firstResult));
+			assert.strictEqual(firstResult.type, "daily");
 			assert.strictEqual(data.today.eaten.daily, 1);
 			assert.strictEqual(data.total.eaten.daily, 1);
 
 			const secondResult = Logic.eatCookie(data, privileged);
 			assert.ok(!isResultFailure(secondResult));
+			assert.strictEqual(secondResult.type, "golden");
 			assert.strictEqual(data.today.eaten.daily, 2);
-			assert.strictEqual(data.total.eaten.daily, 1); // Total stats do not increase after eating the second cookie
+			assert.strictEqual(data.total.eaten.daily, 1); // Total stats should not increase after eating the second cookie
 		});
 
 		it("can donate, then eat golden cookie if privileged", () => {
 			const receiver = Logic.getInitialCookieStats();
 			const firstEatResult = Logic.eatCookie(receiver, notPrivileged);
 			assert.ok(!isResultFailure(firstEatResult));
+			assert.strictEqual(firstEatResult.type, "daily");
 
 			const donator = Logic.getInitialCookieStats();
 			const donationResult = Logic.donateCookie(donator, receiver, privileged, notPrivileged);
@@ -82,6 +86,7 @@ describe("cookie logic", () => {
 
 			const secondEatResult = Logic.eatCookie(donator, privileged);
 			assert.ok(!isResultFailure(secondEatResult));
+			assert.strictEqual(secondEatResult.type, "golden");
 
 			assert.strictEqual(donator.today.eaten.daily, 1);
 			assert.strictEqual(donator.total.eaten.daily, 0); // Total stats should not increase after eating the second cookie
@@ -94,12 +99,14 @@ describe("cookie logic", () => {
 
 			const firstResult = Logic.eatCookie(donator, privileged);
 			assert.ok(!isResultFailure(firstResult));
+			assert.strictEqual(firstResult.type, "daily");
 			assert.strictEqual(donator.today.eaten.daily, 1);
 			assert.strictEqual(donator.total.eaten.daily, 1);
 
 			const receiver = Logic.getInitialCookieStats();
 			const secondResult = Logic.donateCookie(donator, receiver, privileged, notPrivileged);
 			assert.ok(isResultFailure(secondResult));
+			assert.match(secondResult.reply, /golden cookie available.+can't gift/);
 
 			assert.strictEqual(donator.today.donated, 0);
 			assert.strictEqual(receiver.today.received, 0);
@@ -111,6 +118,7 @@ describe("cookie logic", () => {
 
 			const firstEatResult = Logic.eatCookie(receiver, notPrivileged);
 			assert.ok(!isResultFailure(firstEatResult));
+			assert.strictEqual(firstEatResult.type, "daily");
 
 			const donationResult = Logic.donateCookie(donator, receiver, notPrivileged, notPrivileged);
 			assert.ok(!isResultFailure(donationResult));
@@ -142,6 +150,7 @@ describe("cookie logic", () => {
 
 			const secondEatResult = Logic.eatCookie(receiver, notPrivileged);
 			assert.ok(!isResultFailure(secondEatResult));
+			assert.strictEqual(secondEatResult.type, "received");
 
 			assert.strictEqual(Logic.hasDonatedDailyCookie(donator), true);
 		});
@@ -152,6 +161,7 @@ describe("cookie logic", () => {
 
 			const eatResult = Logic.eatCookie(receiver, notPrivileged);
 			assert.ok(!isResultFailure(eatResult));
+			assert.strictEqual(eatResult.type, "daily");
 
 			const donateResult = Logic.donateCookie(donator, receiver, privileged, notPrivileged);
 			assert.ok(!isResultFailure(donateResult));
@@ -162,6 +172,7 @@ describe("cookie logic", () => {
 
 			const secondResult = Logic.eatCookie(donator, privileged);
 			assert.ok(isResultFailure(secondResult));
+			assert.match(secondResult.reply, /already opened.+another one at midnight/);
 		});
 
 		it("cannot donate an already donated cookie", () => {
@@ -170,12 +181,14 @@ describe("cookie logic", () => {
 
 			const eatResult = Logic.eatCookie(userOne, notPrivileged);
 			assert.ok(!isResultFailure(eatResult));
+			assert.strictEqual(eatResult.type, "daily");
 
 			const firstDonateResult = Logic.donateCookie(userTwo, userOne, notPrivileged, notPrivileged);
 			assert.ok(!isResultFailure(firstDonateResult));
 
 			const secondDonateResult = Logic.donateCookie(userOne, userTwo, notPrivileged, notPrivileged);
 			assert.ok(isResultFailure(secondDonateResult));
+			assert.match(secondDonateResult.reply, /was donated to you.+don't give it away/);
 		});
 
 		it("cannot donate cookie to someone who already has a donated cookie pending", () => {
@@ -185,12 +198,14 @@ describe("cookie logic", () => {
 
 			const eatResult = Logic.eatCookie(userOne, notPrivileged);
 			assert.ok(!isResultFailure(eatResult));
+			assert.strictEqual(eatResult.type, "daily");
 
 			const firstDonateResult = Logic.donateCookie(userTwo, userOne, notPrivileged, notPrivileged);
 			assert.ok(!isResultFailure(firstDonateResult));
 
 			const secondDonateResult = Logic.donateCookie(userThree, userOne, notPrivileged, notPrivileged);
 			assert.ok(isResultFailure(secondDonateResult));
+			assert.match(secondDonateResult.reply, /hasn't eaten their donated cookie.+Get them to eat/);
 		});
 
 		it("cannot donate cookie to privileged user who didn't eat their golden cookie", () => {
@@ -199,9 +214,11 @@ describe("cookie logic", () => {
 
 			const eatResult = Logic.eatCookie(userOne, privileged);
 			assert.ok(!isResultFailure(eatResult));
+			assert.strictEqual(eatResult.type, "daily");
 
 			const donateResult = Logic.donateCookie(userTwo, userOne, notPrivileged, privileged);
 			assert.ok(isResultFailure(donateResult));
+			assert.match(donateResult.reply, /hasn't eaten their golden cookie.+Get them to eat/);
 		});
 
 		it("cannot donate if already eaten", () => {
@@ -210,9 +227,11 @@ describe("cookie logic", () => {
 
 			const eatResult = Logic.eatCookie(userOne, notPrivileged);
 			assert.ok(!isResultFailure(eatResult));
+			assert.strictEqual(eatResult.type, "daily");
 
 			const donateResult = Logic.donateCookie(userOne, userTwo, notPrivileged, notPrivileged);
 			assert.ok(isResultFailure(donateResult));
+			assert.match(donateResult.reply, /already ate or donated.+can't gift/);
 		});
 
 		it("cannot donate if already donated", () => {
@@ -222,6 +241,7 @@ describe("cookie logic", () => {
 			// Eat the receiver's daily cookie first, so that donating actually goes through -> should pass
 			const eatResult = Logic.eatCookie(receiver, notPrivileged);
 			assert.ok(!isResultFailure(eatResult));
+			assert.strictEqual(eatResult.type, "daily");
 
 			// Donator donates their cookie away -> should pass
 			const firstResult = Logic.donateCookie(donator, receiver, notPrivileged, notPrivileged);
@@ -230,6 +250,7 @@ describe("cookie logic", () => {
 			// Donator attempts to donate again -> should fail
 			const secondResult = Logic.donateCookie(donator, receiver, notPrivileged, notPrivileged);
 			assert.ok(isResultFailure(secondResult));
+			assert.match(secondResult.reply, /already ate or donated.+can't gift/);
 		});
 
 		// explicitly test Logic.eatDailyCookie and Logic.eatReceivedCookie if not possible
@@ -262,6 +283,7 @@ describe("cookie logic", () => {
 			const data = Logic.getInitialCookieStats();
 			const firstResult = Logic.eatCookie(data, notPrivileged);
 			assert.ok(!isResultFailure(firstResult));
+			assert.strictEqual(firstResult.type, "daily");
 
 			Logic.resetDailyCookieStats(data);
 
@@ -270,16 +292,20 @@ describe("cookie logic", () => {
 
 			const secondResult = Logic.eatCookie(data, notPrivileged);
 			assert.ok(!isResultFailure(secondResult));
+			assert.strictEqual(secondResult.type, "daily");
 		});
 
 		it("allows donating a cookie after stats are reset", () => {
 			const userOne = Logic.getInitialCookieStats();
 			const userTwo = Logic.getInitialCookieStats();
 
-			const oneEatResult = Logic.eatCookie(userOne, notPrivileged);
-			assert.ok(!isResultFailure(oneEatResult));
-			const twoEatResult = Logic.eatCookie(userTwo, notPrivileged);
-			assert.ok(!isResultFailure(twoEatResult));
+			const firstEatResult = Logic.eatCookie(userOne, notPrivileged);
+			assert.ok(!isResultFailure(firstEatResult));
+			assert.strictEqual(firstEatResult.type, "daily");
+
+			const secondEatResult = Logic.eatCookie(userTwo, notPrivileged);
+			assert.ok(!isResultFailure(secondEatResult));
+			assert.strictEqual(secondEatResult.type, "daily");
 
 			Logic.resetDailyCookieStats(userOne);
 
@@ -295,6 +321,7 @@ describe("cookie logic", () => {
 
 			const eatResult = Logic.eatCookie(userOne, notPrivileged);
 			assert.ok(!isResultFailure(eatResult));
+			assert.strictEqual(eatResult.type, "daily");
 
 			const result = Logic.eatDailyCookie(userOne, notPrivileged);
 			assert.strictEqual(result, false);
