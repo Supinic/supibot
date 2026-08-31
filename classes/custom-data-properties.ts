@@ -113,7 +113,6 @@ const userDataSchema = {
 			received: number;
 		};
 		today: {
-			timestamp: number;
 			donated: number;
 			received: number;
 			eaten: {

@@ -1,6 +1,13 @@
 import { SupiDate } from "supi-core";
-import CookieLogic from "../../cookie/cookie-logic.js";
 import type { CheckSubcommandDefinition } from "../index.js";
+import {
+	canEatDailyCookie,
+	canEatReceivedCookie,
+	determineAvailableDailyCookieType,
+	hasDonatedDailyCookie,
+	hasOutdatedDailyCookieStats,
+	resetDailyCookieStats
+} from "../../cookie/cookie-logic.js";
 
 export default {
 	name: "cookie",
@@ -17,11 +24,8 @@ export default {
 		`<code>${prefix}check cookie (username)</code>`,
 		`Checks if someone else has a fortune cookie ready for today.`
 	],
-	execute: async (context, identifier) => {
-		const targetUser = (identifier)
-			? await sb.User.get(identifier, true)
-			: context.user;
-
+	execute: async (context, type, identifier) => {
+		const targetUser = (identifier) ? await sb.User.get(identifier, true) : context.user;
 		if (!targetUser) {
 			return {
 				success: false,
@@ -30,6 +34,7 @@ export default {
 		}
 		else if (targetUser.Name === context.platform.selfName) {
 			return {
+				success: true,
 				reply: "No peeking! 🍪🤖🛡 👀"
 			};
 		}
@@ -44,8 +49,8 @@ export default {
 			};
 		}
 
-		if (CookieLogic.hasOutdatedDailyStats(userCookieData)) {
-			CookieLogic.resetDailyStats(userCookieData);
+		if (hasOutdatedDailyCookieStats(userCookieData)) {
+			resetDailyCookieStats(userCookieData);
 			await targetUser.setDataProperty("cookie", userCookieData);
 		}
 
@@ -53,17 +58,14 @@ export default {
 		const hasDoubleCookieAccess = await platform.fetchUserAdminSubscription(targetUser);
 
 		let string;
-		if (CookieLogic.canEatReceivedCookie(userCookieData)) {
+		if (canEatReceivedCookie(userCookieData)) {
 			string = `${pronoun} have a donated cookie waiting to be eaten.`;
 		}
-		else if (CookieLogic.canEatDailyCookie(userCookieData, { hasDoubleCookieAccess })) {
-			const cookieType = CookieLogic.determineAvailableDailyCookieType(userCookieData, {
-				hasDoubleCookieAccess
-			});
-
+		else if (canEatDailyCookie(userCookieData, { hasDoubleCookieAccess })) {
+			const cookieType = determineAvailableDailyCookieType(userCookieData, { hasDoubleCookieAccess });
 			string = `${pronoun} have a ${cookieType} cookie waiting to be eaten.`;
 		}
-		else if (CookieLogic.hasDonatedDailyCookie(userCookieData)) {
+		else if (hasDonatedDailyCookie(userCookieData)) {
 			string = `${pronoun} have already donated ${posPronoun} daily cookie today.`;
 		}
 		else {
@@ -73,6 +75,7 @@ export default {
 		const nextMidnight = new SupiDate(SupiDate.getTodayUTC()).addHours(24);
 		const delta = core.Utils.timeDelta(nextMidnight);
 		return {
+			success: true,
 			reply: `${string} Next reset of daily cookies will occur in ${delta}.`
 		};
 	}
