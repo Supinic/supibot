@@ -460,7 +460,10 @@ export class Command extends TemplateWithoutId {
 				if (result instanceof Promise) {
 					result
 						.then(() => { this.#ready = true; })
-						.catch(() => { this.#ready = false; });
+						.catch((e: unknown) => {
+							console.warn("Custom command initialization failed", { command: this.Name, error: e });
+							this.#ready = false;
+						});
 				}
 				else {
 					this.#ready = true;
