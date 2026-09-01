@@ -212,9 +212,9 @@ export default declare({
 	Dynamic_Description: (prefix) => {
 		const channelItems = [...channels].map(i => `<li>${i}</li>`).join(" ");
 		return [
-			`Rolls a random picture sourced from Twitch channels. The data is gathered from the <a href="//twitchlotto.com">Twitchlotto website</a>`,
+			`Rolls a random picture sourced from Twitch channels. The data is gathered from the <a href="//twitchlotto.com">Twitchlotto website</a>.`,
 			"You can specify a channel from the list below to get links only from there.",
-			`You will get an approximation of "NSFW score" by an AI, so keep an eye out for that.`,
+			"You will sometimes get a NSFW% scored by an AI, so keep an eye out for that.",
 			"",
 
 			`<code>${prefix}tl</code>`,
