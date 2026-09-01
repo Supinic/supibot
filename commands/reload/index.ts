@@ -57,10 +57,11 @@ export default declare({
 			}
 
 			case "command": {
-				await context.sendIntermediateMessage("ppCircle git pull ppCircle");
+				const loadEmote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
+				await context.sendIntermediateMessage(`${loadEmote} git pull ${loadEmote}`);
 				await shell("git pull");
 
-				await context.sendIntermediateMessage("ppCircle yarn build ppCircle");
+				await context.sendIntermediateMessage(`${loadEmote} yarn build ${loadEmote}`);
 				await shell("yarn build");
 
 				const failures: string[] = [];
