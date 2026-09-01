@@ -3,7 +3,7 @@ import type { User } from "./user.js";
 import type { SimpleGenericData } from "../utils/globals.js";
 import type { Query } from "supi-core";
 
-type TwitchLottoFlagName =
+export type TwitchLottoFlagName =
 	| "Anime" | "Animal" | "Bait" | "Body-fluids" | "Borderline"
 	| "Disfigured" | "Disturbing" | "Drawn" | "Furry" | "Gore"
 	| "Hentai" | "Human" | "None" | "Porn" | "Offensive" | "Rendered"

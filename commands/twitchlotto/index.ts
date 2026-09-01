@@ -4,6 +4,7 @@ import { declare } from "../../classes/command.js";
 import { probabilityShape } from "../../utils/schemas.js";
 import type { User } from "../../classes/user.js";
 import type { Channel } from "../../classes/channel.js";
+import type { TwitchLottoFlagName } from "../../classes/custom-data-properties.js";
 
 const detectionDefinitions = [
 	{
@@ -46,6 +47,7 @@ const dataSchema = z.object({
 	}))
 });
 
+const globalFlagBanlist: string[] = ["Disfigured", "Gore", "Disturbing"] satisfies TwitchLottoFlagName[];
 const formatScore = (score: number | null) => (score === null) ? "N/A" : `${core.Utils.round(score * 100, 2)}%`;
 const getKey = (user: User, channel: Channel | null) => `twitch-lotto-recent-use-${user.ID}-${channel?.ID ?? "PM"}`;
 
@@ -65,7 +67,7 @@ const counts = new Map<string, number>();
 export default declare({
 	Name: "twitchlotto",
 	Aliases: ["tl"],
-	Cooldown: 10000,
+	Cooldown: 5000,
 	Description: "Fetches a random Imgur image from a Twitch channel (based off TwitchLotto).",
 	Flags: ["mention"],
 	Params: [],
@@ -151,6 +153,13 @@ export default declare({
 			const { detections } = dataSchema.parse(raw);
 
 			for (const { replacement, string } of detectionDefinitions) {
+				if (globalFlagBanlist.includes(string)) {
+					return {
+						success: false,
+						reply: "This image includes banned flags and cannot be shown here! Roll again."
+					};
+				}
+
 				const elements = detections.filter(i => i.name === string);
 				const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
 				detectionsStrings.push(...strings);
