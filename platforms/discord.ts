@@ -26,7 +26,6 @@ import type { DiscordEmote, Emote } from "../utils/globals.js";
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import { logger } from "../singletons/logger.js";
-import { get } from "../commands/gpt/history-control.js";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {

@@ -15,7 +15,6 @@ import SuggestionSubcommand from "./suggestion.js";
 import TrackFavouriteSubcommand from "./track-favourite.js";
 
 import ChannelFlagsSubcommands from "./channel-flags.js";
-import TwitchLottoSubcommands from "./twitch-lotto.js";
 
 export default [
 	AmbassadorSubcommand,
@@ -34,6 +33,5 @@ export default [
 	SuggestionSubcommand,
 	TrackFavouriteSubcommand,
 
-	...ChannelFlagsSubcommands,
-	...TwitchLottoSubcommands
+	...ChannelFlagsSubcommands
 ];

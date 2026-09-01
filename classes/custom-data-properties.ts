@@ -3,8 +3,12 @@ import type { User } from "./user.js";
 import type { SimpleGenericData } from "../utils/globals.js";
 import type { Query } from "supi-core";
 
-import type { flags as twitchLottoFlags } from "../commands/twitchlotto/definitions.js";
-type TwitchLottoFlagName = typeof twitchLottoFlags[number]["name"];
+export type TwitchLottoFlagName =
+	| "Anime" | "Animal" | "Bait" | "Body-fluids" | "Borderline"
+	| "Disfigured" | "Disturbing" | "Drawn" | "Furry" | "Gore"
+	| "Hentai" | "Human" | "None" | "Porn" | "Offensive" | "Rendered"
+	| "Scat" | "Softcore";
+
 export type SevenTvRotatingEmotesData = {
 	emoteSetId: string;
 	emotes: {

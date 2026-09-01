@@ -14,7 +14,6 @@ import ReminderSubcommand from "./reminder.js";
 import SlotsSubcommand from "./slots.js";
 import SubscriptionSubcommand from "./subscription.js";
 import SuggestionSubcommand from "./suggestion.js";
-import { TwitchLottoBlacklistSubcommand, TwitchLottoDescriptionSubcommand } from "./twitch-lotto.js";
 
 const subcommands: SubcommandDefinition[] = [
 	AfkSubcommand,
@@ -30,9 +29,7 @@ const subcommands: SubcommandDefinition[] = [
 	ReminderSubcommand,
 	SlotsSubcommand,
 	SubscriptionSubcommand,
-	SuggestionSubcommand,
-	TwitchLottoBlacklistSubcommand,
-	TwitchLottoDescriptionSubcommand
+	SuggestionSubcommand
 ];
 
 export const CheckSubcommands = new SubcommandCollection("check", subcommands);
