@@ -75,7 +75,6 @@ export default declare({
 		const channelNames = await core.Query.getRecordset<{ name: string, amount: number }[]>(rs => rs
 			.select("LOWER(Name) AS name", "Amount AS amount")
 			.from("data", "Twitch_Lotto_Channel")
-			.flat("Name")
 		);
 
 		for (const { name, amount } of channelNames) {
@@ -198,6 +197,7 @@ export default declare({
 		const shouldRemoveEmbeds = (image.Score === null || image.Score > 0.66);
 
 		return {
+			success: true,
 			removeEmbeds: (context.channel && !context.channel.NSFW && shouldRemoveEmbeds),
 			reply: core.Utils.tag.trim `
 				NSFW score: ${formatScore(image.Score)}
