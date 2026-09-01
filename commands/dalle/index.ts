@@ -40,7 +40,7 @@ export default declare({
 		if (!image) {
 			return {
 				success: false,
-				reply: `No images found for your query!`
+				reply: `No images found for your query! You can currently only use this command to search for images generated in the past.`
 			};
 		}
 
