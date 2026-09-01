@@ -2,6 +2,7 @@ import * as z from "zod";
 import { SupiError } from "supi-core";
 import { hasDefinition, getName, getDefinition } from "../../../utils/languages.js";
 import type { TranslateSubcommandDefinition } from "../index.js";
+import { logger } from "../../../singletons/logger.js";
 
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
 const resultSchema = z.union([
@@ -137,7 +138,17 @@ export default {
 
 		let text: string;
 		let fromLanguageId: string = options.from;
-		const data = resultSchema.parse(response.body);
+		const { data, error } = resultSchema.safeParse(response.body);
+		if (error) {
+			const dump = JSON.stringify({ body: response.body, error });
+			void logger.log("Command.Fail", `Google Translate unexpected schema: ${dump}`, context.channel, context.user);
+
+			return {
+				success: false,
+				reply: `Google Translate API encountered an error! Please try again later.`
+			};
+		}
+
 		if (Array.isArray(data[0])) {
 			text = data[0][0];
 			fromLanguageId = data[0][1];
