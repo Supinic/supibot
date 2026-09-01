@@ -1,11 +1,9 @@
 import * as z from "zod";
-import { prefix, randomInt } from "../../utils/command-utils.js";
+import { randomInt } from "../../utils/command-utils.js";
 import { declare } from "../../classes/command.js";
-import {
-	createRecentUseCacheKey as getKey,
-	formatScore
-} from "./definitions.js";
 import { probabilityShape } from "../../utils/schemas.js";
+import type { User } from "../../classes/user.js";
+import type { Channel } from "../../classes/channel.js";
 
 const detectionDefinitions = [
 	{
@@ -41,13 +39,15 @@ const detectionDefinitions = [
 		replacement: "ass"
 	}
 ];
-
 const dataSchema = z.object({
 	detections: z.array(z.object({
 		confidence: probabilityShape,
 		name: z.string()
 	}))
 });
+
+const formatScore = (score: number | null) => (score === null) ? "N/A" : `${core.Utils.round(score * 100, 2)}%`;
+const getKey = (user: User, channel: Channel | null) => `twitch-lotto-recent-use-${user.ID}-${channel?.ID ?? "PM"}`;
 
 type TwitchLottoImage = {
 	Link: string;
@@ -58,9 +58,9 @@ type TwitchLottoImage = {
 	Adult_Flags: string[] | null;
 };
 
+let totalCount = 0;
 const channels = new Set<string>();
 const counts = new Map<string, number>();
-let totalCount = 0;
 
 export default declare({
 	Name: "twitchlotto",
@@ -145,11 +145,6 @@ export default declare({
 			);
 		}
 
-		let appendix = "";
-		if (image.Score === null) {
-			appendix = `(no NSFW % score available, click at your own risk)`;
-		}
-
 		const detectionsStrings = [];
 		if (image.Data) {
 			const raw: unknown = JSON.parse(image.Data);
@@ -162,7 +157,7 @@ export default declare({
 			}
 		}
 
-		await core.Cache.setByPrefix(getKey(context), image.Link, {
+		await core.Cache.setByPrefix(getKey(context.user, context.channel), image.Link, {
 			expiry: 600_000
 		});
 
@@ -202,7 +197,6 @@ export default declare({
 				https://i.imgur.com/${image.Link}
 				${channelString}
 				${descriptionString}
-				${appendix}
 			`
 		};
 	}),
