@@ -116,6 +116,12 @@
     "url": "https://www.gamerpower.com/rss/steam"
   },
   {
+    "title": "SUSE Security Team Blog",
+    "names": ["suse-security"],
+    "item": "blogpost",
+    "url": "https://security.opensuse.org/feed.xml"
+  },
+  {
     "title": "Twitch Developer Changelog",
     "names": ["twitchdev"],
     "item": "update",
