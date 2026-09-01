@@ -15,8 +15,8 @@
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.6.1",
-    "vm2": "^3.11.6",
-    "ws": "^8.21.1",
+    "vm2": "^3.11.7",
+    "ws": "^8.21.3",
     "zod": "^4.4.3"
   },
   "engines": {
@@ -32,7 +32,7 @@
     "auto-setup": "tsc && node --env-file=.env init/auto-setup.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "ncu": "yarn dlx npm-check-updates -c 7d",
+    "ncu": "yarn dlx npm-check-updates -c 7d -x typescript",
     "test": "node --test-reporter=dot --import ./tests/register-loader.mjs --experimental-test-module-mocks --test",
     "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core",
     "validate:config": "node ./build/utils/validate-config.js"
@@ -45,12 +45,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "eslint": "^10.7.0",
-    "eslint-plugin-unicorn": "^72.0.0",
-    "globals": "^17.7.0",
+    "eslint": "^10.9.1",
+    "eslint-plugin-unicorn": "^73.0.0",
+    "globals": "^17.11.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.68.0"
   },
   "nyc": {
     "all": false,
@@ -59,5 +59,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@4.17.0"
+  "packageManager": "yarn@4.18.0"
 }
