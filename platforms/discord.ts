@@ -26,6 +26,7 @@ import type { DiscordEmote, Emote } from "../utils/globals.js";
 import type { User } from "../classes/user.js";
 import type { Channel } from "../classes/channel.js";
 import { logger } from "../singletons/logger.js";
+import { get } from "../commands/gpt/history-control.js";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {
@@ -899,12 +900,20 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			return userData.Name;
 		}
 
-		const guild = await this.client.guilds.fetch(channelData.Specific_ID);
-		const guildMember = guild.members.resolve(userData.Discord_ID);
+		try {
+			const guild = await this.client.guilds.fetch(channelData.Specific_ID);
+			const guildMember = guild.members.resolve(userData.Discord_ID);
 
-		return (guildMember !== null)
-			? `<@${userData.Discord_ID}>`
-			: userData.Name;
+			return (guildMember !== null) ? `<@${userData.Discord_ID}>` : userData.Name;
+		}
+		catch (e) {
+			if (!(e instanceof Error)) {
+				throw e;
+			}
+
+			void logger.log("Discord.Warning", `Could not create user mention: ${e.message}`, channelData, userData);
+			return userData.Name;
+		}
 	}
 
 	isChannelLive () { return null; }
