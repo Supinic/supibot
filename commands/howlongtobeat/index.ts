@@ -1,6 +1,6 @@
 import * as z from "zod";
-import { SupiDate } from "supi-core";
-import { declare, isResultFailure } from "../../classes/command.js";
+import { SupiDate, type GotResponse } from "supi-core";
+import { declare, isResultFailure, type ResultFailure } from "../../classes/command.js";
 
 const HLTB_TOKEN_CACHE_KEY = "hltb-token-cache";
 const HLTB_ENDPOINT_CACHE_KEY = "hltb-api-endpoint";
@@ -71,7 +71,7 @@ const hltbDataSchema = z.object({
 /**
  * Minor heuristic to fetch the API's current endpoint as it is known to change fairly dynamically.
  */
-const fetchEndpoint = async (force?: boolean) => {
+const fetchEndpoint = async (force?: boolean): Promise<string | null> => {
 	if (!force) {
 		const cached = await core.Cache.getByPrefix(HLTB_ENDPOINT_CACHE_KEY) as string | null;
 		if (cached) {
@@ -121,7 +121,7 @@ const fetchEndpoint = async (force?: boolean) => {
 /**
  * Fetches the "authentication token" - either from cache, or refreshes it.
  */
-const fetchToken = async (endpoint: string) => {
+const fetchToken = async (endpoint: string): Promise<InitObject | null> => {
 	const existing = await core.Cache.getByPrefix(HLTB_TOKEN_CACHE_KEY) as InitObject | undefined;
 	if (existing) {
 		return existing;
@@ -153,13 +153,13 @@ const fetchToken = async (endpoint: string) => {
 /**
  * Fetches the search data for a provided game query.
  */
-const fetchData = async (endpoint: string, query: string[]) => {
+const fetchData = async (endpoint: string, query: string[]): Promise<GotResponse | ResultFailure> => {
 	const tokenData = await fetchToken(endpoint);
 	if (!tokenData) {
 		return {
 			success: false,
 			reply: "Could not fetch game data! The API has likely changed (again?!)"
-		} as const;
+		};
 	}
 
 	const { token, hpKey, hpVal } = tokenData;
