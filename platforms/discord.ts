@@ -651,7 +651,8 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				args: {
 					reply,
 					execution: JSON.stringify(execution),
-					user: userData.ID
+					user: userData.ID,
+					messageObject: JSON.stringify(messageObject)
 				}
 			});
 		}
