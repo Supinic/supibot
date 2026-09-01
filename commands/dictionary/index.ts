@@ -6,7 +6,7 @@ const dictSchema = z.union([
 		title: z.string(),
 		message: z.string().nullish(),
 		resolution: z.string().nullish()
-	}), // Failure
+	}), // API failure, also properly parses Cloudflare auto-error (e.g. 522)
 	z.array(z.object({
 		word: z.string(),
 		phonetic: z.string().optional(),
@@ -60,7 +60,7 @@ export default declare({
 		if (!Array.isArray(rawData)) {
 			return {
 				success: false,
-				reply: rawData.message ?? rawData.title
+				reply: `Dictionary API returned an error: ${rawData.message ?? rawData.title}`
 			};
 		}
 
