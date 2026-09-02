@@ -1,5 +1,5 @@
 import * as z from "zod";
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 const oauthSchema = z.object({ access_token: z.string(), expires_in: z.int() });
 const REDDIT_TOKEN_KEY = "reddit-token-cache-key";
@@ -21,7 +21,6 @@ const requiredKeys = [
 
 export default {
 	name: "Reddit",
-	optionsType: "function",
 	options: (() => {
 		const hasAllRequiredEnvs = requiredKeys.every(i => typeof process.env[i] === "string");
 		if (!hasAllRequiredEnvs) {
@@ -35,12 +34,6 @@ export default {
 				Cookie: "_options={%22pref_quarantine_optin%22:true,%22pref_gated_sr_optin%22:true};"
 			},
 			hooks: {
-				afterResponse: [],
-				beforeCache: [],
-				beforeError: [],
-				beforeRedirect: [],
-				beforeRetry: [],
-				init: [],
 				beforeRequest: [
 					async (options) => {
 						let token = await core.Cache.getByPrefix(REDDIT_TOKEN_KEY) as string | null;
@@ -77,6 +70,5 @@ export default {
 			}
 		};
 	}),
-	parent: "GenericAPI",
-	description: "Reddit API"
-} satisfies GotInstanceDefinition;
+	parent: "GenericAPI"
+} satisfies GotRegistryInstanceDefinition;

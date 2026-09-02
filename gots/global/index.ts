@@ -1,6 +1,6 @@
 // import { Agent } from "http2-wrapper";
 // import type { Http2Session } from "node:http2";
-import { type GotInstanceDefinition, isGotRequestError } from "supi-core";
+import { type GotRegistryInstanceDefinition, isGotRequestError } from "supi-core";
 
 import { getConfig } from "../../config.js";
 import { logger } from "../../singletons/logger.js";
@@ -27,7 +27,6 @@ agent.on("session", (session: Http2Session) => {
 
 export default {
 	name: "Global",
-	optionsType: "function",
 	options: (() => ({
 		responseType: "json",
 		// http2: false,
@@ -63,7 +62,7 @@ export default {
 			beforeRequest: [],
 			init: [],
 			beforeError: [
-				async (err) => {
+				async (err: Error) => {
 					if (!isGotRequestError(err)) {
 						return err;
 					}
@@ -100,6 +99,5 @@ export default {
 			]
 		}
 	})),
-	parent: null,
-	description: "Global definition - template for all others"
-} satisfies GotInstanceDefinition;
+	parent: null
+} satisfies GotRegistryInstanceDefinition;

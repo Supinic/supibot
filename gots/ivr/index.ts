@@ -1,11 +1,10 @@
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 export default {
 	name: "IVR",
-	optionsType: "object",
 	options: {
-		prefixUrl: "https://api.ivr.fi"
+		prefixUrl: "https://api.ivr.fi",
+		allowAbsoluteUrls: false
 	},
-	parent: "Global",
-	description: "IVR"
-} satisfies GotInstanceDefinition;
+	parent: "Global"
+} satisfies GotRegistryInstanceDefinition;
