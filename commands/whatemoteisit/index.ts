@@ -71,6 +71,7 @@ export default declare({
 			};
 		}
 
+		const parsedBody = ivrEmoteSchema.parse(response.body);
 		const {
 			channelName,
 			channelLogin,
@@ -81,7 +82,7 @@ export default declare({
 			emoteState,
 			emoteTier,
 			emoteType
-		} = ivrEmoteSchema.parse(response.body);
+		} = parsedBody;
 
 		const originID = await core.Query.getRecordset<number | undefined>(rs => rs
 			.select("ID")
@@ -124,7 +125,7 @@ export default declare({
 			else {
 				throw new SupiError({
 					message: "Assert error: Unexpected emote type + data combination",
-					args: { data: response.body }
+					args: { data: parsedBody }
 				});
 			}
 		}

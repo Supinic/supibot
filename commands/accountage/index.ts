@@ -18,14 +18,14 @@ export default declare({
 			searchParams: { login }
 		});
 
-		if (response.statusCode !== 200 || response.body.length === 0) {
+		const parseResult = ivrUserDataSchema.safeParse(response.body);
+		if (response.statusCode !== 200 || parseResult.error || parseResult.data.length === 0) {
 			return {
 				reply: "That Twitch account has no data associated with them."
 			};
 		}
 
-		const data = ivrUserDataSchema.parse(response.body);
-		const creationDate = data[0].createdAt;
+		const creationDate = parseResult.data[0].createdAt;
 		const created = new SupiDate(creationDate);
 
 		let anniversary = "";

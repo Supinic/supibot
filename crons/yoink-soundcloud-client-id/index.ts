@@ -44,6 +44,10 @@ export default {
 
 		let finalClientID;
 		for (const script of scripts) {
+			if (typeof script !== "string") {
+				continue;
+			}
+
 			const scriptResponse = await core.Got.get("FakeAgent")({
 				url: script,
 				responseType: "text"

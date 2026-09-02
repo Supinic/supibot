@@ -1,4 +1,4 @@
-import { SupiDate } from "supi-core";
+import { SupiDate, SupiError } from "supi-core";
 import { getTwitchGameID } from "../../utils/command-utils.js";
 import { declare } from "../../classes/command.js";
 import { twitchClipSchema } from "../../utils/schemas.js";
@@ -128,6 +128,13 @@ export default declare({
 				success: false,
 				reply: `Provided limit is too high! (maximum is 100)`
 			};
+		}
+
+		if (!channelID || !gameID) {
+			throw new SupiError({
+				message: "Assert error: Channel or game ID does not exist",
+				args: { channelID, gameID }
+			});
 		}
 
 		const response = await core.Got.get("Helix")({

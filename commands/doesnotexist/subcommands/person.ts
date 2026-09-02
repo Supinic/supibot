@@ -33,7 +33,7 @@ export default {
 		}
 
 		const { src } = response.body;
-		const imageResponse = await core.Got.get("FakeAgent")({
+		const imageResponse = await core.Got.get("FakeAgent")<Uint8Array<ArrayBuffer>>({
 			url: `https://this-person-does-not-exist.com${src}`,
 			responseType: "buffer"
 		});
@@ -47,7 +47,8 @@ export default {
 
 		// rawBody might not exist? fall back to `body` just in case, honestly
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		const { statusCode, link } = await uploadFile(imageResponse.rawBody ?? imageResponse.body, { type: "image" });
+		const buffer = Buffer.from(imageResponse.rawBody ?? imageResponse.body);
+		const { statusCode, link } = await uploadFile(buffer, { type: "image" });
 		if (statusCode !== 200 || !link) {
 			return {
 				success: false,

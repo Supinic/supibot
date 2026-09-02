@@ -148,7 +148,7 @@ export const GptOpenAI = {
 			json.max_completion_tokens = 2500;
 		}
 
-		const response = await core.Got.get("GenericAPI")<unknown>({ // unknown - will be zod-validated later
+		const response = await core.Got.get("GenericAPI")({
 			method: "POST",
 			throwHttpErrors: false,
 			url: (isSearch)

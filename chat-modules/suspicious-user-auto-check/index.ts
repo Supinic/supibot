@@ -83,7 +83,8 @@ export default {
 			});
 
 			let hintMessage;
-			if (!response.ok || response.body.length === 0) {
+			const parseResult = ivrUserDataSchema.safeParse(response.body);
+			if (!response.ok || parseResult.error || parseResult.data.length === 0) {
 				type StalkData = { text: string; date: SupiDate; channelName: string; };
 				const data = await core.Query.getRecordset<StalkData | undefined>(rs => rs
 					.select("Last_Message_Text AS text", "Last_Message_Posted AS date", "Channel.Name AS channelName")
@@ -106,7 +107,7 @@ export default {
 				hintMessage = `this last-seen message: "${core.Utils.wrapString(text, 100)}" in channel ${channelName} ${delta} belongs to you or someone else.`;
 			}
 			else {
-				const [data] = ivrUserDataSchema.parse(response.body);
+				const [data] = parseResult.data;
 				if (data.login === raw.user) {
 					const logID = await logger.log(
 						"Twitch.Warning",

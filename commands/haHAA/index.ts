@@ -41,7 +41,7 @@ export default declare({
 			joke = core.Utils.randArray(jokes).joke;
 		}
 		else {
-			const response = await core.Got.get("GenericAPI")("https://icanhazdadjoke.com/");
+			const response = await core.Got.get("GenericAPI")({ url: "https://icanhazdadjoke.com/" });
 			joke = jokeSchema.parse(response.body).joke;
 		}
 
