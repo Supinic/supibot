@@ -1,5 +1,5 @@
 import * as supiCore from "supi-core";
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 import { getConfig } from "./config.js";
 import initializeInternalApi from "./api/index.js";
 
@@ -40,7 +40,7 @@ interface GlobalSb {
 	MpvClient: MpvClientConstructor | null;
 }
 interface GlobalCore {
-	Got: typeof supiCore.Got;
+	Got: supiCore.GotRegistry;
 	Metrics: supiCore.Metrics;
 	Cache: supiCore.Cache;
 	Query: supiCore.Query;
@@ -108,7 +108,7 @@ if (!process.env.REDIS_CONFIGURATION) {
 }
 
 globalThis.core = {
-	Got: supiCore.Got,
+	Got: new supiCore.GotRegistry(),
 	Metrics: new supiCore.Metrics(),
 	Cache: new supiCore.Cache(process.env.REDIS_CONFIGURATION),
 	Query: new supiCore.Query({
@@ -176,7 +176,9 @@ console.timeEnd("basic bot modules");
 console.time("chat modules");
 
 void logger.start();
-supiCore.Got.importData(filterModuleDefinitions("name", gotDefinitions as GotInstanceDefinition[], config.modules.gots));
+const gotInstances = filterModuleDefinitions("name", gotDefinitions as GotRegistryInstanceDefinition[], config.modules.gots);
+core.Got.import(gotInstances);
+
 Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands));
 await ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"]));
 

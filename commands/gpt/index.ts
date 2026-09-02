@@ -1,4 +1,4 @@
-import { SupiError } from "supi-core";
+import { SupiError, isGotRequestError } from "supi-core";
 import { declare, type Context } from "../../classes/command.js";
 import { typedEntries } from "../../utils/ts-helpers.js";
 
@@ -147,7 +147,7 @@ export default declare({
 			executionResult = await Handler.execute(context, query, modelData);
 		}
 		catch (e) {
-			if (core.Got.isRequestError(e)) {
+			if (isGotRequestError(e)) {
 				return {
 					success: false,
 					reply: Handler.getRequestErrorMessage()

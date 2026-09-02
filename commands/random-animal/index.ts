@@ -87,22 +87,22 @@ export const RandomAnimalFactCommand = declare({
 		let fact: string;
 		switch (type) {
 			case "bird": {
-				const response = await core.Got.get("GenericAPI")("https://some-random-api.ml/facts/bird");
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/facts/bird" });
 				fact = simpleFactSchema.parse(response.body).fact;
 				break;
 			}
 			case "cat": {
-				const response = await core.Got.get("GenericAPI")("https://catfact.ninja/fact");
+				const response = await core.Got.get("GenericAPI")({ url: "https://catfact.ninja/fact" });
 				fact = simpleFactSchema.parse(response.body).fact;
 				break;
 			}
 			case "dog": {
-				const response = await core.Got.get("GenericAPI")("https://dogapi.dog/api/v1/facts");
+				const response = await core.Got.get("GenericAPI")({ url: "https://dogapi.dog/api/v1/facts" });
 				fact = multiFactSchema.parse(response.body).facts[0];
 				break;
 			}
 			case "fox": {
-				const response = await core.Got.get("GenericAPI")("https://some-random-api.ml/facts/fox");
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/facts/fox" });
 				fact = simpleFactSchema.parse(response.body).fact;
 				break;
 			}
@@ -160,22 +160,22 @@ export const RandomAnimalPictureCommand = declare({
 		let url: string;
 		switch (type) {
 			case "bird": {
-				const response = await core.Got.get("GenericAPI")("https://some-random-api.ml/img/birb");
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/img/birb" });
 				url = linkSchema.parse(response.body).link;
 				break;
 			}
 			case "cat": {
-				const response = await core.Got.get("GenericAPI")("https://api.thecatapi.com/v1/images/search");
+				const response = await core.Got.get("GenericAPI")({ url: "https://api.thecatapi.com/v1/images/search" });
 				url = urlsSchema.parse(response.body)[0].url;
 				break;
 			}
 			case "dog": {
-				const response = await core.Got.get("GenericAPI")("https://dog.ceo/api/breeds/image/random");
+				const response = await core.Got.get("GenericAPI")({ url: "https://dog.ceo/api/breeds/image/random" });
 				url = messageSchema.parse(response.body).message;
 				break;
 			}
 			case "fox": {
-				const response = await core.Got.get("GenericAPI")("https://some-random-api.ml/img/fox");
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/img/fox" });
 				url = linkSchema.parse(response.body).link;
 				break;
 			}
