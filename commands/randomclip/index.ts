@@ -23,9 +23,8 @@ export default declare({
 	],
 	Whitelist_Response: null,
 	Code: async function randomClip (context, channelName?: string) {
-		let gameID = null;
-		let channelID = null;
-
+		let gameID;
+		let channelID;
 		if (context.params.game) {
 			const games = await getTwitchGameID(context.params.game);
 			if (games.length === 0) {
@@ -130,10 +129,10 @@ export default declare({
 			};
 		}
 
-		if (!channelID || !gameID) {
+		if (!channelID) {
 			throw new SupiError({
 				message: "Assert error: Channel or game ID does not exist",
-				args: { channelID, gameID }
+				args: { channelID }
 			});
 		}
 
