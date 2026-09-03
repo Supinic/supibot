@@ -41,6 +41,12 @@ export default declare({
 				reply: "Thanks for the effort, but I don't stream! I suggest you use some of my commands instead to make me more popular 🙂"
 			};
 		}
+		else if (!targetUserId) {
+			return {
+				success: false,
+				reply: "Target user does not exist on Twitch, or is banned!"
+			};
+		}
 
 		const response = await core.Got.get("Helix")({
 			url: "channels",

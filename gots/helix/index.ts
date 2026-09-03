@@ -1,8 +1,7 @@
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 export default {
 	name: "Helix",
-	optionsType: "function",
 	options: (() => {
 		if (!process.env.TWITCH_CLIENT_ID) {
 			throw new Error("Helix core.Got instance cannot initialize - missing client-id");
@@ -10,6 +9,7 @@ export default {
 
 		return {
 			prefixUrl: "https://api.twitch.tv/helix",
+			allowAbsoluteUrls: false,
 			headers: {
 				"Client-ID": process.env.TWITCH_CLIENT_ID
 			},
@@ -20,12 +20,6 @@ export default {
 				limit: 3
 			},
 			hooks: {
-				afterResponse: [],
-				beforeCache: [],
-				beforeError: [],
-				beforeRedirect: [],
-				beforeRetry: [],
-				init: [],
 				beforeRequest: [
 					async (options) => {
 						const token = await core.Cache.getByPrefix("TWITCH_OAUTH") as string;
@@ -35,6 +29,5 @@ export default {
 			}
 		};
 	}),
-	parent: "Global",
-	description: "Twitch Helix API"
-} satisfies GotInstanceDefinition;
+	parent: "Global"
+} satisfies GotRegistryInstanceDefinition;

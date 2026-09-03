@@ -1,4 +1,4 @@
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 const list = [
 	"TWITCH_GQL_OAUTH",
@@ -9,7 +9,6 @@ const list = [
 
 export default {
 	name: "TwitchGQL",
-	optionsType: "function",
 	options: (() => {
 		if (list.some(key => !process.env[key])) {
 			throw new Error("Twitch GQL core.Got instance cannot initialize - missing configuration variable(s)");
@@ -18,6 +17,7 @@ export default {
 		return {
 			method: "POST",
 			prefixUrl: "https://gql.twitch.tv",
+			allowAbsoluteUrls: false,
 			responseType: "json",
 			headers: {
 				Accept: "*/*",
@@ -31,6 +31,5 @@ export default {
 			}
 		};
 	}),
-	parent: "Global",
-	description: "Twitch GQL API"
-} satisfies GotInstanceDefinition;
+	parent: "Global"
+} satisfies GotRegistryInstanceDefinition;

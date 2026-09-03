@@ -1,14 +1,13 @@
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 export default {
 	name: "Supinic",
-	optionsType: "object",
 	options: {
 		prefixUrl: "https://supinic.com/api",
+		allowAbsoluteUrls: false,
 		timeout: {
 			request: 30000
 		}
 	},
-	parent: "Global",
-	description: "Instance bound to the supinic.com API, used in various project-related commands"
-} satisfies GotInstanceDefinition;
+	parent: "Global"
+} satisfies GotRegistryInstanceDefinition;

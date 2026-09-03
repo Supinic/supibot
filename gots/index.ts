@@ -1,10 +1,4 @@
-export type GotDefinition = {
-	name: string;
-	optionsType: "object" | "function";
-	options: Record<string, unknown> | (() => Record<string, unknown>);
-	parent: string | null;
-	description: string | null;
-};
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 import GlobalGot from "./global/index.js";
 import FakeAgentGot from "./fake-agent/index.js";
@@ -18,7 +12,6 @@ import RedditGot from "./reddit/index.js";
 import SupibotGot from "./supibot/index.js";
 import SupinicGot from "./supinic/index.js";
 import TwitchGQLGot from "./twitch-gql/index.js";
-import TwitchEmotesGot from "./twitch-emotes/index.js";
 
 export const definitions = [
 	GlobalGot,
@@ -32,6 +25,5 @@ export const definitions = [
 	RedditGot,
 	SupibotGot,
 	SupinicGot,
-	TwitchEmotesGot,
 	TwitchGQLGot
-] satisfies GotDefinition[];
+] satisfies GotRegistryInstanceDefinition[];

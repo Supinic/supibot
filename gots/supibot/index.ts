@@ -1,17 +1,16 @@
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 export default {
 	name: "Supibot",
-	optionsType: "function",
 	options: (() => {
 		const secure = process.env.SUPIBOT_API_SECURE ?? false;
 		const protocol = (secure) ? "https" : "http";
 		const port = process.env.SUPIBOT_API_PORT ?? 80;
 
 		return {
-			prefixUrl: `${protocol}://localhost:${port}`
+			prefixUrl: `${protocol}://localhost:${port}`,
+			allowAbsoluteUrls: false
 		};
 	}),
-	parent: "Global",
-	description: "Instance for the internal Supibot API, for the purpose of self-reference, configurable"
-} satisfies GotInstanceDefinition;
+	parent: "Global"
+} satisfies GotRegistryInstanceDefinition;

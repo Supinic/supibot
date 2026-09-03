@@ -1,22 +1,22 @@
-import type { GotInstanceDefinition } from "supi-core";
+import type { GotRegistryInstanceDefinition } from "supi-core";
 
 export default {
 	name: "GitHub",
-	optionsType: "function",
 	options: (() => {
 		if (!process.env.API_GITHUB_KEY) {
 			return {
-				prefixUrl: "https://api.github.com"
+				prefixUrl: "https://api.github.com",
+				allowAbsoluteUrls: false
 			};
 		}
 
 		return {
 			prefixUrl: "https://api.github.com",
+			allowAbsoluteUrls: false,
 			headers: {
 				Authorization: `Bearer ${process.env.API_GITHUB_KEY}`
 			}
 		};
 	}),
-	parent: "Global",
-	description: "Sets up a GitHub instance with the API key, if available. Otherwise reverts to no-auth."
-} satisfies GotInstanceDefinition;
+	parent: "Global"
+} satisfies GotRegistryInstanceDefinition;

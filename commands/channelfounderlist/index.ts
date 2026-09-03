@@ -34,7 +34,7 @@ export default declare({
 		}
 
 		const channel = sb.Channel.normalizeName(channelName);
-		const response = await core.Got.get("IVR")(`v2/twitch/founders/${channel}`);
+		const response = await core.Got.get("IVR")({ url: `v2/twitch/founders/${channel}` });
 
 		if (response.statusCode === 404) {
 			const { error } = ivrErrorSchema.parse(response.body);

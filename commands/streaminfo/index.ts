@@ -110,13 +110,15 @@ export default declare({
 				}
 			});
 
-			if (broadcasterResponse.statusCode !== 200 || broadcasterResponse.body.length === 0) {
+			const parseResult = ivrUserDataSchema.safeParse(broadcasterResponse.body);
+			if (broadcasterResponse.statusCode !== 200 || parseResult.error || parseResult.data.length === 0) {
 				return {
+					success: true,
 					reply: `Channel is offline - no more data currently available. Try again later`
 				};
 			}
 
-			const broadcasterData = ivrUserDataSchema.parse(broadcasterResponse.body)[0];
+			const broadcasterData = parseResult.data[0];
 			const { banned, lastBroadcast } = broadcasterData;
 
 			let status;
