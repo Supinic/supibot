@@ -10,7 +10,7 @@ export default {
 	},
 	set: async (context, ...args) => {
 		let hidden = false;
-		let visibilityType = null;
+		let visibilityType = "public";
 
 		const first = args.at(0);
 		const last = args.at(-1);
