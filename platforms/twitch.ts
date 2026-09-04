@@ -1325,7 +1325,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			});
 		}
 
-		const response = await core.Got.get("TwitchEmotes")<BttvEmoteResponse>({
+		const response = await core.Got.get("GenericAPI")<BttvEmoteResponse>({
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
 
@@ -1353,7 +1353,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	static async fetchChannelFFZEmotes (channelData: Channel): Promise<Emote[]> {
-		const response = await core.Got.get("TwitchEmotes")<FfzEmoteResponse>({
+		const response = await core.Got.get("GenericAPI")<FfzEmoteResponse>({
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
 
@@ -1378,7 +1378,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	static async fetchChannelSevenTVEmotes (channelData: Channel): Promise<Emote[]> {
-		const response = await core.Got.get("TwitchEmotes")<SevenTvEmoteResponse>({
+		const response = await core.Got.get("GenericAPI")<SevenTvEmoteResponse>({
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
 
@@ -1405,13 +1405,13 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	async populateGlobalEmotes (): Promise<Emote[]> {
 		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchPlatform.fetchTwitchEmotes(this.selfId),
-			core.Got.get("TwitchEmotes")<BttvEmote[]>({
+			core.Got.get("GenericAPI")<BttvEmote[]>({
 				url: "https://api.betterttv.net/3/cached/emotes/global"
 			}),
-			core.Got.get("TwitchEmotes")<FfzEmoteResponse>({
+			core.Got.get("GenericAPI")<FfzEmoteResponse>({
 				url: "https://api.frankerfacez.com/v1/set/global"
 			}),
-			core.Got.get("TwitchEmotes")<GlobalSevenTvEmoteResponse>({
+			core.Got.get("GenericAPI")<GlobalSevenTvEmoteResponse>({
 				url: "https://7tv.io/v3/emote-sets/global"
 			})
 		]);
