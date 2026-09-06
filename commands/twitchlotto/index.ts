@@ -72,6 +72,11 @@ export default declare({
 	Flags: ["mention"],
 	Params: [],
 	initialize: async () => {
+		const tableExists = await core.Query.isTablePresent("data", "Twitch_Lotto_Description");
+		if (!tableExists) {
+			return;
+		}
+
 		const channelNames = await core.Query.getRecordset<{ name: string, amount: number }[]>(rs => rs
 			.select("LOWER(Name) AS name", "Amount AS amount")
 			.from("data", "Twitch_Lotto_Channel")
