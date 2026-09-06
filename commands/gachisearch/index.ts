@@ -11,7 +11,7 @@ type Author = z.infer<typeof authorShape>;
 
 const trackShape = z.object({
 	id: z.number(),
-	name: z.string(),
+	name: z.string().nullable(),
 	isTodo: z.union([z.literal(0), z.literal(1)])
 });
 const trackSchema = z.array(trackShape);
