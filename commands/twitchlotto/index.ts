@@ -42,7 +42,7 @@ const detectionDefinitions = [
 ];
 const dataSchema = z.object({
 	detections: z.array(z.object({
-		confidence: probabilityShape,
+		confidence: z.union([probabilityShape, z.string()]),
 		name: z.string()
 	}))
 });
@@ -165,7 +165,7 @@ export default declare({
 				}
 
 				const elements = detections.filter(i => i.name === string);
-				const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
+				const strings = elements.map(i => `${replacement} (${Math.round(Number(i.confidence) * 100)}%)`);
 				detectionsStrings.push(...strings);
 			}
 		}
