@@ -53,7 +53,8 @@ export default declare({
 		const response = await core.Got.get("GenericAPI")({
 			url: `https://api.dictionaryapi.dev/api/v2/entries/en/${phrase}`,
 			throwHttpErrors: false,
-			responseType: "json"
+			responseType: "json",
+			timeout: { request: 5000 }
 		});
 
 		const rawData = dictSchema.parse(response.body);
