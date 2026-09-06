@@ -9,12 +9,12 @@ export default declare({
 	Params: [],
 	Whitelist_Response: null,
 	Code: async function randomFilm () {
-		const html = await core.Got.get("FakeAgent")({
+		const response = await core.Got.get("FakeAgent")({
 			url: "https://www.bestrandoms.com/random-movie-generator",
 			responseType: "text"
-		}).text();
+		});
 
-		const $ = core.Utils.cheerio(html);
+		const $ = core.Utils.cheerio(response.body);
 		const movies = [...$(".movie-card-title")].map(i => {
 			const text = $(i).text();
 			return text.replaceAll(/\s+/g, " ").replace(/(\(\d+\))/, " $1");
@@ -26,7 +26,7 @@ export default declare({
 				reply: "No random movies are available at the moment! Try again later."
 			};
 		}
-		
+
 		const movie = core.Utils.randArray([...movies]);
 		return {
 			success: true,
