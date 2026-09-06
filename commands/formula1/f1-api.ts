@@ -6,6 +6,7 @@ import { formatWeatherReport } from "../weather/formatting.js";
 import { openMeteoWeatherProvider } from "../weather/providers/index.js";
 import type { NumericCoordinates } from "../../utils/globals.js";
 import { isResultFailure } from "../../classes/command.js";
+import { logger } from "../../singletons/logger.js";
 
 const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
@@ -118,7 +119,14 @@ const fetchOfficalRaceStatusFinished = async (race: Race): Promise<boolean | nul
 
 	// The LiveTiming Formula One API returns JSON with a leading BOM -> `trim()` call gets rid of it
 	const cleanedSessionBody = sessionResponse.body.trim();
-	const session = formulaOneSessionInfoShape.parse(JSON.parse(cleanedSessionBody));
+	void logger.log("Command.Other", `F1 SessionInfo API result: ${cleanedSessionBody}`);
+
+	const sessionResult = formulaOneSessionInfoShape.safeParse(JSON.parse(cleanedSessionBody));
+	if (sessionResult.error) {
+		return null;
+	}
+
+	const session = sessionResult.data;
 	if (session.Type !== "Race" || session.StartDate.slice(0, 10) !== race.date) {
 		return null;
 	}
@@ -129,7 +137,14 @@ const fetchOfficalRaceStatusFinished = async (race: Race): Promise<boolean | nul
 	});
 
 	const cleanedStatusBody = statusResponse.body.trim();
-	const data = formulaOneStatusShape.parse(JSON.parse(cleanedStatusBody));
+	void logger.log("Command.Other", `F1 SessionStatus API result: ${cleanedStatusBody}`);
+
+	const dataResult = formulaOneStatusShape.safeParse(JSON.parse(cleanedStatusBody));
+	if (dataResult.error) {
+		return null;
+	}
+
+	const data = dataResult.data;
 	return (data.Status === "Finished" || data.Status === "Finalised" || data.Status === "Ends");
 };
 
