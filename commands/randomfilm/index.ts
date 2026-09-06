@@ -15,13 +15,18 @@ export default declare({
 		}).text();
 
 		const $ = core.Utils.cheerio(html);
-		const movies = $(".content .list-unstyled li").map((ind, i) => {
-			const name = $($(i).children()[2]);
-			return name.text()
-				.replaceAll(/\s+/g, " ")
-				.replace(/(\(\d+\))/, " $1");
+		const movies = [...$(".movie-card-title")].map(i => {
+			const text = $(i).text();
+			return text.replaceAll(/\s+/g, " ").replace(/(\(\d+\))/, " $1");
 		});
 
+		if (movies.length === 0) {
+			return {
+				success: false,
+				reply: "No random movies are available at the moment! Try again later."
+			};
+		}
+		
 		const movie = core.Utils.randArray([...movies]);
 		return {
 			success: true,
