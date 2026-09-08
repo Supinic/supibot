@@ -2,15 +2,17 @@ export default {
 	Name: "bot-faq-helper",
 	Events: ["message"],
 	Description: "Attempts to auto-reply to various queries related to the bot",
-	Code: (async function asyncMarkovExperiment (context, message) {
+	Code: (async function botFaqHelper (context) {
 		if (!context.user?.Name) {
 			return;
 		}
+
+		const { message } = context;
 		if (message.startsWith("$")) {
 			return;
 		}
 
-		const lower = message = message.toLowerCase();
+		const lower = message.toLowerCase();
 		if ((!lower.includes("how can i") && !lower.includes("how do i")) || !lower.includes("supibot")) {
 			return;
 		}

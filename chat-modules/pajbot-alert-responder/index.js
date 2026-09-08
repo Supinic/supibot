@@ -2,10 +2,12 @@ export default {
 	Name: "pajbot-alert-responder",
 	Events: ["message"],
 	Description: "Replies to the 'ALERT' message sent by Pajbot",
-	Code: (async function pajbotAlertResponder (context, message) {
+	Code: (async function pajbotAlertResponder (context) {
 		if (context.user?.Name !== "pajbot") {
 			return;
 		}
+
+		const { message } = context;
 		if (message.includes("pajaS \u{1F6A8} ALERT")) {
 			return;
 		}

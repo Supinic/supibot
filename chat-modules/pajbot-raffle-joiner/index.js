@@ -2,11 +2,13 @@ export default {
 	Name: "pajbot-raffle-joiner",
 	Events: ["message"],
 	Description: "Conditionally joins points raffles initiated by Pajbot",
-	Code: (async function pajbotRaffleJoiner (context, message) {
+	Code: (async function pajbotRaffleJoiner (context) {
 		if (context.user?.Name !== "pajbot") {
 			return false;
 		}
-		else if (!message.includes("type") && !message.includes("!join") && !message.includes("will end")) {
+
+		const { message } = context;
+		if (!message.includes("type") && !message.includes("!join") && !message.includes("will end")) {
 			return false;
 		}
 

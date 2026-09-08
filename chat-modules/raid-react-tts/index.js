@@ -1,6 +1,6 @@
 export default {
 	Name: "raid-react-tts",
-	Events: ["message"],
+	Events: ["raid"],
 	Description: "Reacts to Twitch raids with a TTS message",
 	Code: (async function raidReactTts (context) {
 		const { channel, user, username, data } = context;

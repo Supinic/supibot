@@ -14,7 +14,7 @@ const adjectives = [
 
 export default {
 	Name: "sub-react-tts",
-	Events: ["message"],
+	Events: ["subscription"],
 	Description: "Reacts to Twitch raids with a TTS message",
 	Code: (async function raidReactTts (context) {
 		const { channel, data, user } = context;
