@@ -20,48 +20,43 @@ export default {
 
 		const { message } = context;
 		for (const item of args) {
-			let adjustedMessage = message;
-			let check = item.check;
 			let passed = false;
+			const { ignoreCase = false, check, response } = item;
+			const checkMessage = (ignoreCase) ? message.toLowerCase() : message;
 
-			if (typeof check === "string") {
-				if (item.ignoreCase) {
-					check = check.toLowerCase();
-					adjustedMessage = adjustedMessage.toLowerCase();
+			if (check.type === "string") {
+				const { string } = check;
+				passed = (ignoreCase)
+					? (checkMessage === string.toLowerCase())
+					: (checkMessage === string);
+			}
+			else if (check.type === "includes") {
+				const { mode, values } = check;
+				if (mode === "any") {
+					passed = values.some(i => (ignoreCase)
+						? (checkMessage.includes(i.toLowerCase()))
+						: (checkMessage.includes(i))
+					);
+				}
+				else {
+					passed = values.every(i => (ignoreCase)
+						? (checkMessage.includes(i.toLowerCase()))
+						: (checkMessage.includes(i))
+					);
+				}
+			}
+			else if (check.type === "regex") {
+				const { source } = check;
+				const regex = core.Utils.parseRegExp(source);
+				if (!regex) {
+					continue;
 				}
 
-				passed = (adjustedMessage === check);
-			}
-			else if (check instanceof RegExp) {
-				passed = check.test(message);
-			}
-			else if (typeof check === "function") {
-				passed = await check(context, message);
-			}
-			else {
-				console.warn("Incorrect chat-module check type", {
-					chatModule: this.Name,
-					channel: channel.ID,
-					item
-				});
+				passed = regex.test(checkMessage);
 			}
 
-			if (!passed) {
-				continue;
-			}
-
-			if (typeof item.response === "string") {
-				await channel.send(item.response);
-			}
-			else if (typeof item.callback === "function") {
-				await item.callback(context, item);
-			}
-			else {
-				console.warn("Incorrect chat-module response type", {
-					chatModule: this.Name,
-					channel: channel.ID,
-					item
-				});
+			if (passed) {
+				void channel.send(response);
 			}
 		}
 	}),
