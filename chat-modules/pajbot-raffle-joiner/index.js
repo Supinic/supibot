@@ -28,7 +28,8 @@ export default {
 		}
 
 		const timeout = core.Utils.random(2_500, 20_000);
-		const emote = await context.channel.getBestAvailableEmote(
+		const emote = await context.platform.getBestAvailableEmote(
+			context.channel,
 			["pajaS", "pajaW", "pajaH", "pajaScoots", "pajaL", "monkaS", "paaaajaW", "Okayga", "PAJAW", "paaaajaW"],
 			":)"
 		);

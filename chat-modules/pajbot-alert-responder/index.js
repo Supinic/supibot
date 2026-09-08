@@ -8,11 +8,11 @@ export default {
 		}
 
 		const { message } = context;
-		if (message.includes("pajaS \u{1F6A8} ALERT")) {
+		if (!message.includes("pajaS \u{1F6A8} ALERT")) {
 			return;
 		}
 
-		const emote = await context.channel.getBestAvailableEmote(["pajaS"], "pajaGIGA");
+		const emote = await context.platform.getBestAvailableEmote(context.channel, ["pajaS"], "pajaGIGA");
 		const word = core.Utils.randArray([
 			"LARM",
 			"POPLACH",
