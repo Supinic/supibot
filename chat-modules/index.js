@@ -15,7 +15,6 @@ import PyramidDetectionModule from "./pyramid-detection/index.js";
 import RaidReactionModule from "./raid-react/index.js";
 import RaidReactionTtsModule from "./raid-react-tts/index.js";
 import StreamPointsRedemptionModule from "./stream-points-redemptions/index.js";
-import StreamerHealthNotificationModule from "./streamer-health-notification/index.js";
 import SubscriptionReactionModule from "./subscription-react/index.js";
 import SubscriptionReactionTtsModule from "./subscription-react-tts/index.js";
 import SilencePreventionTriggerModule from "./supinic-silence-prevention-trigger/index.js";
@@ -41,7 +40,6 @@ export default [
 	RaidReactionModule,
 	RaidReactionTtsModule,
 	StreamPointsRedemptionModule,
-	StreamerHealthNotificationModule,
 	SubscriptionReactionModule,
 	SubscriptionReactionTtsModule,
 	SilencePreventionTriggerModule,
