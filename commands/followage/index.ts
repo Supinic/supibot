@@ -83,10 +83,14 @@ export default declare({
 
 		const { followedAt } = ivrSubAgeSchema.parse(response.body);
 		if (!followedAt) {
+			const emote = await context.getBestAvailableEmote(["Clueless"], "🥸");
 			const verb = (user.toLowerCase() === context.user.Name) ? "are" : "is";
 			return {
 				success: true,
-				reply: `${prefix} ${verb} not following ${suffix}.`
+				reply: core.Utils.tag.trim `
+					Twitch says ${prefix.toLowerCase()} ${verb} not following ${suffix}.
+					This might be wrong because Twitch recently stopped giving us this info ${emote}
+				`
 			};
 		}
 
