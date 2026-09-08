@@ -326,7 +326,7 @@ export const TwitchConfigSchema = BasePlatformConfigSchema.extend({
 });
 export type TwitchConfig = z.infer<typeof TwitchConfigSchema>;
 
-export class TwitchPlatform extends Platform<TwitchConfig> {
+export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	public readonly supportsMeAction = true;
 	public readonly dynamicChannelAddition = true;
 	private readonly reconnectCheck: NodeJS.Timeout;

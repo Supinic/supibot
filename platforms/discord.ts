@@ -91,7 +91,7 @@ export const DiscordConfigSchema = BasePlatformConfigSchema.extend({
 });
 export type DiscordConfig = z.infer<typeof DiscordConfigSchema>;
 
-export class DiscordPlatform extends Platform<DiscordConfig> {
+export class DiscordPlatform extends Platform<DiscordConfig, "discord"> {
 	#emoteFetchingPromise: Promise<Emote[]> | null = null;
 
 	public readonly client: Client;

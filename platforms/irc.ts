@@ -68,7 +68,7 @@ interface FauxIrcClient extends EventEmitter {
 	join (channel: string): unknown;
 }
 
-export class IrcPlatform extends Platform<IrcConfig> {
+export class IrcPlatform extends Platform<IrcConfig, "irc"> {
 	#notifiedUnregisteredUsers = new Set();
 	#nicknameChanged = false;
 

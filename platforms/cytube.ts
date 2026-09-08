@@ -442,7 +442,7 @@ export const CytubeConfigSchema = BasePlatformConfigSchema.extend({
 });
 export type CytubeConfig = z.infer<typeof CytubeConfigSchema>;
 
-export class CytubePlatform extends Platform<CytubeConfig> {
+export class CytubePlatform extends Platform<CytubeConfig, "cytube"> {
 	private readonly clients: Map<Channel["ID"], CytubeClient> = new Map();
 
 	constructor (config: CytubeConfig) {

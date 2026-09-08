@@ -52,8 +52,8 @@ type MessageAwaiterOptions = { timeout?: number; };
 
 export type GenericSendOptions = Record<string, unknown>;
 
-export abstract class Platform <T extends BaseConfig = BaseConfig> {
-	public readonly name: string;
+export abstract class Platform <T extends BaseConfig = BaseConfig, U extends string = string> {
+	public readonly name: U;
 	public readonly debug: boolean = false;
 
 	public readonly ID: T["ID"];
@@ -75,7 +75,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 	protected static readonly list: Platform[] = [];
 
-	protected constructor (name: string, config: T) {
+	protected constructor (name: U, config: T) {
 		this.name = name;
 		this.ID = config.ID;
 
