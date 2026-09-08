@@ -405,7 +405,7 @@ export class ChatModule extends TemplateWithoutId {
 
 		let args;
 		try {
-			args = eval(rawArgs) as EventArgument[];
+			args = JSON.parse(rawArgs) as EventArgument[]; // @todo zod validation
 		}
 		catch (e) {
 			console.warn(e);
