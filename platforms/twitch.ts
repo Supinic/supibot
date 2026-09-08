@@ -1103,7 +1103,6 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		channelData.events.emit("raid", {
 			event: "raid",
-			message: null,
 			channel: channelData,
 			username: fromName,
 			platform: this,

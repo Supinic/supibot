@@ -8,6 +8,66 @@ import { Platform, type Like as PlatformLike } from "../platforms/template.js";
 import type { SimpleGenericData, XOR } from "../utils/globals.js";
 import type { TwitchPlatform } from "../platforms/twitch.js";
 import type { MessageNotification as TwitchMessageNotification } from "../platforms/twitch-utils.js";
+import type { DiscordPlatform } from "../platforms/discord.js";
+import type { CytubePlatform } from "../platforms/cytube.js";
+import type { IrcPlatform } from "../platforms/irc.js";
+
+interface EventBase<E extends string, P extends Platform = Platform> {
+	event: E;
+	channel: Channel;
+	Platform: P;
+}
+type MessageEvent<P extends Platform = Platform> = EventBase<"message", P> & {
+	message: string;
+	user: User | null;
+};
+type SubscriptionEvent<P extends Platform = Platform> = EventBase<"subscription", P> & {
+	message: string;
+	user: User;
+	data: {
+		amount: number;
+		months: number;
+		streak: number;
+		gifted: boolean;
+		recipient: User;
+		plan: string;
+	};
+};
+type RaidEvent<P extends Platform = Platform> = EventBase<"raid", P> & {
+	username: string;
+	data: { viewers: number; };
+};
+type OnlineEvent<P extends Platform = Platform> = EventBase<"online", P>;
+type OfflineEvent<P extends Platform = Platform> = EventBase<"offline", P>;
+type TwitchRawMessageEvent = EventBase<"message", TwitchPlatform> & {
+	message: string;
+	user: null;
+	messageData: TwitchMessageNotification["payload"]["event"]["message"];
+	raw: {
+		user: string;
+		userId: string;
+	};
+};
+
+type ChatEventMap = {
+	message: MessageEvent;
+	online: OnlineEvent;
+	offline: OfflineEvent;
+	raid: RaidEvent;
+	subscription: SubscriptionEvent;
+};
+type PlatformEventMap = {
+	twitch: {
+		message: MessageEvent<TwitchPlatform> | TwitchRawMessageEvent;
+		online: OnlineEvent<TwitchPlatform>;
+		offline: OfflineEvent<TwitchPlatform>;
+		raid: RaidEvent<TwitchPlatform>;
+		subscription: SubscriptionEvent<TwitchPlatform>;
+	};
+	discord: { message: MessageEvent<DiscordPlatform>; };
+	cytube: { message: MessageEvent<CytubePlatform>; };
+	irc: { message: MessageEvent<IrcPlatform>; };
+};
 
 type TwitchMessageData = TwitchMessageNotification["payload"]["event"];
 
