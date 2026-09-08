@@ -3,7 +3,7 @@ import { declare, type Context } from "../../classes/command.js";
 import { typedEntries } from "../../utils/ts-helpers.js";
 
 import rawGptConfig from "./config.json" with { type: "json" };
-import { gptConfigSchema } from "./config-schema.js";
+import { gptConfigSchema, gptErrorSchema } from "./config-schema.js";
 const GptConfig = gptConfigSchema.parse(rawGptConfig);
 
 import GptCache from "./cache-control.js";
@@ -174,6 +174,14 @@ export default declare({
 				return {
 					success: false,
 					reply: `The ChatGPT service is likely overloaded at the moment! Please try again later.`
+				};
+			}
+
+			const errorData = gptErrorSchema.safeParse(response.body).data?.error ?? null;
+			if (errorData && errorData.message.includes("flag") && response.statusCode === 400) {
+				return {
+					success: false,
+					reply: `ChatGPT refused your prompt! Message: ${errorData.message}`
 				};
 			}
 			else {
