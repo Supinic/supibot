@@ -206,18 +206,17 @@ export default declare({
 		`<code>${prefix}weather</code>`,
 		`<code>${prefix}weather alerts:true</code>`,
 		`<code>${prefix}weather pollution:true</code>`,
-		"If you set your own weather location, show its weather.",
+		"If you set your own weather location, using no extra text like this will show your location's weather.",
 		"Works the same for the hourly, daily, alerts, pollution and format usages.",
 		"",
 
 		"<h5>Weather for others' locations</h5>",
 
+		`<code>${prefix}weather User</code>`,
 		`<code>${prefix}weather @User</code>`,
 		`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
-		`<code>${prefix}weather @User alerts:true</code>`,
-		`<code>${prefix}weather @User pollution:true</code>`,
-		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
-		"Again, as above, works the same for the hourly, daily, alerts, pollution and format usages as well.",
+		"If that user has set their own weather location, show its weather.",
+		"The <code>@</code> symbol is not mandatory, but should be used if the user's name is similar or even identical to a real location.",
 		"",
 
 		"<h5>Weather providers</h5>",

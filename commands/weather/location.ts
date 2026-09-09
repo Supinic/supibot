@@ -2,7 +2,10 @@ import { promisify } from "node:util";
 import { exec } from "node:child_process";
 
 import type { Context, StrictResult } from "../../classes/command.js";
+import type { User } from "../../classes/user.js";
+import type { UserDataPropertyMap } from "../../classes/custom-data-properties.js";
 import { fetchGeoLocationData } from "../../utils/command-utils.js";
+import { get } from "../gpt/history-control.js";
 
 type GeoCacheData = { empty: true } | {
 	empty: false;
@@ -20,9 +23,38 @@ type WeatherLocation = {
 };
 type CommandResult = { command: StrictResult };
 type LocationResult = CommandResult | WeatherLocation;
+type UserLocationResult =
+	| { success: false; reason: "no-user"; }
+	| { success: false; reason: "no-location"; userData: User; }
+	| { success: true; location: NonNullable<UserDataPropertyMap["location"]>; userData: User };
 
 const shell = promisify(exec);
 const getGeoCacheKey = (query: string) => `weather-location-cache-${query.toLowerCase().trim()}`;
+
+const getUserLocation = async (possibleUsername: string): Promise<UserLocationResult> => {
+	const userData = await sb.User.get(possibleUsername);
+	if (!userData) {
+		return {
+			success: false,
+			reason: "no-user"
+		};
+	}
+
+	const location = await userData.getDataProperty("location");
+	if (!location) {
+		return {
+			success: false,
+			reason: "no-location",
+			userData
+		};
+	}
+
+	return {
+		success: true,
+		location,
+		userData
+	};
+};
 
 export const getWeatherLocation = async (context: Context, args: readonly string[]): Promise<LocationResult> => {
 	let origin: "self" | "user" | "public";
@@ -46,49 +78,49 @@ export const getWeatherLocation = async (context: Context, args: readonly string
 		coords = location.coordinates;
 		address = location.formatted;
 	}
+	else if (sb.User.normalizeUsername(args[0]) === context.platform.selfName) {
+		let temperature;
+		try {
+			const result = await shell("vcgencmd measure_temp");
+			const temperatureMatch = result.stdout.match(/([\d.]+)/);
+			if (temperatureMatch) {
+				temperature = `${temperatureMatch[1]}°C`;
+			}
+		}
+		catch (e) {
+			console.warn(e);
+		}
+
+		return {
+			command: {
+				success: true,
+				reply: `Supibot, Supinic's LACK table: ${temperature ?? "Unknown temperature"}. No wind detected. No precipitation expected.`
+			}
+		};
+	}
 	else if (args[0].startsWith("@")) {
-		const userData = await sb.User.get(args[0]);
-		if (!userData) {
-			return {
-				command: {
-					success: false,
-					reply: "Invalid user provided!"
-				}
-			};
-		}
-
-		if (userData.Name === context.platform.selfName) {
-			let temperature;
-			try {
-				const result = await shell("vcgencmd measure_temp");
-				const temperatureMatch = result.stdout.match(/([\d.]+)/);
-				if (temperatureMatch) {
-					temperature = `${temperatureMatch[1]}°C`;
-				}
+		const result = await getUserLocation(args[0]);
+		if (!result.success) {
+			if (result.reason === "no-user") {
+				return {
+					command: {
+						success: false,
+						reply: "Invalid user provided!"
+					}
+				};
 			}
-			catch (e) {
-				console.warn(e);
+			else {
+				const who = (result.userData.ID === context.user.ID) ? "You" : "That user";
+				return {
+					command: {
+						success: false,
+						reply: `${who} did not set their location!`
+					}
+				};
 			}
-
-			return {
-				command: {
-					success: true,
-					reply: `Supibot, Supinic's LACK table: ${temperature ?? "Unknown temperature"}. No wind detected. No precipitation expected.`
-				}
-			};
 		}
 
-		const location = await userData.getDataProperty("location");
-		if (!location) {
-			const who = (userData.ID === context.user.ID) ? "You" : "That user";
-			return {
-				command: {
-					success: false,
-					reply: `${who} did not set their location!`
-				}
-			};
-		}
-
+		const { location, userData } = result;
 		origin = (userData.ID === context.user.ID) ? "self" : "user";
 		coords = location.coordinates;
 		hidden = location.hidden;
@@ -116,31 +148,27 @@ export const getWeatherLocation = async (context: Context, args: readonly string
 		}
 
 		if (geoData.empty) {
-			// Check if the not-found location is actually someone's username - possibly hinting at a user error
-			const checkUserData = await sb.User.get(location);
-			const checkLocation = await checkUserData?.getDataProperty("location");
-			if (checkLocation) {
+			// Check if the not-found location is actually someone's username - possibly as a user error
+			const result = await getUserLocation(location);
+			if (!result.success) {
+				const emote = await context.getBestAvailableEmote(["peepoSadDank", "PepeHands", "FeelsBadMan"], "🙁");
 				return {
 					command: {
 						success: false,
-						reply: `That place was not found! However, you probably meant to check @${location}'s location. Use "$weather @${location}" instead, with the @ symbol.`,
-						cooldown: 5000
+						reply: `That place was not found! ${emote}`
 					}
 				};
 			}
 
-			const emote = await context.getBestAvailableEmote(["peepoSadDank", "PepeHands", "FeelsBadMan"], "🙁");
-			return {
-				command: {
-					success: false,
-					reply: `That place was not found! ${emote}`
-				}
-			};
+			origin = (result.userData.ID === context.user.ID) ? "self" : "user";
+			address = result.location.formatted;
+			coords = result.location.coordinates;
 		}
-
-		origin = "public";
-		address = geoData.formattedAddress;
-		coords = geoData.coords;
+		else {
+			origin = "public";
+			address = geoData.formattedAddress;
+			coords = geoData.coords;
+		}
 	}
 
 	return {
