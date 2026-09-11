@@ -163,6 +163,7 @@ export const getWeatherLocation = async (context: Context, args: readonly string
 			origin = (result.userData.ID === context.user.ID) ? "self" : "user";
 			address = result.location.formatted;
 			coords = result.location.coordinates;
+			hidden = result.location.hidden;
 		}
 		else {
 			origin = "public";
