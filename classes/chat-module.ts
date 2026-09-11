@@ -68,8 +68,33 @@ type PlatformEventMap = {
 	cytube: { message: MessageEvent<CytubePlatform>; };
 	irc: { message: MessageEvent<IrcPlatform>; };
 };
+type KnownPlatformName = keyof PlatformEventMap;
+
+type PlatformSelector = "all" | readonly KnownPlatformName[];
+type AttachmentScope = "channel" | "platform" | "global";
+
+type SelectedPlatform <P extends PlatformSelector> = P extends "all" ? never : P[number];
+type EventNameFor<P extends PlatformSelector> = P extends "all"
+	? keyof ChatEventMap
+	: SelectedPlatform<P> extends infer K extends KnownPlatformName
+		? keyof PlatformEventMap[K]
+		: never;
+
+type ContextFor<P extends PlatformSelector, E extends PropertyKey> = P extends "all"
+	? E extends keyof ChatEventMap ? ChatEventMap[E] : never
+	: SelectedPlatform<P> extends infer K extends KnownPlatformName
+		? K extends KnownPlatformName
+			? E extends keyof PlatformEventMap[K] ? PlatformEventMap[K][E] : never
+			: never
+		: never;
 
 type TwitchMessageData = TwitchMessageNotification["payload"]["event"];
+
+export type TemporaryChatModuleDefinition = {
+	name: string;
+	description: string;
+
+};
 
 export type ChatModuleDefinition = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
 	Description: string | null;

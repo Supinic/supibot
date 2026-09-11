@@ -1,5 +1,4 @@
 import AsyncMarkovExperimentModule from "./async-markov-experiment/index.js";
-import AutomaticUnscrambleModule from "./automatic-unscramble/index.js";
 import BotFaqHelperModule from "./bot-faq-helper/index.js";
 import ChatSuggestionLinkerModule from "./chat-suggestion-linker/index.js";
 import DiscordAnnouncementSubscriber from "./discord-announcement-subscriber/index.js";
@@ -24,7 +23,6 @@ import WannaBecomeFamousModule from "./wanna-become-famous/index.js";
 
 export default [
 	AsyncMarkovExperimentModule,
-	AutomaticUnscrambleModule,
 	BotFaqHelperModule,
 	ChatSuggestionLinkerModule,
 	DiscordAnnouncementSubscriber,
