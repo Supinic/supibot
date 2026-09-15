@@ -1,7 +1,7 @@
 import * as z from "zod";
+import { postToHastebin } from "../../utils/command-utils.js";
 import { handleEventSubscription } from "../../commands/subscribe/generic-event.js";
 import type { ChatModuleDefinition } from "../../classes/chat-module.js";
-import { postToHastebin } from "../../utils/command-utils.js";
 
 const defSchema = z.object({
 	channelId: z.string(),

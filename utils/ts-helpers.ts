@@ -12,6 +12,7 @@ export const filterNonNullable = <T> (array: T[]): NonNullable<T>[] => array.fil
 
 export const hasKey = <T extends object> (obj: T, key: PropertyKey): key is keyof T => (Object.hasOwn(obj, key));
 
+type GroupLike = { groups?: Record<string, unknown>; };
 type GroupRecord <Required extends string, Optional extends string> =
 	& Record<Required, string>
 	& Record<Optional, string | undefined>;
@@ -19,7 +20,7 @@ type GroupRecord <Required extends string, Optional extends string> =
 export function typeRegexGroups<
 	Required extends string,
 	Optional extends string = never
-> (matches: RegExpMatchArray): GroupRecord<Required, Optional> {
+> (matches: GroupLike): GroupRecord<Required, Optional> {
 	if (!matches.groups) {
 		throw new Error("Input RegExp does not contain groups");
 	}
