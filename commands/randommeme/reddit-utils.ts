@@ -55,6 +55,8 @@ const postShape = z.object({
 	})).nullish(),
 	created: z.number(),
 	created_utc: z.number(),
+	post_hint: z.string().nullish(),
+	thumbnail: z.string().nullish(),
 	score: z.number().optional(), // posts can have hidden score
 	subreddit: z.string(),
 	subreddit_name_prefixed: z.string(),
@@ -90,7 +92,8 @@ type RedditPost = {
 	flairs: string[];
 	nsfw: boolean;
 	stickied: boolean;
-	isTextPost: boolean;
+	hasText: boolean;
+	hasImage: boolean;
 	isGallery: boolean;
 	isVideo: boolean;
 	score: number;
@@ -108,7 +111,8 @@ type RawRedditPost = {
 	flairs: string[];
 	nsfw: boolean;
 	stickied: boolean;
-	isTextPost: boolean;
+	hasText: boolean;
+	hasImage: boolean;
 	isGallery: boolean;
 	isVideo: boolean;
 	score: number;
@@ -170,7 +174,8 @@ const parsePost = (data: z.infer<typeof postShape>): RedditPost => {
 		url: data.url,
 		title,
 		author: data.author,
-		isTextPost: Boolean(data.selftext && data.selftext_html),
+		hasText: Boolean(data.selftext && data.selftext_html),
+		hasImage: (data.post_hint === "image"),
 		isVideo: data.is_video,
 		isGallery: Boolean(data.is_gallery),
 		nsfw: data.over_18 || crosspostNSFW,
@@ -190,7 +195,8 @@ export const getRawRedditPost = (post: RedditPost): RawRedditPost => ({
 	url: post.url,
 	title: post.title,
 	author: post.author,
-	isTextPost: post.isTextPost,
+	hasText: post.hasText,
+	hasImage: post.hasImage,
 	isVideo: post.isVideo,
 	isGallery: post.isGallery,
 	nsfw: post.nsfw,

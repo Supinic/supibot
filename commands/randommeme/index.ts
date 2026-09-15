@@ -61,7 +61,7 @@ export default declare({
 			? `C-${context.channel.ID}`
 			: `PM-${context.user.ID}`;
 
-		// @todo use Map.prototype.getOrInsert once stable in Node (v27 probably)
+		// @todo use Map.prototype.getOrInsert once stable in Node (v26 confirmed)
 		let repeatedPosts = repeatedPostsMap.get(repeatedPostKey);
 		if (!repeatedPosts) {
 			repeatedPosts = [];
@@ -71,7 +71,7 @@ export default declare({
 		const { posts } = subreddit;
 		let validPosts = posts.filter(i => (
 			!i.stickied
-			&& !i.isTextPost
+			&& i.hasImage
 			&& !repeatedPosts.includes(i.id)
 			&& !i.removed
 		));
@@ -181,7 +181,7 @@ export default declare({
 			: "";
 
 		let fixedUrl = `https://redd.it/${post.id}`;
-		if (post.isGallery || post.isVideo) {
+		if (post.hasImage) {
 			fixedUrl += ` ${post.url}`;
 		}
 
