@@ -1,3 +1,4 @@
+import type * as z from "zod";
 import { SupiError } from "supi-core";
 import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
@@ -46,6 +47,19 @@ type TwitchRawMessageEvent = EventBase<"message", TwitchPlatform> & {
 	};
 };
 
+type ConfigSchema = z.ZodType;
+type StateFactory = () => object;
+type ConfigFor<C extends ConfigSchema | undefined> = C extends ConfigSchema
+	? z.output<C>
+	: undefined;
+type StateFor<F extends StateFactory | undefined> = F extends StateFactory
+	? ReturnType<F>
+	: undefined;
+type ChatModuleRuntime<C extends ConfigSchema | undefined, F extends StateFactory | undefined> = {
+	readonly config: ConfigFor<C>;
+	readonly state: StateFor<F>;
+};
+
 type PlatformEventMap = {
 	twitch: {
 		message: MessageEvent<TwitchPlatform> | TwitchRawMessageEvent;
@@ -83,21 +97,34 @@ type ContextFor<P extends PlatformSelector, E extends PropertyKey> = P extends "
 
 type AnyChatEvent = { [E in EventName]: ContextFor<"all", E>; }[EventName];
 type EventName = EventNameFor<"all">;
-type ChatModuleHandler<P extends PlatformSelector, E extends EventNameFor<P>> = (context: ContextFor<P, E>) => void | Promise<void>;
+type ChatModuleHandler<
+	P extends PlatformSelector,
+	E extends EventNameFor<P>,
+	C extends ConfigSchema | undefined,
+	F extends StateFactory | undefined
+> = (context: ContextFor<P, E>, runtime: ChatModuleRuntime<C, F>) => void | Promise<void>;
 
-export type ChatModuleDefinition<P extends PlatformSelector = PlatformSelector> = {
+export type ChatModuleDefinition<
+	P extends PlatformSelector = PlatformSelector,
+	C extends ConfigSchema | undefined = undefined,
+	F extends StateFactory | undefined = undefined
+> = {
 	name: string;
 	description: string | null;
 	scope: AttachmentScope;
 	platform: P,
+	config?: C,
+	state?: F,
 	handlers: {
-		[E in EventNameFor<P>]?: ChatModuleHandler<P, E>;
+		[E in EventNameFor<P>]?: ChatModuleHandler<P, E, C, F>;
 	};
 };
 
 export function defineChatModule <
-	const P extends PlatformSelector = PlatformSelector
-> (definition: ChatModuleDefinition<P>): ChatModuleDefinition<P> {
+	const P extends PlatformSelector = PlatformSelector,
+	C extends ConfigSchema | undefined = undefined,
+	F extends StateFactory | undefined = undefined
+> (definition: ChatModuleDefinition<P, C, F>): ChatModuleDefinition<P, C, F> {
 	return definition;
 }
 
@@ -110,13 +137,23 @@ type AttachmentTarget =
 	| { scope: "global"; }
 	| { scope: "platform"; platform: Platform["ID"]; }
 	| { scope: "channel"; channel: Channel["ID"]; };
+type RegisteredChatModuleDefinition = {
+	name: string;
+	description: string | null;
+	scope: AttachmentScope;
+	platform: PlatformSelector;
+	config?: ConfigSchema;
+	state?: StateFactory;
+	handlers: Partial<Record<EventName, unknown>>;
+};
+type RuntimeData = {
+	config: unknown;
+	state: object | undefined;
+};
 type RuntimeAttachment = {
-	definition: ChatModuleDefinition;
+	definition: RegisteredChatModuleDefinition;
 	target: AttachmentTarget;
-	rawArgs: string | null;
-	// @todo 5: uncomment and implement
-	// config: unknown;
-	// state: unknown;
+	runtime: RuntimeData;
 };
 type Attachments = {
 	global: Map<string, RuntimeAttachment>;
@@ -126,7 +163,7 @@ type Attachments = {
 
 export class ChatModuleManager {
 	private initialized = false;
-	private definitions = new Map<ChatModuleDefinition["name"], ChatModuleDefinition>();
+	private definitions = new Map<string, RegisteredChatModuleDefinition>();
 	private attachments: Attachments = {
 		global: new Map(),
 		platform: new Map(),
@@ -186,11 +223,11 @@ export class ChatModuleManager {
 		this.initialized = true;
 	}
 
-	get (name: ChatModuleDefinition["name"]): ChatModuleDefinition | null {
+	get (name: string): RegisteredChatModuleDefinition | null {
 		return this.definitions.get(name) ?? null;
 	}
 
-	import (definitions: ChatModuleDefinition[]): void {
+	import (definitions: readonly ChatModuleDefinition[]): void {
 		if (this.initialized) {
 			throw new SupiError({ message: "Cannot import new definitions after initialization" });
 		}
@@ -209,7 +246,11 @@ export class ChatModuleManager {
 	}
 
 	dispatch (eventData: AnyChatEvent): void {
-		const { event, channel, platform } = eventData;
+		if (!this.initialized) {
+			throw new SupiError({ message: "Cannot dispatch chat module events before initialization" });
+		}
+
+		const { channel, platform } = eventData;
 		const maps = [
 			this.attachments.global,
 			this.attachments.platform.get(platform.ID),
@@ -231,14 +272,22 @@ export class ChatModuleManager {
 		}
 	}
 
-	private attach (definition: ChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): void {
+	private attach (definition: RegisteredChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): void {
 		if (definition.scope !== target.scope) {
 			throw new SupiError({
 				message: `Cannot attach ${definition.scope}-scoped module "${definition.name}" to ${target.scope}`
 			});
 		}
 
-		const attachment: RuntimeAttachment = { definition, target, rawArgs };
+		const attachment: RuntimeAttachment = {
+			definition,
+			target,
+			runtime: {
+				config: ChatModuleManager.parseConfig(definition, target, rawArgs),
+				state: definition.state?.()
+			}
+		};
+
 		if (target.scope === "global") {
 			this.attachments.global.set(definition.name, attachment);
 		}
@@ -257,17 +306,61 @@ export class ChatModuleManager {
 		}
 	}
 
+	private static parseConfig (definition: RegisteredChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): unknown {
+		if (!definition.config) {
+			if (rawArgs !== null) {
+				throw new SupiError({
+					message: `Chat module "${definition.name}" has config arguments but no config schema`,
+					args: { chatModule: definition.name, scope: target.scope }
+				});
+			}
+
+			return;
+		}
+
+		let config: unknown;
+		if (rawArgs === null) {
+			config = undefined;
+		}
+		else {
+			try {
+				config = JSON.parse(rawArgs);
+			}
+			catch (e) {
+				if (!(e instanceof Error)) {
+					throw e;
+				}
+
+				throw new SupiError({
+					message: `Chat module "${definition.name}" has invalid JSON config`,
+					args: { chatModule: definition.name, scope: target.scope },
+					cause: e
+				});
+			}
+		}
+
+		const result = definition.config.safeParse(config);
+		if (!result.success) {
+			throw new SupiError({
+				message: `Chat module "${definition.name}" has invalid config: ${result.error.message}`,
+				args: { chatModule: definition.name, scope: target.scope }
+			});
+		}
+
+		return result.data;
+	}
+
 	private static executeAttachment (attachment: RuntimeAttachment, eventData: AnyChatEvent): void {
-		type AnyHandler = ChatModuleHandler<PlatformSelector, EventNameFor<PlatformSelector>>;
+		type AnyHandler = (context: AnyChatEvent, runtime: RuntimeData) => void | Promise<void>;
 		const handler = attachment.definition.handlers[eventData.event] as AnyHandler | undefined;
 		if (!handler) {
 			return;
 		}
 
-		void handler(eventData);
+		void handler(eventData, attachment.runtime);
 	}
 
-	private static supportsPlatform (definition: ChatModuleDefinition, platform: Platform): boolean {
+	private static supportsPlatform (definition: RegisteredChatModuleDefinition, platform: Platform): boolean {
 		return (definition.platform === "all" || definition.platform.includes(platform.name as KnownPlatformName));
 	}
 }
