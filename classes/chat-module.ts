@@ -184,7 +184,7 @@ export class ChatModuleManager {
 
 		const names = [...this.definitions.keys()];
 		const attachmentData = await core.Query.getRecordset<InitializeData[]>(rs => rs
-			.select("Channel AS channel", "Chat_Module as chatModule", "Specific_Arguments as args")
+			.select("Channel AS channel", "Chat_Module AS chatModule", "Specific_Arguments AS args")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Chat_Module IN %s+", names)
 		);
@@ -282,6 +282,30 @@ export class ChatModuleManager {
 
 				ChatModuleManager.executeAttachment(attachment, eventData);
 			}
+		}
+	}
+
+	async reloadChannelAttachments (channelData: Channel): Promise<void> {
+		const attachmentData = await core.Query.getRecordset<InitializeData[]>(rs => rs
+			.select("Channel AS channel", "Chat_Module AS chatModule", "Specific_Arguments AS args")
+			.from("chat_data", "Channel_Chat_Module")
+			.where("Channel = %n", channelData.ID)
+		);
+
+		// Technically unsafe - ideally we want to construct the attachments first, and only then with no error,
+		// go ahead and bind them to the given channel. This is simpler, but perhaps insecure.
+		this.attachments.channel.get(channelData.ID)?.clear();
+
+		for (const { chatModule, args } of attachmentData) {
+			const definition = this.definitions.get(chatModule);
+			if (!definition) {
+				continue;
+			}
+			if (definition.scope !== "channel") {
+				continue;
+			}
+
+			this.attach(definition, { scope: "channel", channel: channelData.ID }, args);
 		}
 	}
 
