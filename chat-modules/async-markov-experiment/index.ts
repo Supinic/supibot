@@ -6,14 +6,14 @@ import { defineChatModule } from "../../classes/chat-module.js";
 const allowRegex = /^[\p{Emoji}\u0020-\u007E]+$/ui;
 const MARKOV_THRESHOLD = 250_000;
 
+type AsyncMarkovState = { markov: AsyncMarkov | null };
+
 export default defineChatModule({
 	name: "async-markov-experiment",
 	description: "Super experimental automatic async markov tester thing",
 	platform: "all",
 	scope: "channel",
-	state: () => ({
-		markov: null as AsyncMarkov | null
-	}),
+	state: (): AsyncMarkovState => ({ markov: null }),
 	handlers: {
 		message (context, runtime) {
 			let { markov } = runtime.state;
