@@ -4,7 +4,7 @@ import type * as z from "zod";
 import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
 import type { Platform } from "../platforms/template.js";
-import type { TwitchPlatform } from "../platforms/twitch.js";
+import Twitch, { type TwitchPlatform } from "../platforms/twitch.js";
 import type { MessageNotification as TwitchMessageNotification } from "../platforms/twitch-utils.js";
 import type { DiscordPlatform } from "../platforms/discord.js";
 import type { CytubePlatform } from "../platforms/cytube.js";
@@ -38,6 +38,11 @@ type RaidEvent<P extends Platform = Platform> = EventBase<"raid", P> & {
 };
 type OnlineEvent<P extends Platform = Platform> = EventBase<"online", P>;
 type OfflineEvent<P extends Platform = Platform> = EventBase<"offline", P>;
+type TwitchMessageEvent = MessageEvent<TwitchPlatform> & {
+	data: {
+		customRewardId: string | null
+	};
+};
 type TwitchRawMessageEvent = EventBase<"message", TwitchPlatform> & {
 	message: string;
 	user: null;
@@ -63,7 +68,7 @@ type ChatModuleRuntime<C extends ConfigSchema | undefined, F extends StateFactor
 
 type PlatformEventMap = {
 	twitch: {
-		message: MessageEvent<TwitchPlatform> | TwitchRawMessageEvent;
+		message: TwitchMessageEvent | TwitchRawMessageEvent;
 		online: OnlineEvent<TwitchPlatform>;
 		offline: OfflineEvent<TwitchPlatform>;
 		raid: RaidEvent<TwitchPlatform>;

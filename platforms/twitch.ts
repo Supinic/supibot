@@ -915,7 +915,11 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			message: messageData.text,
 			user: userData,
 			channel: channelData,
-			platform: this
+			platform: this,
+			data: {
+				// @deprecated replace with a proper separate event
+				customRewardId: messageData.rewardId
+			}
 		});
 
 		// If channel is read-only, do not proceed with any processing
