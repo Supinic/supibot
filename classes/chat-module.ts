@@ -1,5 +1,6 @@
-import type * as z from "zod";
 import { SupiError } from "supi-core";
+
+import type * as z from "zod";
 import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
 import type { Platform } from "../platforms/template.js";
@@ -242,6 +243,18 @@ export class ChatModuleManager {
 			if (definition.scope === "global") {
 				this.attach(definition, { scope: "global" }, null);
 			}
+			else if (definition.scope === "platform") {
+				if (definition.platform === "all" || definition.platform.length === 0) {
+					throw new SupiError({
+						message: `Platform-scoped module "${definition.name}" must declare at least one platform`
+					});
+				}
+
+				for (const platformName of definition.platform) {
+					const platformData = sb.Platform.getAsserted(platformName);
+					this.attach(definition, { scope: "platform", platform: platformData.ID }, null);
+				}
+			}
 		}
 	}
 
@@ -301,8 +314,13 @@ export class ChatModuleManager {
 			modules.set(definition.name, attachment);
 		}
 		else {
-			// platform DB attachments later - will likely need DB table change (currently enforces module + channel)
-			throw new SupiError({ message: "Platform attachments not implemented yet" });
+			let modules = this.attachments.platform.get(target.platform);
+			if (!modules) {
+				modules = new Map();
+				this.attachments.platform.set(target.platform, modules);
+			}
+
+			modules.set(definition.name, attachment);
 		}
 	}
 
