@@ -277,7 +277,7 @@ export class IrcPlatform extends Platform<IrcConfig, "irc"> {
 				await logger.push(message, userData, channelData);
 			}
 
-			channelData.events.emit("message", {
+			sb.ChatModule.dispatch({
 				event: "message",
 				message,
 				user: userData,

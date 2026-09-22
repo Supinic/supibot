@@ -32,14 +32,14 @@ export default defineChatModule({
 			const years = Math.floor(data.months / 12);
 			const club = [adjectives[years], "Hackerman Club"].join(" ").trim();
 
-			const name = data.recipient.Name;
-			const recipient = data.recipient.Name.replace(/_/g, "");
+			const name = data.recipient;
+			const recipient = data.recipient.replace(/_/g, "");
 
 			let message;
 			let ttsMessage;
 			if (data.gifted) {
-				// const gifter = user.Name.replace(/_/g, "") ?? "Anonymous";
-				const gifter = user.Name.replace(/_/g, "");
+				// const gifter = user.replace(/_/g, "") ?? "Anonymous";
+				const gifter = user.replace(/_/g, "");
 				message = `PogChamp Clap ${gifter} just gifted a sub to ${name}! Thanks for the gift, and ${name} - welcome to the ${club}! supiniHack`;
 				ttsMessage = `${gifter} just gifted a sub to ${recipient}! Welcome to the ${club}!`;
 			}

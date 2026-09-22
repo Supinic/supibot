@@ -1,4 +1,3 @@
-import EventEmitter from "node:events";
 import { SupiError, type SupiDate } from "supi-core";
 
 import {
@@ -85,7 +84,6 @@ export class Channel extends TemplateWithId {
 	readonly Logging: Set<LogType>;
 	readonly Mirror: Channel["ID"] | null;
 	readonly Description: string | null;
-	readonly events: EventEmitter = new EventEmitter();
 
 	static readonly dataCache: WeakMap<Channel, Partial<ChannelDataPropertyMap>> = new WeakMap();
 	static readonly uniqueIdentifier = "ID";
@@ -285,9 +283,7 @@ export class Channel extends TemplateWithId {
 		return `sb-channel-${this.ID}`;
 	}
 
-	destroy () {
-		this.events.removeAllListeners();
-	}
+	destroy () {}
 
 	static async initialize () {
 		await Channel.loadData();

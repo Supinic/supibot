@@ -13,7 +13,7 @@ export default defineChatModule({
 			if (channel.Mode === "Read") {
 				return;
 			}
-			if (user.Name === platform.selfName) {
+			if (user === platform.selfName) {
 				return;
 			}
 

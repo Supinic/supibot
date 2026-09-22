@@ -892,13 +892,12 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		if (this.logging.messages && channelData.Logging.has("Lines")) {
 			await logger.push(messageData.text, userData, channelData);
 		}
-
 		/**
 		 * Message events should be emitted even if the channel is in "Read" mode (see below).
 		 * This is due to the fact that chat-modules listening to this event can rely on being processed,
 		 * even if the channel is in read-only mode.
 		 */
-		channelData.events.emit("message", {
+		sb.ChatModule.dispatch({
 			event: "message",
 			message: messageData.text,
 			user: userData,
@@ -1055,7 +1054,6 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	async handleSub (notification: SubscribeMessageNotification) {
 		const { event } = notification.payload;
 
-		const userData = await sb.User.get(event.user_login);
 		const channelData = sb.Channel.get(event.broadcaster_user_login);
 		if (!channelData) {
 			return;
@@ -1063,10 +1061,10 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 
 		await logger.log("Twitch.Sub", JSON.stringify({ event }));
 
-		channelData.events.emit("subscription", {
+		sb.ChatModule.dispatch({
 			event: "subscription",
 			message: event.message.text,
-			user: userData,
+			user: event.user_login,
 			channel: channelData,
 			platform: this,
 			data: {
@@ -1074,7 +1072,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 				months: event.cumulative_months,
 				streak: event.streak_months ?? 1,
 				gifted: false,
-				recipient: userData,
+				recipient: event.user_login,
 				plan: TWITCH_SUBSCRIPTION_PLANS[event.tier]
 			}
 		});
@@ -1093,14 +1091,12 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			return;
 		}
 
-		channelData.events.emit("raid", {
+		sb.ChatModule.dispatch({
 			event: "raid",
 			channel: channelData,
 			username: fromName,
 			platform: this,
-			data: {
-				viewers
-			}
+			data: { viewers }
 		});
 
 		if (this.logging.hosts) {
@@ -1121,9 +1117,10 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		}
 
 		if (type === "stream.online") {
-			channelData.events.emit("online", {
+			sb.ChatModule.dispatch({
 				event: "online",
-				channel: channelData
+				channel: channelData,
+				platform: this
 			});
 
 			const existing = await this.getLiveChannelIdList();
@@ -1132,9 +1129,10 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			}
 		}
 		else {
-			channelData.events.emit("offline", {
+			sb.ChatModule.dispatch({
 				event: "offline",
-				channel: channelData
+				channel: channelData,
+				platform: this
 			});
 
 			await this.removeLiveChannelIdList(channelId);
@@ -1613,9 +1611,10 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 				continue;
 			}
 
-			channelData.events.emit("offline", {
+			sb.ChatModule.dispatch({
 				event: "offline",
-				channel: channelData
+				channel: channelData,
+				platform: this
 			});
 
 			await this.removeLiveChannelIdList(channelId);

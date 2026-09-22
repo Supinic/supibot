@@ -101,16 +101,17 @@ class CytubeClient {
 				: this.userMap.get(data.username);
 
 			if (!userData) {
-				this.channelData.events.emit("message", {
-					event: "message",
-					message: msg,
-					user: null,
-					channel: this.channelData,
-					platform: this.platform,
-					raw: {
-						user: data.username
-					}
-				});
+				// @todo create a separate "raw message" event
+				// sb.ChatModule.dispatch({
+				// 	event: "message",
+				// 	message: msg,
+				// 	user: null,
+				// 	channel: this.channelData,
+				// 	platform: this.platform,
+				// 	raw: {
+				// 		user: data.username
+				// 	}
+				// });
 
 				return;
 			}
@@ -135,8 +136,8 @@ class CytubeClient {
 
 				this.platform.resolveUserMessage(this.channelData, userData, msg);
 
-				this.channelData.events.emit("message", {
-					type: "message",
+				sb.ChatModule.dispatch({
+					event: "message",
 					message: msg,
 					user: userData,
 					channel: this.channelData,

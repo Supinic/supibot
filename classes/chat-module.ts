@@ -22,13 +22,13 @@ type MessageEvent<P extends Platform = Platform> = EventBase<"message", P> & {
 };
 type SubscriptionEvent<P extends Platform = Platform> = EventBase<"subscription", P> & {
 	message: string;
-	user: User;
+	user: string;
 	data: {
 		amount: number;
 		months: number;
 		streak: number;
 		gifted: boolean;
-		recipient: User;
+		recipient: string;
 		plan: string;
 	};
 };

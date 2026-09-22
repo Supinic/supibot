@@ -779,7 +779,8 @@ const emitRawUserMessageEvent = (username: string, userId: string, channelName: 
 
 	const channelData = sb.Channel.get(channelName, platform);
 	if (channelData) {
-		channelData.events.emit("message", {
+		// @todo create a separate "raw message" event
+		sb.ChatModule.dispatch({
 			event: "message",
 			message: message.text,
 			user: null,
