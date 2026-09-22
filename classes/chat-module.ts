@@ -237,7 +237,7 @@ export class ChatModuleManager {
 		const definition = this.definitions.get(name);
 		if (!definition) {
 			throw new SupiError({
-				message: `Assert error: asserted chat module definition "${definition}" is not available`
+				message: `Assert error: asserted chat module definition "${name}" is not available`
 			});
 		}
 
