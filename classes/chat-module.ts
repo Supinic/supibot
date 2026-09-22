@@ -228,6 +228,17 @@ export class ChatModuleManager {
 		return this.definitions.get(name) ?? null;
 	}
 
+	getAsserted (name: string): RegisteredChatModuleDefinition {
+		const definition = this.definitions.get(name);
+		if (!definition) {
+			throw new SupiError({
+				message: `Assert error: asserted chat module definition "${definition}" is not available`
+			});
+		}
+
+		return definition;
+	}
+
 	import (definitions: readonly ChatModuleDefinition[]): void {
 		if (this.initialized) {
 			throw new SupiError({ message: "Cannot import new definitions after initialization" });
