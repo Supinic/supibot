@@ -711,7 +711,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		}
 	}
 
-	async timeout (channelData: Channel, user: User | string, duration: number = 1, reason: string | null = null) {
+	async timeout (channelData: Channel, user: User | string, duration: number | null = 1, reason: string | null = null) {
 		if (channelData.Platform !== this) {
 			throw new SupiError({
 				message: "Non-Twitch channel provided",
