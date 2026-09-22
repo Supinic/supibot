@@ -101,8 +101,8 @@ type ContextFor<P extends PlatformSelector, E extends PropertyKey> = P extends "
 		? ContextForPlatforms<P[number], E>
 		: never;
 
-type AnyChatEvent = { [E in EventName]: ContextFor<"all", E>; }[EventName];
 type EventName = EventNameFor<"all">;
+type AnyChatEvent = { [E in EventName]: ContextFor<"all", E>; }[EventName];
 type ChatModuleHandler<
 	P extends PlatformSelector,
 	E extends EventNameFor<P>,
