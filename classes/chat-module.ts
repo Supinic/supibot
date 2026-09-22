@@ -5,10 +5,10 @@ import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
 import type { Platform } from "../platforms/template.js";
 import type { TwitchPlatform } from "../platforms/twitch.js";
-import type { MessageNotification as TwitchMessageNotification } from "../platforms/twitch-utils.js";
 import type { DiscordPlatform } from "../platforms/discord.js";
 import type { CytubePlatform } from "../platforms/cytube.js";
 import type { IrcPlatform } from "../platforms/irc.js";
+import type { TwitchMessageData } from "../platforms/twitch-utils.js";
 
 interface EventBase<E extends string, P extends Platform = Platform> {
 	event: E;
@@ -46,7 +46,7 @@ type TwitchMessageEvent = MessageEvent<TwitchPlatform> & {
 type TwitchRawMessageEvent = EventBase<"message", TwitchPlatform> & {
 	message: string;
 	user: null;
-	messageData: TwitchMessageNotification["payload"]["event"]["message"];
+	messageData: TwitchMessageData;
 	raw: {
 		user: string;
 		userId: string;

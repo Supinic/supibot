@@ -1,8 +1,8 @@
 import { type ContextPlatformSpecificData, declare } from "../../classes/command.js";
-import type { MessageData as TwitchMessageData } from "../../platforms/twitch.js";
 import { filterNonNullable } from "../../utils/ts-helpers.js";
 import { SupiError } from "supi-core";
 import { ivrEmoteSchema } from "../../utils/schemas.js";
+import type { TwitchMessageData } from "../../platforms/twitch-utils.js";
 
 const REGEXES = {
 	V1: /^\d+$/,

@@ -30,7 +30,8 @@ import TwitchUtils, {
 	type SubscribeMessageNotification,
 	type RaidNotification,
 	type StreamOnlineNotification,
-	type StreamOfflineNotification
+	type StreamOfflineNotification,
+	type TwitchMessageData
 } from "./twitch-utils.js";
 
 import type { Channel } from "../classes/channel.js";
@@ -240,19 +241,6 @@ type SevenTvEmoteResponse = {
 };
 type GlobalSevenTvEmoteResponse = SevenTvEmoteResponse["emote_set"] & {
 	emotes: SevenTvEmote[];
-};
-
-export type MessageData = {
-	text: string;
-	fragments: MessageNotification["payload"]["event"]["message"]["fragments"];
-	type: MessageNotification["payload"]["event"]["message_type"];
-	id: MessageNotification["payload"]["event"]["message_id"];
-	bits: MessageNotification["payload"]["event"]["cheer"];
-	badges: MessageNotification["payload"]["event"]["badges"];
-	color: MessageNotification["payload"]["event"]["color"];
-	animationId: MessageNotification["payload"]["event"]["channel_points_animation_id"];
-	rewardId: MessageNotification["payload"]["event"]["channel_points_custom_reward_id"];
-	reply: MessageNotification["payload"]["event"]["reply"];
 };
 
 type ConnectOptions = {
@@ -795,7 +783,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			reply
 		} = event;
 
-		const messageData: MessageData = {
+		const messageData: TwitchMessageData = {
 			text: TwitchUtils.sanitizeMessage(event.message.text),
 			fragments: event.message.fragments,
 			type: event.message_type,
@@ -1160,7 +1148,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		channel: Channel | null,
 		args: string[] = [],
 		options: { privateMessage: boolean; },
-		specificData: MessageData | null
+		specificData: TwitchMessageData | null
 	) {
 		const execution = await sb.Command.checkAndExecute({
 			command,

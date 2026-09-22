@@ -310,6 +310,19 @@ export const isStreamChangeNotification = (input: NotificationMessage): input is
 	input.payload.subscription.type === "stream.offline" || input.payload.subscription.type === "stream.online"
 );
 
+export type TwitchMessageData = {
+	text: string;
+	fragments: MessageNotification["payload"]["event"]["message"]["fragments"];
+	type: MessageNotification["payload"]["event"]["message_type"];
+	id: MessageNotification["payload"]["event"]["message_id"];
+	bits: MessageNotification["payload"]["event"]["cheer"];
+	badges: MessageNotification["payload"]["event"]["badges"];
+	color: MessageNotification["payload"]["event"]["color"];
+	animationId: MessageNotification["payload"]["event"]["channel_points_animation_id"];
+	rewardId: MessageNotification["payload"]["event"]["channel_points_custom_reward_id"];
+	reply: MessageNotification["payload"]["event"]["reply"];
+};
+
 type AccessTokenData = {
 	access_token: string;
 	refresh_token: string;
@@ -752,8 +765,7 @@ const fetchToken = async () => {
 	return response.body.access_token;
 };
 
-type MessageData = MessageNotification["payload"]["event"]["message"];
-const emitRawUserMessageEvent = (username: string, userId: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
+const emitRawUserMessageEvent = (username: string, userId: string, channelName: string, platform: TwitchPlatform, message: TwitchMessageData) => {
 	if (!username || !channelName) {
 		throw new SupiError({
 			message: "No username or channel name provided for raw event",
