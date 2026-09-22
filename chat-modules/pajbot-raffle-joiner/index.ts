@@ -1,6 +1,5 @@
 import { defineChatModule } from "../../classes/chat-module.js";
 
-let timeoutTimestamp = 0;
 const REPLY_EMOTES = ["pajaS", "pajaW", "pajaH", "pajaScoots", "pajaL", "monkaS", "paaaajaW", "Okayga", "PAJAW", "paaaajaW"];
 
 export default defineChatModule({
@@ -8,8 +7,9 @@ export default defineChatModule({
 	description: "Conditionally joins points raffles initiated by Pajbot",
 	platform: ["twitch"],
 	scope: "channel",
+	state: () => ({ timestamp: 0 }),
 	handlers: {
-		async message (context) {
+		async message (context, { state }) {
 			if (context.user?.Name !== "pajbot") {
 				return;
 			}
@@ -25,11 +25,11 @@ export default defineChatModule({
 			}
 
 			const now = Date.now();
-			if (timeoutTimestamp > now) {
+			if (state.timestamp > now) {
 				return;
 			}
 
-			timeoutTimestamp = now + 30_000;
+			state.timestamp = now + 30_000;
 			const replyTimeout = core.Utils.random(2500, 20_000);
 			const emote = await context.platform.getBestAvailableEmote(context.channel, REPLY_EMOTES, ":)");
 
