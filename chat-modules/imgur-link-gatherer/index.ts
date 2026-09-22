@@ -11,15 +11,15 @@ const uploadSchema = z.object({
 });
 
 const regex = /(https:\/\/)?(i\.)?imgur\.com\/(?<slug>\w{5,8})\.(?<extension>\w{3,4})/g;
-const processedLinks = new Set<string>();
 
 export default defineChatModule({
 	name: "imgur-link-gatherer",
 	description: "Gathers Imgur links globally, and reuploads them if possible.",
 	platform: "all",
 	scope: "global",
+	state: () => ({ links: new Set<string>() }),
 	handlers: {
-		async message (context) {
+		async message (context, { state }) {
 			if (!process.env.API_IMGBB) {
 				if (missingEnvNotified) {
 					missingEnvNotified = true;
@@ -44,11 +44,11 @@ export default defineChatModule({
 				if (!SUPPORTED_EXTENSIONS.has(extension)) {
 					return;
 				}
-				else if (processedLinks.has(slug)) {
+				else if (state.links.has(slug)) {
 					return;
 				}
 
-				processedLinks.add(slug);
+				state.links.add(slug);
 
 				const link = `${slug}.${extension}`;
 				const row = await core.Query.getRow("data", "Imgur_Reupload");

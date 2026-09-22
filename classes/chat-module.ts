@@ -61,10 +61,16 @@ type ConfigFor<C extends ConfigSchema | undefined> = C extends ConfigSchema
 type StateFor<F extends StateFactory | undefined> = F extends StateFactory
 	? ReturnType<F>
 	: undefined;
-type ChatModuleRuntime<C extends ConfigSchema | undefined, F extends StateFactory | undefined> = {
-	readonly config: ConfigFor<C>;
-	readonly state: StateFor<F>;
+
+export type ChatModuleRuntimeData<C = unknown, S extends object | undefined = object | undefined> = {
+	readonly config: C;
+	readonly state: S;
 };
+
+type ChatModuleRuntime<
+	C extends ConfigSchema | undefined,
+	F extends StateFactory | undefined
+> = ChatModuleRuntimeData<ConfigFor<C>, StateFor<F>>;
 
 type PlatformEventMap = {
 	twitch: {
@@ -125,6 +131,17 @@ export type ChatModuleDefinition<
 		[E in EventNameFor<P>]?: ChatModuleHandler<P, E, C, F>;
 	};
 };
+
+export type ChatModuleRuntimeFor<D> = D extends ChatModuleDefinition<
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	infer _P extends PlatformSelector,
+	infer C extends ConfigSchema | undefined,
+	infer F extends StateFactory | undefined
+> ? ChatModuleRuntime<C, F> : never;
+
+export interface ChatModuleRuntimeMap {
+	[name: string]: ChatModuleRuntimeData;
+}
 
 export function defineChatModule <
 	const P extends PlatformSelector = PlatformSelector,
@@ -325,7 +342,7 @@ export class ChatModuleManager {
 		}
 	}
 
-	getRuntimeData (name: string, target: AttachmentTarget): Readonly<RuntimeData> | null {
+	getRuntimeData <N extends string> (name: N, target: AttachmentTarget): ChatModuleRuntimeMap[N] | null {
 		if (!this.initialized) {
 			throw new SupiError({ message: "Cannot get module runtime data before initialization" });
 		}
@@ -341,7 +358,7 @@ export class ChatModuleManager {
 			attachment = this.attachments.channel.get(target.channel)?.get(name);
 		}
 
-		return attachment?.runtime ?? null;
+		return (attachment?.runtime ?? null) as ChatModuleRuntimeMap[N] | null;
 	}
 
 	private attach (definition: RegisteredChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): void {

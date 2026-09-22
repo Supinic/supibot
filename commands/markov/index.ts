@@ -1,12 +1,11 @@
 import { declare } from "../../classes/command.js";
-import type AsyncMarkov from "async-markov";
 import type { Channel } from "../../classes/channel.js";
 
 const MODEL_SIZE_THRESHOLD = 25;
 const WORD_AMOUNT = 25;
 
 type ModuleRow = { channelId: Channel["ID"], name: Channel["Name"] };
-const getMarkovData = (channel: Channel["ID"]) => (
+const getMarkovRuntime = (channel: Channel["ID"]) => (
 	sb.ChatModule.getRuntimeData("async-markov-experiment", { scope: "channel", channel })
 );
 
@@ -29,14 +28,14 @@ export default declare({
 				};
 			}
 
-			runtime = getMarkovData(channelData.ID);
+			runtime = getMarkovRuntime(channelData.ID);
 		}
 		else {
 			if (context.channel) {
-				runtime = getMarkovData(context.channel.ID);
+				runtime = getMarkovRuntime(context.channel.ID);
 			}
 
-			runtime ??= getMarkovData(sb.Channel.getAsserted("forsen").ID);
+			runtime ??= getMarkovRuntime(sb.Channel.getAsserted("forsen").ID);
 		}
 
 		if (!runtime) {
@@ -48,7 +47,7 @@ export default declare({
 			};
 		}
 
-		const markov = (runtime.state as { markov: AsyncMarkov | null }).markov;
+		const { markov } = runtime.state;
 		if (!markov || markov.size < MODEL_SIZE_THRESHOLD) {
 			return {
 				success: false,
