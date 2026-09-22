@@ -325,6 +325,25 @@ export class ChatModuleManager {
 		}
 	}
 
+	getRuntimeData (name: string, target: AttachmentTarget): Readonly<RuntimeData> | null {
+		if (!this.initialized) {
+			throw new SupiError({ message: "Cannot get module runtime data before initialization" });
+		}
+
+		let attachment;
+		if (target.scope === "global") {
+			attachment = this.attachments.global.get(name);
+		}
+		else if (target.scope === "platform") {
+			attachment = this.attachments.platform.get(target.platform)?.get(name);
+		}
+		else {
+			attachment = this.attachments.channel.get(target.channel)?.get(name);
+		}
+
+		return attachment?.runtime ?? null;
+	}
+
 	private attach (definition: RegisteredChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): void {
 		if (definition.scope !== target.scope) {
 			throw new SupiError({

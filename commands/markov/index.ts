@@ -1,32 +1,14 @@
-import { SupiError } from "supi-core";
-import type AsyncMarkov from "async-markov";
 import { declare } from "../../classes/command.js";
+import type AsyncMarkov from "async-markov";
 import type { Channel } from "../../classes/channel.js";
 
 const MODEL_SIZE_THRESHOLD = 25;
 const WORD_AMOUNT = 25;
 
 type ModuleRow = { channelId: Channel["ID"], name: Channel["Name"] };
-const getMarkovData = () => {
-	const module = sb.ChatModule.get("async-markov-experiment");
-	if (!module) {
-		throw new SupiError({
-			message: "Assert error: Markov module is not available"
-		});
-	}
-
-	const { data } = module;
-	if (!("markovs" in data)) {
-		throw new SupiError({
-			message: "Assert error: Markov module has no specific data available"
-		});
-	}
-
-	return {
-		// @todo use proper typing for markov's chat module when available
-		markovs: data.markovs as Map<Channel["ID"], AsyncMarkov>
-	};
-};
+const getMarkovData = (channel: Channel["ID"]) => (
+	sb.ChatModule.getRuntimeData("async-markov-experiment", { scope: "channel", channel })
+);
 
 export default declare({
 	Name: "markov",
@@ -37,8 +19,7 @@ export default declare({
 	Params: [{ name: "channel", type: "string" }],
 	Whitelist_Response: null,
 	Code: function markov (context, input) {
-		let markov;
-		const { markovs } = getMarkovData();
+		let runtime;
 		if (context.params.channel) {
 			const channelData = sb.Channel.get(context.params.channel);
 			if (!channelData) {
@@ -48,17 +29,17 @@ export default declare({
 				};
 			}
 
-			markov = markovs.get(channelData.ID);
+			runtime = getMarkovData(channelData.ID);
 		}
 		else {
 			if (context.channel) {
-				markov = markovs.get(context.channel.ID);
+				runtime = getMarkovData(context.channel.ID);
 			}
 
-			markov ??= markovs.get(sb.Channel.getAsserted("forsen").ID);
+			runtime ??= getMarkovData(sb.Channel.getAsserted("forsen").ID);
 		}
 
-		if (!markov) {
+		if (!runtime) {
 			return {
 				success: false,
 				reply: (context.params.channel)
@@ -66,10 +47,12 @@ export default declare({
 					: "Could not load the markov-chain module for fallback channel!"
 			};
 		}
-		else if (markov.size < MODEL_SIZE_THRESHOLD) {
+
+		const markov = (runtime.state as { markov: AsyncMarkov | null }).markov;
+		if (!markov || markov.size < MODEL_SIZE_THRESHOLD) {
 			return {
 				success: false,
-				reply: `Markov-chain module does not have enough data available! (${markov.size}/${MODEL_SIZE_THRESHOLD} required)`
+				reply: `Markov-chain module does not have enough data available! (${markov?.size ?? 0}/${MODEL_SIZE_THRESHOLD} required)`
 			};
 		}
 
@@ -79,6 +62,7 @@ export default declare({
 		};
 	},
 	Dynamic_Description: async function (prefix) {
+		// @todo possibly implement a "get all channels/attachments for module name" method into sb.ChatModule
 		const channels = await core.Query.getRecordset<ModuleRow[]>(rs => rs
 			.select("Channel.ID AS channelId", "Channel.Name as name")
 			.from("chat_data", "Channel_Chat_Module")

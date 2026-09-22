@@ -1,12 +1,10 @@
 import AsyncMarkov from "async-markov";
 import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
 import { defineChatModule } from "../../classes/chat-module.js";
-import type { Channel } from "../../classes/channel.js";
 
 // only allows messages consisting of just emojis, or ASCII 32-126 characters (0x20-0x7E)
 const allowRegex = /^[\p{Emoji}\u0020-\u007E]+$/ui;
 const MARKOV_THRESHOLD = 250_000;
-export const markovInstancesMap = new Map<Channel["ID"], AsyncMarkov>();
 
 export default defineChatModule({
 	name: "async-markov-experiment",

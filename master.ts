@@ -4,14 +4,14 @@ import { getConfig } from "./config.js";
 import initializeInternalApi from "./api/index.js";
 
 import commandDefinitions from "./commands/index.js";
-import chatModuleDefinitions from "./chat-modules/index.js";
+import { chatModuleDefinitions } from "./chat-modules/index.js";
 import { definitions as gotDefinitions } from "./gots/index.js";
 import initializeCrons from "./crons/index.js";
 
 import { AwayFromKeyboard } from "./classes/afk.js";
 import { Banphrase } from "./classes/banphrase.js";
 import { Channel } from "./classes/channel.js";
-import { ChatModule, type ChatModuleDefinition } from "./classes/chat-module.js";
+import { type ChatModuleDefinition, ChatModuleManager } from "./classes/chat-module.js";
 import { Command, type CommandDefinition } from "./classes/command.js";
 import { Filter } from "./classes/filter.js";
 import { MpvClient as MpvClientConstructor } from "./singletons/mpv-client.js";
@@ -31,7 +31,7 @@ interface GlobalSb {
 	AwayFromKeyboard: typeof AwayFromKeyboard;
 	Banphrase: typeof Banphrase;
 	Channel: typeof Channel;
-	ChatModule: typeof ChatModule;
+	ChatModule: ChatModuleManager;
 	Command: typeof Command;
 	Filter: typeof Filter;
 	Platform: typeof Platform;
@@ -85,10 +85,7 @@ const connectToPlatform = async (platform: Platform) => {
 };
 
 const MODULE_INITIALIZE_ORDER = [
-	// First batch - no dependencies
-	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder],
-	// Second batch - depends on Channel
-	[ChatModule]
+	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder]
 ] as const;
 
 const config = getConfig();
@@ -167,7 +164,7 @@ globalThis.sb = {
 	Banphrase,
 	Channel,
 	Reminder,
-	ChatModule,
+	ChatModule: new ChatModuleManager(),
 	MpvClient,
 	API: initializeInternalApi()
 };
@@ -180,7 +177,11 @@ const gotInstances = filterModuleDefinitions("name", gotDefinitions as GotRegist
 core.Got.import(gotInstances);
 
 Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands));
-await ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"]));
+
+sb.ChatModule.import(
+	filterModuleDefinitions("name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"])
+);
+await sb.ChatModule.initialize();
 
 console.timeEnd("chat modules");
 
