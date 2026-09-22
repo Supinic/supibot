@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { defineChatModule } from "../../classes/chat-module.js";
 
 export default defineChatModule({
@@ -5,37 +6,15 @@ export default defineChatModule({
 	description: "According to arguments, reacts to a Twitch channel being raided.",
 	scope: "channel",
 	platform: ["twitch"],
+	config: z.object({ message: z.string() }),
 	handlers: {
-		async raid (context, definition) {
-			const { channel, platform, user } = context;
-			if (platform.name !== "twitch") {
-				return;
-			}
-			else if (channel.mode === "Read") {
-				return;
-			}
-			else if (!definition) {
+		async raid (context, { config }) {
+			const { channel } = context;
+			if (channel.Mode === "Read") {
 				return;
 			}
 
-			if (!user) {
-				return;
-			}
-
-			const { response, callback } = definition;
-			if (typeof response === "string") {
-				await channel.send(response);
-			}
-			else if (typeof callback === "function") {
-				await callback(context, definition);
-			}
-			else {
-				console.warn("Incorrect raid chat-module response type", {
-					chatModule: this.Name,
-					channel: channel.ID,
-					definition
-				});
-			}
+			await channel.send(config.message);
 		}
 	}
 });
