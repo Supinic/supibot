@@ -21,7 +21,7 @@ export default defineChatModule({
 	handlers: {
 		async message (context, { state }) {
 			if (!process.env.API_IMGBB) {
-				if (missingEnvNotified) {
+				if (!missingEnvNotified) {
 					missingEnvNotified = true;
 					console.warn("No ImgBB key notified (API_IMGBB)");
 				}
