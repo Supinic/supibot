@@ -4,7 +4,7 @@ import type * as z from "zod";
 import type { Channel } from "./channel.js";
 import type { User } from "./user.js";
 import type { Platform } from "../platforms/template.js";
-import Twitch, { type TwitchPlatform } from "../platforms/twitch.js";
+import type { TwitchPlatform } from "../platforms/twitch.js";
 import type { MessageNotification as TwitchMessageNotification } from "../platforms/twitch-utils.js";
 import type { DiscordPlatform } from "../platforms/discord.js";
 import type { CytubePlatform } from "../platforms/cytube.js";

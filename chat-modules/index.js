@@ -16,7 +16,6 @@ import RaidReactionTtsModule from "./raid-react-tts/index.js";
 import StreamPointsRedemptionModule from "./stream-points-redemptions/index.js";
 import SubscriptionReactionModule from "./subscription-react/index.js";
 import SubscriptionReactionTtsModule from "./subscription-react-tts/index.js";
-import SilencePreventionTriggerModule from "./supinic-silence-prevention-trigger/index.js";
 import StreamDatabaseUpdaterModule from "./supinic-stream-db/index.js";
 import SuspiciousUserAutoCheckerModule from "./suspicious-user-auto-check/index.js";
 import WannaBecomeFamousModule from "./wanna-become-famous/index.js";
@@ -40,7 +39,6 @@ export default [
 	StreamPointsRedemptionModule,
 	SubscriptionReactionModule,
 	SubscriptionReactionTtsModule,
-	SilencePreventionTriggerModule,
 	StreamDatabaseUpdaterModule,
 	SuspiciousUserAutoCheckerModule,
 	WannaBecomeFamousModule
