@@ -13,24 +13,28 @@ const prepareMessage = (message: string): string => (
 		.replaceAll(/https:\/\/media.discordapp.net.+?(\s|$)/g, "")
 );
 
+const configSchema = z.object({
+	channelId: z.string(),
+	wordFilters: z.object({
+		include: z.array(z.string()).optional(),
+		exclude: z.array(z.string()).optional()
+	}).optional(),
+	subscription: z.string(),
+	messagePrefix: z.string()
+});
+
 export default defineChatModule({
 	name: "discord-announcement-subscriber",
 	description: "When listening to a message in a specified Discord channel, Supibot will then create a $subscription like list of reminders and post the news to all affected channels.",
 	platform: ["discord"],
 	scope: "channel",
-	config: z.object({
-		channelId: z.string(),
-		wordFilters: z.object({
-			include: z.array(z.string()).optional(),
-			exclude: z.array(z.string()).optional()
-		}).optional(),
-		subscription: z.string(),
-		messagePrefix: z.string()
-	}),
+	config: z.union([configSchema, z.array(configSchema)]),
 	handlers: {
 		async message (context, runtime) {
 			const { channel, message } = context;
-			const { channelId, wordFilters = {}, subscription, messagePrefix } = runtime.config;
+			const config = (Array.isArray(runtime.config)) ? runtime.config[0] : runtime.config;
+
+			const { channelId, wordFilters = {}, subscription, messagePrefix } = config;
 			if (channel.Name !== channelId) { // sanity check
 				return;
 			}
