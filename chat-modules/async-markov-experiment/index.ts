@@ -13,15 +13,18 @@ export default defineChatModule({
 	description: "Super experimental automatic async markov tester thing",
 	platform: "all",
 	scope: "channel",
+	state: () => ({
+		markov: null as AsyncMarkov | null
+	}),
 	handlers: {
-		message (context) {
-			let instance = markovInstancesMap.get(context.channel.ID);
-			if (!instance) {
-				instance = new AsyncMarkov();
-				markovInstancesMap.set(context.channel.ID, instance);
+		message (context, runtime) {
+			let { markov } = runtime.state;
+			if (!markov) {
+				markov = new AsyncMarkov();
+				runtime.state.markov = markov;
 			}
 
-			if (instance.size > MARKOV_THRESHOLD) {
+			if (markov.size > MARKOV_THRESHOLD) {
 				return;
 			}
 
@@ -38,7 +41,7 @@ export default defineChatModule({
 				return;
 			}
 
-			instance.add(fixedMessage);
+			markov.add(fixedMessage);
 		}
 	}
 });
