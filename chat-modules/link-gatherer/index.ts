@@ -82,6 +82,9 @@ export default defineChatModule({
 			if (!user) {
 				return;
 			}
+			if (user.Name === platform.selfName) {
+				return;
+			}
 
 			for (const { host, regex } of matchers) {
 				for (const match of context.message.matchAll(regex)) {
