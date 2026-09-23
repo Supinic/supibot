@@ -2,7 +2,7 @@ import AsyncMarkovExperimentModule from "./async-markov-experiment/index.js";
 import BotFaqHelperModule from "./bot-faq-helper/index.js";
 import ChatSuggestionLinkerModule from "./chat-suggestion-linker/index.js";
 import DiscordAnnouncementSubscriber from "./discord-announcement-subscriber/index.js";
-import ImgurLinkGathererModule from "./imgur-link-gatherer/index.js";
+import LinkGathererModule from "./link-gatherer/index.js";
 import LiveDetectionModule from "./live-detection/index.js";
 import MessageReactionModule from "./message-react/index.js";
 import OfflineOnlyMirrorModule from "./offline-only-mirror/index.js";
@@ -33,7 +33,7 @@ export const chatModuleDefinitions = [
 	BotFaqHelperModule,
 	ChatSuggestionLinkerModule,
 	DiscordAnnouncementSubscriber,
-	ImgurLinkGathererModule,
+	LinkGathererModule,
 	LiveDetectionModule,
 	MessageReactionModule,
 	OfflineOnlyMirrorModule,
