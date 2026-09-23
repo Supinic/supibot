@@ -1,6 +1,7 @@
 import { SupiDate } from "supi-core";
 import { defineChatModule } from "../../classes/chat-module.js";
 import { typeRegexGroups } from "../../utils/ts-helpers.js";
+import initialize from "../../api/index.js";
 
 type SourceRow = {
 	ID: number;
@@ -67,6 +68,14 @@ export default defineChatModule({
 	description: "Gathers media links globally, and creates a database record for each occurrence.",
 	platform: ["twitch", "discord"],
 	scope: "platform",
+	initialize: async () => {
+		const [sourceTableAvailable, seenTableAvailable] = await Promise.all([
+			core.Query.isTablePresent("data", "Media_Source"),
+			core.Query.isTablePresent("data", "Media_Seen")
+		]);
+
+		return (sourceTableAvailable && seenTableAvailable);
+	},
 	handlers: {
 		async message (context) {
 			const { user, platform, channel } = context;
