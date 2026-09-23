@@ -34,13 +34,13 @@ const HOSTS_DEFINITIONS = [
 	{
 		name: "nuuls",
 		hostnames: ["i.nuuls.com"],
-		slugPattern: "[A-Za-z0-9]{5}",
+		slugPattern: "[A-Za-z0-9]{5,8}",
 		extensions: BASE_EXTENSIONS
 	},
 	{
 		name: "kappa",
 		hostnames: ["kappa.lol"],
-		slugPattern: "[A-Za-z0-9]{5}",
+		slugPattern: "[A-Za-z0-9]{5,8}",
 		extensions: []
 	}
 ] as const satisfies readonly ImageHostDefinition[];
