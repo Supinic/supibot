@@ -30,7 +30,8 @@ import TwitchUtils, {
 	type SubscribeMessageNotification,
 	type RaidNotification,
 	type StreamOnlineNotification,
-	type StreamOfflineNotification
+	type StreamOfflineNotification,
+	type TwitchMessageData
 } from "./twitch-utils.js";
 
 import type { Channel } from "../classes/channel.js";
@@ -242,19 +243,6 @@ type GlobalSevenTvEmoteResponse = SevenTvEmoteResponse["emote_set"] & {
 	emotes: SevenTvEmote[];
 };
 
-export type MessageData = {
-	text: string;
-	fragments: MessageNotification["payload"]["event"]["message"]["fragments"];
-	type: MessageNotification["payload"]["event"]["message_type"];
-	id: MessageNotification["payload"]["event"]["message_id"];
-	bits: MessageNotification["payload"]["event"]["cheer"];
-	badges: MessageNotification["payload"]["event"]["badges"];
-	color: MessageNotification["payload"]["event"]["color"];
-	animationId: MessageNotification["payload"]["event"]["channel_points_animation_id"];
-	rewardId: MessageNotification["payload"]["event"]["channel_points_custom_reward_id"];
-	reply: MessageNotification["payload"]["event"]["reply"];
-};
-
 type ConnectOptions = {
 	url?: string;
 	skipSubscriptions?: boolean;
@@ -326,7 +314,7 @@ export const TwitchConfigSchema = BasePlatformConfigSchema.extend({
 });
 export type TwitchConfig = z.infer<typeof TwitchConfigSchema>;
 
-export class TwitchPlatform extends Platform<TwitchConfig> {
+export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	public readonly supportsMeAction = true;
 	public readonly dynamicChannelAddition = true;
 	private readonly reconnectCheck: NodeJS.Timeout;
@@ -723,7 +711,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	async timeout (channelData: Channel, user: User | string, duration: number = 1, reason: string | null = null) {
+	async timeout (channelData: Channel, user: User | string, duration: number | null = 1, reason: string | null = null) {
 		if (channelData.Platform !== this) {
 			throw new SupiError({
 				message: "Non-Twitch channel provided",
@@ -795,7 +783,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			reply
 		} = event;
 
-		const messageData: MessageData = {
+		const messageData: TwitchMessageData = {
 			text: TwitchUtils.sanitizeMessage(event.message.text),
 			fragments: event.message.fragments,
 			type: event.message_type,
@@ -904,18 +892,21 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		if (this.logging.messages && channelData.Logging.has("Lines")) {
 			await logger.push(messageData.text, userData, channelData);
 		}
-
 		/**
 		 * Message events should be emitted even if the channel is in "Read" mode (see below).
 		 * This is due to the fact that chat-modules listening to this event can rely on being processed,
 		 * even if the channel is in read-only mode.
 		 */
-		channelData.events.emit("message", {
+		sb.ChatModule.dispatch({
 			event: "message",
 			message: messageData.text,
 			user: userData,
 			channel: channelData,
-			platform: this
+			platform: this,
+			data: {
+				// @deprecated replace with a proper separate event
+				customRewardId: messageData.rewardId
+			}
 		});
 
 		// If channel is read-only, do not proceed with any processing
@@ -1063,7 +1054,6 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	async handleSub (notification: SubscribeMessageNotification) {
 		const { event } = notification.payload;
 
-		const userData = await sb.User.get(event.user_login);
 		const channelData = sb.Channel.get(event.broadcaster_user_login);
 		if (!channelData) {
 			return;
@@ -1071,10 +1061,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		await logger.log("Twitch.Sub", JSON.stringify({ event }));
 
-		channelData.events.emit("subscription", {
+		sb.ChatModule.dispatch({
 			event: "subscription",
 			message: event.message.text,
-			user: userData,
+			user: event.user_login,
 			channel: channelData,
 			platform: this,
 			data: {
@@ -1082,7 +1072,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				months: event.cumulative_months,
 				streak: event.streak_months ?? 1,
 				gifted: false,
-				recipient: userData,
+				recipient: event.user_login,
 				plan: TWITCH_SUBSCRIPTION_PLANS[event.tier]
 			}
 		});
@@ -1101,15 +1091,12 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			return;
 		}
 
-		channelData.events.emit("raid", {
+		sb.ChatModule.dispatch({
 			event: "raid",
-			message: null,
 			channel: channelData,
 			username: fromName,
 			platform: this,
-			data: {
-				viewers
-			}
+			data: { viewers }
 		});
 
 		if (this.logging.hosts) {
@@ -1130,9 +1117,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		if (type === "stream.online") {
-			channelData.events.emit("online", {
+			sb.ChatModule.dispatch({
 				event: "online",
-				channel: channelData
+				channel: channelData,
+				platform: this
 			});
 
 			const existing = await this.getLiveChannelIdList();
@@ -1141,9 +1129,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 		}
 		else {
-			channelData.events.emit("offline", {
+			sb.ChatModule.dispatch({
 				event: "offline",
-				channel: channelData
+				channel: channelData,
+				platform: this
 			});
 
 			await this.removeLiveChannelIdList(channelId);
@@ -1157,7 +1146,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		channel: Channel | null,
 		args: string[] = [],
 		options: { privateMessage: boolean; },
-		specificData: MessageData | null
+		specificData: TwitchMessageData | null
 	) {
 		const execution = await sb.Command.checkAndExecute({
 			command,
@@ -1622,9 +1611,10 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				continue;
 			}
 
-			channelData.events.emit("offline", {
+			sb.ChatModule.dispatch({
 				event: "offline",
-				channel: channelData
+				channel: channelData,
+				platform: this
 			});
 
 			await this.removeLiveChannelIdList(channelId);

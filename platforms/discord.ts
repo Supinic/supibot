@@ -91,7 +91,7 @@ export const DiscordConfigSchema = BasePlatformConfigSchema.extend({
 });
 export type DiscordConfig = z.infer<typeof DiscordConfigSchema>;
 
-export class DiscordPlatform extends Platform<DiscordConfig> {
+export class DiscordPlatform extends Platform<DiscordConfig, "discord"> {
 	#emoteFetchingPromise: Promise<Emote[]> | null = null;
 
 	public readonly client: Client;
@@ -462,14 +462,15 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			// Still, fire a "raw user" message event
 			const channelData = sb.Channel.get(chan, this);
 			if (channelData) {
-				channelData.events.emit("message", {
-					event: "message",
-					message: msg,
-					user: null,
-					channel: channelData,
-					platform: this,
-					raw: { user }
-				});
+				// @todo create a separate "raw message" event
+				// sb.ChatModule.dispatch({
+				// 	event: "message",
+				// 	message: msg,
+				// 	user: null,
+				// 	channel: channelData,
+				// 	platform: this,
+				// 	raw: { user }
+				// });
 			}
 
 			return;
@@ -511,7 +512,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				await logger.push(core.Utils.wrapString(msg, this.messageLimit), userData, channelData);
 			}
 
-			channelData.events.emit("message", {
+			sb.ChatModule.dispatch({
 				event: "message",
 				message: msg,
 				user: userData,

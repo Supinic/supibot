@@ -1,14 +1,13 @@
-import type { ChatModuleDefinition, GenericMessageEventData, TwitchMessageEventData } from "../../classes/chat-module.js";
-import type { TwitchPlatform } from "../../platforms/twitch.js";
-import type { User } from "../../classes/user.js";
+import { defineChatModule } from "../../classes/chat-module.js";
 import { SupiError, type SupiDate } from "supi-core";
 import { ivrUserDataSchema } from "../../utils/schemas.js";
 import { logger } from "../../singletons/logger.js";
+import type { TwitchPlatform } from "../../platforms/twitch.js";
+import type { User } from "../../classes/user.js";
+import type { TwitchMessageData } from "../../platforms/twitch-utils.js";
 
 type UserAliasRow = Pick<User, "Discord_ID" | "Twitch_ID" | "Name">;
-type ReplyData = TwitchMessageEventData["messageData"]["reply"];
-
-const isTwitchEvent = (eventData: GenericMessageEventData): eventData is TwitchMessageEventData => (eventData.platform.name === "twitch");
+type ReplyData = TwitchMessageData["reply"];
 
 const keywords = new Set(["sus", "username", "account", "supibot", "help", "flag", "remedy"]);
 const alreadySelfCheckedUsernames: Set<string> = new Set();
@@ -41,153 +40,151 @@ const isMessageCheckReply = (username: string, reply: ReplyData) => {
 	return (messageId === reply.parent_message_id);
 };
 
-export default {
-	Name: "suspicious-user-auto-check",
-	Events: ["message"],
-	Description: "For each user who types (a part of) the \"suspicious user\" message, this module will automatically try the $$suscheck alias.",
-	Code: (async function suspiciousUserAutoChecker (eventData) {
-		if (!isTwitchEvent(eventData)) {
-			return;
-		}
-
-		const { channel, message, raw, user, platform, messageData } = eventData;
-		if (!channel || channel.Mode === "Read") {
-			return;
-		}
-		else if (user) {
-			// Immediately return if the user is **NOT** suspicious
-			// If the user object is present, then immediately return - suspicious users will be seen as "raw" instead
-			return;
-		}
-
-		if (isMessageSelfCheck(raw.user, message)) {
-			alreadySelfCheckedUsernames.add(raw.user);
-
-			type UserData = { id: string; internalId: string; };
-			const assumedUserData = await core.Query.getRecordset<UserData | undefined>(rs => rs
-				.select("Twitch_ID AS id", "ID AS internalId")
-				.from("chat_data", "User_Alias")
-				.where("Name = %s", raw.user)
-				.single()
-				.limit(1)
-			);
-			if (!assumedUserData) {
-				await channel.send(`Could not find user ${raw.user} in the database for Twitch_ID!`);
+export default defineChatModule({
+	name: "suspicious-user-auto-check",
+	description: "For each user who types (a part of) the \"suspicious user\" message, this module will automatically try the $$suscheck alias.",
+	scope: "channel",
+	platform: ["twitch"],
+	handlers: {
+		async message (context) {
+			if (!context.raw) {
+				// Immediately return if the user is **NOT** suspicious
+				// If the user object is present, then immediately return - suspicious users will be seen as "raw" instead
 				return;
 			}
 
-			const { id, internalId } = assumedUserData;
-			const response = await core.Got.get("IVR")({
-				url: "v2/twitch/user",
-				searchParams: { id }
-			});
+			const { channel, message, raw, platform, messageData } = context;
+			if (channel.Mode === "Read") {
+				return;
+			}
 
-			let hintMessage;
-			const parseResult = ivrUserDataSchema.safeParse(response.body);
-			if (!response.ok || parseResult.error || parseResult.data.length === 0) {
-				type StalkData = { text: string; date: SupiDate; channelName: string; };
-				const data = await core.Query.getRecordset<StalkData | undefined>(rs => rs
-					.select("Last_Message_Text AS text", "Last_Message_Posted AS date", "Channel.Name AS channelName")
-					.from("chat_data", "Message_Meta_User_Alias")
-					.join("chat_data", "Channel")
-					.where("User_Alias = %n", internalId)
-					.orderBy("Last_Message_Posted DESC")
-					.limit(1)
+			if (isMessageSelfCheck(raw.user, message)) {
+				alreadySelfCheckedUsernames.add(raw.user);
+
+				type UserData = { id: string; internalId: string; };
+				const assumedUserData = await core.Query.getRecordset<UserData | undefined>(rs => rs
+					.select("Twitch_ID AS id", "ID AS internalId")
+					.from("chat_data", "User_Alias")
+					.where("Name = %s", raw.user)
 					.single()
+					.limit(1)
 				);
-
-				if (!data) {
-					await channel.send(`Could not find any kind of data for this user! Please contact @Supinic for manual help.`);
+				if (!assumedUserData) {
+					await channel.send(`Could not find user ${raw.user} in the database for Twitch_ID!`);
 					return;
 				}
 
-				const { text, date, channelName } = data;
-				const delta = core.Utils.timeDelta(date);
+				const { id, internalId } = assumedUserData;
+				const response = await core.Got.get("IVR")({
+					url: "v2/twitch/user",
+					searchParams: { id }
+				});
 
-				hintMessage = `this last-seen message: "${core.Utils.wrapString(text, 100)}" in channel ${channelName} ${delta} belongs to you or someone else.`;
-			}
-			else {
-				const [data] = parseResult.data;
-				if (data.login === raw.user) {
-					const logID = await logger.log(
-						"Twitch.Warning",
-						`Weird suspicious case: ${JSON.stringify({ data, id })}`
+				let hintMessage;
+				const parseResult = ivrUserDataSchema.safeParse(response.body);
+				if (!response.ok || parseResult.error || parseResult.data.length === 0) {
+					type StalkData = { text: string; date: SupiDate; channelName: string; };
+					const data = await core.Query.getRecordset<StalkData | undefined>(rs => rs
+						.select("Last_Message_Text AS text", "Last_Message_Posted AS date", "Channel.Name AS channelName")
+						.from("chat_data", "Message_Meta_User_Alias")
+						.join("chat_data", "Channel")
+						.where("User_Alias = %n", internalId)
+						.orderBy("Last_Message_Posted DESC")
+						.limit(1)
+						.single()
 					);
 
-					await channel.send(`It seems like @${raw.user} is not suspicious at all...! Something probably went wrong. @Supinic check Log ID ${logID} pleae`);
+					if (!data) {
+						await channel.send(`Could not find any kind of data for this user! Please contact @Supinic for manual help.`);
+						return;
+					}
+
+					const { text, date, channelName } = data;
+					const delta = core.Utils.timeDelta(date);
+
+					hintMessage = `this last-seen message: "${core.Utils.wrapString(text, 100)}" in channel ${channelName} ${delta} belongs to you or someone else.`;
+				}
+				else {
+					const [data] = parseResult.data;
+					if (data.login === raw.user) {
+						const logID = await logger.log(
+							"Twitch.Warning",
+							`Weird suspicious case: ${JSON.stringify({ data, id })}`
+						);
+
+						await channel.send(`It seems like @${raw.user} is not suspicious at all...! Something probably went wrong. @Supinic check Log ID ${logID} pleae`);
+						return;
+					}
+
+					hintMessage = `@${data.login} is a different account/name that you used in the past, or if it belongs to someone else.`;
+				}
+
+				const resultMessage = core.Utils.tag.trim `
+					Hey @${raw.user}, I'd like to verify whether ${hintMessage}
+					Use the "Reply to message" Twitch function to this message with "me" or "not me" accordingly.
+					How to reply: https://kappa.lol/XkY0rB
+				`;
+
+				const messageResult = await (platform as TwitchPlatform).send(resultMessage, channel);
+				if (messageResult.success) {
+					replyIdUserMap.set(raw.user, messageResult.messageId);
+				}
+			}
+			else if (isMessageCheckReply(raw.user, messageData.reply)) {
+				const lower = message
+					.toLowerCase()
+					.replace(/^\s*@\w+\s*/, "") // Replaces any @ mentions at the start of the message
+					.replaceAll(/[^a-z ]/g, "") // Removes all non-letter (+ space) characters
+					.trim();
+
+				if (lower !== "me" && lower !== "not me") {
+					await channel.send(`Please reply to the original message with specifically "me" or "not me"!`);
 					return;
 				}
 
-				hintMessage = `@${data.login} is a different account/name that you used in the past, or if it belongs to someone else.`;
-			}
+				const userId = await core.Query.getRecordset<string | undefined>(rs => rs
+					.select("ID")
+					.from("chat_data", "User_Alias")
+					.where("Name = %s", raw.user)
+					.limit(1)
+					.single()
+					.flat("ID")
+				);
 
-			const resultMessage = core.Utils.tag.trim `
-				Hey @${raw.user}, I'd like to verify whether ${hintMessage}
-				Use the "Reply to message" Twitch function to this message with "me" or "not me" accordingly.
-				How to reply: https://kappa.lol/XkY0rB
-			`;
+				if (!userId) {
+					throw new SupiError({
+						message: "Assert error: Suspicious-checked user ID does not exist",
+						args: { raw }
+					});
+				}
 
-			const messageResult = await (platform as TwitchPlatform).send(resultMessage, channel);
-			if (messageResult.success) {
-				replyIdUserMap.set(raw.user, messageResult.messageId);
+				const row = await core.Query.getRow<UserAliasRow>("chat_data", "User_Alias");
+				await row.load(userId);
+
+				let description: string;
+				if (lower === "me") {
+					description = `Twitch_ID: ${row.values.Twitch_ID} -> ${raw.userId}`;
+					row.setValues({ Twitch_ID: raw.userId });
+				}
+				else {
+					description = `Name: ${row.values.Name} -> _INACTIVE_${row.values.Name}`;
+					row.setValues({ Name: `_INACTIVE_${row.values.Name}` });
+				}
+
+				const json = JSON.stringify({ description, raw, reply: messageData.reply }, null, 4);
+				await logger.log(
+					"Twitch.Other",
+					`Automatic suspicious user resolution: ${json}`,
+					channel,
+					null
+				);
+
+				await row.save({ skipLoad: true });
+				await sb.User.invalidateUserCache(raw.user);
+
+				await channel.send(`Success 🥳 Make sure to try using a command (like $test) before leaving, to confirm everything is okay.`);
+				replyIdUserMap.delete(raw.user);
 			}
 		}
-		else if (isMessageCheckReply(raw.user, messageData.reply)) {
-			const lower = message
-				.toLowerCase()
-				.replace(/^\s*@\w+\s*/, "") // Replaces any @ mentions at the start of the message
-				.replaceAll(/[^a-z ]/g, "") // Removes all non-letter (+ space) characters
-				.trim();
-
-			if (lower !== "me" && lower !== "not me") {
-				await channel.send(`Please reply to the original message with specifically "me" or "not me"!`);
-				return;
-			}
-
-			const userId = await core.Query.getRecordset<string | undefined>(rs => rs
-				.select("ID")
-				.from("chat_data", "User_Alias")
-				.where("Name = %s", raw.user)
-				.limit(1)
-				.single()
-				.flat("ID")
-			);
-
-			if (!userId) {
-				throw new SupiError({
-					message: "Assert error: Suspicious-checked user ID does not exist",
-					args: { raw }
-				});
-			}
-
-			const row = await core.Query.getRow<UserAliasRow>("chat_data", "User_Alias");
-			await row.load(userId);
-
-			let description: string;
-			if (lower === "me") {
-				description = `Twitch_ID: ${row.values.Twitch_ID} -> ${raw.userId}`;
-				row.setValues({ Twitch_ID: raw.userId });
-			}
-			else {
-				description = `Name: ${row.values.Name} -> _INACTIVE_${row.values.Name}`;
-				row.setValues({ Name: `_INACTIVE_${row.values.Name}` });
-			}
-
-			const json = JSON.stringify({ description, raw, reply: messageData.reply }, null, 4);
-			await logger.log(
-				"Twitch.Other",
-				`TEST! Automatic suspicious user resolution: ${json}`,
-				channel,
-				null
-			);
-
-			await row.save({ skipLoad: true });
-			await sb.User.invalidateUserCache(raw.user);
-
-			await channel.send(`Success 🥳 Make sure to try using a command (like $test) before leaving, to confirm everything is okay.`);
-			replyIdUserMap.delete(raw.user);
-		}
-	}),
-	Global: false,
-	Platform: null
-} satisfies ChatModuleDefinition;
+	}
+});

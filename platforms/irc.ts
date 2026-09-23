@@ -68,7 +68,7 @@ interface FauxIrcClient extends EventEmitter {
 	join (channel: string): unknown;
 }
 
-export class IrcPlatform extends Platform<IrcConfig> {
+export class IrcPlatform extends Platform<IrcConfig, "irc"> {
 	#notifiedUnregisteredUsers = new Set();
 	#nicknameChanged = false;
 
@@ -277,7 +277,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 				await logger.push(message, userData, channelData);
 			}
 
-			channelData.events.emit("message", {
+			sb.ChatModule.dispatch({
 				event: "message",
 				message,
 				user: userData,

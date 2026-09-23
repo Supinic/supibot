@@ -24,7 +24,7 @@ import { type Channel, privateMessageChannelSymbol } from "./channel.js";
 import { permissions as userPermissions, permissionNames as userPermissionNames, type PermissionNumbers, type User } from "./user.js";
 
 import type { Platform, GetEmoteOptions } from "../platforms/template.js";
-import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
+import type { TwitchMessageData as TwitchAppendData } from "../platforms/twitch-utils.js";
 import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
 import CooldownManager from "../utils/cooldown-manager.js";
@@ -553,7 +553,7 @@ export class Command extends TemplateWithoutId {
 		return Promise.resolve();
 	}
 
-	static importData (definitions: CommandDefinition[]) {
+	static importData (definitions: readonly CommandDefinition[]) {
 		for (const definition of definitions) {
 			const instance = new Command(definition);
 			this.data.set(definition.Name, instance);

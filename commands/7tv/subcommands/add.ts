@@ -12,7 +12,7 @@ import {
 	sevenTvEmoteIdRegex
 } from "./index.js";
 import type { SevenTvSubcommandDefinition } from "../index.js";
-import { type MessageData as TwitchMessageData } from "../../../platforms/twitch.js";
+import type { TwitchMessageData } from "../../../platforms/twitch-utils.js";
 
 export default {
 	name: "add",

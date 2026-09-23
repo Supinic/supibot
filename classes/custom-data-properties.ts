@@ -83,7 +83,7 @@ const channelDataSchema = {
 		started: string,
 		mode: Channel["Mode"],
 	},
-	offlineOnlyMirror: "boolean",
+	offlineOnlyMirror: "number",
 	redditNSFW: "boolean",
 	removeReason: "string",
 	sevenTvRotatingEmotes: {} as SevenTvRotatingEmotesData,

@@ -1,9 +1,8 @@
 import AsyncMarkovExperimentModule from "./async-markov-experiment/index.js";
-import AutomaticUnscrambleModule from "./automatic-unscramble/index.js";
 import BotFaqHelperModule from "./bot-faq-helper/index.js";
 import ChatSuggestionLinkerModule from "./chat-suggestion-linker/index.js";
 import DiscordAnnouncementSubscriber from "./discord-announcement-subscriber/index.js";
-import ImgurLinkGathererModule from "./imgur-link-gatherer/index.js";
+import LinkGathererModule from "./link-gatherer/index.js";
 import LiveDetectionModule from "./live-detection/index.js";
 import MessageReactionModule from "./message-react/index.js";
 import OfflineOnlyMirrorModule from "./offline-only-mirror/index.js";
@@ -17,18 +16,24 @@ import RaidReactionTtsModule from "./raid-react-tts/index.js";
 import StreamPointsRedemptionModule from "./stream-points-redemptions/index.js";
 import SubscriptionReactionModule from "./subscription-react/index.js";
 import SubscriptionReactionTtsModule from "./subscription-react-tts/index.js";
-import SilencePreventionTriggerModule from "./supinic-silence-prevention-trigger/index.js";
 import StreamDatabaseUpdaterModule from "./supinic-stream-db/index.js";
 import SuspiciousUserAutoCheckerModule from "./suspicious-user-auto-check/index.js";
 import WannaBecomeFamousModule from "./wanna-become-famous/index.js";
 
-export default [
+import type { ChatModuleRuntimeFor, GenericChatModuleDefinition } from "../classes/chat-module.js";
+
+declare module "../classes/chat-module.js" {
+	interface ChatModuleRuntimeMap {
+		"async-markov-experiment": ChatModuleRuntimeFor<typeof AsyncMarkovExperimentModule>;
+	}
+}
+
+export const chatModuleDefinitions = [
 	AsyncMarkovExperimentModule,
-	AutomaticUnscrambleModule,
 	BotFaqHelperModule,
 	ChatSuggestionLinkerModule,
 	DiscordAnnouncementSubscriber,
-	ImgurLinkGathererModule,
+	LinkGathererModule,
 	LiveDetectionModule,
 	MessageReactionModule,
 	OfflineOnlyMirrorModule,
@@ -42,8 +47,7 @@ export default [
 	StreamPointsRedemptionModule,
 	SubscriptionReactionModule,
 	SubscriptionReactionTtsModule,
-	SilencePreventionTriggerModule,
 	StreamDatabaseUpdaterModule,
 	SuspiciousUserAutoCheckerModule,
 	WannaBecomeFamousModule
-];
+] as const satisfies GenericChatModuleDefinition[];
