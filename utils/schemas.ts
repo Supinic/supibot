@@ -100,7 +100,7 @@ export const twitchScheduleSchema = z.object({
 export const twitchVodSchema = z.object({
 	data: z.array(z.object({
 		id: z.string(),
-		stream_id: z.string(),
+		stream_id: z.string().nullish(),
 		created_at: z.string(), // RFC 3339
 		duration: z.string(), // ISO 8601
 		title: z.string(),
