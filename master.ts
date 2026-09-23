@@ -54,9 +54,9 @@ declare global {
 
 function filterModuleDefinitions <T extends "name" | "Name", U extends { [K in T]: string; }> (
 	property: T,
-	definitions: U[],
+	definitions: readonly U[],
 	config: PopulateOptions
-): U[] {
+): readonly U[] {
 	const {
 		disableAll = true,
 		whitelist = [],
@@ -179,7 +179,7 @@ core.Got.import(gotInstances);
 Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands));
 
 sb.ChatModule.import(
-	filterModuleDefinitions("name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"])
+	filterModuleDefinitions("name", chatModuleDefinitions, config.modules["chat-modules"])
 );
 await sb.ChatModule.initialize();
 

@@ -62,15 +62,11 @@ type StateFor<F extends StateFactory | undefined> = F extends StateFactory
 	? ReturnType<F>
 	: undefined;
 
-export type ChatModuleRuntimeData<C = unknown, S extends object | undefined = object | undefined> = {
+type ChatModuleRuntimeData<C = unknown, S extends object | undefined = object | undefined> = {
 	readonly config: C;
 	readonly state: S;
 };
-
-type ChatModuleRuntime<
-	C extends ConfigSchema | undefined,
-	F extends StateFactory | undefined
-> = ChatModuleRuntimeData<ConfigFor<C>, StateFor<F>>;
+type ChatModuleRuntime<C extends ConfigSchema | undefined, F extends StateFactory | undefined> = ChatModuleRuntimeData<ConfigFor<C>, StateFor<F>>;
 
 type PlatformEventMap = {
 	twitch: {
@@ -85,11 +81,8 @@ type PlatformEventMap = {
 	irc: { message: MessageEvent<IrcPlatform>; };
 };
 type KnownPlatformName = keyof PlatformEventMap;
-
-type EventNameForPlatforms<P extends KnownPlatformName> = { [K in P]: keyof PlatformEventMap[K]; }[P];
-
 type PlatformSelector = "all" | readonly KnownPlatformName[];
-type AttachmentScope = "channel" | "platform" | "global";
+type EventNameForPlatforms<P extends KnownPlatformName> = { [K in P]: keyof PlatformEventMap[K]; }[P];
 
 type ContextForPlatforms<P extends KnownPlatformName, E extends PropertyKey> = {
 	[K in P]: E extends keyof PlatformEventMap[K]
@@ -116,6 +109,10 @@ type ChatModuleHandler<
 	F extends StateFactory | undefined
 > = (context: ContextFor<P, E>, runtime: ChatModuleRuntime<C, F>) => void | Promise<void>;
 
+export type AttachmentTarget =
+	| { scope: "global"; }
+	| { scope: "platform"; platform: Platform["ID"]; }
+	| { scope: "channel"; channel: Channel["ID"]; };
 export type ChatModuleDefinition<
 	P extends PlatformSelector = PlatformSelector,
 	C extends ConfigSchema | undefined = undefined,
@@ -123,16 +120,18 @@ export type ChatModuleDefinition<
 > = {
 	name: string;
 	description: string | null;
-	scope: AttachmentScope;
+	scope: "channel" | "platform" | "global";
 	platform: P,
 	config?: C,
 	state?: F,
+	initialize? (target: AttachmentTarget, runtime: ChatModuleRuntime<C, F>): boolean | Promise<boolean>;
 	handlers: {
 		[E in EventNameFor<P>]?: ChatModuleHandler<P, E, C, F>;
 	};
 };
 
 export type ChatModuleRuntimeFor<D> = D extends ChatModuleDefinition<
+	// type parameter is not used - but is correctly inferred here as generic and ignored so the type matches
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	infer _P extends PlatformSelector,
 	infer C extends ConfigSchema | undefined,
@@ -156,41 +155,32 @@ type InitializeData = {
 	chatModule: string;
 	args: string | null;
 };
-type AttachmentTarget =
-	| { scope: "global"; }
-	| { scope: "platform"; platform: Platform["ID"]; }
-	| { scope: "channel"; channel: Channel["ID"]; };
-type RegisteredChatModuleDefinition = {
-	name: string;
-	description: string | null;
-	scope: AttachmentScope;
-	platform: PlatformSelector;
-	config?: ConfigSchema;
-	state?: StateFactory;
+export type GenericChatModuleDefinition = Omit<
+	ChatModuleDefinition<PlatformSelector, ConfigSchema | undefined, StateFactory | undefined>,
+	"initialize" | "handlers"
+> & {
+	initialize? (target: AttachmentTarget, runtime: ChatModuleRuntimeData): boolean | Promise<boolean>;
 	handlers: Partial<Record<EventName, unknown>>;
 };
+
 type RuntimeData = {
 	config: unknown;
 	state: object | undefined;
 };
 type RuntimeAttachment = {
-	definition: RegisteredChatModuleDefinition;
+	definition: GenericChatModuleDefinition;
 	target: AttachmentTarget;
 	runtime: RuntimeData;
-};
-type Attachments = {
-	global: Map<string, RuntimeAttachment>;
-	platform: Map<Platform["ID"], Map<string, RuntimeAttachment>>;
-	channel: Map<Channel["ID"], Map<string, RuntimeAttachment>>;
+	enabled: boolean;
 };
 
 export class ChatModuleManager {
 	private initialized = false;
-	private definitions = new Map<string, RegisteredChatModuleDefinition>();
-	private attachments: Attachments = {
-		global: new Map(),
-		platform: new Map(),
-		channel: new Map()
+	private definitions = new Map<string, GenericChatModuleDefinition>();
+	private attachments = {
+		global: new Map<string, RuntimeAttachment>(),
+		platform: new Map<Platform["ID"], Map<string, RuntimeAttachment>>(),
+		channel: new Map<Channel["ID"], Map<string, RuntimeAttachment>>()
 	};
 
 	async initialize (): Promise<void> {
@@ -243,14 +233,21 @@ export class ChatModuleManager {
 			this.attach(definition, { scope: "channel", channel }, args);
 		}
 
+		for (const attachment of this.getAllAttachments()) {
+			const { definition, target, runtime } = attachment;
+			attachment.enabled = (definition.initialize)
+				? await definition.initialize(target, runtime)
+				: true;
+		}
+
 		this.initialized = true;
 	}
 
-	get (name: string): RegisteredChatModuleDefinition | null {
+	get (name: string): GenericChatModuleDefinition | null {
 		return this.definitions.get(name) ?? null;
 	}
 
-	getAsserted (name: string): RegisteredChatModuleDefinition {
+	getAsserted (name: string): GenericChatModuleDefinition {
 		const definition = this.definitions.get(name);
 		if (!definition) {
 			throw new SupiError({
@@ -261,7 +258,7 @@ export class ChatModuleManager {
 		return definition;
 	}
 
-	import (definitions: readonly ChatModuleDefinition[]): void {
+	import (definitions: readonly GenericChatModuleDefinition[]): void {
 		if (this.initialized) {
 			throw new SupiError({ message: "Cannot import new definitions after initialization" });
 		}
@@ -361,7 +358,7 @@ export class ChatModuleManager {
 		return (attachment?.runtime ?? null) as ChatModuleRuntimeMap[N] | null;
 	}
 
-	private attach (definition: RegisteredChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): void {
+	private attach (definition: GenericChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): void {
 		if (definition.scope !== target.scope) {
 			throw new SupiError({
 				message: `Cannot attach ${definition.scope}-scoped module "${definition.name}" to ${target.scope}`
@@ -371,6 +368,7 @@ export class ChatModuleManager {
 		const attachment: RuntimeAttachment = {
 			definition,
 			target,
+			enabled: false, // create attachments as disabled first, then enable conditionally later (initialize)
 			runtime: {
 				config: ChatModuleManager.parseConfig(definition, target, rawArgs),
 				state: definition.state?.()
@@ -400,7 +398,19 @@ export class ChatModuleManager {
 		}
 	}
 
-	private static parseConfig (definition: RegisteredChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): unknown {
+	private *getAllAttachments (): Iterable<RuntimeAttachment> {
+		yield* this.attachments.global.values();
+
+		for (const attachments of this.attachments.platform.values()) {
+			yield* attachments.values();
+		}
+
+		for (const attachments of this.attachments.channel.values()) {
+			yield* attachments.values();
+		}
+	}
+
+	private static parseConfig (definition: GenericChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): unknown {
 		if (!definition.config) {
 			if (rawArgs !== null) {
 				throw new SupiError({
@@ -445,6 +455,10 @@ export class ChatModuleManager {
 	}
 
 	private static executeAttachment (attachment: RuntimeAttachment, eventData: AnyChatEvent): void {
+		if (!attachment.enabled) {
+			return;
+		}
+
 		type AnyHandler = (context: AnyChatEvent, runtime: RuntimeData) => void | Promise<void>;
 		const handler = attachment.definition.handlers[eventData.event] as AnyHandler | undefined;
 		if (!handler) {
@@ -454,7 +468,7 @@ export class ChatModuleManager {
 		void handler(eventData, attachment.runtime);
 	}
 
-	private static supportsPlatform (definition: RegisteredChatModuleDefinition, platform: Platform): boolean {
+	private static supportsPlatform (definition: GenericChatModuleDefinition, platform: Platform): boolean {
 		return (definition.platform === "all" || definition.platform.includes(platform.name as KnownPlatformName));
 	}
 }

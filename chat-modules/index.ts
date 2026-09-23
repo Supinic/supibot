@@ -20,7 +20,7 @@ import StreamDatabaseUpdaterModule from "./supinic-stream-db/index.js";
 import SuspiciousUserAutoCheckerModule from "./suspicious-user-auto-check/index.js";
 import WannaBecomeFamousModule from "./wanna-become-famous/index.js";
 
-import type { ChatModuleRuntimeFor } from "../classes/chat-module.js";
+import type { ChatModuleRuntimeFor, GenericChatModuleDefinition } from "../classes/chat-module.js";
 
 declare module "../classes/chat-module.js" {
 	interface ChatModuleRuntimeMap {
@@ -50,4 +50,4 @@ export const chatModuleDefinitions = [
 	StreamDatabaseUpdaterModule,
 	SuspiciousUserAutoCheckerModule,
 	WannaBecomeFamousModule
-];
+] as const satisfies GenericChatModuleDefinition[];

@@ -553,7 +553,7 @@ export class Command extends TemplateWithoutId {
 		return Promise.resolve();
 	}
 
-	static importData (definitions: CommandDefinition[]) {
+	static importData (definitions: readonly CommandDefinition[]) {
 		for (const definition of definitions) {
 			const instance = new Command(definition);
 			this.data.set(definition.Name, instance);
