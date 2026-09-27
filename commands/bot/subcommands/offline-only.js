@@ -23,7 +23,7 @@ export default {
 			.select("1")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Channel = %n", channelData.ID)
-			.where("Chat_Module = %s", moduleData.Name)
+			.where("Chat_Module = %s", moduleData.name)
 			.single()
 			.flat("1")
 		);
@@ -39,7 +39,7 @@ export default {
 			const row = await core.Query.getRow("chat_data", "Channel_Chat_Module");
 			row.setValues({
 				Channel: channelData.ID,
-				Chat_Module: moduleData.Name
+				Chat_Module: moduleData.name
 			});
 
 			await row.save();
@@ -61,7 +61,7 @@ export default {
 				.delete()
 				.from("chat_data", "Channel_Chat_Module")
 				.where("Channel = %n", channelData.ID)
-				.where("Chat_Module = %s", moduleData.Name)
+				.where("Chat_Module = %s", moduleData.name)
 			);
 
 			await sb.Channel.reloadSpecific(channelData);
