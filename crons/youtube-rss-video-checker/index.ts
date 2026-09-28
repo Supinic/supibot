@@ -55,14 +55,12 @@ export default {
 
 		const updatedChannels = new Set<string>();
 		const channelVideosMap = new Map<string, string[]>();
-		const ts = SupiDate.now() % 15;
-
 		for (const channelId of uniqueChannelIds) {
 			const response = await core.Got.get("GenericAPI")({
 				url: `https://www.youtube.com/feeds/videos.xml`,
 				searchParams: {
 					channel_id: channelId,
-					ts
+					ts: Math.trunc(SupiDate.now() / 15)
 				},
 				throwHttpErrors: false,
 				responseType: "text",
@@ -70,12 +68,11 @@ export default {
 					request: 10_000
 				},
 				retry: {
-					limit: 5,
-					errorCodes: ["ETIMEDOUT", "ECONNREFUSED", "ECONNRESET"]
+					limit: 3
 				}
 			});
+
 			if (!response.ok) {
-				console.log(`Couldn't fetch channel ${channelHandleMap.get(channelId)} (${channelId})`, response.statusCode, response.statusMessage);
 				continue;
 			}
 
@@ -141,7 +138,7 @@ export default {
 					});
 				}
 
-				userStrings.push(`${handle}: ${channelStrings.length}: ${channelStrings.join(" ")}`);
+				userStrings.push(`${handle}: ${channelStrings.join(" ")}`);
 			}
 
 			const userData = await sb.User.getAsserted(userId);
