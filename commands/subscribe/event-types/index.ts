@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import type { EventDefinition } from "../generic-event.js";
+import { type EventDefinition, rssEventDefinitionSchema } from "../generic-event.js";
 
 import BrighterShoresSubDefinition from "./brighter-shores.js";
 import ChangelogSubDefinition from "./changelog.js";
@@ -13,19 +13,7 @@ import YoutubeVideoSubDefinition from "./youtube-video.js";
 
 import rawRssDefinitions from "./rss-definitions.json" with { type: "json" };
 
-const rssDefinitionSchema = z.object({
-	title: z.string(),
-	names: z.array(z.string()).min(1),
-	url: z.string(),
-	channelSpecificMention: z.boolean().optional(),
-	cronExpression: z.string().optional(),
-	emote: z.string().optional(),
-	item: z.string().optional(),
-	options: z.object({
-		ignoredCategories: z.array(z.string().lowercase()).min(1)
-	}).optional()
-});
-const rssJsonSchema = z.array(rssDefinitionSchema);
+const rssJsonSchema = z.array(rssEventDefinitionSchema);
 const rssDefinitions = rssJsonSchema.parse(rawRssDefinitions).map(i => ({
 	...i,
 	type: "rss" as const

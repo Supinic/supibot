@@ -77,7 +77,10 @@
     "title": "Linux Kernel",
     "names": ["linux", "linux-kernel"],
     "item": "version",
-    "url": "https://www.kernel.org/feeds/kdist.xml"
+    "url": "https://www.kernel.org/feeds/kdist.xml",
+    "options": {
+      "guidBlacklist": ["linux-next"]
+    }
   },
   {
     "title": "MSVC++",

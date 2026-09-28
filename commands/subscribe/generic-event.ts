@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { Date as SupiDate, type Row } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
 import type { User } from "../../classes/user.js";
@@ -6,6 +7,19 @@ import type { Platform } from "../../platforms/template.js";
 import type { SubscribeCommandContext } from "./index.js";
 
 const DEFAULT_CHANNEL_ID = 38;
+export const rssEventDefinitionSchema = z.object({
+	title: z.string(),
+	names: z.array(z.string()).min(1),
+	url: z.string(),
+	channelSpecificMention: z.boolean().optional(),
+	cronExpression: z.string().optional(),
+	emote: z.string().optional(),
+	item: z.string().optional(),
+	options: z.object({
+		ignoredCategories: z.array(z.string().lowercase()).min(1).optional(),
+		guidBlacklist: z.array(z.string().lowercase()).min(1).optional()
+	}).optional()
+});
 
 type SubscriptionType = string;
 type UserSubscription = {
@@ -145,7 +159,7 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 	const feed = await parseRSS(xml);
 	const lastPublishDate = (await core.Cache.getByPrefix(cacheKey) ?? 0) as number;
 
-	const { ignoredCategories } = options;
+	const { ignoredCategories, guidBlacklist } = options;
 	const eligibleArticles = feed.items
 		.filter(article => new SupiDate(article.pubDate).valueOf() > lastPublishDate)
 		.filter(article => {
@@ -158,6 +172,14 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 				const category = (typeof cat === "string") ? cat : cat._;
 				return !ignoredCategories.includes(category.toLowerCase());
 			});
+		})
+		.filter(article => {
+			if (!guidBlacklist || !article.guid) {
+				return true;
+			}
+
+			const lower = article.guid.toLowerCase();
+			return (guidBlacklist.some(word => lower.includes(word)));
 		})
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
 
@@ -228,10 +250,7 @@ export type RssEventDefinition = BaseEventDefinition & {
 	emote?: string;
 	cronExpression?: string;
 	item?: string;
-	options?: {
-		// Always lowercase due to zod validation
-		ignoredCategories?: string[];
-	};
+	options?: z.infer<typeof rssEventDefinitionSchema>["options"];
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
