@@ -178,6 +178,16 @@
     "iso6393": "aym"
   },
   {
+    "group": "Aymaran",
+    "names": [
+      "aymara",
+      "aymar aru"
+    ],
+    "iso6391": "ay",
+    "iso6392": "aym",
+    "iso6393": "aym"
+  },
+  {
     "group": "Turkic",
     "names": [
       "azerbaijani",
@@ -1413,14 +1423,22 @@
     "names": [
       "kurdish",
       "kurdî",
-      "کوردی‎",
-      "kurmanji",
-      "northern kurdish",
-      "kurdish (kurmanji)"
+      "کوردی"
     ],
     "iso6391": "ku",
     "iso6392": "kur",
     "iso6393": "kur"
+  },
+  {
+    "group": "Indo-European",
+    "names": [
+      "kurdish (kurmanji)",
+      "kurmanji",
+      "northern kurdish"
+    ],
+    "iso6391": null,
+    "iso6392": null,
+    "iso6393": "kmr"
   },
   {
     "group": "Niger–Congo",

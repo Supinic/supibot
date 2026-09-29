@@ -1,22 +1,7 @@
-/* eslint-disable array-element-newline */
-import { getCode, getName } from "../../../utils/languages.js";
+import * as z from "zod";
 import { SupiError } from "supi-core";
+import { getCode, getName } from "../../../utils/languages.js";
 import type { TranslateSubcommandDefinition } from "../index.js";
-
-const supportedLanguages: readonly string[] = [
-	"bg", "cs", "da", "de", "el",
-	"en", "es", "et", "fi", "fr",
-	"hu", "id", "it", "ja", "lt",
-	"lv", "nl", "pl", "pt", "ro",
-	"ru", "sk", "sl", "sv", "tr",
-	"uk", "zh"
-];
-
-// https://support.deepl.com/hc/en-us/articles/4406432463762-About-the-formal-informal-feature
-const formalitySupportedLanguages: readonly string[] = [
-	"de", "es", "fr", "it", "ja",
-	"nl", "pl", "pt", "ru"
-];
 
 type DeeplSearchParams = {
 	text: string;
@@ -24,24 +9,66 @@ type DeeplSearchParams = {
 	target_lang: string;
 	formality?: string;
 };
-type DeeplTranslateResponse = {
-	translations: {
-		text: string;
-		detected_source_language: string;
-	}[];
+type DeeplLanguage = {
+	code: string;
+	name: string;
+	formality: boolean;
 };
 
-let formalitySupportedLanguageNames: string[] | undefined;
+const translationSchema = z.object({
+	translations: z.array(z.object({
+		detected_source_language: z.string(),
+		text: z.string()
+	}))
+});
+const languageListSchema = z.array(z.object({
+	lang: z.string(),
+	name: z.string(),
+	features: z.object({
+		formality: z.object({ status: z.string() }).optional()
+	})
+}));
+
+const languageKey = "deepl-cached-languages-list";
+const getDeeplLanguageList = async (): Promise<DeeplLanguage[]> => {
+	const cacheData = await core.Cache.getByPrefix(languageKey) as DeeplLanguage[] | null;
+	if (cacheData) {
+		return cacheData;
+	}
+
+	const response = await core.Got.get("GenericAPI")({
+		url: "https://api-free.deepl.com/v3/languages",
+		headers: {
+			Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
+		},
+		throwHttpErrors: false,
+		searchParams: { resource: "translate_text" }
+	});
+
+	const list = languageListSchema.parse(response.body);
+	const storeList = list.map(i => ({
+		code: i.lang,
+		name: i.name,
+		formality: (i.features.formality?.status === "stable")
+	}));
+
+	await core.Cache.setByPrefix(languageKey, storeList, { expiry: 3 * 864e5 }); // 3 days
+	return storeList;
+};
+
 export default {
 	name: "deepl",
 	title: "DeepL",
 	aliases: [],
 	default: false,
-	getDescription: (prefix) => {
-		formalitySupportedLanguageNames ??= formalitySupportedLanguages.map(i => {
-			const name = getName(i);
-			return (name) ? core.Utils.capitalize(name) : `(unknown: ${i})`;
-		});
+	getDescription: async (prefix) => {
+		const list = await getDeeplLanguageList();
+		const formalitySupportedLanguageNames = list
+			.filter(i => i.formality)
+			.map(i => {
+				const localName = getName(i.code);
+				return (localName) ? core.Utils.capitalize(localName) : i.name;
+			});
 
 		return [
 			`<code>${prefix}deepl</code>`,
@@ -55,7 +82,7 @@ export default {
 			`Only supports these languages: ${formalitySupportedLanguageNames.join(", ")}`
 		];
 	},
-	execute: async function (context, subInvocation, query) {
+	execute: async function (context, _subInvocation, query) {
 		if (!process.env.API_DEEPL_KEY) {
 			throw new SupiError({
 				message: "No DeepL key configured (API_DEEPL_KEY)"
@@ -67,6 +94,7 @@ export default {
 			target_lang: "EN"
 		};
 
+		const list = await getDeeplLanguageList();
 		if (context.params.from) {
 			const code = getCode(context.params.from);
 			if (!code) {
@@ -75,7 +103,9 @@ export default {
 					reply: `Input language was not recognized!`
 				};
 			}
-			else if (!supportedLanguages.includes(code)) {
+
+			const isSupported = list.some(i => i.code === code);
+			if (!isSupported) {
 				return {
 					success: false,
 					reply: `Input language is not supported by DeepL!`
@@ -91,7 +121,8 @@ export default {
 		let targetLanguageCode: string | null = null;
 		if (context.params.to) {
 			if (context.params.to === "random") {
-				searchParams.target_lang = core.Utils.randArray(supportedLanguages);
+				const { code } = core.Utils.randArray(list);
+				searchParams.target_lang = code;
 			}
 			else {
 				targetLanguageCode = getCode(context.params.to);
@@ -100,7 +131,7 @@ export default {
 		else {
 			const userDefaultLanguage = await context.user.getDataProperty("defaultUserLanguage");
 			targetLanguageCode = (userDefaultLanguage)
-				? userDefaultLanguage.code.toUpperCase()
+				? userDefaultLanguage.code.toLowerCase()
 				: "EN";
 		}
 
@@ -110,7 +141,9 @@ export default {
 				reply: `Invalid or unsupported language provided!`
 			};
 		}
-		else if (!supportedLanguages.includes(targetLanguageCode.toLowerCase())) {
+
+		const isSupported = list.some(i => i.code === targetLanguageCode);
+		if (!isSupported) {
 			const rawLanguageName = getName(targetLanguageCode) ?? "(unknown)";
 			const languageName = core.Utils.capitalize(rawLanguageName);
 			return {
@@ -119,7 +152,7 @@ export default {
 			};
 		}
 
-		searchParams.target_lang = targetLanguageCode.toUpperCase();
+		searchParams.target_lang = targetLanguageCode.toLowerCase();
 
 		if (context.params.formality) {
 			const allowedFormalities = ["more", "less", "default"];
@@ -129,21 +162,25 @@ export default {
 					reply: `You provided an incorrect formality level! Use one of: ${allowedFormalities.join(", ")}`
 				};
 			}
-			else if (!formalitySupportedLanguages.includes(targetLanguageCode.toLowerCase())) {
-				const languageNames = formalitySupportedLanguages
-					.map(i => core.Utils.capitalize(getName(i) ?? "(unknown)"))
-					.sort();
+
+			const formalityList = list.filter(i => i.formality);
+			const isFormalitySupported = formalityList.some(i => i.code === targetLanguageCode);
+			if (!isFormalitySupported) {
+				const formalitySupportedLanguageNames = formalityList.map(i => {
+					const localName = getName(i.code);
+					return (localName) ? core.Utils.capitalize(localName) : i.name;
+				});
 
 				return {
 					success: false,
-					reply: `The language you provided does not support formality! Use one of: ${languageNames.join(", ")}`
+					reply: `The language you provided does not support the formality setting! Use one of: ${formalitySupportedLanguageNames.join(", ")}`
 				};
 			}
 
 			searchParams.formality = context.params.formality;
 		}
 
-		const response = await core.Got.get("GenericAPI")<DeeplTranslateResponse>({
+		const response = await core.Got.get("GenericAPI")({
 			url: "https://api-free.deepl.com/v2/translate",
 			headers: {
 				Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
@@ -172,7 +209,7 @@ export default {
 			};
 		}
 
-		const [data] = response.body.translations;
+		const [data] = translationSchema.parse(response.body).translations;
 		const fromLanguageName = core.Utils.capitalize(getName(data.detected_source_language) ?? "(unknown)");
 		const toLanguageName = core.Utils.capitalize(getName(searchParams.target_lang) ?? "(unknown)");
 
