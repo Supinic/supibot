@@ -56,6 +56,21 @@ const getDeeplLanguageList = async (): Promise<DeeplLanguage[]> => {
 	return storeList;
 };
 
+const specificDeeplCodeMap = { no: "nb" }; // Norwegian -> Norwegian bokmål
+const replaceSpecificDeeplCode = (code: string | null): string | null => {
+	if (!code) {
+		return code;
+	}
+
+	code = code.toLowerCase(); // just in case
+
+	if (code in specificDeeplCodeMap) {
+		return specificDeeplCodeMap[code as keyof typeof specificDeeplCodeMap];
+	}
+
+	return code;
+};
+
 export default {
 	name: "deepl",
 	title: "DeepL",
@@ -91,12 +106,12 @@ export default {
 
 		const searchParams: DeeplSearchParams = {
 			text: query,
-			target_lang: "EN"
+			target_lang: "en"
 		};
 
 		const list = await getDeeplLanguageList();
 		if (context.params.from) {
-			const code = getCode(context.params.from);
+			const code = replaceSpecificDeeplCode(getCode(context.params.from));
 			if (!code) {
 				return {
 					success: false,
@@ -125,14 +140,14 @@ export default {
 				searchParams.target_lang = code;
 			}
 			else {
-				targetLanguageCode = getCode(context.params.to);
+				targetLanguageCode = replaceSpecificDeeplCode(getCode(context.params.to));
 			}
 		}
 		else {
 			const userDefaultLanguage = await context.user.getDataProperty("defaultUserLanguage");
 			targetLanguageCode = (userDefaultLanguage)
-				? userDefaultLanguage.code.toLowerCase()
-				: "EN";
+				? replaceSpecificDeeplCode(userDefaultLanguage.code.toLowerCase())
+				: "en";
 		}
 
 		if (!targetLanguageCode) {
