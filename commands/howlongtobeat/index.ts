@@ -5,11 +5,7 @@ import { declare, isResultFailure, type ResultFailure } from "../../classes/comm
 const HLTB_TOKEN_CACHE_KEY = "hltb-token-cache";
 const HLTB_ENDPOINT_CACHE_KEY = "hltb-api-endpoint";
 
-const initSchema = z.object({
-	token: z.string(),
-	hpKey: z.string(),
-	hpVal: z.string()
-});
+const initSchema = z.object({ token: z.string() });
 type InitObject = z.infer<typeof initSchema>;
 
 const hltbGameSchema = z.object({
@@ -140,8 +136,8 @@ const fetchToken = async (endpoint: string): Promise<InitObject | null> => {
 		return null;
 	}
 
-	const { token, hpKey, hpVal } = initSchema.parse(response.body);
-	const tokenData = { token, hpKey, hpVal };
+	const { token } = initSchema.parse(response.body);
+	const tokenData = { token };
 
 	await core.Cache.setByPrefix(HLTB_TOKEN_CACHE_KEY, tokenData, {
 		expiry: 864e5 // 1 day
@@ -162,21 +158,18 @@ const fetchData = async (endpoint: string, query: string[]): Promise<GotResponse
 		};
 	}
 
-	const { token, hpKey, hpVal } = tokenData;
+	const { token } = tokenData;
 	const response = await core.Got.get("FakeAgent")({
 		url: `https://howlongtobeat.com/api/${endpoint}`,
 		method: "POST",
 		throwHttpErrors: false,
 		headers: {
 			Referer: "https://howlongtobeat.com",
-			"X-Auth-Token": token,
-			"X-Hp-Key": hpKey,
-			"X-Hp-Val": hpVal
+			"X-Auth-Token": token
 		},
 		// All the default values (e.g. empty strings, nulls, zeroes) must be filled,
 		// else the API fails with 500 Internal Server Error.
 		json: {
-			[hpKey]: hpVal,
 			searchType: "games",
 			searchTerms: [...query],
 			searchPage: 1,
