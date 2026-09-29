@@ -1,4 +1,4 @@
-import { SupiDate, SupiError } from "supi-core";
+import { SupiDate } from "supi-core";
 import { getTwitchGameID } from "../../utils/command-utils.js";
 import { declare } from "../../classes/command.js";
 import { twitchClipSchema } from "../../utils/schemas.js";
@@ -9,8 +9,8 @@ export default declare({
 	Name: "randomclip",
 	Aliases: ["rc"],
 	Author: "supinic",
-	Cooldown: 30000,
-	Description: "Posts a random clip from either the current channel or the specified channel.",
+	Cooldown: 15000,
+	Description: "Posts a random clip from either the current channel or the specified channel. Can also specify game name, which will look through all Twitch channels for clips of that one game.",
 	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "author", type: "string" },
@@ -129,13 +129,6 @@ export default declare({
 			};
 		}
 
-		if (!channelID) {
-			throw new SupiError({
-				message: "Assert error: Channel or game ID does not exist",
-				args: { channelID }
-			});
-		}
-
 		const response = await core.Got.get("Helix")({
 			url: "clips",
 			searchParams: {
@@ -200,6 +193,7 @@ export default declare({
 
 		const delta = core.Utils.timeDelta(new SupiDate(clip.created_at));
 		return {
+			success: true,
 			reply: `"${clip.title}" - ${clip.duration} sec, clipped by ${clip.creator_name}, ${delta}: ${clip.url}`
 		};
 	},
@@ -221,7 +215,7 @@ export default declare({
 		`<code>${prefix}rc <u>game:Starfield</u></code>`,
 		`<code>${prefix}rc <u>game:"The Elder Scrolls V: Skyrim"</u></code>`,
 		"Posts a random clip where the category is set to the game that you provided.",
-		"Cannot be combined with a specific channel - this is due to how Twitch works.",
+		"This will look through *all* channels on Twitch, since that's how they made this search work.",
 		"",
 
 		`<code>${prefix}rc <u>linkOnly:true</u></code>`,
