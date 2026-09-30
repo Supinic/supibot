@@ -528,23 +528,23 @@ export abstract class Platform <T extends BaseConfig = BaseConfig, U extends str
 	public static async create (type: string, config: BaseConfig) {
 		switch (type) {
 			case "twitch": {
-				const Instance = await import("./twitch.js");
+				const Instance = await import("./twitch.ts");
 				return new Instance.default(config as TwitchConfig);
 			}
 			case "discord": {
-				const Instance = await import("./discord.js");
+				const Instance = await import("./discord.ts");
 				return new Instance.default(config as DiscordConfig);
 			}
 			case "cytube": {
-				const Instance = await import("./cytube.js");
+				const Instance = await import("./cytube.ts");
 				return new Instance.default(config as CytubeConfig);
 			}
 			case "irc": {
-				const Instance = await import("./irc.js");
+				const Instance = await import("./irc.ts");
 				return new Instance.default(config as IrcConfig);
 			}
 			case "net": {
-				const Instance = await import("./net.js");
+				const Instance = await import("./net.ts");
 				return new Instance.default(config as NetConfig);
 			}
 			default: {

@@ -1,12 +1,12 @@
-import BanphraseApiSubcommand from "./banphrase-api.ts";
-import CheckLiveSubcommand from "./check-live.ts";
-import EnableRustlogSubcommand from "./enable-rustlog.ts";
-import GlobalEmotesSubcommand from "./global-emotes.ts";
-import LinksSubcommand from "./links.ts";
-import OfflineOnlySubcommand from "./offline-only.ts";
-import RejoinSubcommand from "./rejoin.ts";
-import RenameSubcommand from "./rename.ts";
-import ToggleSubcommand from "./toggle.ts";
+import BanphraseApiSubcommand from "./banphrase-api.js";
+import CheckLiveSubcommand from "./check-live.js";
+import EnableRustlogSubcommand from "./enable-rustlog.js";
+import GlobalEmotesSubcommand from "./global-emotes.js";
+import LinksSubcommand from "./links.js";
+import OfflineOnlySubcommand from "./offline-only.js";
+import RejoinSubcommand from "./rejoin.js";
+import RenameSubcommand from "./rename.js";
+import ToggleSubcommand from "./toggle.js";
 
 export default [
 	BanphraseApiSubcommand,

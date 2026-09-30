@@ -1,15 +1,15 @@
-import ArgumentsBlock from "./arguments.ts";
-import BestEmoteBlock from "./best-emote.ts";
-import ChannelBlock from "./channel.ts";
-import ChatterBlock from "./chatter.ts";
-import ExecutorBlock from "./executor.ts";
-import ExplodeBlock from "./explode.ts";
-import LinkifyBlock from "./linkify.ts";
-import PlatformBlock from "./platform.ts";
-import RepeatBlock from "./repeat.ts";
-import ReplaceBlock from "./replace.ts";
-import SayBlock from "./say.ts";
-import TeeBlock from "./tee.ts";
+import ArgumentsBlock from "./arguments.js";
+import BestEmoteBlock from "./best-emote.js";
+import ChannelBlock from "./channel.js";
+import ChatterBlock from "./chatter.js";
+import ExecutorBlock from "./executor.js";
+import ExplodeBlock from "./explode.js";
+import LinkifyBlock from "./linkify.js";
+import PlatformBlock from "./platform.js";
+import RepeatBlock from "./repeat.js";
+import ReplaceBlock from "./replace.js";
+import SayBlock from "./say.js";
+import TeeBlock from "./tee.js";
 
 export default [
 	ArgumentsBlock,

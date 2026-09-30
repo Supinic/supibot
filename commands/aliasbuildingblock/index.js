@@ -1,4 +1,4 @@
-import blocks from "./blocks/index.ts";
+import blocks from "./blocks/index.js";
 
 export default {
 	Name: "aliasbuildingblock",

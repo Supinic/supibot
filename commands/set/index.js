@@ -1,4 +1,4 @@
-import subcommands from "./subcommands/index.ts";
+import subcommands from "./subcommands/index.js";
 
 export default {
 	Name: "set",

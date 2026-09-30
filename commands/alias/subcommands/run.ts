@@ -17,7 +17,7 @@ import {
 	parseCommandName,
 	isClassicAlias,
 	isOrphanedAlias
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
 export default {

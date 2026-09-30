@@ -22,7 +22,7 @@ import WannaBecomeFamousModule from "./wanna-become-famous/index.ts";
 
 import type { ChatModuleRuntimeFor, GenericChatModuleDefinition } from "../classes/chat-module.ts";
 
-declare module "../classes/chat-module.js" {
+declare module "../classes/chat-module.ts" {
 	interface ChatModuleRuntimeMap {
 		"async-markov-experiment": ChatModuleRuntimeFor<typeof AsyncMarkovExperimentModule>;
 	}

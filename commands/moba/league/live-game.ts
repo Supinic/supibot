@@ -7,7 +7,7 @@ import {
 	getLiveMatchData,
 	getChampionData,
 	getChampionName
-} from "./utils.js";
+} from "./utils.ts";
 
 export default {
 	name: "liveGame",

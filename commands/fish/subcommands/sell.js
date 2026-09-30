@@ -1,4 +1,4 @@
-import { COIN_EMOJI, itemTypeDefinitions, getInitialStats, itemTypes } from "./fishing-utils.ts";
+import { COIN_EMOJI, itemTypeDefinitions, getInitialStats, itemTypes } from "./fishing-utils.js";
 const fishEmojis = itemTypes.map(i => i.name);
 
 /**

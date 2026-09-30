@@ -9,7 +9,7 @@ import {
 	getQueueDescription,
 	getChampionData,
 	getChampionName
-} from "./utils.js";
+} from "./utils.ts";
 
 export default {
 	name: "lastMatch",

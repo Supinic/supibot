@@ -5,7 +5,7 @@ import {
 	ALIAS_INVALID_NAME_RESPONSE,
 	getAliasByNameAndUser,
 	getGenericAliasRow
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 export default {
 	name: "rename",

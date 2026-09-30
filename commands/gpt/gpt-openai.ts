@@ -6,7 +6,7 @@ import {
 	getUserHash,
 	globalSystemPrompts,
 	type GptTemplate
-} from "./gpt-template.js";
+} from "./gpt-template.ts";
 import GptHistory from "./history-control.ts";
 import type { GptContext } from "./index.ts";
 import type { ModelData } from "./config-schema.ts";

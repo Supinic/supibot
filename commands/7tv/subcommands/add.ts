@@ -10,7 +10,7 @@ import {
 	removeEmote,
 	SEVEN_TV_DEFAULT_LIMIT,
 	sevenTvEmoteIdRegex
-} from "./index.js";
+} from "./index.ts";
 import type { SevenTvSubcommandDefinition } from "../index.ts";
 import type { TwitchMessageData } from "../../../platforms/twitch-utils.ts";
 

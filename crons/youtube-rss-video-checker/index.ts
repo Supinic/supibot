@@ -6,7 +6,7 @@ import type { Platform } from "../../platforms/template.ts";
 import {
 	YOUTUBE_VIDEO_SUBSCRIPTION_TITLE,
 	type YoutubeChannelSubData
-} from "../../commands/subscribe/event-types/youtube-video.js";
+} from "../../commands/subscribe/event-types/youtube-video.ts";
 
 type SubData = {
 	userId: User["ID"];

@@ -1,4 +1,4 @@
-import { hasFishedBefore } from "./fishing-utils.ts";
+import { hasFishedBefore } from "./fishing-utils.js";
 
 export default {
 	name: "stats",

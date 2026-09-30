@@ -7,7 +7,7 @@ import {
 	type FilterArgumentDescriptor,
 	type Type as FilterType,
 	type FilterArgumentDatabaseShape
-} from "../../classes/filter.js";
+} from "../../classes/filter.ts";
 
 import type { Channel } from "../../classes/channel.ts";
 import type { User } from "../../classes/user.ts";

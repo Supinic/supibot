@@ -9,7 +9,7 @@ import {
 	getParentAlias,
 	isLinkedAlias,
 	isRestricted
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 export default {
 	name: "link",

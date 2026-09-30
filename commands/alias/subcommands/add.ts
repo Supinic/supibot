@@ -8,7 +8,7 @@ import {
 	parseCommandName,
 	type AliasData,
 	getAliasByNameAndUser
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 export default {
 	name: "add",

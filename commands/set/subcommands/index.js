@@ -1,20 +1,20 @@
-import AmbassadorSubcommand from "./ambassador.ts";
-import BirthdaySubcommand from "./birthday.ts";
+import AmbassadorSubcommand from "./ambassador.js";
+import BirthdaySubcommand from "./birthday.js";
 import DefaultGptModelSubcommand from "./default-gpt-model.ts";
-import DiscordSubcommand from "./discord.ts";
-import GachiSubcommand from "./gachi.ts";
-import LanguageSubcommand from "./language.ts";
-import LeagueRegionSubcommand from "./league-region.ts";
-import LeagueUserSubcommand from "./league-user.ts";
-import LocationSubcommand from "./location.ts";
-import NoAbbChatterSubcommand from "./no-abb-chatter.ts";
+import DiscordSubcommand from "./discord.js";
+import GachiSubcommand from "./gachi.js";
+import LanguageSubcommand from "./language.js";
+import LeagueRegionSubcommand from "./league-region.js";
+import LeagueUserSubcommand from "./league-user.js";
+import LocationSubcommand from "./location.js";
+import NoAbbChatterSubcommand from "./no-abb-chatter.js";
 import OSRSUsernameSubcommand from "./osrs-username.ts";
-import ReminderSubcommand from "./reminder.ts";
-import StalkPreventionSubcommand from "./stalk-prevention.ts";
-import SuggestionSubcommand from "./suggestion.ts";
-import TrackFavouriteSubcommand from "./track-favourite.ts";
+import ReminderSubcommand from "./reminder.js";
+import StalkPreventionSubcommand from "./stalk-prevention.js";
+import SuggestionSubcommand from "./suggestion.js";
+import TrackFavouriteSubcommand from "./track-favourite.js";
 
-import ChannelFlagsSubcommands from "./channel-flags.ts";
+import ChannelFlagsSubcommands from "./channel-flags.js";
 
 export default [
 	AmbassadorSubcommand,

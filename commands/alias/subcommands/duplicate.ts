@@ -9,7 +9,7 @@ import {
 	isClassicAlias,
 	isLinkedAlias,
 	isOrphanedAlias
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 export default {
 	name: "duplicate",

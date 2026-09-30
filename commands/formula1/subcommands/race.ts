@@ -6,7 +6,7 @@ import {
 	fetchQualifyingResults,
 	fetchRaceResults,
 	getHighlights
-} from "../f1-api.js";
+} from "../f1-api.ts";
 
 export default {
 	name: "race",

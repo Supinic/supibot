@@ -7,7 +7,7 @@ import {
 	hasDonatedDailyCookie,
 	hasOutdatedDailyCookieStats,
 	resetDailyCookieStats
-} from "../../cookie/cookie-logic.js";
+} from "../../cookie/cookie-logic.ts";
 
 export default {
 	name: "cookie",

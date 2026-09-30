@@ -3,7 +3,7 @@ import {
 	checkSevenTvAvailable,
 	SevenTvSubcommands,
 	syncLocalDataToApi
-} from "./subcommands/index.js";
+} from "./subcommands/index.ts";
 
 export type SevenTvSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
 

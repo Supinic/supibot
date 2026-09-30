@@ -1,9 +1,9 @@
 import { VM } from "vm2";
 import { logger } from "../../singletons/logger.ts";
 import { postToHastebin } from "../../utils/command-utils.ts";
-import preventTomfoolery from "./anti-tomfoolery.ts";
-import analyze from "./acorn-heuristic.ts";
-import createSandbox from "./create-sandbox.ts";
+import preventTomfoolery from "./anti-tomfoolery.js";
+import analyze from "./acorn-heuristic.js";
+import createSandbox from "./create-sandbox.js";
 
 const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); Object.freeze(Promise.prototype); void 0;`;
 const MAXIMUM_DATA_LENGTH = 1_000_000;

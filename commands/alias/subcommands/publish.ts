@@ -6,7 +6,7 @@ import {
 	getChannelAlias,
 	getAliasByNameAndUser,
 	getClassicAliasRow
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 export default {
 	name: "publish",

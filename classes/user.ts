@@ -11,7 +11,7 @@ import {
 	fetchUserDataProperty,
 	isCachedUserProperty,
 	saveUserDataProperty
-} from "./custom-data-properties.js";
+} from "./custom-data-properties.ts";
 
 type ConstructorData = {
 	ID: User["ID"];

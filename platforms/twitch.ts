@@ -32,7 +32,7 @@ import TwitchUtils, {
 	type StreamOnlineNotification,
 	type StreamOfflineNotification,
 	type TwitchMessageData
-} from "./twitch-utils.js";
+} from "./twitch-utils.ts";
 
 import type { Channel } from "../classes/channel.ts";
 import type { User } from "../classes/user.ts";

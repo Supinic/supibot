@@ -14,7 +14,7 @@ import {
 	expectCommandResultFailure,
 	expectCommandResultSuccess,
 	TestWorld
-} from "../../test-utils.js";
+} from "../../test-utils.ts";
 
 const EXISTING_COMMANDS = ["EXISTING_COMMAND"];
 
@@ -47,8 +47,8 @@ describe("$alias", async () => {
 
 	const world = new TestWorld();
 
-	const realAliasUtils = await import("../../../commands/alias/alias-utils.js");
-	mock.module("../../../commands/alias/alias-utils.js", {
+	const realAliasUtils = await import("../../../commands/alias/alias-utils.ts");
+	mock.module("../../../commands/alias/alias-utils.ts", {
 		namedExports: {
 			...realAliasUtils,
 			getAliasByNameAndUser: (aliasName: string, userId: number) => {
@@ -100,7 +100,7 @@ describe("$alias", async () => {
 		}
 	});
 
-	const aliasCommandDefinition = (await import("../../../commands/alias/index.js")).default;
+	const aliasCommandDefinition = (await import("../../../commands/alias/index.ts")).default;
 
 	const BASE_USERNAME = "test_user";
 	const BASE_USER_ID = 1337;

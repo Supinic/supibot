@@ -6,7 +6,7 @@ import {
 	getIronman,
 	getActivityFromAlias,
 	isValidActivityAlias
-} from "./osrs-utils.js";
+} from "./osrs-utils.ts";
 
 import SetCommand from "../../set/subcommands/osrs-username.ts";
 
