@@ -87,7 +87,7 @@ export const RandomAnimalFactCommand = declare({
 		let fact: string;
 		switch (type) {
 			case "bird": {
-				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/facts/bird" });
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.com/facts/bird" });
 				fact = simpleFactSchema.parse(response.body).fact;
 				break;
 			}
@@ -102,7 +102,7 @@ export const RandomAnimalFactCommand = declare({
 				break;
 			}
 			case "fox": {
-				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/facts/fox" });
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.com/facts/fox" });
 				fact = simpleFactSchema.parse(response.body).fact;
 				break;
 			}
@@ -160,7 +160,7 @@ export const RandomAnimalPictureCommand = declare({
 		let url: string;
 		switch (type) {
 			case "bird": {
-				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/img/birb" });
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.com/img/birb" });
 				url = linkSchema.parse(response.body).link;
 				break;
 			}
@@ -175,7 +175,7 @@ export const RandomAnimalPictureCommand = declare({
 				break;
 			}
 			case "fox": {
-				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.ml/img/fox" });
+				const response = await core.Got.get("GenericAPI")({ url: "https://some-random-api.com/img/fox" });
 				url = linkSchema.parse(response.body).link;
 				break;
 			}
