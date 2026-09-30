@@ -1,11 +1,11 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
-import ConstructorStandingsSubcommand from "./constructor-standings.js";
-import CopypastaSubcommand from "./copypasta.js";
-import DriverStandingsSubcommand from "./driver-standings.js";
-import FerrariSubcommand from "./ferrari.js";
-import KimiSubcommand from "./kimi.js";
-import RaceSubcommand from "./race.js";
+import ConstructorStandingsSubcommand from "./constructor-standings.ts";
+import CopypastaSubcommand from "./copypasta.ts";
+import DriverStandingsSubcommand from "./driver-standings.ts";
+import FerrariSubcommand from "./ferrari.ts";
+import KimiSubcommand from "./kimi.ts";
+import RaceSubcommand from "./race.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	ConstructorStandingsSubcommand,

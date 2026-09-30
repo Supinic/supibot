@@ -1,5 +1,5 @@
-import type { NumericCoordinates } from "../../../utils/globals.js";
-import type { ResultFailure } from "../../../classes/command.js";
+import type { NumericCoordinates } from "../../../utils/globals.ts";
+import type { ResultFailure } from "../../../classes/command.ts";
 
 export type WeatherReportType = "current" | "hourly" | "daily";
 type BaseWeatherReport = {

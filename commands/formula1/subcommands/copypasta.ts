@@ -1,5 +1,5 @@
-import type { FormulaOneSubcommandDefinition } from "../index.js";
-import type { Channel } from "../../../classes/channel.js";
+import type { FormulaOneSubcommandDefinition } from "../index.ts";
+import type { Channel } from "../../../classes/channel.ts";
 
 import copypastaList from "./copypasta.json" with { type: "json" };
 

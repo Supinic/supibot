@@ -1,4 +1,4 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
 import {
 	checkSevenTvAvailable,
 	SevenTvSubcommands,

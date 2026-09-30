@@ -1,9 +1,9 @@
-import { SubcommandCollection } from "../../../classes/command.js";
-import type { MobaSubcommandDefinition, MobaGameDefinition } from "../index.js";
+import { SubcommandCollection } from "../../../classes/command.ts";
+import type { MobaSubcommandDefinition, MobaGameDefinition } from "../index.ts";
 
-import LastMatchCommand from "./last-match.js";
-import LiveGameCommand from "./live-game.js";
-import RankCommand from "./rank.js";
+import LastMatchCommand from "./last-match.ts";
+import LiveGameCommand from "./live-game.ts";
+import RankCommand from "./rank.ts";
 
 const subcommands = [
 	LastMatchCommand,

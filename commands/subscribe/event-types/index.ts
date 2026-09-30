@@ -1,15 +1,15 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { type EventDefinition, rssEventDefinitionSchema } from "../generic-event.js";
+import { type EventDefinition, rssEventDefinitionSchema } from "../generic-event.ts";
 
-import BrighterShoresSubDefinition from "./brighter-shores.js";
-import ChangelogSubDefinition from "./changelog.js";
-import ChannelLiveSubDefinition from "./channel-live.js";
-import GlobalTwitchEmotesDefinition from "./global-twitch-emotes.js";
-import NodeSubDefinition from "./nodejs.js";
-import OsrsSubDefinition from "./osrs.js";
-import SuggestionSubDefinition from "./suggestion.js";
-import YoutubeVideoSubDefinition from "./youtube-video.js";
+import BrighterShoresSubDefinition from "./brighter-shores.ts";
+import ChangelogSubDefinition from "./changelog.ts";
+import ChannelLiveSubDefinition from "./channel-live.ts";
+import GlobalTwitchEmotesDefinition from "./global-twitch-emotes.ts";
+import NodeSubDefinition from "./nodejs.ts";
+import OsrsSubDefinition from "./osrs.ts";
+import SuggestionSubDefinition from "./suggestion.ts";
+import YoutubeVideoSubDefinition from "./youtube-video.ts";
 
 import rawRssDefinitions from "./rss-definitions.json" with { type: "json" };
 

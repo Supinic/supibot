@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import { type NewAfkData } from "../../classes/afk.js";
+import { declare } from "../../classes/command.ts";
+import { type NewAfkData } from "../../classes/afk.ts";
 import { SupiDate } from "supi-core";
 
 const RESUME_AFK_THRESHOLD_SEC = 120;

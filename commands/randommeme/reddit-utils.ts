@@ -1,7 +1,7 @@
 import * as z from "zod";
 import rawConfig from "./config.json" with { type: "json" };
-import { filterNonNullable } from "../../utils/ts-helpers.js";
-import type { ResultFailure } from "../../classes/command.js";
+import { filterNonNullable } from "../../utils/ts-helpers.ts";
+import type { ResultFailure } from "../../classes/command.ts";
 
 const configShape = z.object({
 	repeats: z.number(),

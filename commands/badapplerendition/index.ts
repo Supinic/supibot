@@ -1,5 +1,5 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import { BadAppleSubcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import { BadAppleSubcommands } from "./subcommands/index.ts";
 
 export type BadAppleSubcommandDefinition = SubcommandDefinition<typeof badAppleCommandDefinition>;
 export type BadAppleRow = {

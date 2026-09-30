@@ -1,7 +1,7 @@
-import type { CronDefinition } from "../index.js";
-import { logger } from "../../singletons/logger.js";
-import { CHANNEL_LIVE_SUBSCRIPTION_TITLE } from "../../commands/subscribe/event-types/channel-live.js";
-import { YOUTUBE_VIDEO_SUBSCRIPTION_TITLE } from "../../commands/subscribe/event-types/youtube-video.js";
+import type { CronDefinition } from "../index.ts";
+import { logger } from "../../singletons/logger.ts";
+import { CHANNEL_LIVE_SUBSCRIPTION_TITLE } from "../../commands/subscribe/event-types/channel-live.ts";
+import { YOUTUBE_VIDEO_SUBSCRIPTION_TITLE } from "../../commands/subscribe/event-types/youtube-video.ts";
 
 type SubscriptionRow = {
 	ID: number;

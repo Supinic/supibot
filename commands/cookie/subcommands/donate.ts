@@ -1,6 +1,6 @@
-import { canEatDailyCookie, canEatReceivedCookie, donateCookie, getValidUserCookieData } from "../cookie-logic.js";
-import { isResultFailure } from "../../../classes/command.js";
-import type { CookieSubcommandDefinition } from "../index.js";
+import { canEatDailyCookie, canEatReceivedCookie, donateCookie, getValidUserCookieData } from "../cookie-logic.ts";
+import { isResultFailure } from "../../../classes/command.ts";
+import type { CookieSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "donate",

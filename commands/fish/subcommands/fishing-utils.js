@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import { randomInt } from "../../../utils/command-utils.js";
+import { randomInt } from "../../../utils/command-utils.ts";
 
 const defaultFishingData = Object.freeze({
 	catch: {

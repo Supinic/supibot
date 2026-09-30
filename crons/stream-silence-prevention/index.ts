@@ -1,7 +1,7 @@
 import * as z from "zod";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-import { getConfig } from "../../config.js";
-import type { CronDefinition } from "../index.js";
+import { getConfig } from "../../config.ts";
+import type { CronDefinition } from "../index.ts";
 
 const { listenerAddress, listenerPort } = getConfig().local ?? {};
 const { SONG_REQUESTS_STATE } = sharedKeys;

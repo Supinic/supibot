@@ -1,9 +1,9 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { fetchGeoLocationData, fetchTimeData, formatTimezoneOffset } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { fetchGeoLocationData, fetchTimeData, formatTimezoneOffset } from "../../utils/command-utils.ts";
 import rawTimezones from "./timezones.json" with { type: "json" };
-import { typeRegexGroups } from "../../utils/ts-helpers.js";
+import { typeRegexGroups } from "../../utils/ts-helpers.ts";
 
 const timezonesSchema = z.array(z.object({
 	abbreviation: z.string(),

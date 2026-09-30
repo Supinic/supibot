@@ -2,8 +2,8 @@
 // import type { Http2Session } from "node:http2";
 import { type GotRegistryInstanceDefinition, isGotRequestError } from "supi-core";
 
-import { getConfig } from "../../config.js";
-import { logger } from "../../singletons/logger.js";
+import { getConfig } from "../../config.ts";
+import { logger } from "../../singletons/logger.ts";
 const { defaultUserAgent } = getConfig().modules.gots;
 
 /*

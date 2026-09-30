@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 // This number represents Supibot's User_Alias ID.
 // With some assumptions, every user with a lower ID is then not considered "first seen" by Supibot,

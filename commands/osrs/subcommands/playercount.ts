@@ -1,5 +1,5 @@
-import type { OsrsSubcommandDefinition } from "../index.js";
-import { fetchPlayerCount } from "./osrs-utils.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
+import { fetchPlayerCount } from "./osrs-utils.ts";
 
 // let previousPlayerCount: number | null = null;
 // let previousTimestamp: number | null = null;

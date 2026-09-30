@@ -1,24 +1,24 @@
 import * as supiCore from "supi-core";
 import type { GotRegistryInstanceDefinition } from "supi-core";
-import { getConfig } from "./config.js";
-import initializeInternalApi from "./api/index.js";
+import { getConfig } from "./config.ts";
+import initializeInternalApi from "./api/index.ts";
 
 import commandDefinitions from "./commands/index.js";
-import { chatModuleDefinitions } from "./chat-modules/index.js";
-import { definitions as gotDefinitions } from "./gots/index.js";
-import initializeCrons from "./crons/index.js";
+import { chatModuleDefinitions } from "./chat-modules/index.ts";
+import { definitions as gotDefinitions } from "./gots/index.ts";
+import initializeCrons from "./crons/index.ts";
 
-import { AwayFromKeyboard } from "./classes/afk.js";
-import { Banphrase } from "./classes/banphrase.js";
-import { Channel } from "./classes/channel.js";
-import { ChatModuleManager } from "./classes/chat-module.js";
-import { Command, type CommandDefinition } from "./classes/command.js";
-import { Filter } from "./classes/filter.js";
-import { MpvClient as MpvClientConstructor } from "./singletons/mpv-client.js";
-import { Reminder } from "./classes/reminder.js";
-import { User } from "./classes/user.js";
-import { logger } from "./singletons/logger.js";
-import { Platform } from "./platforms/template.js";
+import { AwayFromKeyboard } from "./classes/afk.ts";
+import { Banphrase } from "./classes/banphrase.ts";
+import { Channel } from "./classes/channel.ts";
+import { ChatModuleManager } from "./classes/chat-module.ts";
+import { Command, type CommandDefinition } from "./classes/command.ts";
+import { Filter } from "./classes/filter.ts";
+import { MpvClient as MpvClientConstructor } from "./singletons/mpv-client.ts";
+import { Reminder } from "./classes/reminder.ts";
+import { User } from "./classes/user.ts";
+import { logger } from "./singletons/logger.ts";
+import { Platform } from "./platforms/template.ts";
 
 type PopulateOptions = {
 	blacklist?: string[];

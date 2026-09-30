@@ -1,8 +1,8 @@
-import { declare, isResultFailure } from "../../classes/command.js";
-import { getWeatherLocation } from "./location.js";
-import { weatherProviders } from "./providers/index.js";
-import { formatWeatherReport } from "./formatting.js";
-import { getDefaultProvider, isValidWeatherProviderName } from "./providers/weather-template.js";
+import { declare, isResultFailure } from "../../classes/command.ts";
+import { getWeatherLocation } from "./location.ts";
+import { weatherProviders } from "./providers/index.ts";
+import { formatWeatherReport } from "./formatting.ts";
+import { getDefaultProvider, isValidWeatherProviderName } from "./providers/weather-template.ts";
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",

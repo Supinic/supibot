@@ -1,8 +1,8 @@
 import * as assert from "node:assert";
 import { describe, it, beforeEach, afterEach, mock } from "node:test";
-import { Command, type ParameterType } from "../../../classes/command.js";
+import { Command, type ParameterType } from "../../../classes/command.ts";
 import { SupiDate } from "supi-core";
-import { TestWorld } from "../../test-utils.js";
+import { TestWorld } from "../../test-utils.ts";
 
 describe("Command parameter parsing", () => {
 	const world = new TestWorld();

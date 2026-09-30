@@ -1,6 +1,6 @@
 import { SupiDate, SupiError } from "supi-core";
 
-import { type MobaSubcommandDefinition } from "../index.js";
+import { type MobaSubcommandDefinition } from "../index.ts";
 import {
 	TEAM_POSITIONS_MAP,
 	parseUserIdentifier,

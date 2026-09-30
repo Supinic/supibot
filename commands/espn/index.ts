@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const espnSchema = z.object({
 	events: z.array(z.object({

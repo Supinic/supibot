@@ -1,5 +1,5 @@
-import { getCode } from "../../utils/languages.js";
-import checkPartialCommandFilters from "./check-partials.js";
+import { getCode } from "../../utils/languages.ts";
+import checkPartialCommandFilters from "./check-partials.ts";
 
 export default {
 	Name: "define",

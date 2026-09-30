@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { randomInt } from "../../../utils/command-utils.js";
-import { logger } from "../../../singletons/logger.js";
+import { randomInt } from "../../../utils/command-utils.ts";
+import { logger } from "../../../singletons/logger.ts";
 import {
 	baitTypes,
 	COIN_EMOJI,
@@ -10,7 +10,7 @@ import {
 	getWeightedCatch
 } from "./fishing-utils.js";
 
-import { checkLimits } from "../../gpt/cache-control.js";
+import { checkLimits } from "../../gpt/cache-control.ts";
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "mysterious", "hilarious", "enchanting", "touching", "intriguing"];
 const createGptPrompt = (executor, resultFish, sizeString) => core.Utils.tag.trim `

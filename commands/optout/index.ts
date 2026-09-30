@@ -1,6 +1,6 @@
-import { declare } from "../../classes/command.js";
-import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
-import { Filter } from "../../classes/filter.js";
+import { declare } from "../../classes/command.ts";
+import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.ts";
+import { Filter } from "../../classes/filter.ts";
 
 export default declare({
 	Name: "optout",

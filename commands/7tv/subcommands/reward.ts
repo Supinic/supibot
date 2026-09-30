@@ -1,6 +1,6 @@
-import { fetchSevenTvChannelData } from "./index.js";
-import type { SevenTvSubcommandDefinition } from "../index.js";
-import type { Channel } from "../../../classes/channel.js";
+import { fetchSevenTvChannelData } from "./index.ts";
+import type { SevenTvSubcommandDefinition } from "../index.ts";
+import type { Channel } from "../../../classes/channel.ts";
 
 const set = async (channelData: Channel, ...args: string[]) => {
 	const twitch = sb.Platform.getAsserted("twitch");

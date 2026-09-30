@@ -5,10 +5,10 @@ import { SupiDate, SupiError } from "supi-core";
 import { randomBytes } from "node:crypto";
 import { setTimeout as wait } from "node:timers/promises";
 
-import { BasePlatformConfigSchema } from "./schema.js";
-import { Platform } from "./template.js";
-import { logger } from "../singletons/logger.js";
-import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
+import { BasePlatformConfigSchema } from "./schema.ts";
+import { Platform } from "./template.ts";
+import { logger } from "../singletons/logger.ts";
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.ts";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
 import TwitchUtils, {
@@ -34,10 +34,10 @@ import TwitchUtils, {
 	type TwitchMessageData
 } from "./twitch-utils.js";
 
-import type { Channel } from "../classes/channel.js";
-import type { User } from "../classes/user.js";
-import type { Emote, ThirdPartyEmote } from "../utils/globals.js";
-import type { TwitchSubscriberData } from "../utils/schemas.js";
+import type { Channel } from "../classes/channel.ts";
+import type { User } from "../classes/user.ts";
+import type { Emote, ThirdPartyEmote } from "../utils/globals.ts";
+import type { TwitchSubscriberData } from "../utils/schemas.ts";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth

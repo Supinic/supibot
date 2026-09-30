@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.ts";
 
 const ALLOWED_PARAMETER_TYPES = new Set(["string", "number", "boolean", "date", "object", "regex"]);
 const allowedUtilsMethods = [

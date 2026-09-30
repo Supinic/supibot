@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { defineChatModule } from "../../classes/chat-module.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 type PyramidData = {
 	base: string;

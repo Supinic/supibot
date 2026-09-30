@@ -1,4 +1,4 @@
-import type { BadAppleRow, BadAppleSubcommandDefinition } from "../index.js";
+import type { BadAppleRow, BadAppleSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "random",

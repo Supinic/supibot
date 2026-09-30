@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-misused-spread */
 import * as z from "zod";
-import { randomInt, TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+import { randomInt, TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.ts";
 
-import textCaseCode from "./text-case-code.js";
+import textCaseCode from "./text-case-code.ts";
 import officialCharactersMap from "./definitions/official-characters.json" with { type: "json" };
 
 import AlienDefinition from "./definitions/alien.json" with { type: "json" };
@@ -20,7 +20,7 @@ import MorseData from "./definitions/morse.json" with { type: "json" };
 import LingoCockneyDefinition from "./lingo-translations/cockney.json" with { type: "json" };
 import LingoCowboyDefinition from "./lingo-translations/cowboy.json" with { type: "json" };
 import LingoOutbackDefinition from "./lingo-translations/outback.json" with { type: "json" };
-import type { ResultFailure } from "../../classes/command.js";
+import type { ResultFailure } from "../../classes/command.ts";
 import { SupiError } from "supi-core";
 
 const lingoSchema = z.object({

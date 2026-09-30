@@ -1,4 +1,4 @@
-import { DEFAULT_USER_IDENTIFIER_KEY } from "../../moba/league/utils.js";
+import { DEFAULT_USER_IDENTIFIER_KEY } from "../../moba/league/utils.ts";
 
 export default {
 	name: "league-user",

@@ -1,14 +1,14 @@
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import { SupiDate, SupiError } from "supi-core";
 import type { default as LinkParser } from "track-link-parser";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 
-import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
-import { getLinkParser } from "../../utils/link-parser.js";
+import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.ts";
+import { getLinkParser } from "../../utils/link-parser.ts";
 
-import { type User } from "../../classes/user.js";
-import { type MpvPlaylistItem } from "../../singletons/mpv-client.js";
-import { ivrClipSchema } from "../../utils/schemas.js";
+import { type User } from "../../classes/user.ts";
+import { type MpvPlaylistItem } from "../../singletons/mpv-client.ts";
+import { ivrClipSchema } from "../../utils/schemas.ts";
 
 const { SONG_REQUESTS_STATE } = cacheKeys;
 

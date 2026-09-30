@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { randomInt } from "../../../utils/command-utils.js";
-import { addFish, addJunk, getInitialStats, rollCatch, saveData } from "./fishing-utils.js";
+import { randomInt } from "../../../utils/command-utils.ts";
+import { addFish, addJunk, getInitialStats, rollCatch, saveData } from "./fishing-utils.ts";
 
 const FISHING_TRIP_STATIC_DURATION = 36e5; // 1 hour
 const FISH_SUCCESS_DELAY_MIN = 30;

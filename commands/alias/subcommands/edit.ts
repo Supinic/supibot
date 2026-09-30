@@ -1,7 +1,7 @@
-import { getAliasByNameAndUser, getClassicAliasRow, isLinkedAlias, parseCommandName } from "../alias-utils.js";
+import { getAliasByNameAndUser, getClassicAliasRow, isLinkedAlias, parseCommandName } from "../alias-utils.ts";
 
-import { type AliasSubcommandDefinition } from "../index.js";
-import { prefix } from "../../../utils/command-utils.js";
+import { type AliasSubcommandDefinition } from "../index.ts";
+import { prefix } from "../../../utils/command-utils.ts";
 
 export default {
 	name: "edit",

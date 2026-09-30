@@ -1,4 +1,4 @@
-import type { BadAppleSubcommandDefinition } from "../index.js";
+import type { BadAppleSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "list",

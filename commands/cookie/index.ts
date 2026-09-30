@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { CookieSubcommands } from "./subcommands/index.js";
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
+import { CookieSubcommands } from "./subcommands/index.ts";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
 
 export type CookieSubcommandDefinition = SubcommandDefinition<typeof cookieCommandDefinition>;
 

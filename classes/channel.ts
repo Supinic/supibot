@@ -16,10 +16,10 @@ import {
 	saveChannelDataProperty
 } from "./custom-data-properties.js";
 
-import type { User } from "./user.js";
-import { createMessageLoggingTable } from "../utils/create-db-table.js";
-import { TemplateWithId } from "./template.js";
-import type { Emote } from "../utils/globals.js";
+import type { User } from "./user.ts";
+import { createMessageLoggingTable } from "../utils/create-db-table.ts";
+import { TemplateWithId } from "./template.ts";
+import type { Emote } from "../utils/globals.ts";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 

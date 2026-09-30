@@ -1,10 +1,10 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 const shell = promisify(exec);
 
-import { getConfig } from "../../config.js";
-import { hasKey } from "../../utils/ts-helpers.js";
+import { getConfig } from "../../config.ts";
+import { hasKey } from "../../utils/ts-helpers.ts";
 const { basePath } = getConfig();
 
 const restartMethods = {

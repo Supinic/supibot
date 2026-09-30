@@ -1,9 +1,9 @@
 import { SupiDate, SupiError } from "supi-core";
 import type { ParserName } from "track-link-parser";
-import { postToHastebin } from "../../utils/command-utils.js";
-import { getLinkParser } from "../../utils/link-parser.js";
-import { declare } from "../../classes/command.js";
-import type { Channel } from "../../classes/channel.js";
+import { postToHastebin } from "../../utils/command-utils.ts";
+import { getLinkParser } from "../../utils/link-parser.ts";
+import { declare } from "../../classes/command.ts";
+import type { Channel } from "../../classes/channel.ts";
 
 type Track = {
 	ID: number;

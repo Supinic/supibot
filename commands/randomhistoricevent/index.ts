@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const formatter = new Intl.DateTimeFormat("en-GB", {
 	month: "long"

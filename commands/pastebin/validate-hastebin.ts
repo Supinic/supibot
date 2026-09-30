@@ -1,5 +1,5 @@
 import * as z from "zod";
-import type { Command } from "../../classes/command.js";
+import type { Command } from "../../classes/command.ts";
 
 const validateSchema = z.object({ key: z.string() });
 

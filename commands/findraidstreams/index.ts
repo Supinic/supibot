@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { twitchStreamSchema } from "../../utils/schemas.js";
-import { postToHastebin } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { twitchStreamSchema } from "../../utils/schemas.ts";
+import { postToHastebin } from "../../utils/command-utils.ts";
 
 const VIEWER_THRESHOLD = 100;
 const BATCH_SIZE = 100;

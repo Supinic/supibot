@@ -1,6 +1,6 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
-import LeagueSubcommand from "./league.js";
-import RollSubcommand from "./roll.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
+import LeagueSubcommand from "./league.ts";
+import RollSubcommand from "./roll.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	LeagueSubcommand,

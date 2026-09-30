@@ -1,5 +1,5 @@
-import type { Channel } from "../../../classes/channel.js";
-import type { SpecialEventDefinition } from "../generic-event.js";
+import type { Channel } from "../../../classes/channel.ts";
+import type { SpecialEventDefinition } from "../generic-event.ts";
 
 type ChannelsSubData = {
 	channels?: Channel["ID"][];

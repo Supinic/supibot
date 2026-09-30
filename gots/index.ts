@@ -1,17 +1,17 @@
 import type { GotRegistryInstanceDefinition } from "supi-core";
 
-import GlobalGot from "./global/index.js";
-import FakeAgentGot from "./fake-agent/index.js";
-import GenericAPIGot from "./generic-api/index.js";
-import GitHubGot from "./github/index.js";
-import GoogleGot from "./google/index.js";
-import HelixGot from "./helix/index.js";
-import IVRGot from "./ivr/index.js";
-import RaspberryPi4Got from "./raspberry-pi-4/index.js";
-import RedditGot from "./reddit/index.js";
-import SupibotGot from "./supibot/index.js";
-import SupinicGot from "./supinic/index.js";
-import TwitchGQLGot from "./twitch-gql/index.js";
+import GlobalGot from "./global/index.ts";
+import FakeAgentGot from "./fake-agent/index.ts";
+import GenericAPIGot from "./generic-api/index.ts";
+import GitHubGot from "./github/index.ts";
+import GoogleGot from "./google/index.ts";
+import HelixGot from "./helix/index.ts";
+import IVRGot from "./ivr/index.ts";
+import RaspberryPi4Got from "./raspberry-pi-4/index.ts";
+import RedditGot from "./reddit/index.ts";
+import SupibotGot from "./supibot/index.ts";
+import SupinicGot from "./supinic/index.ts";
+import TwitchGQLGot from "./twitch-gql/index.ts";
 
 export const definitions = [
 	GlobalGot,

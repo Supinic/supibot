@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate, type GotResponse } from "supi-core";
-import { declare, isResultFailure, type ResultFailure } from "../../classes/command.js";
+import { declare, isResultFailure, type ResultFailure } from "../../classes/command.ts";
 
 const HLTB_TOKEN_CACHE_KEY = "hltb-token-cache";
 const HLTB_ENDPOINT_CACHE_KEY = "hltb-api-endpoint";

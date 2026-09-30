@@ -1,4 +1,4 @@
-import type { ApiDefinition } from "./index.js";
+import type { ApiDefinition } from "./index.ts";
 
 export default {
 	index: async (req, res) => {

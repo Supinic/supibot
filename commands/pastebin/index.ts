@@ -1,7 +1,7 @@
 import * as z from "zod";
-import { getPathFromURL, postToPastebin } from "../../utils/command-utils.js";
-import validateHastebinServer from "./validate-hastebin.js";
-import { declare } from "../../classes/command.js";
+import { getPathFromURL, postToPastebin } from "../../utils/command-utils.ts";
+import validateHastebinServer from "./validate-hastebin.ts";
+import { declare } from "../../classes/command.ts";
 
 const BASE_HASTEBIN_SERVER = "https://haste.zneix.eu";
 const ALLOWED_GIST_TYPES = ["text/plain", "text/javascript", "application/javascript"];

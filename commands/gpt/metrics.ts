@@ -1,7 +1,7 @@
 import type { GotResponse } from "supi-core";
-import type { Command } from "../../classes/command.js";
-import type { GptTemplate } from "./gpt-template.js";
-import type { GptContext, ModelName } from "./index.js";
+import type { Command } from "../../classes/command.ts";
+import type { GptTemplate } from "./gpt-template.ts";
+import type { GptContext, ModelName } from "./index.ts";
 
 type GptMetricsData = {
 	Handler: GptTemplate;

@@ -1,7 +1,7 @@
-import * as LocalLogs from "./db-randomline.js";
-import * as Rustlog from "./rustlog.js";
-import { getConfig } from "../../config.js";
-import { declare } from "../../classes/command.js";
+import * as LocalLogs from "./db-randomline.ts";
+import * as Rustlog from "./rustlog.ts";
+import { getConfig } from "../../config.ts";
+import { declare } from "../../classes/command.ts";
 
 const { instances } = getConfig().rustlog;
 

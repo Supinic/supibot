@@ -1,6 +1,6 @@
 import { SupiError } from "supi-core";
-import { isChannelSupported } from "../../randomline/rustlog.js";
-import type { CheckSubcommandDefinition } from "../index.js";
+import { isChannelSupported } from "../../randomline/rustlog.ts";
+import type { CheckSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "logs",

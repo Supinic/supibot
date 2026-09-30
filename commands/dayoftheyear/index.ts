@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const responseSchema = z.object({
 	data: z.array(z.object({

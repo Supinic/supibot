@@ -1,4 +1,4 @@
-import { fetchGeoLocationData } from "../../../utils/command-utils.js";
+import { fetchGeoLocationData } from "../../../utils/command-utils.ts";
 
 export default {
 	name: "location",

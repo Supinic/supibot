@@ -2,9 +2,9 @@ import { it, describe, beforeEach, mock, afterEach } from "node:test";
 import assert from "node:assert/strict";
 
 import type { SupiDate } from "supi-core";
-import { type User, permissions as userPermissions } from "../../../classes/user.js";
-import { Command, type Context, type ContextData } from "../../../classes/command.js";
-import type { Channel } from "../../../classes/channel.js";
+import { type User, permissions as userPermissions } from "../../../classes/user.ts";
+import { Command, type Context, type ContextData } from "../../../classes/command.ts";
+import type { Channel } from "../../../classes/channel.ts";
 
 import {
 	createTestPlatform,

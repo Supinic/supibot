@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
 import unsetSuggestionSubcommand from "../set/subcommands/suggestion.js";
-import { declare } from "../../classes/command.js";
-import type User from "../../classes/user.js";
+import { declare } from "../../classes/command.ts";
+import type User from "../../classes/user.ts";
 
 type Suggestion = {
 	ID: number;
@@ -29,7 +29,7 @@ export default declare({
 			return {
 				success: false,
 				reply: core.Utils.tag.trim `
-					No suggestion text provided!
+					No suggestion text provided! 
 					Your suggestions here: https://supinic.com/data/suggestion/list?columnAuthor=${context.user.Name}
 				`,
 				cooldown: 5000

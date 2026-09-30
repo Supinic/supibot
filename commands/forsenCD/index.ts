@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawBeahmData from "./guy-beahm.json" with { type: "json" };
 
 let beahmData: string[] | undefined;

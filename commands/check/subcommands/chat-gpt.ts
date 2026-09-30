@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
-import { postToHastebin } from "../../../utils/command-utils.js";
-import { getTokenUsage, determineUserLimits } from "../../gpt/cache-control.js";
-import type { CheckSubcommandDefinition } from "../index.js";
+import { postToHastebin } from "../../../utils/command-utils.ts";
+import { getTokenUsage, determineUserLimits } from "../../gpt/cache-control.ts";
+import type { CheckSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "chatgpt",

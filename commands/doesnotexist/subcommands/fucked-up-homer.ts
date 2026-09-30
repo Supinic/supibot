@@ -1,4 +1,4 @@
-import type { DoesNotExistSubcommandDefinition } from "../index.js";
+import type { DoesNotExistSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "fuckeduphomer",

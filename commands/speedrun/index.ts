@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { selectClosestObject } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { selectClosestObject } from "../../utils/command-utils.ts";
 
 type RunData = z.infer<typeof runsSchema>["data"]["runs"][number]["run"];
 

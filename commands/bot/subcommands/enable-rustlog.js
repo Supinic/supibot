@@ -1,4 +1,4 @@
-import { addChannel, isChannelSupported } from "../../randomline/rustlog.js";
+import { addChannel, isChannelSupported } from "../../randomline/rustlog.ts";
 
 export default {
 	name: "enable-rustlog",

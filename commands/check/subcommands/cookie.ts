@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CheckSubcommandDefinition } from "../index.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
 import {
 	canEatDailyCookie,
 	canEatReceivedCookie,

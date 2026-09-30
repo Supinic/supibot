@@ -1,5 +1,5 @@
-import type { StatsSubcommandDefinition } from "../index.js";
-import { unping } from "../../../utils/command-utils.js";
+import type { StatsSubcommandDefinition } from "../index.ts";
+import { unping } from "../../../utils/command-utils.ts";
 const BASE_LIMIT = 10;
 
 export default {

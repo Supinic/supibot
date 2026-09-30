@@ -1,9 +1,9 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
-import EatSubcommand from "./eat.js";
-import DonateSubcommand from "./donate.js";
-import StatsSubcommand from "./stats.js";
-import TopSubcommand from "./top.js";
+import EatSubcommand from "./eat.ts";
+import DonateSubcommand from "./donate.ts";
+import StatsSubcommand from "./stats.ts";
+import TopSubcommand from "./top.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	EatSubcommand,

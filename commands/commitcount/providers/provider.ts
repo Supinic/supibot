@@ -1,6 +1,6 @@
 import type { SupiDate } from "supi-core";
-import type { ResultFailure } from "../../../classes/command.js";
-import type User from "../../../classes/user.js";
+import type { ResultFailure } from "../../../classes/command.ts";
+import type User from "../../../classes/user.ts";
 
 type GitProviderData = {
 	user: User;

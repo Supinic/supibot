@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import { randomInt } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { randomInt } from "../../utils/command-utils.ts";
 
 const MAXIMUM_EMOJI_LIMIT = 50;
 const EMOJI_RANGES = [

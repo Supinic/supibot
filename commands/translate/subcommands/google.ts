@@ -1,8 +1,8 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { hasDefinition, getName, getDefinition } from "../../../utils/languages.js";
-import type { TranslateSubcommandDefinition } from "../index.js";
-import { logger } from "../../../singletons/logger.js";
+import { hasDefinition, getName, getDefinition } from "../../../utils/languages.ts";
+import type { TranslateSubcommandDefinition } from "../index.ts";
+import { logger } from "../../../singletons/logger.ts";
 
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
 const resultSchema = z.union([

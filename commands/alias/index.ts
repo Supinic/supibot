@@ -1,5 +1,5 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import { AliasSubcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import { AliasSubcommands } from "./subcommands/index.ts";
 
 export type AliasSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
 

@@ -1,9 +1,9 @@
 import * as z from "zod";
 import { type CacheValue, SupiDate } from "supi-core";
-import { typedKeys } from "../../../utils/ts-helpers.js";
-import { isResultFailure, type ResultFailure } from "../../../classes/command.js";
-import type { NumericCoordinates } from "../../../utils/globals.js";
-import type { WeatherProvider, WeatherReportType } from "./weather-template.js";
+import { typedKeys } from "../../../utils/ts-helpers.ts";
+import { isResultFailure, type ResultFailure } from "../../../classes/command.ts";
+import type { NumericCoordinates } from "../../../utils/globals.ts";
+import type { WeatherProvider, WeatherReportType } from "./weather-template.ts";
 
 const WEATHER_ICONS: Partial<Record<number, string>> = {
 	1: "🌤️️",

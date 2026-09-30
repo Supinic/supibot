@@ -1,4 +1,4 @@
-import type { ParameterDefinition, ParamFromDefinition, ResultFailure } from "../../classes/command.js";
+import type { ParameterDefinition, ParamFromDefinition, ResultFailure } from "../../classes/command.ts";
 import { SupiDate } from "supi-core";
 
 export const newsParams = [

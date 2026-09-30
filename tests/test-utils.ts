@@ -1,11 +1,11 @@
 import * as assert from "node:assert/strict";
 import { Utils } from "supi-core";
-import { Channel } from "../classes/channel.js";
-import { Command, type CommandDefinition } from "../classes/command.js";
-import { User } from "../classes/user.js";
-import { type BaseConfig, type Platform } from "../platforms/template.js";
-import { TwitchPlatform } from "../platforms/twitch.js";
-import { typedEntries } from "../utils/ts-helpers.js";
+import { Channel } from "../classes/channel.ts";
+import { Command, type CommandDefinition } from "../classes/command.ts";
+import { User } from "../classes/user.ts";
+import { type BaseConfig, type Platform } from "../platforms/template.ts";
+import { TwitchPlatform } from "../platforms/twitch.ts";
+import { typedEntries } from "../utils/ts-helpers.ts";
 
 export const createTestUser = (opts: { Name?: string, ID?: number, Twitch_ID?: string, Discord_ID?: string } = {}) => new User({
 	ID: opts.ID ?? 1,

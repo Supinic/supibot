@@ -1,5 +1,5 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import { FormulaOneSubcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import { FormulaOneSubcommands } from "./subcommands/index.ts";
 
 export type FormulaOneSubcommandDefinition = SubcommandDefinition<typeof formulaOneCommandDefinition>;
 

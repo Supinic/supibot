@@ -1,21 +1,21 @@
 import { CronJob } from "cron";
 
-import ActiveChattersLog from "./active-chatters-log/index.js";
-import BotActivity from "./bot-active/index.js";
-import BotRequestDenialManager from "./bot-request-denial-manager/index.js";
-import ChangelogAnnouncer from "./changelog-announcer/index.js";
-import TwitchSubscribersFetcher from "./fetch-twitch-subscriber-list/index.js";
-import GlobalEmoteAnnouncer from "./global-emote-announcer/index.js";
-import InactiveDiscordServersDetector from "./inactive-discord-server-detector/index.js";
-import LateStreamChecker from "./late-stream-announcer/index.js";
-import PostureChecker from "./posture-check/index.js";
-import StayHydratedChecker from "./stay-hydrated/index.js";
-import StreamSilencePreventer from "./stream-silence-prevention/index.js";
-import SuggestionNotificator from "./suggestion-notification-system/index.js";
-import SupinicAdvertiser from "./supinic-advert/index.js";
-import TitlechangeBotAnnouncer from "./supinic-tcb/index.js";
-import SoundcloudClientIdFetcher from "./yoink-soundcloud-client-id/index.js";
-import YoutubeRssVideoChecker from "./youtube-rss-video-checker/index.js";
+import ActiveChattersLog from "./active-chatters-log/index.ts";
+import BotActivity from "./bot-active/index.ts";
+import BotRequestDenialManager from "./bot-request-denial-manager/index.ts";
+import ChangelogAnnouncer from "./changelog-announcer/index.ts";
+import TwitchSubscribersFetcher from "./fetch-twitch-subscriber-list/index.ts";
+import GlobalEmoteAnnouncer from "./global-emote-announcer/index.ts";
+import InactiveDiscordServersDetector from "./inactive-discord-server-detector/index.ts";
+import LateStreamChecker from "./late-stream-announcer/index.ts";
+import PostureChecker from "./posture-check/index.ts";
+import StayHydratedChecker from "./stay-hydrated/index.ts";
+import StreamSilencePreventer from "./stream-silence-prevention/index.ts";
+import SuggestionNotificator from "./suggestion-notification-system/index.ts";
+import SupinicAdvertiser from "./supinic-advert/index.ts";
+import TitlechangeBotAnnouncer from "./supinic-tcb/index.ts";
+import SoundcloudClientIdFetcher from "./yoink-soundcloud-client-id/index.ts";
+import YoutubeRssVideoChecker from "./youtube-rss-video-checker/index.ts";
 
 const definitions = [
 	ActiveChattersLog,

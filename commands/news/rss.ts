@@ -1,9 +1,9 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
-import { logger } from "../../singletons/logger.js";
-import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
-import { isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.js";
-import { fetchEligibleArticle, type NewsOptions } from "./news-helpers.js";
+import { logger } from "../../singletons/logger.ts";
+import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.ts";
+import { isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.ts";
+import { fetchEligibleArticle, type NewsOptions } from "./news-helpers.ts";
 
 import rawDefinitions from "./definitions.json" with { type: "json" };
 const rssDefinitionSchema = z.array(z.strictObject({

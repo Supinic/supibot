@@ -1,5 +1,5 @@
-import { fetchSevenTvChannelData, fetchSevenTvToken, removeEmote } from "./index.js";
-import type { SevenTvSubcommandDefinition } from "../index.js";
+import { fetchSevenTvChannelData, fetchSevenTvToken, removeEmote } from "./index.ts";
+import type { SevenTvSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "remove",

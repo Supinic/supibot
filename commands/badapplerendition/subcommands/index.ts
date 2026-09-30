@@ -1,8 +1,8 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
-import CheckSubcommand from "./check.js";
-import ListSubcommand from "./list.js";
-import RandomSubcommand from "./random.js";
+import CheckSubcommand from "./check.ts";
+import ListSubcommand from "./list.ts";
+import RandomSubcommand from "./random.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	CheckSubcommand,

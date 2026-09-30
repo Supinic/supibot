@@ -1,4 +1,4 @@
-import { defineChatModule } from "../../classes/chat-module.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
 const ALERT_WORDS = [
 	"LARM",
 	"POPLACH",

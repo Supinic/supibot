@@ -1,5 +1,5 @@
-import { randomInt } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
 
 export default declare({
 	Name: "percent",

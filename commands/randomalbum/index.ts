@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { randomInt } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
 
 // Borrowed from https://codepen.io/bobhami/pen/gwAJNp
 const GENIUS_ACCESS_TOKEN = "CXyFeSBw2lAdG41xkuU3LS6a_nwyxwwCz2dCkUohw-rw0C49x2HqP__6_4is5RPx";

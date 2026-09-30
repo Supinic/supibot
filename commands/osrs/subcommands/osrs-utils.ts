@@ -1,14 +1,14 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import type { Context } from "../../../classes/command.js";
-import type { User } from "../../../classes/user.js";
+import type { Context } from "../../../classes/command.ts";
+import type { User } from "../../../classes/user.ts";
 // import type { CheerioNode } from "supi-core";
 
 import GameData from "./game-data.json" with { type: "json" };
 import extraItemData from "./extra-item-data.json" with { type: "json" };
 export const { aliases /* , priorities */ } = extraItemData;
 
-import { typedEntries } from "../../../utils/ts-helpers.js";
+import { typedEntries } from "../../../utils/ts-helpers.ts";
 
 for (const item of GameData.activities) {
 	if (item.toLowerCase() !== item) {

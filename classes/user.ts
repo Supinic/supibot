@@ -1,7 +1,7 @@
 import { SupiDate, SupiError, type Batch, type Row } from "supi-core";
-import { TemplateWithIdString } from "./template.js";
+import { TemplateWithIdString } from "./template.ts";
 
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 const { userAdditionCriticalLoadThreshold, userAdditionHighLoadThreshold } = getConfig().values;
 
 import {

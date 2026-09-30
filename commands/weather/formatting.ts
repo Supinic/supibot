@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { WeatherReport as Report } from "./providers/weather-template.js";
+import type { WeatherReport as Report } from "./providers/weather-template.ts";
 
 export const WEATHER_FORMAT_KEYS = [
 	"cloudCover",

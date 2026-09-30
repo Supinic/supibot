@@ -1,4 +1,4 @@
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SONG_REQUESTS_STATE } = cacheKeys;
 

@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
-import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.js";
-import { isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.js";
-import { type NewsOptions, fetchEligibleArticle } from "./news-helpers.js";
+import { parseRSS, sanitizeHtmlString } from "../../utils/command-utils.ts";
+import { isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.ts";
+import { type NewsOptions, fetchEligibleArticle } from "./news-helpers.ts";
 
 export const fetchGoogleNews = async (options: NewsOptions, query?: string): Promise<ResultFailure | StrictResult> => {
 	if (options.params.link) {

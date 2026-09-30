@@ -1,11 +1,11 @@
-import BuySubcommand from "./buy.js";
-import ConfigSubcommand from "./config.js";
-import FishSubcommand from "./fish.js";
-import LeaderboardSubcommand from "./leaderboard.js";
-import SellSubcommand from "./sell.js";
-import ShowSubcommand from "./show.js";
-import StatsSubcommand from "./stats.js";
-import TrapSubcommand from "./trap.js";
+import BuySubcommand from "./buy.ts";
+import ConfigSubcommand from "./config.ts";
+import FishSubcommand from "./fish.ts";
+import LeaderboardSubcommand from "./leaderboard.ts";
+import SellSubcommand from "./sell.ts";
+import ShowSubcommand from "./show.ts";
+import StatsSubcommand from "./stats.ts";
+import TrapSubcommand from "./trap.ts";
 
 export default [
 	BuySubcommand,

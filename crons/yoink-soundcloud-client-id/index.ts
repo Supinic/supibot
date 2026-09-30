@@ -1,7 +1,7 @@
-import { getLinkParser } from "../../utils/link-parser.js";
+import { getLinkParser } from "../../utils/link-parser.ts";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-import type { CronDefinition } from "../index.js";
-import { logger } from "../../singletons/logger.js";
+import type { CronDefinition } from "../index.ts";
+import { logger } from "../../singletons/logger.ts";
 
 const { SOUNDCLOUD_CLIENT_ID } = sharedKeys;
 const fetchStatusCode = async (clientId: string): Promise<number> => {

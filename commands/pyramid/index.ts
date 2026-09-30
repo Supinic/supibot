@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const REASONABLE_PYRAMID_MAXIMUM = 10;

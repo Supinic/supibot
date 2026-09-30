@@ -1,5 +1,5 @@
-import type { OsrsSubcommandDefinition } from "../index.js";
-import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
+import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.ts";
 import GameData from "./game-data.json" with { type: "json" };
 import { SupiError } from "supi-core";
 

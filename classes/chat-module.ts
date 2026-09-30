@@ -1,14 +1,14 @@
 import { SupiError } from "supi-core";
 
 import type * as z from "zod";
-import type { Channel } from "./channel.js";
-import type { User } from "./user.js";
-import type { Platform } from "../platforms/template.js";
-import type { TwitchPlatform } from "../platforms/twitch.js";
-import type { DiscordPlatform } from "../platforms/discord.js";
-import type { CytubePlatform } from "../platforms/cytube.js";
-import type { IrcPlatform } from "../platforms/irc.js";
-import type { TwitchMessageData } from "../platforms/twitch-utils.js";
+import type { Channel } from "./channel.ts";
+import type { User } from "./user.ts";
+import type { Platform } from "../platforms/template.ts";
+import type { TwitchPlatform } from "../platforms/twitch.ts";
+import type { DiscordPlatform } from "../platforms/discord.ts";
+import type { CytubePlatform } from "../platforms/cytube.ts";
+import type { IrcPlatform } from "../platforms/irc.ts";
+import type { TwitchMessageData } from "../platforms/twitch-utils.ts";
 
 interface EventBase<E extends string, P extends Platform = Platform> {
 	event: E;

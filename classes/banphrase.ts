@@ -1,13 +1,13 @@
 import { isGotRequestError, SupiDate, SupiError, type RecordUpdater } from "supi-core";
-import { TemplateWithId } from "./template.js";
-import { asciiArtRegex, emojiRegex, linkRegex, whitespaceRegex } from "../utils/regexes.js";
+import { TemplateWithId } from "./template.ts";
+import { asciiArtRegex, emojiRegex, linkRegex, whitespaceRegex } from "../utils/regexes.ts";
 import { transliterate as executeTransliteration } from "transliteration";
-import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
-import { getConfig } from "../config.js";
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.ts";
+import { getConfig } from "../config.ts";
 
-import type { Channel } from "./channel.js";
-import type { Platform } from "../platforms/template.js";
-import { logger } from "../singletons/logger.js";
+import type { Channel } from "./channel.ts";
+import type { Platform } from "../platforms/template.ts";
+import { logger } from "../singletons/logger.ts";
 
 const { responses, values } = getConfig();
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");

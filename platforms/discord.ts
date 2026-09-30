@@ -19,13 +19,13 @@ import {
 	escapeMarkdown
 } from "discord.js";
 
-import { BasePlatformConfigSchema } from "./schema.js";
-import { Platform, type PlatformVerificationStatus, type PrepareMessageOptions } from "./template.js";
-import type { DiscordEmote, Emote } from "../utils/globals.js";
+import { BasePlatformConfigSchema } from "./schema.ts";
+import { Platform, type PlatformVerificationStatus, type PrepareMessageOptions } from "./template.ts";
+import type { DiscordEmote, Emote } from "../utils/globals.ts";
 
-import type { User } from "../classes/user.js";
-import type { Channel } from "../classes/channel.js";
-import { logger } from "../singletons/logger.js";
+import type { User } from "../classes/user.ts";
+import type { Channel } from "../classes/channel.ts";
+import { logger } from "../singletons/logger.ts";
 
 export type Embeds = BaseMessageOptions["embeds"];
 type SimpleMessage = {

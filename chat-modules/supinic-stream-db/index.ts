@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-import { defineChatModule } from "../../classes/chat-module.js";
-import { twitchVodSchema } from "../../utils/schemas.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
+import { twitchVodSchema } from "../../utils/schemas.ts";
 const { SONG_REQUESTS_STATE } = cacheKeys;
 
 type StreamRow = {

@@ -12,27 +12,27 @@ import {
 import type { BaseMessageOptions } from "discord.js";
 
 import { ZodError } from "zod";
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 
 type DiscordEmbeds = BaseMessageOptions["embeds"];
 
-import { TemplateWithoutId, type TemplateDefinition } from "./template.js";
+import { TemplateWithoutId, type TemplateDefinition } from "./template.ts";
 
-import { Banphrase } from "./banphrase.js";
-import { Filter } from "./filter.js";
-import { type Channel, privateMessageChannelSymbol } from "./channel.js";
-import { permissions as userPermissions, permissionNames as userPermissionNames, type PermissionNumbers, type User } from "./user.js";
+import { Banphrase } from "./banphrase.ts";
+import { Filter } from "./filter.ts";
+import { type Channel, privateMessageChannelSymbol } from "./channel.ts";
+import { permissions as userPermissions, permissionNames as userPermissionNames, type PermissionNumbers, type User } from "./user.ts";
 
-import type { Platform, GetEmoteOptions } from "../platforms/template.js";
-import type { TwitchMessageData as TwitchAppendData } from "../platforms/twitch-utils.js";
-import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
+import type { Platform, GetEmoteOptions } from "../platforms/template.ts";
+import type { TwitchMessageData as TwitchAppendData } from "../platforms/twitch-utils.ts";
+import type { MessageData as DiscordAppendData } from "../platforms/discord.ts";
 
-import CooldownManager from "../utils/cooldown-manager.js";
-import { getDefinition as getLanguageDefinition, type LanguageDefinition } from "../utils/languages.js";
+import CooldownManager from "../utils/cooldown-manager.ts";
+import { getDefinition as getLanguageDefinition, type LanguageDefinition } from "../utils/languages.ts";
 
-import { whitespaceRegex } from "../utils/regexes.js";
-import type { Emote } from "../utils/globals.js";
-import { logger } from "../singletons/logger.js";
+import { whitespaceRegex } from "../utils/regexes.ts";
+import type { Emote } from "../utils/globals.ts";
+import { logger } from "../singletons/logger.ts";
 
 const { values: configValues, modules: modulesConfig, responses: configResponses } = getConfig();
 const COMMAND_PREFIX = modulesConfig.commands.prefix;

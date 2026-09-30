@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import type { OsrsSubcommandDefinition } from "../index.js";
-import { fetchWorldsData, type GameWorlds } from "./osrs-utils.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
+import { fetchWorldsData, type GameWorlds } from "./osrs-utils.ts";
 
 /**
  * Each star tier lasts 7 minutes flat after the latest update on 2023-10-25:

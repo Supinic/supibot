@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const searchSchema = z.tuple([ // For given search term:
 	z.string(), // searched term in lowercase

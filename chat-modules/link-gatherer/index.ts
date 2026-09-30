@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { defineChatModule } from "../../classes/chat-module.js";
-import { typeRegexGroups } from "../../utils/ts-helpers.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
+import { typeRegexGroups } from "../../utils/ts-helpers.ts";
 
 type SourceRow = {
 	ID: number;

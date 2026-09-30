@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import type { User } from "../../classes/user.js";
+import { declare } from "../../classes/command.ts";
+import type { User } from "../../classes/user.ts";
 
 const edgesShape = z.array(z.object({
 	followedAt: z.iso.datetime(),

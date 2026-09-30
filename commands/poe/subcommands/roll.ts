@@ -1,6 +1,6 @@
 import * as z from "zod";
 import rawPoe1Data from "./poe1.json" with { type: "json" };
-import type { PathOfExileSubcommandDefinition } from "../index.js";
+import type { PathOfExileSubcommandDefinition } from "../index.ts";
 
 const dataShape = z.object({
 	ascendancies: z.array(z.string()),

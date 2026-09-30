@@ -1,7 +1,7 @@
 import type * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import { SupiDate } from "supi-core";
-import { ivrUserDataSchema, twitchStreamSchema, twitchVodSchema } from "../../utils/schemas.js";
+import { ivrUserDataSchema, twitchStreamSchema, twitchVodSchema } from "../../utils/schemas.ts";
 
 type StreamData = z.infer<typeof twitchStreamSchema>["data"][number];
 type VodData = z.infer<typeof twitchVodSchema>["data"][number];

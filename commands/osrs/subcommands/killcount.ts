@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import type { OsrsSubcommandDefinition } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
 import {
 	fetchUserData,
 	parseUserIdentifier,
@@ -8,7 +8,7 @@ import {
 	isValidActivityAlias
 } from "./osrs-utils.js";
 
-import SetCommand from "../../set/subcommands/osrs-username.js";
+import SetCommand from "../../set/subcommands/osrs-username.ts";
 
 export default {
 	name: "kc",

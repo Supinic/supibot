@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import type { CheckSubcommandDefinition } from "../index.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
 
 const memoryUsageSchema = z.object({
 	data: z.object({

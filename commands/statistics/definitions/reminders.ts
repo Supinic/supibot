@@ -1,4 +1,4 @@
-import type { StatsSubcommandDefinition } from "../index.js";
+import type { StatsSubcommandDefinition } from "../index.ts";
 type Data = { regular: number; scheduled: number; };
 
 export default {

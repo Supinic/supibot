@@ -1,7 +1,7 @@
-import GiteaHandler from "./gitea.js";
-import GithubHandler from "./github.js";
-import GitlabHandler from "./gitlab.js";
-import type { GitProvider } from "./provider.js";
+import GiteaHandler from "./gitea.ts";
+import GithubHandler from "./github.ts";
+import GitlabHandler from "./gitlab.ts";
+import type { GitProvider } from "./provider.ts";
 import { SupiError } from "supi-core";
 
 const gitHandlers: GitProvider[] = [

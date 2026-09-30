@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import cryptoGamePriceUpdate from "./update-prices-cron.js";
+import cryptoGamePriceUpdate from "./update-prices-cron.ts";
 import {
 	availableCommands,
 	baseAsset,

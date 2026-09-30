@@ -1,4 +1,4 @@
-import type { User } from "../../classes/user.js";
+import type { User } from "../../classes/user.ts";
 
 const createCacheKey = (id: number) => `gpt-history-user-${id}`;
 

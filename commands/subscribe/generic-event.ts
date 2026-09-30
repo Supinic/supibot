@@ -1,10 +1,10 @@
 import * as z from "zod";
 import { Date as SupiDate, type Row } from "supi-core";
-import { parseRSS } from "../../utils/command-utils.js";
-import type { User } from "../../classes/user.js";
-import type { Channel } from "../../classes/channel.js";
-import type { Platform } from "../../platforms/template.js";
-import type { SubscribeCommandContext } from "./index.js";
+import { parseRSS } from "../../utils/command-utils.ts";
+import type { User } from "../../classes/user.ts";
+import type { Channel } from "../../classes/channel.ts";
+import type { Platform } from "../../platforms/template.ts";
+import type { SubscribeCommandContext } from "./index.ts";
 
 const DEFAULT_CHANNEL_ID = 38;
 export const rssEventDefinitionSchema = z.object({

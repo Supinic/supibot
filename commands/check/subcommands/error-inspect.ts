@@ -1,5 +1,5 @@
-import type { CheckSubcommandDefinition } from "../index.js";
-import { postToHastebin } from "../../../utils/command-utils.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
+import { postToHastebin } from "../../../utils/command-utils.ts";
 
 const createCacheKey = (type: string, id: number) => `error-${type}-stack-link-${id}`;
 

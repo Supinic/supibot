@@ -1,10 +1,10 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
 
-import type { Context, StrictResult } from "../../classes/command.js";
-import type { User } from "../../classes/user.js";
-import type { UserDataPropertyMap } from "../../classes/custom-data-properties.js";
-import { fetchGeoLocationData } from "../../utils/command-utils.js";
+import type { Context, StrictResult } from "../../classes/command.ts";
+import type { User } from "../../classes/user.ts";
+import type { UserDataPropertyMap } from "../../classes/custom-data-properties.ts";
+import { fetchGeoLocationData } from "../../utils/command-utils.ts";
 
 type GeoCacheData = { empty: true } | {
 	empty: false;

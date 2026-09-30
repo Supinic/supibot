@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { declare, type ContextPlatformSpecificData } from "../../classes/command.js";
-import type { TwitchMessageData } from "../../platforms/twitch-utils.js";
+import { declare, type ContextPlatformSpecificData } from "../../classes/command.ts";
+import type { TwitchMessageData } from "../../platforms/twitch-utils.ts";
 
 const platformHasMessageId = (input: ContextPlatformSpecificData): input is TwitchMessageData => {
 	if (!input) {

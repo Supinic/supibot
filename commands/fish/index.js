@@ -1,4 +1,4 @@
-import subcommands from "./subcommands/index.js";
+import subcommands from "./subcommands/index.ts";
 
 export default {
 	Name: "fish",

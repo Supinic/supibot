@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawCategoriesData from "./categories.json" with { type: "json" };
 
 const querySchema = z.object({

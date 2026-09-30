@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawForsenData from "./forsenE.json" with { type: "json" };
 
 let forsenData: string[] | undefined;

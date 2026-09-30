@@ -1,4 +1,4 @@
-import { COIN_EMOJI, getInitialStats, hasFishedBefore, itemTypes, itemTypeDefinitions } from "./fishing-utils.js";
+import { COIN_EMOJI, getInitialStats, hasFishedBefore, itemTypes, itemTypeDefinitions } from "./fishing-utils.ts";
 const defaultShowType = itemTypeDefinitions.find(i => i.name === "fish");
 
 export default {

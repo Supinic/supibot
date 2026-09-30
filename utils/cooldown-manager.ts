@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 const { values: configValues } = getConfig();
 
 type Identifier = string | number | symbol | null;

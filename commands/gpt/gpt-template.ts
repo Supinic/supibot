@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
 import config from "./config.json" with { type: "json" };
-import History from "./history-control.js";
-import type { GptContext } from "./index.js";
-import type { ModelData } from "./config-schema.js";
+import History from "./history-control.ts";
+import type { GptContext } from "./index.ts";
+import type { ModelData } from "./config-schema.ts";
 import { type GotResponse } from "supi-core";
 
 type ExecuteFailure = {

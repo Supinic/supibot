@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { getName } from "../../utils/languages.js";
-import { declare } from "../../classes/command.js";
+import { getName } from "../../utils/languages.ts";
+import { declare } from "../../classes/command.ts";
 import RAW_OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
 
 type CacheData = { statusCode: number; text: string | null; };

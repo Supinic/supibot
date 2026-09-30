@@ -1,5 +1,5 @@
-import type { OsrsSubcommandDefinition } from "../index.js";
-import { fetchItemId } from "./osrs-utils.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
+import { fetchItemId } from "./osrs-utils.ts";
 
 export default {
 	name: "itemid",

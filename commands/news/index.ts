@@ -1,8 +1,8 @@
 import { SupiError } from "supi-core";
-import * as Rss from "./rss.js";
-import { fetchGoogleNews } from "./google-news.js";
-import { declare } from "../../classes/command.js";
-import { newsParams } from "./news-helpers.js";
+import * as Rss from "./rss.ts";
+import { fetchGoogleNews } from "./google-news.ts";
+import { declare } from "../../classes/command.ts";
+import { newsParams } from "./news-helpers.ts";
 
 const newsCommandDefinition = declare({
 	Name: "news",

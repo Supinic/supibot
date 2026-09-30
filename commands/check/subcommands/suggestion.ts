@@ -1,6 +1,6 @@
 import { type SupiDate, SupiError } from "supi-core";
-import type { CheckSubcommandDefinition } from "../index.js";
-import type { User } from "../../../classes/user.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
+import type { User } from "../../../classes/user.ts";
 
 type SuggestionData = {
 	ID: number;

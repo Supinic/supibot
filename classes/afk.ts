@@ -1,13 +1,13 @@
 import * as z from "zod";
 import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
-import { TemplateWithId } from "./template.js";
+import { TemplateWithId } from "./template.ts";
 
-import Filter from "./filter.js";
-import User from "./user.js";
-import type Channel from "./channel.js";
+import Filter from "./filter.ts";
+import User from "./user.ts";
+import type Channel from "./channel.ts";
 
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 const { responses: configResponses } = getConfig();
 
 import rawAfkDefinitions from "./afk-definitions.json" with { type: "json" };

@@ -1,5 +1,5 @@
-import type { CheckSubcommandDefinition } from "../index.js";
-import { TWITCH_ANTIPING_CHARACTER } from "../../../utils/command-utils.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
+import { TWITCH_ANTIPING_CHARACTER } from "../../../utils/command-utils.ts";
 
 export default {
 	name: "ambassador",

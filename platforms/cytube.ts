@@ -2,12 +2,12 @@ import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 import { CytubeConnector, type EmoteObject, type UserObject, type QueueObject, type VideoObject } from "cytube-connector";
 
-import { Platform, type MirrorOptions } from "./template.js";
-import { BasePlatformConfigSchema } from "./schema.js";
-import type { Channel } from "../classes/channel.js";
-import type { User } from "../classes/user.js";
-import type { Emote } from "../utils/globals.js";
-import { logger } from "../singletons/logger.js";
+import { Platform, type MirrorOptions } from "./template.ts";
+import { BasePlatformConfigSchema } from "./schema.ts";
+import type { Channel } from "../classes/channel.ts";
+import type { User } from "../classes/user.ts";
+import type { Emote } from "../utils/globals.ts";
+import { logger } from "../singletons/logger.ts";
 
 type PlaylistObject = VideoObject | {
 	media: VideoObject["media"];

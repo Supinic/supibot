@@ -1,5 +1,5 @@
-import { randomInt } from "../../utils/command-utils.js";
-import type { Emote } from "../../utils/globals.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import type { Emote } from "../../utils/globals.ts";
 
 type Pattern = {
 	name: string;

@@ -5,12 +5,12 @@ import { Client as IrcClient } from "irc-framework";
 import type { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
-import { BasePlatformConfigSchema } from "./schema.js";
-import { Platform, type PrepareMessageOptions } from "./template.js";
-import { User } from "../classes/user.js";
-import { Channel, type Like as ChannelLike } from "../classes/channel.js";
-import { Command } from "../classes/command.js";
-import { logger } from "../singletons/logger.js";
+import { BasePlatformConfigSchema } from "./schema.ts";
+import { Platform, type PrepareMessageOptions } from "./template.ts";
+import { User } from "../classes/user.ts";
+import { Channel, type Like as ChannelLike } from "../classes/channel.ts";
+import { Command } from "../classes/command.ts";
+import { logger } from "../singletons/logger.ts";
 
 const DEFAULT_LOGGING_CONFIG = {
 	messages: true,

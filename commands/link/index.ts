@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import type { Platform } from "../../platforms/template.js";
+import { declare } from "../../classes/command.ts";
+import type { Platform } from "../../platforms/template.ts";
 
 type Verification = {
 	Platform_From: Platform["ID"];

@@ -1,13 +1,13 @@
 import { SupiDate, SupiError, type Batch } from "supi-core";
 import { CronJob } from "cron";
-import { getConfig } from "../config.js";
-import { typedEntries } from "../utils/ts-helpers.js";
+import { getConfig } from "../config.ts";
+import { typedEntries } from "../utils/ts-helpers.ts";
 
-import type { Command } from "../classes/command.js";
-import type { User } from "../classes/user.js";
-import type { Channel } from "../classes/channel.js";
-import type { Platform } from "../platforms/template.js";
-import type { JSONifiable } from "../utils/globals.js";
+import type { Command } from "../classes/command.ts";
+import type { User } from "../classes/user.ts";
+import type { Channel } from "../classes/channel.ts";
+import type { Platform } from "../platforms/template.ts";
+import type { JSONifiable } from "../utils/globals.ts";
 
 const { logging } = getConfig();
 const FALLBACK_WARN_LIMIT = 2500;

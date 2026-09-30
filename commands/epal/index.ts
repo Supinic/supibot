@@ -1,7 +1,7 @@
 import * as z from "zod";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-import { getConfig } from "../../config.js";
-import { declare } from "../../classes/command.js";
+import { getConfig } from "../../config.ts";
+import { declare } from "../../classes/command.ts";
 
 const profilesSchema = z.object({
 	content: z.object({

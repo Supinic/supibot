@@ -1,6 +1,6 @@
 import * as z from "zod";
 import rawWordList from "./words.json" with { type: "json" };
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const fullWordList = z.array(z.string()).parse(rawWordList);
 const MAXIMUM_WORD_AMOUNT = 50;

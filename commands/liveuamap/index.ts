@@ -1,5 +1,5 @@
-import { getName } from "../../utils/languages.js";
-import { declare } from "../../classes/command.js";
+import { getName } from "../../utils/languages.ts";
+import { declare } from "../../classes/command.ts";
 
 const BASE_CACHE_KEY = "liveuamap-data";
 const SUPPORTED_LANGUAGE_CODES = ["en", "ru", "uk", "pl"];

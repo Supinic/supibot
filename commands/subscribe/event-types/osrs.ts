@@ -1,7 +1,7 @@
 import * as z from "zod";
-import type { CustomEventDefinition } from "../generic-event.js";
+import type { CustomEventDefinition } from "../generic-event.ts";
 import { SupiError } from "supi-core";
-import { logger } from "../../../singletons/logger.js";
+import { logger } from "../../../singletons/logger.ts";
 
 const jagexRssSchema = z.object({
 	newsItems: z.array(z.object({

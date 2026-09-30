@@ -1,12 +1,12 @@
 import { SupiError } from "supi-core";
-import { TemplateWithId } from "./template.js";
+import { TemplateWithId } from "./template.ts";
 
-import { type Channel, isChannel, privateMessageChannelSymbol } from "./channel.js";
-import { User } from "./user.js";
-import type { Platform } from "../platforms/template.js";
-import type { Command } from "./command.js";
-import type { XOR } from "../utils/globals.js";
-import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.js";
+import { type Channel, isChannel, privateMessageChannelSymbol } from "./channel.ts";
+import { User } from "./user.ts";
+import type { Platform } from "../platforms/template.ts";
+import type { Command } from "./command.ts";
+import type { XOR } from "../utils/globals.ts";
+import { TWITCH_ANTIPING_CHARACTER } from "../utils/command-utils.ts";
 
 export type Type =
 	"Blacklist" | "Whitelist" | "Opt-out" | "Block" | "Unping" | "Unmention" |

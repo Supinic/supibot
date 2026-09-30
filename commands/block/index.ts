@@ -1,9 +1,9 @@
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
-import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
-import { Filter } from "../../classes/filter.js";
-import { type User } from "../../classes/user.js";
+import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.ts";
+import { Filter } from "../../classes/filter.ts";
+import { type User } from "../../classes/user.ts";
 
 type HasVerbOptions = { enableVerb: string; disableVerb: string; };
 const fillUsernameProperties = async <T extends HasVerbOptions> (options: T, blockedUserId: User["ID"] | null): Promise<T> => {

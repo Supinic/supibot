@@ -1,18 +1,18 @@
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 import http from "node:http";
 import https from "node:https";
 
-import AfkDefinition from "./afk.js";
-import ChannelDefinition from "./channel.js";
-import CommandDefinition from "./command.js";
-import FilterDefinition from "./filter.js";
-import HealthDefinition from "./health.js";
-import MetricsDefinition from "./metrics.js";
-import PlatformDefinition from "./platform.js";
-import ReminderDefinition from "./reminder.js";
-import UserDefinition from "./user.js";
+import AfkDefinition from "./afk.ts";
+import ChannelDefinition from "./channel.ts";
+import CommandDefinition from "./command.ts";
+import FilterDefinition from "./filter.ts";
+import HealthDefinition from "./health.ts";
+import MetricsDefinition from "./metrics.ts";
+import PlatformDefinition from "./platform.ts";
+import ReminderDefinition from "./reminder.ts";
+import UserDefinition from "./user.ts";
 
-import type { JSONifiable } from "../utils/globals.js";
+import type { JSONifiable } from "../utils/globals.ts";
 
 type ApiSuccess = {
 	statusCode: number;

@@ -11,8 +11,8 @@ import {
 	SEVEN_TV_DEFAULT_LIMIT,
 	sevenTvEmoteIdRegex
 } from "./index.js";
-import type { SevenTvSubcommandDefinition } from "../index.js";
-import type { TwitchMessageData } from "../../../platforms/twitch-utils.js";
+import type { SevenTvSubcommandDefinition } from "../index.ts";
+import type { TwitchMessageData } from "../../../platforms/twitch-utils.ts";
 
 export default {
 	name: "add",

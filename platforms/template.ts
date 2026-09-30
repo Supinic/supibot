@@ -1,24 +1,24 @@
 import type * as z from "zod";
 import { type Counter, SupiError } from "supi-core";
 
-import type { User } from "../classes/user.js";
-import { Channel, type Like as ChannelLike } from "../classes/channel.js";
-import { Banphrase } from "../classes/banphrase.js";
+import type { User } from "../classes/user.ts";
+import { Channel, type Like as ChannelLike } from "../classes/channel.ts";
+import { Banphrase } from "../classes/banphrase.ts";
 
-import { createMessageLoggingTable } from "../utils/create-db-table.js";
+import { createMessageLoggingTable } from "../utils/create-db-table.ts";
 
-import type { TwitchConfig, TwitchPlatform } from "./twitch.js";
-import type { DiscordConfig, DiscordPlatform } from "./discord.js";
-import type { CytubeConfig, CytubePlatform } from "./cytube.js";
-import type { IrcConfig, IrcPlatform } from "./irc.js";
-import type { NetConfig, NetPlatform } from "./net.js";
+import type { TwitchConfig, TwitchPlatform } from "./twitch.ts";
+import type { DiscordConfig, DiscordPlatform } from "./discord.ts";
+import type { CytubeConfig, CytubePlatform } from "./cytube.ts";
+import type { IrcConfig, IrcPlatform } from "./irc.ts";
+import type { NetConfig, NetPlatform } from "./net.ts";
 
-import type { UserDataPropertyMap } from "../classes/custom-data-properties.js";
-import type { Emote } from "../utils/globals.js";
+import type { UserDataPropertyMap } from "../classes/custom-data-properties.ts";
+import type { Emote } from "../utils/globals.ts";
 
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-import type { BasePlatformConfigSchema } from "./schema.js";
+import type { BasePlatformConfigSchema } from "./schema.ts";
 export type BaseConfig = z.infer<typeof BasePlatformConfigSchema>;
 
 export type Like = Platform | number | string;

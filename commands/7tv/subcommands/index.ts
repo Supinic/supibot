@@ -1,14 +1,14 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
-import type { Channel } from "../../../classes/channel.js";
-import type { SevenTvRotatingEmotesData } from "../../../classes/custom-data-properties.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
+import type { Channel } from "../../../classes/channel.ts";
+import type { SevenTvRotatingEmotesData } from "../../../classes/custom-data-properties.ts";
 
-import AddSubcommand from "./add.js";
-import CheckSubcommand from "./check.js";
-import LimitSubcommand from "./limit.js";
-import RemoveSubcommand from "./remove.js";
-import RewardSubcommand from "./reward.js";
+import AddSubcommand from "./add.ts";
+import CheckSubcommand from "./check.ts";
+import LimitSubcommand from "./limit.ts";
+import RemoveSubcommand from "./remove.ts";
+import RewardSubcommand from "./reward.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	AddSubcommand,

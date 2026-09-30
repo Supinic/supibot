@@ -1,6 +1,6 @@
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import { SupiDate, SupiError } from "supi-core";
-import { linkRegex } from "../../utils/regexes.js";
+import { linkRegex } from "../../utils/regexes.ts";
 
 const charToFlagEmoji = (char: string) => {
 	const charCode = char.codePointAt(0);

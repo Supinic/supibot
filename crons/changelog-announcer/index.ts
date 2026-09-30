@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { createRelayLink } from "../../utils/command-utils.js";
-import type { CronDefinition } from "../index.js";
+import { createRelayLink } from "../../utils/command-utils.ts";
+import type { CronDefinition } from "../index.ts";
 
 let isTableAvailable: boolean | undefined;
 let latestID: number | undefined;

@@ -1,12 +1,12 @@
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import { SupiDate, SupiError } from "supi-core";
 
-import { GptDeepInfra } from "../gpt/gpt-deepinfra.js";
+import { GptDeepInfra } from "../gpt/gpt-deepinfra.ts";
 import gptConfig from "../gpt/config.json" with { type: "json" };
 
-import { check as checkModeration } from "../gpt/moderation.js";
-import type { GptContext } from "../gpt/index.js";
-import type { ModelData } from "../gpt/config-schema.js";
+import { check as checkModeration } from "../gpt/moderation.ts";
+import type { GptContext } from "../gpt/index.ts";
+import type { ModelData } from "../gpt/config-schema.ts";
 
 const { models } = gptConfig;
 const summaryModel = models.maverick as ModelData;

@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { FormulaOneSubcommandDefinition } from "../index.js";
+import type { FormulaOneSubcommandDefinition } from "../index.ts";
 import {
 	fetchRace,
 	fetchNextRaceDetail,

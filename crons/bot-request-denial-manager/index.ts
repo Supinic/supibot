@@ -1,4 +1,4 @@
-import type { CronDefinition } from "../index.js";
+import type { CronDefinition } from "../index.ts";
 
 let isTableAvailable: boolean | undefined;
 const trackedRequestIDs = new Set<number>();

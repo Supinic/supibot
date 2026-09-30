@@ -2,10 +2,10 @@ import { setTimeout as wait } from "node:timers/promises";
 import * as z from "zod";
 import { SupiDate } from "supi-core";
 
-import type { CronDefinition } from "../index.js";
-import { postToHastebin } from "../../utils/command-utils.js";
-import subscriptionDefinition from "../../commands/subscribe/event-types/global-twitch-emotes.js";
-import type { Channel } from "../../classes/channel.js";
+import type { CronDefinition } from "../index.ts";
+import { postToHastebin } from "../../utils/command-utils.ts";
+import subscriptionDefinition from "../../commands/subscribe/event-types/global-twitch-emotes.ts";
+import type { Channel } from "../../classes/channel.ts";
 
 const emoteSchema = z.object({
 	data: z.array(z.object({

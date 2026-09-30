@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import type { DoesNotExistSubcommandDefinition } from "../index.js";
-import { uploadFile } from "../../../utils/command-utils.js";
+import type { DoesNotExistSubcommandDefinition } from "../index.ts";
+import { uploadFile } from "../../../utils/command-utils.ts";
 
 type PersonDoesNotExistResponse = {
 	src: string;

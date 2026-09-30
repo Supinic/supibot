@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { ivrUserDataSchema } from "../../utils/schemas.js";
+import { declare } from "../../classes/command.ts";
+import { ivrUserDataSchema } from "../../utils/schemas.ts";
 
 export default declare({
 	Name: "accountage",
