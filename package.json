@@ -15,9 +15,9 @@
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.6.1",
-    "vm2": "^3.11.7",
+    "vm2": "^3.12.2",
     "ws": "^8.21.3",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "engines": {
     "node": ">= 24.0"
@@ -44,19 +44,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "eslint": "^10.9.1",
-    "eslint-plugin-unicorn": "^73.0.0",
-    "globals": "^17.11.0",
+    "eslint": "^10.11.0",
+    "eslint-plugin-unicorn": "^76.0.0",
+    "globals": "^17.12.0",
     "supi-db-init": "supinic/supi-db-init",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.68.0"
-  },
-  "nyc": {
-    "all": false,
-    "reporter": [
-      "text",
-      "html"
-    ]
+    "typescript-eslint": "^8.70.1"
   },
   "packageManager": "yarn@4.18.0"
 }
