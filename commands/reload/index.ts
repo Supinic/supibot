@@ -61,8 +61,8 @@ export default declare({
 				await context.sendIntermediateMessage(`${loadEmote} git pull ${loadEmote}`);
 				await shell("git pull");
 
-				await context.sendIntermediateMessage(`${loadEmote} yarn build ${loadEmote}`);
-				await shell("yarn build");
+				await context.sendIntermediateMessage(`${loadEmote} yarn typecheck ${loadEmote}`);
+				await shell("yarn typecheck");
 
 				const failures: string[] = [];
 				const definitions: CommandDefinition[] = [];
