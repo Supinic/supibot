@@ -1,5 +1,5 @@
-import type { CronDefinition } from "../index.js";
-import { twitchVodSchema } from "../../utils/schemas.js";
+import type { CronDefinition } from "../index.ts";
+import { twitchVodSchema } from "../../utils/schemas.ts";
 import { SupiDate } from "supi-core";
 
 export default {

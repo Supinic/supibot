@@ -1,9 +1,9 @@
 import { it, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert";
 
-import * as Logic from "../../../commands/cookie/cookie-logic.js";
-import { TestWorld } from "../../test-utils.js";
-import { isResultFailure } from "../../../classes/command.js";
+import * as Logic from "../../../commands/cookie/cookie-logic.ts";
+import { TestWorld } from "../../test-utils.ts";
+import { isResultFailure } from "../../../classes/command.ts";
 
 // Allow proper simple object cloning when `structuredClone` is not available, e.g. in workers or in GitHub CI
 globalThis.structuredClone ??= (input) => JSON.parse(JSON.stringify(input));

@@ -1,8 +1,8 @@
 import { SupiError } from "supi-core";
 import * as z from "zod";
 
-import type { Context } from "../../../classes/command.js";
-import { typedEntries, typedKeys } from "../../../utils/ts-helpers.js";
+import type { Context } from "../../../classes/command.ts";
+import { typedEntries, typedKeys } from "../../../utils/ts-helpers.ts";
 
 const PLATFORMS = {
 	br: ["br", "bra", "brasil", "brazil"],

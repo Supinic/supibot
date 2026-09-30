@@ -1,5 +1,5 @@
-import type { DoesNotExistSubcommandDefinition } from "../index.js";
-import { randomInt } from "../../../utils/command-utils.js";
+import type { DoesNotExistSubcommandDefinition } from "../index.ts";
+import { randomInt } from "../../../utils/command-utils.ts";
 
 export default {
 	name: "fursona",

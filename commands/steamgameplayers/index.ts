@@ -2,7 +2,7 @@ import { CronJob } from "cron";
 import { SupiDate, SupiError } from "supi-core";
 import * as z from "zod";
 
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const steamAppSchema = z.object({
 	response: z.object({

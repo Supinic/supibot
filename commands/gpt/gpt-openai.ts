@@ -6,10 +6,10 @@ import {
 	getUserHash,
 	globalSystemPrompts,
 	type GptTemplate
-} from "./gpt-template.js";
-import GptHistory from "./history-control.js";
-import type { GptContext } from "./index.js";
-import type { ModelData } from "./config-schema.js";
+} from "./gpt-template.ts";
+import GptHistory from "./history-control.ts";
+import type { GptContext } from "./index.ts";
+import type { ModelData } from "./config-schema.ts";
 
 const openAiChatResponseSchema = z.object({
 	object: z.literal("chat.completion"),

@@ -5,7 +5,7 @@ import {
 	type Like as PlatformLike,
 	type GenericSendOptions,
 	type PrepareMessageOptions
-} from "../platforms/template.js";
+} from "../platforms/template.ts";
 
 import {
 	type ChannelDataProperty,
@@ -14,12 +14,12 @@ import {
 	fetchChannelDataProperty,
 	isCachedChannelProperty,
 	saveChannelDataProperty
-} from "./custom-data-properties.js";
+} from "./custom-data-properties.ts";
 
-import type { User } from "./user.js";
-import { createMessageLoggingTable } from "../utils/create-db-table.js";
-import { TemplateWithId } from "./template.js";
-import type { Emote } from "../utils/globals.js";
+import type { User } from "./user.ts";
+import { createMessageLoggingTable } from "../utils/create-db-table.ts";
+import { TemplateWithId } from "./template.ts";
+import type { Emote } from "../utils/globals.ts";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 

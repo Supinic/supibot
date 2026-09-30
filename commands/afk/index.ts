@@ -1,6 +1,6 @@
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { afkDefinitions } from "../../classes/afk.js";
+import { declare } from "../../classes/command.ts";
+import { afkDefinitions } from "../../classes/afk.ts";
 
 const { invocations, specialSuffixes } = afkDefinitions;
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;

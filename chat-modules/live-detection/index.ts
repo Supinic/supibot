@@ -1,7 +1,7 @@
-import { CHANNEL_LIVE_SUBSCRIPTION_TITLE } from "../../commands/subscribe/event-types/channel-live.js";
-import { defineChatModule } from "../../classes/chat-module.js";
-import type { User } from "../../classes/user.js";
-import type { Platform } from "../../platforms/template.js";
+import { CHANNEL_LIVE_SUBSCRIPTION_TITLE } from "../../commands/subscribe/event-types/channel-live.ts";
+import { defineChatModule } from "../../classes/chat-module.ts";
+import type { User } from "../../classes/user.ts";
+import type { Platform } from "../../platforms/template.ts";
 
 type SubData = {
 	userId: User["ID"];

@@ -1,5 +1,5 @@
-import { getConfig } from "../../config.js";
-import { declare, type Result as CommandResult } from "../../classes/command.js";
+import { getConfig } from "../../config.ts";
+import { declare, type Result as CommandResult } from "../../classes/command.ts";
 const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
 
 // matches | and > characters if and only if they're not preceded, nor followed by another | or >.

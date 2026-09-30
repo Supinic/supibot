@@ -1,5 +1,5 @@
-import { Owm3WeatherProvider, Owm4WeatherProvider } from "./owm.js";
-import { OpenMeteoProvider } from "./open-meteo.js";
+import { Owm3WeatherProvider, Owm4WeatherProvider } from "./owm.ts";
+import { OpenMeteoProvider } from "./open-meteo.ts";
 
 export const openMeteoWeatherProvider = new OpenMeteoProvider();
 

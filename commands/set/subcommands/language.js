@@ -1,4 +1,4 @@
-import { getCode, getName } from "../../../utils/languages.js";
+import { getCode, getName } from "../../../utils/languages.ts";
 
 export default {
 	name: "language",

@@ -1,7 +1,7 @@
-import { declare } from "../../classes/command.js";
-import type { Channel } from "../../classes/channel.js";
+import { declare } from "../../classes/command.ts";
+import type { Channel } from "../../classes/channel.ts";
 import type { SupiDate } from "supi-core";
-import type { User } from "../../classes/user.js";
+import type { User } from "../../classes/user.ts";
 
 type MetaRow = {
 	User_Alias: User["ID"];

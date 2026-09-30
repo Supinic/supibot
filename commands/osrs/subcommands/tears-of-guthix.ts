@@ -1,5 +1,5 @@
-import type { OsrsSubcommandDefinition } from "../index.js";
-import { fetchWorldsData } from "./osrs-utils.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
+import { fetchWorldsData } from "./osrs-utils.ts";
 
 type WorldTearsData = {
 	world_number: number;

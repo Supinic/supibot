@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { afkStatuses } from "../../../classes/afk.js";
-import type { StatsSubcommandDefinition } from "../index.js";
+import { afkStatuses } from "../../../classes/afk.ts";
+import type { StatsSubcommandDefinition } from "../index.ts";
 
 export const AfkStatistic = {
 	name: "afk",

@@ -1,7 +1,7 @@
 import { SupiError } from "supi-core";
-import type { GptContext } from "./index.js";
-import { typedEntries } from "../../utils/ts-helpers.js";
-import { logger } from "../../singletons/logger.js";
+import type { GptContext } from "./index.ts";
+import { typedEntries } from "../../utils/ts-helpers.ts";
+import { logger } from "../../singletons/logger.ts";
 
 type ModerationCategory =
 	| "harrassment" | "harrassment/threatening"

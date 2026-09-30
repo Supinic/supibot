@@ -1,8 +1,8 @@
 import { type SupiDate, SupiError } from "supi-core";
-import { randomInt } from "../../utils/command-utils.js";
-import type { User } from "../../classes/user.js";
-import type { Channel } from "../../classes/channel.js";
-import type { ResultFailure } from "../../classes/command.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import type { User } from "../../classes/user.ts";
+import type { Channel } from "../../classes/channel.ts";
+import type { ResultFailure } from "../../classes/command.ts";
 
 type RandomLine = {
 	success: true,

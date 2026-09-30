@@ -8,7 +8,7 @@ export default tseslint.config(
 	eslintJs.configs.recommended,
 	tseslint.configs.strictTypeChecked,
 	{
-		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
+		ignores: [".db/", ".yarn/", "coverage/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs", "tests/**"]
 	},
 	{
 		plugins: {

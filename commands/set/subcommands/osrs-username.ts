@@ -1,5 +1,5 @@
-import type User from "../../../classes/user.js";
-import { OSRS_GAME_USERNAME_KEY, fetchUserData } from "../../osrs/subcommands/osrs-utils.js";
+import type User from "../../../classes/user.ts";
+import { OSRS_GAME_USERNAME_KEY, fetchUserData } from "../../osrs/subcommands/osrs-utils.ts";
 
 // @todo Import from Command when done in Typescript
 type Context = {

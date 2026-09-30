@@ -1,8 +1,8 @@
 import { SupiDate, SupiError } from "supi-core";
 
-import { postToHastebin } from "../../../utils/command-utils.js";
-import { getLinkParser } from "../../../utils/link-parser.js";
-import type { BadAppleSubcommandDefinition, BadAppleRow } from "../index.js";
+import { postToHastebin } from "../../../utils/command-utils.ts";
+import { getLinkParser } from "../../../utils/link-parser.ts";
+import type { BadAppleSubcommandDefinition, BadAppleRow } from "../index.ts";
 
 export default {
 	name: "check",

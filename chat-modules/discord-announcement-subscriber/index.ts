@@ -1,7 +1,7 @@
 import * as z from "zod";
-import { postToHastebin } from "../../utils/command-utils.js";
-import { handleEventSubscription } from "../../commands/subscribe/generic-event.js";
-import { defineChatModule } from "../../classes/chat-module.js";
+import { postToHastebin } from "../../utils/command-utils.ts";
+import { handleEventSubscription } from "../../commands/subscribe/generic-event.ts";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 const prepareMessage = (message: string): string => (
 	message

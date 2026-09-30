@@ -1,13 +1,13 @@
 import { SupiDate } from "supi-core";
 
-import { type MobaSubcommandDefinition } from "../index.js";
+import { type MobaSubcommandDefinition } from "../index.ts";
 import {
 	parseUserIdentifier,
 	getQueueDescription,
 	getLiveMatchData,
 	getChampionData,
 	getChampionName
-} from "./utils.js";
+} from "./utils.ts";
 
 export default {
 	name: "liveGame",

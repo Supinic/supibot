@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.ts";
 
 export default declare({
 	Name: "chatneighbour",

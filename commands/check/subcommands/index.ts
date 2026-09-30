@@ -1,19 +1,19 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
-import AfkSubcommand from "./afk.js";
-import AmbassadorSubcommand from "./ambassador.js";
-import ChangelogSubcommand from "./changelog.js";
-import ChatGptSubcommand from "./chat-gpt.js";
-import CookieSubcommand from "./cookie.js";
-import DeeplSubcommand from "./deepl.js";
-import ErrorInspectSubcommand from "./error-inspect.js";
-import LocationSubcommand from "./location.js";
-import LogsSubcommand from "./logs.js";
-import MariadbSubcommand from "./mariadb.js";
-import ReminderSubcommand from "./reminder.js";
-import SlotsSubcommand from "./slots.js";
-import SubscriptionSubcommand from "./subscription.js";
-import SuggestionSubcommand from "./suggestion.js";
+import AfkSubcommand from "./afk.ts";
+import AmbassadorSubcommand from "./ambassador.ts";
+import ChangelogSubcommand from "./changelog.ts";
+import ChatGptSubcommand from "./chat-gpt.ts";
+import CookieSubcommand from "./cookie.ts";
+import DeeplSubcommand from "./deepl.ts";
+import ErrorInspectSubcommand from "./error-inspect.ts";
+import LocationSubcommand from "./location.ts";
+import LogsSubcommand from "./logs.ts";
+import MariadbSubcommand from "./mariadb.ts";
+import ReminderSubcommand from "./reminder.ts";
+import SlotsSubcommand from "./slots.ts";
+import SubscriptionSubcommand from "./subscription.ts";
+import SuggestionSubcommand from "./suggestion.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	AfkSubcommand,

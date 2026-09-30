@@ -1,9 +1,9 @@
 import { SupiError } from "supi-core";
-import { logger } from "../singletons/logger.js";
+import { logger } from "../singletons/logger.ts";
 
-import type { TwitchPlatform } from "./twitch.js";
-import type { User } from "../classes/user.js";
-import type { Channel } from "../classes/channel.js";
+import type { TwitchPlatform } from "./twitch.ts";
+import type { User } from "../classes/user.ts";
+import type { Channel } from "../classes/channel.ts";
 
 const { env } = process;
 

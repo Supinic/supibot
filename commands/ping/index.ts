@@ -3,9 +3,9 @@ import { promisify } from "node:util";
 import { platform } from "node:os";
 import { SupiDate } from "supi-core";
 
-import { randomInt } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
-import type { TwitchPlatform } from "../../platforms/twitch.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
+import type { TwitchPlatform } from "../../platforms/twitch.ts";
 
 const shell = promisify(exec);
 const checkLatency = async (callback: () => Promise<unknown>) => {

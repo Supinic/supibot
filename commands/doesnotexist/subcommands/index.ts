@@ -1,14 +1,14 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
-import AnimeDneSubcommand from "./anime.js";
-import AutombileDneSubcommand from "./automobile.js";
-import FuckedUpHomerDneSubcommand from "./fucked-up-homer.js";
-import FursonaDneSubcommand from "./fursona.js";
-import MpDneSubcommand from "./member-of-parliament.js";
-import PersonDneSubcommand from "./person.js";
-import WaifuDneSubcommand from "./waifu.js";
-import WojakDneSubcommand from "./wojak.js";
-import WordDneSubcommand from "./word.js";
+import AnimeDneSubcommand from "./anime.ts";
+import AutombileDneSubcommand from "./automobile.ts";
+import FuckedUpHomerDneSubcommand from "./fucked-up-homer.ts";
+import FursonaDneSubcommand from "./fursona.ts";
+import MpDneSubcommand from "./member-of-parliament.ts";
+import PersonDneSubcommand from "./person.ts";
+import WaifuDneSubcommand from "./waifu.ts";
+import WojakDneSubcommand from "./wojak.ts";
+import WordDneSubcommand from "./word.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	AnimeDneSubcommand,

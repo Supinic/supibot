@@ -1,7 +1,7 @@
 import * as z from "zod";
-import { getCode } from "../../utils/languages.js";
-import { declare } from "../../classes/command.js";
-import { getConfig } from "../../config.js";
+import { getCode } from "../../utils/languages.ts";
+import { declare } from "../../classes/command.ts";
+import { getConfig } from "../../config.ts";
 import rawLocales from "./tts-locales.json" with { type: "json" };
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 

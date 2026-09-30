@@ -1,6 +1,6 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
-import { createRelayLink } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { createRelayLink } from "../../utils/command-utils.ts";
 
 const authorShape = z.object({
 	id: z.number(),

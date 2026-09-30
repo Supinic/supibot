@@ -1,12 +1,12 @@
 import { SupiDate } from "supi-core";
-import type { FormulaOneSubcommandDefinition } from "../index.js";
+import type { FormulaOneSubcommandDefinition } from "../index.ts";
 import {
 	fetchRace,
 	fetchNextRaceDetail,
 	fetchQualifyingResults,
 	fetchRaceResults,
 	getHighlights
-} from "../f1-api.js";
+} from "../f1-api.ts";
 
 export default {
 	name: "race",

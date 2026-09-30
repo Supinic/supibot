@@ -1,4 +1,4 @@
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import type { SupiDate } from "supi-core";
 
 export default declare({

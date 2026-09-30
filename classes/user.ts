@@ -1,7 +1,7 @@
 import { SupiDate, SupiError, type Batch, type Row } from "supi-core";
-import { TemplateWithIdString } from "./template.js";
+import { TemplateWithIdString } from "./template.ts";
 
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 const { userAdditionCriticalLoadThreshold, userAdditionHighLoadThreshold } = getConfig().values;
 
 import {
@@ -11,7 +11,7 @@ import {
 	fetchUserDataProperty,
 	isCachedUserProperty,
 	saveUserDataProperty
-} from "./custom-data-properties.js";
+} from "./custom-data-properties.ts";
 
 type ConstructorData = {
 	ID: User["ID"];

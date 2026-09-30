@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { transliterate as executeGenericTransliteration } from "transliteration";
-import { declare, isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.js";
+import { declare, isResultFailure, type ResultFailure, type StrictResult } from "../../classes/command.ts";
 
 const nakdanSchema = z.object({
 	data: z.array(z.object({

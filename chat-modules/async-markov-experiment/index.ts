@@ -1,6 +1,6 @@
 import AsyncMarkov from "async-markov";
-import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
-import { defineChatModule } from "../../classes/chat-module.js";
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.ts";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 // only allows messages consisting of just emojis, or ASCII 32-126 characters (0x20-0x7E)
 const allowRegex = /^[\p{Emoji}\u0020-\u007E]+$/ui;

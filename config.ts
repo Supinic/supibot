@@ -2,7 +2,7 @@ import type * as z from "zod";
 import { readFile } from "node:fs/promises";
 
 const raw = await readFile("./config.json");
-import { ConfigSchema } from "./utils/config-validation-schema.js";
+import { ConfigSchema } from "./utils/config-validation-schema.ts";
 
 type Config = z.infer<typeof ConfigSchema>;
 

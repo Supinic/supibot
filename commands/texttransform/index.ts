@@ -1,5 +1,5 @@
-import transforms from "./transforms.js";
-import { declare } from "../../classes/command.js";
+import transforms from "./transforms.ts";
+import { declare } from "../../classes/command.ts";
 import { SupiError } from "supi-core";
 const sortedDefinitions = transforms.definitions.toSorted((a, b) => a.name.localeCompare(b.name));
 

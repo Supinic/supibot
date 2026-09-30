@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CronDefinition } from "../index.js";
+import type { CronDefinition } from "../index.ts";
 
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 const sanitize = (string: string) => string.replaceAll(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));

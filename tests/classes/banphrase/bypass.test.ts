@@ -1,7 +1,7 @@
 import * as assert from "node:assert";
 import { describe, it, beforeEach, afterEach, mock } from "node:test";
-import { Command, type ParameterType } from "../../../classes/command.js";
-import { Banphrase } from "../../../classes/banphrase.js";
+import { Command, type ParameterType } from "../../../classes/command.ts";
+import { Banphrase } from "../../../classes/banphrase.ts";
 
 describe("Whitespace bypass checking", async () => {
 	const banphrase = new Banphrase({

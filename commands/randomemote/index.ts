@@ -1,6 +1,6 @@
-import { randomInt } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
-import { RESULT_CHARACTER_LIMIT } from "../pipe/index.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
+import { RESULT_CHARACTER_LIMIT } from "../pipe/index.ts";
 
 const MAXIMUM_EMOTE_LIMIT = 200;
 const match = (flag: boolean | undefined, condition: boolean) => (flag === undefined || condition === flag);

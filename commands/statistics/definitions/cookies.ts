@@ -1,5 +1,5 @@
-import type { StatsSubcommandDefinition } from "../index.js";
-import type { Context } from "../../../classes/command.js";
+import type { StatsSubcommandDefinition } from "../index.ts";
+import type { Context } from "../../../classes/command.ts";
 
 export const getUserCookieCountStatistics = async (context: Context, user?: string) => {
 	const targetUser = (user) ? await sb.User.get(user) : context.user;

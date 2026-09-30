@@ -2,9 +2,9 @@ import { it, describe, beforeEach, mock, afterEach } from "node:test";
 import assert from "node:assert/strict";
 
 import type { SupiDate } from "supi-core";
-import { type User, permissions as userPermissions } from "../../../classes/user.js";
-import { Command, type Context, type ContextData } from "../../../classes/command.js";
-import type { Channel } from "../../../classes/channel.js";
+import { type User, permissions as userPermissions } from "../../../classes/user.ts";
+import { Command, type Context, type ContextData } from "../../../classes/command.ts";
+import type { Channel } from "../../../classes/channel.ts";
 
 import {
 	createTestPlatform,
@@ -14,7 +14,7 @@ import {
 	expectCommandResultFailure,
 	expectCommandResultSuccess,
 	TestWorld
-} from "../../test-utils.js";
+} from "../../test-utils.ts";
 
 const EXISTING_COMMANDS = ["EXISTING_COMMAND"];
 
@@ -47,8 +47,8 @@ describe("$alias", async () => {
 
 	const world = new TestWorld();
 
-	const realAliasUtils = await import("../../../commands/alias/alias-utils.js");
-	mock.module("../../../commands/alias/alias-utils.js", {
+	const realAliasUtils = await import("../../../commands/alias/alias-utils.ts");
+	mock.module("../../../commands/alias/alias-utils.ts", {
 		namedExports: {
 			...realAliasUtils,
 			getAliasByNameAndUser: (aliasName: string, userId: number) => {
@@ -100,7 +100,7 @@ describe("$alias", async () => {
 		}
 	});
 
-	const aliasCommandDefinition = (await import("../../../commands/alias/index.js")).default;
+	const aliasCommandDefinition = (await import("../../../commands/alias/index.ts")).default;
 
 	const BASE_USERNAME = "test_user";
 	const BASE_USER_ID = 1337;

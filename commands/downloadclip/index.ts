@@ -1,6 +1,6 @@
-import { declare } from "../../classes/command.js";
-import { getPathFromURL } from "../../utils/command-utils.js";
-import { ivrClipSchema } from "../../utils/schemas.js";
+import { declare } from "../../classes/command.ts";
+import { getPathFromURL } from "../../utils/command-utils.ts";
+import { ivrClipSchema } from "../../utils/schemas.ts";
 
 export default declare({
 	Name: "downloadclip",

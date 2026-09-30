@@ -1,6 +1,6 @@
 import * as z from "zod";
-import type { OsrsSubcommandDefinition } from "../index.js";
-import { fetchItemId } from "./osrs-utils.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
+import { fetchItemId } from "./osrs-utils.ts";
 
 const formatPrice = (price: number) => {
 	if (price < 1000) {

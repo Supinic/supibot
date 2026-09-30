@@ -2,10 +2,10 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { randomBytes } from "node:crypto";
 import { exec } from "node:child_process";
-import { declare, type CommandDefinition } from "../../classes/command.js";
+import { declare, type CommandDefinition } from "../../classes/command.ts";
 const shell = promisify(exec);
 
-import { getConfig } from "../../config.js";
+import { getConfig } from "../../config.ts";
 const BASE_PATH = getConfig().basePath;
 
 export default declare({
@@ -61,8 +61,8 @@ export default declare({
 				await context.sendIntermediateMessage(`${loadEmote} git pull ${loadEmote}`);
 				await shell("git pull");
 
-				await context.sendIntermediateMessage(`${loadEmote} yarn build ${loadEmote}`);
-				await shell("yarn build");
+				await context.sendIntermediateMessage(`${loadEmote} yarn typecheck ${loadEmote}`);
+				await shell("yarn typecheck");
 
 				const failures: string[] = [];
 				const definitions: CommandDefinition[] = [];

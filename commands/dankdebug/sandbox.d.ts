@@ -1,9 +1,9 @@
-import type { JSONifiable, Emote } from "../../utils/globals.js"
-import type { Command, ParameterType } from "../../classes/command.js"
-import type { Channel } from "../../classes/channel.js"
-import type { User, permissions as Permissions } from "../../classes/user.js"
+import type { JSONifiable, Emote } from "../../utils/globals.ts"
+import type { Command, ParameterType } from "../../classes/command.ts"
+import type { Channel } from "../../classes/channel.ts"
+import type { User, permissions as Permissions } from "../../classes/user.ts"
 
-import type { Platform } from "../../platforms/template.js"
+import type { Platform } from "../../platforms/template.ts"
 
 import type { Utils } from "supi-core";
 

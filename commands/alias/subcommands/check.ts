@@ -1,8 +1,8 @@
-import { type AliasSubcommandDefinition } from "../index.js";
-import { prefix } from "../../../utils/command-utils.js";
+import { type AliasSubcommandDefinition } from "../index.ts";
+import { prefix } from "../../../utils/command-utils.ts";
 
-import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser, parseAliasArguments } from "../alias-utils.js";
-import { type User } from "../../../classes/user.js";
+import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser, parseAliasArguments } from "../alias-utils.ts";
+import { type User } from "../../../classes/user.ts";
 
 export default {
 	name: "check",

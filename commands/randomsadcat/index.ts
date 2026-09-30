@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawSadCats from "./sad-cat.json" with { type: "json" };
 
 const sadCats = z.array(z.string()).parse(rawSadCats);

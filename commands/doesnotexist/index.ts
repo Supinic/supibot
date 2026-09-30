@@ -1,5 +1,5 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import { DoesNotExistSubcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import { DoesNotExistSubcommands } from "./subcommands/index.ts";
 
 export type DoesNotExistSubcommandDefinition = SubcommandDefinition<typeof doesNotExistCommandDefinition>;
 

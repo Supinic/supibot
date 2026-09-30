@@ -1,5 +1,5 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import { OsrsSubcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import { OsrsSubcommands } from "./subcommands/index.ts";
 
 import gameData from "./subcommands/game-data.json" with { type: "json" };
 const { activities, activityAliases, skills } = gameData;

@@ -1,6 +1,6 @@
-import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
-import type { User } from "../../classes/user.js";
+import { TWITCH_ANTIPING_CHARACTER } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
+import type { User } from "../../classes/user.ts";
 
 type AliasData = {
 	ID: number;

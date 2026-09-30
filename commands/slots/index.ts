@@ -1,5 +1,5 @@
-import { slotCommandPatterns } from "./definitions.js";
-import { declare } from "../../classes/command.js";
+import { slotCommandPatterns } from "./definitions.ts";
+import { declare } from "../../classes/command.ts";
 const leaderboardKeywords = ["leader", "leaders", "leaderboard", "winners"];
 
 const ROLLED_ITEMS = 3;

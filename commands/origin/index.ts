@@ -1,6 +1,6 @@
 import type { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { createRelayLink } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { createRelayLink } from "../../utils/command-utils.ts";
 
 type EmoteData = {
 	ID: string;

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
-import type { ResultFailure } from "../../classes/command.js";
+import type { ResultFailure } from "../../classes/command.ts";
 
 type RandomLine = {
 	success: true,
@@ -9,7 +9,7 @@ type RandomLine = {
 	date: SupiDate;
 };
 
-import { getConfig } from "../../config.js";
+import { getConfig } from "../../config.ts";
 const { instances } = getConfig().rustlog;
 
 const instanceNames = Object.keys(instances);

@@ -1,4 +1,4 @@
-import type { CustomEventDefinition } from "../generic-event.js";
+import type { CustomEventDefinition } from "../generic-event.ts";
 
 import cacheKeys from "../../../utils/shared-cache-keys.json" with { type: "json" };
 import { SupiDate } from "supi-core";

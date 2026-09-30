@@ -1,14 +1,14 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
-import ItemIdSubcommand from "./item-id.js";
-import KillcountSubcommand from "./killcount.js";
-import PlayerCountSubcommand from "./playercount.js";
-import PriceSubcommand from "./price.js";
-import StarsSubcommand from "./stars.js";
-import StatsSubcommand from "./stats.js";
-import StatusSubcommand from "./status.js";
-import TearsOfGuthixSubcommand from "./tears-of-guthix.js";
-import WikiSubcommand from "./wiki.js";
+import ItemIdSubcommand from "./item-id.ts";
+import KillcountSubcommand from "./killcount.ts";
+import PlayerCountSubcommand from "./playercount.ts";
+import PriceSubcommand from "./price.ts";
+import StarsSubcommand from "./stars.ts";
+import StatsSubcommand from "./stats.ts";
+import StatusSubcommand from "./status.ts";
+import TearsOfGuthixSubcommand from "./tears-of-guthix.ts";
+import WikiSubcommand from "./wiki.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	ItemIdSubcommand,

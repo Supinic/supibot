@@ -1,6 +1,6 @@
-import { declare } from "../../classes/command.js";
-import { getTwitchGameID } from "../../utils/command-utils.js";
-import { twitchStreamSchema } from "../../utils/schemas.js";
+import { declare } from "../../classes/command.ts";
+import { getTwitchGameID } from "../../utils/command-utils.ts";
+import { twitchStreamSchema } from "../../utils/schemas.ts";
 
 export default declare({
 	Name: "topstreams",

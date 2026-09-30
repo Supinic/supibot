@@ -1,9 +1,9 @@
 import { SupiDate } from "supi-core";
-import { randomInt } from "../../utils/command-utils.js";
+import { randomInt } from "../../utils/command-utils.ts";
 import fortuneCookieData from "./fortune-cookies.json" with { type: "json" };
-import type { UserDataPropertyMap } from "../../classes/custom-data-properties.js";
-import type { ResultFailure } from "../../classes/command.js";
-import type { User } from "../../classes/user.js";
+import type { UserDataPropertyMap } from "../../classes/custom-data-properties.ts";
+import type { ResultFailure } from "../../classes/command.ts";
+import type { User } from "../../classes/user.ts";
 
 type CookieData = NonNullable<UserDataPropertyMap["cookie"]>;
 type UserOptions = {

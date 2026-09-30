@@ -1,10 +1,10 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 const shell = promisify(exec);
 
-import { getConfig } from "../../config.js";
-import { hasKey } from "../../utils/ts-helpers.js";
+import { getConfig } from "../../config.ts";
+import { hasKey } from "../../utils/ts-helpers.ts";
 const { basePath } = getConfig();
 
 const restartMethods = {
@@ -19,9 +19,9 @@ const restartMethods = {
 		message: "yarn",
 		commands: ["COREPACK_ENABLE_DOWNLOAD_PROMPT=0 yarn"]
 	},
-	build: {
-		message: "yarn build",
-		commands: ["yarn build"]
+	check: {
+		message: "yarn typecheck",
+		commands: ["yarn typecheck"]
 	}
 } as const;
 
@@ -75,8 +75,8 @@ export default declare({
 		"Runs <code>yarn</code>, then exits the process.",
 		"",
 
-		"<code>$restart bot build</code>",
-		"Runs <code>yarn build</code>, then exits the process.",
+		"<code>$restart bot check</code>",
+		"Runs <code>yarn typecheck</code>, then exits the process.",
 		"",
 
 		"<code>$restart bot all</code>",

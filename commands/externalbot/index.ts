@@ -1,4 +1,4 @@
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 type BotData = { ID: number; prefix: string; };
 

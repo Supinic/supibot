@@ -1,6 +1,6 @@
 import { freemem, totalmem } from "node:os";
 import { SupiDate } from "supi-core";
-import type { ApiDefinition } from "./index.js";
+import type { ApiDefinition } from "./index.ts";
 
 export default {
 	summary: () => {

@@ -1,8 +1,8 @@
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { ivrErrorSchema, ivrSubAgeSchema } from "../../utils/schemas.js";
-import type { Platform } from "../../platforms/template.js";
-import type { User } from "../../classes/user.js";
+import { declare } from "../../classes/command.ts";
+import { ivrErrorSchema, ivrSubAgeSchema } from "../../utils/schemas.ts";
+import type { Platform } from "../../platforms/template.ts";
+import type { User } from "../../classes/user.ts";
 
 const getTargetName = (username: string, user: User, platform: Platform) => {
 	if (username === user.Name) {

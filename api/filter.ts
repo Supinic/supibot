@@ -1,8 +1,8 @@
-import type Filter from "../classes/filter.js";
-import type { ApiDefinition } from "./index.js";
-import type Channel from "../classes/channel.js";
-import type User from "../classes/user.js";
-import type { JSONifiable } from "../utils/globals.js";
+import type Filter from "../classes/filter.ts";
+import type { ApiDefinition } from "./index.ts";
+import type Channel from "../classes/channel.ts";
+import type User from "../classes/user.ts";
+import type { JSONifiable } from "../utils/globals.ts";
 
 export default {
 	reloadAll: async () => {

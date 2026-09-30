@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import { isCooldownData } from "../../classes/filter.js";
+import { declare } from "../../classes/command.ts";
+import { isCooldownData } from "../../classes/filter.ts";
 
 export default declare({
 	Name: "help",

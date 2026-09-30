@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { defineChatModule } from "../../classes/chat-module.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 // @todo likely refactor to its own event type "reward" or something, instead of hooking onto "message"
 export default defineChatModule({

@@ -1,5 +1,5 @@
-import { defineChatModule } from "../../classes/chat-module.js";
-import { getConfig } from "../../config.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
+import { getConfig } from "../../config.ts";
 
 const { local = {} } = getConfig();
 const adjectives = [

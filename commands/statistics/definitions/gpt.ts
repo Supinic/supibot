@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { StatsSubcommandDefinition } from "../index.js";
+import type { StatsSubcommandDefinition } from "../index.ts";
 type Data = { requests: number; inputTokens: number; outputTokens: number; };
 
 let tableExists: boolean | undefined;

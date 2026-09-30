@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { ivrErrorSchema, ivrSubAgeSchema } from "../../utils/schemas.js";
+import { declare } from "../../classes/command.ts";
+import { ivrErrorSchema, ivrSubAgeSchema } from "../../utils/schemas.ts";
 
 export default declare({
 	Name: "followage",

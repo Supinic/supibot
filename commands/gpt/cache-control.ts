@@ -1,9 +1,9 @@
 import { SupiDate, SupiError } from "supi-core";
 import ChatGptConfig from "./config.json" with { type: "json" };
-import type { User } from "../../classes/user.js";
-import type { Platform } from "../../platforms/template.js";
-import type { TwitchPlatform } from "../../platforms/twitch.js";
-import type { ModelData } from "./config-schema.js";
+import type { User } from "../../classes/user.ts";
+import type { Platform } from "../../platforms/template.ts";
+import type { TwitchPlatform } from "../../platforms/twitch.ts";
+import type { ModelData } from "./config-schema.ts";
 
 const createCacheKey = (id: number) => `gpt-token-usage-user-${id}`;
 const isTwitchPlatform = (input: Platform | null): input is TwitchPlatform => {

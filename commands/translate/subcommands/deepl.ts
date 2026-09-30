@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { getCode, getName } from "../../../utils/languages.js";
-import type { TranslateSubcommandDefinition } from "../index.js";
+import { getCode, getName } from "../../../utils/languages.ts";
+import type { TranslateSubcommandDefinition } from "../index.ts";
 
 type DeeplSearchParams = {
 	text: string;

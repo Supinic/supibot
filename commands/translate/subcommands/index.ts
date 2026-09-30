@@ -1,7 +1,7 @@
-import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.js";
+import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
-import DeeplTranslateSubcommand from "./deepl.js";
-import GoogleTranslateSubcommand from "./google.js";
+import DeeplTranslateSubcommand from "./deepl.ts";
+import GoogleTranslateSubcommand from "./google.ts";
 
 const subcommands: SubcommandDefinition[] = [
 	DeeplTranslateSubcommand,

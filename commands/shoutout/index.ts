@@ -1,6 +1,6 @@
-import { declare } from "../../classes/command.js";
-import type TwitchPlatform from "../../platforms/twitch.js";
-import { twitchChannelSchema } from "../../utils/schemas.js";
+import { declare } from "../../classes/command.ts";
+import type TwitchPlatform from "../../platforms/twitch.ts";
+import { twitchChannelSchema } from "../../utils/schemas.ts";
 
 export default declare({
 	Name: "shoutout",

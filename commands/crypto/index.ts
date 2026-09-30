@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 // nonexistent symbol = empty object as response
 // otherwise, the record keys will be the requested symbols

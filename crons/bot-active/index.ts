@@ -1,4 +1,4 @@
-import type { CronDefinition } from "../index.js";
+import type { CronDefinition } from "../index.ts";
 
 export default {
 	name: "bot-active",

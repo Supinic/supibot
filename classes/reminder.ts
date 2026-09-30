@@ -1,6 +1,6 @@
 import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 const {
 	maxIncomingActiveReminders,
 	maxOutgoingActiveReminders,
@@ -8,16 +8,16 @@ const {
 	maxOutgoingScheduledReminders
 } = getConfig().values;
 
-import AwayFromKeyboard from "./afk.js";
-import Banphrase from "./banphrase.js";
-import Channel from "./channel.js";
-import { Command } from "./command.js";
-import Filter from "./filter.js";
-import User from "./user.js";
-import { TemplateWithId } from "./template.js";
+import AwayFromKeyboard from "./afk.ts";
+import Banphrase from "./banphrase.ts";
+import Channel from "./channel.ts";
+import { Command } from "./command.ts";
+import Filter from "./filter.ts";
+import User from "./user.ts";
+import { TemplateWithId } from "./template.ts";
 
-import Platform from "../platforms/template.js";
-import LongTimeout from "../utils/long-timeout.js";
+import Platform from "../platforms/template.ts";
+import LongTimeout from "../utils/long-timeout.ts";
 
 type Type = "Reminder" | "Pingme" | "Deferred";
 type ConstructorData = Pick<Reminder, "ID" | "User_From" | "User_To" | "Channel" | "Text" | "Created" | "Schedule" | "Private_Message" | "Type"> & {

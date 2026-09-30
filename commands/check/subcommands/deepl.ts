@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
 
-import type { CheckSubcommandDefinition } from "../index.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
 
 const deeplUsageSchema = z.object({
 	character_count: z.int(),

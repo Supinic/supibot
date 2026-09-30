@@ -1,28 +1,28 @@
-import AsyncMarkovExperimentModule from "./async-markov-experiment/index.js";
-import BotFaqHelperModule from "./bot-faq-helper/index.js";
-import ChatSuggestionLinkerModule from "./chat-suggestion-linker/index.js";
-import DiscordAnnouncementSubscriber from "./discord-announcement-subscriber/index.js";
-import LinkGathererModule from "./link-gatherer/index.js";
-import LiveDetectionModule from "./live-detection/index.js";
-import MessageReactionModule from "./message-react/index.js";
-import OfflineOnlyMirrorModule from "./offline-only-mirror/index.js";
-import OfflineOnlyModeModule from "./offline-only-mode/index.js";
-import PajbotAlertResponderModule from "./pajbot-alert-responder/index.js";
-import PajbotRaffleJoinerModule from "./pajbot-raffle-joiner/index.js";
-import PingSupiModule from "./ping-supi/index.js";
-import PyramidDetectionModule from "./pyramid-detection/index.js";
-import RaidReactionModule from "./raid-react/index.js";
-import RaidReactionTtsModule from "./raid-react-tts/index.js";
-import StreamPointsRedemptionModule from "./stream-points-redemptions/index.js";
-import SubscriptionReactionModule from "./subscription-react/index.js";
-import SubscriptionReactionTtsModule from "./subscription-react-tts/index.js";
-import StreamDatabaseUpdaterModule from "./supinic-stream-db/index.js";
-import SuspiciousUserAutoCheckerModule from "./suspicious-user-auto-check/index.js";
-import WannaBecomeFamousModule from "./wanna-become-famous/index.js";
+import AsyncMarkovExperimentModule from "./async-markov-experiment/index.ts";
+import BotFaqHelperModule from "./bot-faq-helper/index.ts";
+import ChatSuggestionLinkerModule from "./chat-suggestion-linker/index.ts";
+import DiscordAnnouncementSubscriber from "./discord-announcement-subscriber/index.ts";
+import LinkGathererModule from "./link-gatherer/index.ts";
+import LiveDetectionModule from "./live-detection/index.ts";
+import MessageReactionModule from "./message-react/index.ts";
+import OfflineOnlyMirrorModule from "./offline-only-mirror/index.ts";
+import OfflineOnlyModeModule from "./offline-only-mode/index.ts";
+import PajbotAlertResponderModule from "./pajbot-alert-responder/index.ts";
+import PajbotRaffleJoinerModule from "./pajbot-raffle-joiner/index.ts";
+import PingSupiModule from "./ping-supi/index.ts";
+import PyramidDetectionModule from "./pyramid-detection/index.ts";
+import RaidReactionModule from "./raid-react/index.ts";
+import RaidReactionTtsModule from "./raid-react-tts/index.ts";
+import StreamPointsRedemptionModule from "./stream-points-redemptions/index.ts";
+import SubscriptionReactionModule from "./subscription-react/index.ts";
+import SubscriptionReactionTtsModule from "./subscription-react-tts/index.ts";
+import StreamDatabaseUpdaterModule from "./supinic-stream-db/index.ts";
+import SuspiciousUserAutoCheckerModule from "./suspicious-user-auto-check/index.ts";
+import WannaBecomeFamousModule from "./wanna-become-famous/index.ts";
 
-import type { ChatModuleRuntimeFor, GenericChatModuleDefinition } from "../classes/chat-module.js";
+import type { ChatModuleRuntimeFor, GenericChatModuleDefinition } from "../classes/chat-module.ts";
 
-declare module "../classes/chat-module.js" {
+declare module "../classes/chat-module.ts" {
 	interface ChatModuleRuntimeMap {
 		"async-markov-experiment": ChatModuleRuntimeFor<typeof AsyncMarkovExperimentModule>;
 	}

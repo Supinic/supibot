@@ -1,5 +1,5 @@
-import { fetchSevenTvChannelData } from "./index.js";
-import type { SevenTvSubcommandDefinition } from "../index.js";
+import { fetchSevenTvChannelData } from "./index.ts";
+import type { SevenTvSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "check",

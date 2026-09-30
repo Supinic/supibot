@@ -1,6 +1,6 @@
 import { SupiDate, SupiError } from "supi-core";
-import { type AliasSubcommandDefinition } from "../index.js";
-import { prefix } from "../../../utils/command-utils.js";
+import { type AliasSubcommandDefinition } from "../index.ts";
+import { prefix } from "../../../utils/command-utils.ts";
 import {
 	ALIAS_INVALID_NAME_RESPONSE,
 	ALIAS_NAME_REGEX,
@@ -9,7 +9,7 @@ import {
 	isClassicAlias,
 	isLinkedAlias,
 	isOrphanedAlias
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 export default {
 	name: "duplicate",

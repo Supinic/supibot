@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import { asciiArtRegex, brailleRegex } from "../../utils/regexes.js";
+import { declare } from "../../classes/command.ts";
+import { asciiArtRegex, brailleRegex } from "../../utils/regexes.ts";
 
 const MAXIMUM_REPEATS = 5;
 

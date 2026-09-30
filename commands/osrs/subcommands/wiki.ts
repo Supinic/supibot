@@ -1,4 +1,4 @@
-import type { OsrsSubcommandDefinition } from "../index.js";
+import type { OsrsSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "wiki",

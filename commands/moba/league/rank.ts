@@ -1,5 +1,5 @@
-import { parseUserIdentifier, getLeagueEntries } from "./utils.js";
-import { type MobaSubcommandDefinition } from "../index.js";
+import { parseUserIdentifier, getLeagueEntries } from "./utils.ts";
+import { type MobaSubcommandDefinition } from "../index.ts";
 
 const TARGET_LEAGUE = "RANKED_SOLO_5x5";
 const RANKLESS_TIERS = new Set(["MASTER", "GRANDMASTER", "CHALLENGER"]);

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import type { GitProvider } from "./provider.js";
+import type { GitProvider } from "./provider.ts";
 
 const errorSchema = z.object({ message: z.string().nullish() });
 const giteaSchema = z.array(z.object({

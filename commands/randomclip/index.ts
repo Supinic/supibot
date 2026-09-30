@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
-import { getTwitchGameID } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
-import { twitchClipSchema } from "../../utils/schemas.js";
+import { getTwitchGameID } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
+import { twitchClipSchema } from "../../utils/schemas.ts";
 
 const EARLIEST_CLIP_DATE = new SupiDate("2011-01-01");
 

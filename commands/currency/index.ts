@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { typeRegexGroups } from "../../utils/ts-helpers.js";
+import { declare } from "../../classes/command.ts";
+import { typeRegexGroups } from "../../utils/ts-helpers.ts";
 
 const exchangeRatesKey = "currency-conversion-rates";
 const irrExchangeRateKey = "irr-usd-exchange-rate";

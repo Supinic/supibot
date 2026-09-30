@@ -1,5 +1,5 @@
-import { StatsSubcommands } from "./definitions/index.js";
-import { type CommandDefinition, declare, type SubcommandDefinition } from "../../classes/command.js";
+import { StatsSubcommands } from "./definitions/index.ts";
+import { type CommandDefinition, declare, type SubcommandDefinition } from "../../classes/command.ts";
 
 export type StatsSubcommandDefinition = SubcommandDefinition<typeof statisticsCommandDefinition>;
 

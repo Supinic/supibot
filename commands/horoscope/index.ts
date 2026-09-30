@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import zodiacData from "./zodiac-signs.js";
+import { declare } from "../../classes/command.ts";
+import zodiacData from "./zodiac-signs.ts";
 
 export default declare({
 	Name: "horoscope",

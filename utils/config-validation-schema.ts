@@ -1,7 +1,7 @@
 /* eslint-disable newline-per-chained-call */
 import * as z from "zod";
 
-import { BasePlatformConfigSchema } from "../platforms/schema.js";
+import { BasePlatformConfigSchema } from "../platforms/schema.ts";
 const PlatformConfigSchema = BasePlatformConfigSchema.extend({
 	type: z.string()
 });

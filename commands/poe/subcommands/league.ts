@@ -2,7 +2,7 @@ import * as z from "zod";
 import { SupiDate } from "supi-core";
 import rawPoe1Data from "./poe1.json" with { type: "json" };
 import rawPoe2Data from "./poe2.json" with { type: "json" };
-import type { PathOfExileSubcommandDefinition } from "../index.js";
+import type { PathOfExileSubcommandDefinition } from "../index.ts";
 
 const leagueShape = z.object({
 	patch: z.string(),

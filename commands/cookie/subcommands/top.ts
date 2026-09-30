@@ -1,4 +1,4 @@
-import type { CookieSubcommandDefinition } from "../index.js";
+import type { CookieSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "top",

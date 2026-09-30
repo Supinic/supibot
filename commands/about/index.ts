@@ -1,5 +1,5 @@
 import { type SupiDate, SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 export default declare({
 	Name: "about",

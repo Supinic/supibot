@@ -1,5 +1,5 @@
-import { logger } from "../../singletons/logger.js";
-import { declare } from "../../classes/command.js";
+import { logger } from "../../singletons/logger.ts";
+import { declare } from "../../classes/command.ts";
 import type { SupiDate } from "supi-core";
 
 export default declare({

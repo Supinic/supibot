@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import { defineChatModule } from "../../classes/chat-module.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 const relaxedRegex = /(supi|supinic(?!\.com)|bupi|супи|супик.?|супиник.?)\b/i;
 // const strictRegex = /\bsupinic(?!\.com)\b/i;

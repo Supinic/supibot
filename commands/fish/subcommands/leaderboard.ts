@@ -1,9 +1,9 @@
 import { itemTypes } from "./fishing-utils.js";
-import { unping } from "../../../utils/command-utils.js";
+import { unping } from "../../../utils/command-utils.ts";
 
 // @todo refactor to FishSubcommandDefinition once `$fish` is being reworked to TS
-import type { SubcommandDefinition as GenericSubcommandDefinition } from "../../../classes/command.js";
-import type { UserDataPropertyMap } from "../../../classes/custom-data-properties.js";
+import type { SubcommandDefinition as GenericSubcommandDefinition } from "../../../classes/command.ts";
+import type { UserDataPropertyMap } from "../../../classes/custom-data-properties.ts";
 
 type FishData = UserDataPropertyMap["fishData"];
 type TopResult = { userId: number; value: number };

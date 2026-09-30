@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { randomInt } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { randomInt } from "../../utils/command-utils.ts";
 
 const previousPosts = new Map<number, string>();
 const querySchema = z.array(z.object({

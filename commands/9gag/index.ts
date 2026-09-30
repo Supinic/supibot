@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const scrapeDataRegex = /window\._config\s*=\s*JSON\.parse\s*\((.+)\).+?<\/script>/;
 const nineGagSchema = z.object({

@@ -2,7 +2,7 @@ import * as z from "zod";
 import * as assert from "node:assert";
 import { it, test, describe } from "node:test";
 
-import { getCode, getName } from "../../utils/languages.js";
+import { getCode, getName } from "../../utils/languages.ts";
 import rawLanguages from "../../utils/languages-data.json" with { type: "json" };
 
 // partially duplicated with `utils/languages.ts`, but omits properties we don't care about for testing

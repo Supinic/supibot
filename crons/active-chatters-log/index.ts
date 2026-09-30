@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CronDefinition } from "../index.js";
+import type { CronDefinition } from "../index.ts";
 
 let isTableAvailable: boolean | undefined;
 export default {

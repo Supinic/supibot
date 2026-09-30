@@ -1,4 +1,4 @@
-import type { DoesNotExistSubcommandDefinition } from "../index.js";
+import type { DoesNotExistSubcommandDefinition } from "../index.ts";
 const MP_CACHE_KEY = `command-dne-mp-data`;
 
 type ParliamentMember = {

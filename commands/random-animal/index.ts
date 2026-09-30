@@ -1,6 +1,6 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
-import type { UserDataPropertyMap } from "../../classes/custom-data-properties.js";
+import { declare } from "../../classes/command.ts";
+import type { UserDataPropertyMap } from "../../classes/custom-data-properties.ts";
 
 const supportedAnimalTypes = ["cat", "dog", "bird", "fox"] as const;
 const animalTypeSchema = z.enum(supportedAnimalTypes);

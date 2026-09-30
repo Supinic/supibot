@@ -1,10 +1,10 @@
-import { defineChatModule } from "../../classes/chat-module.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
 import { SupiError, type SupiDate } from "supi-core";
-import { ivrUserDataSchema } from "../../utils/schemas.js";
-import { logger } from "../../singletons/logger.js";
-import type { TwitchPlatform } from "../../platforms/twitch.js";
-import type { User } from "../../classes/user.js";
-import type { TwitchMessageData } from "../../platforms/twitch-utils.js";
+import { ivrUserDataSchema } from "../../utils/schemas.ts";
+import { logger } from "../../singletons/logger.ts";
+import type { TwitchPlatform } from "../../platforms/twitch.ts";
+import type { User } from "../../classes/user.ts";
+import type { TwitchMessageData } from "../../platforms/twitch-utils.ts";
 
 type UserAliasRow = Pick<User, "Discord_ID" | "Twitch_ID" | "Name">;
 type ReplyData = TwitchMessageData["reply"];

@@ -3,9 +3,9 @@ import { SupiError } from "supi-core";
 import { createServer, type Server, type Socket } from "node:net";
 import { createInterface, type Interface } from "node:readline";
 
-import { BasePlatformConfigSchema } from "./schema.js";
-import { Platform } from "./template.js";
-import type { User } from "../classes/user.js";
+import { BasePlatformConfigSchema } from "./schema.ts";
+import { Platform } from "./template.ts";
+import type { User } from "../classes/user.ts";
 
 const NetConfigSchema = BasePlatformConfigSchema.extend({
 	platform: z.object({

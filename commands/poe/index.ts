@@ -1,5 +1,5 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import { PathOfExileSubcommands } from "./subcommands/index.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import { PathOfExileSubcommands } from "./subcommands/index.ts";
 
 export type PathOfExileSubcommandDefinition = SubcommandDefinition<typeof pathOfExileCommandDefinition>;
 

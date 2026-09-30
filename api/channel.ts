@@ -1,5 +1,5 @@
-import type { ApiDefinition } from "./index.js";
-import { isChannelMode } from "../classes/channel.js";
+import type { ApiDefinition } from "./index.ts";
+import { isChannelMode } from "../classes/channel.ts";
 
 export default {
 	reloadAll: async () => {

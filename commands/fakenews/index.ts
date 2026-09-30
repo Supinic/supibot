@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawTemplates from "./templates.json" with { type: "json" };
 
 const templatesSchema = z.object({

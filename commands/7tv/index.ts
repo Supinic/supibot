@@ -1,9 +1,9 @@
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
 import {
 	checkSevenTvAvailable,
 	SevenTvSubcommands,
 	syncLocalDataToApi
-} from "./subcommands/index.js";
+} from "./subcommands/index.ts";
 
 export type SevenTvSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
 

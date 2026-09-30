@@ -1,4 +1,4 @@
-import { logger } from "../../../singletons/logger.js";
+import { logger } from "../../../singletons/logger.ts";
 
 export default {
 	name: "reminder",

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawSymbolData from "./popular-stock-symbols.json" with { type: "json" };
 
 const symbolSchema = z.array(z.tuple([z.string(), z.string()]));

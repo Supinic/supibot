@@ -1,4 +1,4 @@
-import type { CheckSubcommandDefinition } from "../index.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "subscription",

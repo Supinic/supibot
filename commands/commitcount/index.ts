@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { gitHandlerMap, defaultGitProvider, gitHandlerNames } from "./providers/index.js";
-import { declare, isResultFailure } from "../../classes/command.js";
+import { gitHandlerMap, defaultGitProvider, gitHandlerNames } from "./providers/index.ts";
+import { declare, isResultFailure } from "../../classes/command.ts";
 
 export default declare({
 	Name: "commitcount",

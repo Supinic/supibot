@@ -1,6 +1,6 @@
 import { VM } from "vm2";
-import { logger } from "../../singletons/logger.js";
-import { postToHastebin } from "../../utils/command-utils.js";
+import { logger } from "../../singletons/logger.ts";
+import { postToHastebin } from "../../utils/command-utils.ts";
 import preventTomfoolery from "./anti-tomfoolery.js";
 import analyze from "./acorn-heuristic.js";
 import createSandbox from "./create-sandbox.js";

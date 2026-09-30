@@ -1,4 +1,4 @@
-import { defineChatModule } from "../../classes/chat-module.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 const REPLY_EMOTES = ["pajaS", "pajaW", "pajaH", "pajaScoots", "pajaL", "monkaS", "paaaajaW", "Okayga", "PAJAW", "paaaajaW"];
 

@@ -1,7 +1,7 @@
-import { TranslateSubcommands } from "./subcommands/index.js";
-import { declare, type SubcommandDefinition } from "../../classes/command.js";
-import type { User } from "../../classes/user.js";
-import type { Channel } from "../../classes/channel.js";
+import { TranslateSubcommands } from "./subcommands/index.ts";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import type { User } from "../../classes/user.ts";
+import type { Channel } from "../../classes/channel.ts";
 
 let logTableExists: boolean | undefined;
 export type TranslateSubcommandDefinition = SubcommandDefinition<typeof translateCommandDefinition>;

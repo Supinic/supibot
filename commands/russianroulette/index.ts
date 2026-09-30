@@ -1,9 +1,9 @@
 import * as z from "zod";
 import { SupiError } from "supi-core";
-import { randomInt } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
 import rawDefinitions from "./definitions.json" with { type: "json" };
-import type { TwitchPlatform } from "../../platforms/twitch.js";
+import type { TwitchPlatform } from "../../platforms/twitch.ts";
 
 const definitionsSchema = z.object({
 	upperLimit: z.int().min(1).max(86400),

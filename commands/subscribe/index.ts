@@ -1,8 +1,8 @@
 import { CronJob } from "cron";
-import { type Context, declare } from "../../classes/command.js";
+import { type Context, declare } from "../../classes/command.ts";
 
-import subscriptions from "./event-types/index.js";
-import { type EventSubscription, handleGenericSubscription, isGenericSubscriptionDefinition } from "./generic-event.js";
+import subscriptions from "./event-types/index.ts";
+import { type EventSubscription, handleGenericSubscription, isGenericSubscriptionDefinition } from "./generic-event.ts";
 
 const DEFAULT_CRON_EXPRESSION = "0 */5 * * * *";
 

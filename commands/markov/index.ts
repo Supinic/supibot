@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import type { Channel } from "../../classes/channel.js";
+import { declare } from "../../classes/command.ts";
+import type { Channel } from "../../classes/channel.ts";
 
 const MODEL_SIZE_THRESHOLD = 25;
 const WORD_AMOUNT = 25;

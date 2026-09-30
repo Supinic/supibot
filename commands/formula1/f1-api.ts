@@ -1,12 +1,12 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
 
-import { searchYoutube } from "../../utils/command-utils.js";
-import { formatWeatherReport } from "../weather/formatting.js";
-import { openMeteoWeatherProvider } from "../weather/providers/index.js";
-import type { NumericCoordinates } from "../../utils/globals.js";
-import { isResultFailure } from "../../classes/command.js";
-import { logger } from "../../singletons/logger.js";
+import { searchYoutube } from "../../utils/command-utils.ts";
+import { formatWeatherReport } from "../weather/formatting.ts";
+import { openMeteoWeatherProvider } from "../weather/providers/index.ts";
+import type { NumericCoordinates } from "../../utils/globals.ts";
+import { isResultFailure } from "../../classes/command.ts";
+import { logger } from "../../singletons/logger.ts";
 
 const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;

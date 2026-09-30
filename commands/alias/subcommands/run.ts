@@ -1,10 +1,10 @@
 import { SupiError } from "supi-core";
-import type { User } from "../../../classes/user.js";
-import type { ContextAppendData } from "../../../classes/command.js";
-import { getConfig } from "../../../config.js";
+import type { User } from "../../../classes/user.ts";
+import type { ContextAppendData } from "../../../classes/command.ts";
+import { getConfig } from "../../../config.ts";
 
-import { type AliasSubcommandDefinition } from "../index.js";
-import { prefix } from "../../../utils/command-utils.js";
+import { type AliasSubcommandDefinition } from "../index.ts";
+import { prefix } from "../../../utils/command-utils.ts";
 
 import {
 	ALIAS_NAME_REGEX,
@@ -17,7 +17,7 @@ import {
 	parseCommandName,
 	isClassicAlias,
 	isOrphanedAlias
-} from "../alias-utils.js";
+} from "../alias-utils.ts";
 
 const bannedCommandCombinations = getConfig().modules.commands.bannedCombinations ?? [];
 export default {

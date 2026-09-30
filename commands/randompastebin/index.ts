@@ -1,7 +1,7 @@
 /* eslint-disable array-element-newline */
 import * as z from "zod";
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const pastebinLanguages = [
 	"apache", "arduino", "bash", "c", "cpp",

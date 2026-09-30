@@ -1,5 +1,5 @@
 import { SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 import {
 	isArgumentsData,
@@ -7,10 +7,10 @@ import {
 	type FilterArgumentDescriptor,
 	type Type as FilterType,
 	type FilterArgumentDatabaseShape
-} from "../../classes/filter.js";
+} from "../../classes/filter.ts";
 
-import type { Channel } from "../../classes/channel.js";
-import type { User } from "../../classes/user.js";
+import type { Channel } from "../../classes/channel.ts";
+import type { User } from "../../classes/user.ts";
 
 const AVAILABLE_BAN_FILTER_TYPES: string[] = [
 	"Arguments",

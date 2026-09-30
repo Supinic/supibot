@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import { declare } from "../../classes/command.js";
-import { fetchTimeData, formatTimezoneOffset, parseChrono } from "../../utils/command-utils.js";
+import { declare } from "../../classes/command.ts";
+import { fetchTimeData, formatTimezoneOffset, parseChrono } from "../../utils/command-utils.ts";
 
 // SQL DATETIME limit - 9999-12-31 23:59:59.999
 const MAXIMUM_SQL_TIMESTAMP = 253_402_297_199_999;

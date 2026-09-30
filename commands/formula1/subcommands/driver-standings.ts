@@ -1,6 +1,6 @@
 import { SupiDate } from "supi-core";
-import type { FormulaOneSubcommandDefinition } from "../index.js";
-import { fetchDriverStandings } from "../f1-api.js";
+import type { FormulaOneSubcommandDefinition } from "../index.ts";
+import { fetchDriverStandings } from "../f1-api.ts";
 
 export default {
 	name: "driverStandings",

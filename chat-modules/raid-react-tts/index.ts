@@ -1,5 +1,5 @@
-import { getConfig } from "../../config.js";
-import { defineChatModule } from "../../classes/chat-module.js";
+import { getConfig } from "../../config.ts";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 const { local = {} } = getConfig();
 

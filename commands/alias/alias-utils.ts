@@ -1,6 +1,6 @@
-import type { User } from "../../classes/user.js";
-import type { Channel } from "../../classes/channel.js";
-import type { Command, Context } from "../../classes/command.js";
+import type { User } from "../../classes/user.ts";
+import type { Channel } from "../../classes/channel.ts";
+import type { Command, Context } from "../../classes/command.ts";
 import { type SupiDate, SupiError } from "supi-core";
 
 export const NESTED_ALIAS_LIMIT = 10;

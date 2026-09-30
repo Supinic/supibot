@@ -1,8 +1,8 @@
 import { SupiDate, SupiError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
-import { searchYoutube } from "../../utils/command-utils.js";
-import { getLinkParser } from "../../utils/link-parser.js";
+import { searchYoutube } from "../../utils/command-utils.ts";
+import { getLinkParser } from "../../utils/link-parser.ts";
 
 const RESULTS_PER_SEARCH = 25;
 const DAILY_SEARCHES_CAP = 2000;

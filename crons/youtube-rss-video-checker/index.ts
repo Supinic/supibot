@@ -1,12 +1,12 @@
-import { parseRSS } from "../../utils/command-utils.js";
+import { parseRSS } from "../../utils/command-utils.ts";
 import { SupiDate, SupiError } from "supi-core";
-import type { User } from "../../classes/user.js";
-import type { CronDefinition } from "../index.js";
-import type { Platform } from "../../platforms/template.js";
+import type { User } from "../../classes/user.ts";
+import type { CronDefinition } from "../index.ts";
+import type { Platform } from "../../platforms/template.ts";
 import {
 	YOUTUBE_VIDEO_SUBSCRIPTION_TITLE,
 	type YoutubeChannelSubData
-} from "../../commands/subscribe/event-types/youtube-video.js";
+} from "../../commands/subscribe/event-types/youtube-video.ts";
 
 type SubData = {
 	userId: User["ID"];

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawWeapons from "./weapons.json" with { type: "json" };
 
 const weaponsSchema = z.array(z.object({

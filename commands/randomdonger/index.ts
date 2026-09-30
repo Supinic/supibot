@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import rawDongers from "./dongers.json" with { type: "json" };
 
 let dongers: string[] | undefined;

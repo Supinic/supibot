@@ -1,4 +1,4 @@
-import { defineChatModule } from "../../classes/chat-module.js";
+import { defineChatModule } from "../../classes/chat-module.ts";
 
 const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best|real|more)?\s*(viewers|followers)/gi;
 const siteRegex = /(streamboo|u\.to|dogehype)/gi;

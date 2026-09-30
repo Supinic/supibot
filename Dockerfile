@@ -13,7 +13,7 @@ COPY --chown=supibot:supibot package.json tsconfig.json yarn.lock .yarnrc.yml ./
 RUN yarn install --immutable
 
 COPY --chown=supibot:supibot . .
-RUN yarn build
+RUN yarn typecheck
 
 COPY docker-entrypoint.sh /usr/local/bin/
 

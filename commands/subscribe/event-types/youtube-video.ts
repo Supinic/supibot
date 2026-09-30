@@ -1,5 +1,5 @@
-import type { SpecialEventDefinition } from "../generic-event.js";
-import { fetchYoutubeChannelId } from "../../../utils/command-utils.js";
+import type { SpecialEventDefinition } from "../generic-event.ts";
+import { fetchYoutubeChannelId } from "../../../utils/command-utils.ts";
 import { SupiError } from "supi-core";
 
 export type YoutubeChannelSubData = {

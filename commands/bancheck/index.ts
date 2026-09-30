@@ -1,6 +1,6 @@
-import { linkRegex } from "../../utils/regexes.js";
+import { linkRegex } from "../../utils/regexes.ts";
 import { isGotRequestError } from "supi-core";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 export default declare({
 	Name: "bancheck",

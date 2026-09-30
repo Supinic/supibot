@@ -1,5 +1,5 @@
-import { declare } from "../../classes/command.js";
-import { getRawRedditPost, getSubreddit, redditConfig } from "./reddit-utils.js";
+import { declare } from "../../classes/command.ts";
+import { getRawRedditPost, getSubreddit, redditConfig } from "./reddit-utils.ts";
 
 const repeatedPostsMap = new Map<string, string[]>();
 

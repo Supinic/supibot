@@ -4,14 +4,14 @@ import RSSParser from "rss-parser";
 import { parse as chronoParse, type ParsingOption, type Component as ChronoComponent } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
 
-import { Filter, type Type as FilterType } from "../classes/filter.js";
-import type { Command, Context as CommandContext, Flag as CommandFlag } from "../classes/command.js";
-import type { User } from "../classes/user.js";
-import type { Channel } from "../classes/channel.js";
-import type { Platform } from "../platforms/template.js";
-import type { Coordinates } from "./globals.js";
+import { Filter, type Type as FilterType } from "../classes/filter.ts";
+import type { Command, Context as CommandContext, Flag as CommandFlag } from "../classes/command.ts";
+import type { User } from "../classes/user.ts";
+import type { Channel } from "../classes/channel.ts";
+import type { Platform } from "../platforms/template.ts";
+import type { Coordinates } from "./globals.ts";
 
-import { getConfig } from "../config.js";
+import { getConfig } from "../config.ts";
 export const { prefix } = getConfig().modules.commands;
 
 type CommandContextParams = CommandContext["params"];

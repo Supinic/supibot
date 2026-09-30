@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 import { ZodError } from "zod";
-import { ConfigSchema } from "./config-validation-schema.js";
+import { ConfigSchema } from "./config-validation-schema.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const configPath = path.resolve(here, "..", "config.json");

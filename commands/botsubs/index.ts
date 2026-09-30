@@ -1,5 +1,5 @@
-import type { TwitchEmote } from "../../utils/globals.js";
-import { declare } from "../../classes/command.js";
+import type { TwitchEmote } from "../../utils/globals.ts";
+import { declare } from "../../classes/command.ts";
 
 export default declare({
 	Name: "botsubs",

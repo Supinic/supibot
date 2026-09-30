@@ -1,6 +1,6 @@
 import { Script, createContext } from "node:vm";
 import crypto from "node:crypto";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 export default declare({
 	Name: "debug",

@@ -1,6 +1,6 @@
-import { type AliasSubcommandDefinition } from "../index.js";
-import { prefix } from "../../../utils/command-utils.js";
-import { getAliasByNameAndUser } from "../alias-utils.js";
+import { type AliasSubcommandDefinition } from "../index.ts";
+import { prefix } from "../../../utils/command-utils.ts";
+import { getAliasByNameAndUser } from "../alias-utils.ts";
 
 export default {
 	name: "inspect",

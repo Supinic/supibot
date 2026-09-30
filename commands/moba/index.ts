@@ -1,7 +1,7 @@
 import { SupiError } from "supi-core";
-import { declare, type SubcommandCollection, type SubcommandDefinition } from "../../classes/command.js";
+import { declare, type SubcommandCollection, type SubcommandDefinition } from "../../classes/command.ts";
 
-import LeagueGameDefinition from "./league/index.js";
+import LeagueGameDefinition from "./league/index.ts";
 
 export type MobaSubcommandDefinition = SubcommandDefinition<typeof mobaCommandDefinition>;
 export type MobaGameDefinition = {

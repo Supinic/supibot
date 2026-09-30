@@ -1,20 +1,20 @@
 import { SupiError, isGotRequestError } from "supi-core";
-import { declare, type Context } from "../../classes/command.js";
-import { typedEntries } from "../../utils/ts-helpers.js";
+import { declare, type Context } from "../../classes/command.ts";
+import { typedEntries } from "../../utils/ts-helpers.ts";
 
 import rawGptConfig from "./config.json" with { type: "json" };
-import { gptConfigSchema, gptErrorSchema } from "./config-schema.js";
+import { gptConfigSchema, gptErrorSchema } from "./config-schema.ts";
 const GptConfig = gptConfigSchema.parse(rawGptConfig);
 
-import GptCache from "./cache-control.js";
-import { determineOutputLimit, handleHistoryCommand, type GptTemplate } from "./gpt-template.js";
-import { GptOpenAI } from "./gpt-openai.js";
-import { GptDeepInfra } from "./gpt-deepinfra.js";
-import { process as processMetrics } from "./metrics.js";
-import { check as checkModeration } from "./moderation.js";
+import GptCache from "./cache-control.ts";
+import { determineOutputLimit, handleHistoryCommand, type GptTemplate } from "./gpt-template.ts";
+import { GptOpenAI } from "./gpt-openai.ts";
+import { GptDeepInfra } from "./gpt-deepinfra.ts";
+import { process as processMetrics } from "./metrics.ts";
+import { check as checkModeration } from "./moderation.ts";
 
-import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.js";
-import { logger } from "../../singletons/logger.js";
+import setDefaultModelSubcommand from "../set/subcommands/default-gpt-model.ts";
+import { logger } from "../../singletons/logger.ts";
 
 export type ModelName = keyof typeof rawGptConfig.models;
 

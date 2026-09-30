@@ -1,4 +1,4 @@
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const EIGHT_BALL_RESPONSES = [
 	"😃 It is certain.",

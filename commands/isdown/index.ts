@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SupiDate } from "supi-core";
 import { domainToASCII } from "node:url";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const cachingSites = ["shouldiblamecach.ing", "shouldiblamecaching.com"];
 const querySchema = z.object({

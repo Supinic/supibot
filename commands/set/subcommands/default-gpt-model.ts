@@ -1,5 +1,5 @@
-import type { Context } from "../../../classes/command.js";
-import { isModelName as isGptModelName } from "../../gpt/index.js";
+import type { Context } from "../../../classes/command.ts";
+import { isModelName as isGptModelName } from "../../gpt/index.ts";
 
 export default {
 	name: "default-gpt-model",

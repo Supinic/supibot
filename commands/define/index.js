@@ -1,4 +1,4 @@
-import { getCode } from "../../utils/languages.js";
+import { getCode } from "../../utils/languages.ts";
 import checkPartialCommandFilters from "./check-partials.js";
 
 export default {

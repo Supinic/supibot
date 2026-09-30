@@ -1,5 +1,5 @@
-import { fetchSevenTvChannelData, SEVEN_TV_DEFAULT_LIMIT } from "./index.js";
-import type { SevenTvSubcommandDefinition } from "../index.js";
+import { fetchSevenTvChannelData, SEVEN_TV_DEFAULT_LIMIT } from "./index.ts";
+import type { SevenTvSubcommandDefinition } from "../index.ts";
 
 const MAX_EMOTE_LIMIT = 250;
 

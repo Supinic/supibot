@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CronDefinition } from "../index.js";
+import type { CronDefinition } from "../index.ts";
 
 type SubsData = { User_Alias: number; Platform: number; };
 type SuggestionsData = {

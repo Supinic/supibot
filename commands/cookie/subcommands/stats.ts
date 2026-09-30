@@ -1,5 +1,5 @@
-import { getUserCookieCountStatistics } from "../../statistics/definitions/cookies.js";
-import type { CookieSubcommandDefinition } from "../index.js";
+import { getUserCookieCountStatistics } from "../../statistics/definitions/cookies.ts";
+import type { CookieSubcommandDefinition } from "../index.ts";
 
 export default {
 	name: "stats",

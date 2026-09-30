@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { CheckSubcommandDefinition } from "../index.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
 import {
 	canEatDailyCookie,
 	canEatReceivedCookie,
@@ -7,7 +7,7 @@ import {
 	hasDonatedDailyCookie,
 	hasOutdatedDailyCookieStats,
 	resetDailyCookieStats
-} from "../../cookie/cookie-logic.js";
+} from "../../cookie/cookie-logic.ts";
 
 export default {
 	name: "cookie",

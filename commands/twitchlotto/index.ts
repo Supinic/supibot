@@ -1,10 +1,10 @@
 import * as z from "zod";
-import { randomInt } from "../../utils/command-utils.js";
-import { declare } from "../../classes/command.js";
-import { probabilityShape } from "../../utils/schemas.js";
-import type { User } from "../../classes/user.js";
-import type { Channel } from "../../classes/channel.js";
-import type { TwitchLottoFlagName } from "../../classes/custom-data-properties.js";
+import { randomInt } from "../../utils/command-utils.ts";
+import { declare } from "../../classes/command.ts";
+import { probabilityShape } from "../../utils/schemas.ts";
+import type { User } from "../../classes/user.ts";
+import type { Channel } from "../../classes/channel.ts";
+import type { TwitchLottoFlagName } from "../../classes/custom-data-properties.ts";
 
 const detectionDefinitions = [
 	{

@@ -1,5 +1,5 @@
-import type { CheckSubcommandDefinition } from "../index.js";
-import type { AwayFromKeyboard } from "../../../classes/afk.js";
+import type { CheckSubcommandDefinition } from "../index.ts";
+import type { AwayFromKeyboard } from "../../../classes/afk.ts";
 
 type AfkData = Pick<AwayFromKeyboard, "Text" | "Started" | "Status">;
 

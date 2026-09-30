@@ -1,6 +1,6 @@
 import { SupiError } from "supi-core";
-import type { CronDefinition } from "../index.js";
-import { twitchIdentitySchema, twitchSubscriberSchema } from "../../utils/schemas.js";
+import type { CronDefinition } from "../index.ts";
+import { twitchIdentitySchema, twitchSubscriberSchema } from "../../utils/schemas.ts";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = sharedKeys;

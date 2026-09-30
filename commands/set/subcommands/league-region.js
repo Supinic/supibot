@@ -1,4 +1,4 @@
-import { DEFAULT_REGION_KEY, getPlatform } from "../../moba/league/utils.js";
+import { DEFAULT_REGION_KEY, getPlatform } from "../../moba/league/utils.ts";
 
 export default {
 	name: "league-region",

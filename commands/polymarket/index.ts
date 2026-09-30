@@ -1,7 +1,7 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 import { SupiError } from "supi-core";
-import { postToHastebin } from "../../utils/command-utils.js";
+import { postToHastebin } from "../../utils/command-utils.ts";
 
 const marketShape = z.object({
 	id: z.string(),

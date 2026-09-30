@@ -1,4 +1,4 @@
-import type { SpecialEventDefinition } from "../generic-event.js";
+import type { SpecialEventDefinition } from "../generic-event.ts";
 
 export default {
 	title: "Changelog",

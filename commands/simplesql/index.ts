@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { declare } from "../../classes/command.js";
+import { declare } from "../../classes/command.ts";
 
 const simpleQuerySchema = z.array(z.record(z.string(), z.unknown()));
 

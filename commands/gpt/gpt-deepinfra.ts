@@ -1,8 +1,8 @@
 import { type GotResponse, SupiError } from "supi-core";
-import { getHistoryMode, getTemperature, determineOutputLimit, globalSystemPrompts, type GptTemplate } from "./gpt-template.js";
-import { get as getHistoryEntry, add as addHistoryEntry } from "./history-control.js";
-import type { GptContext } from "./index.js";
-import type { ModelData } from "./config-schema.js";
+import { getHistoryMode, getTemperature, determineOutputLimit, globalSystemPrompts, type GptTemplate } from "./gpt-template.ts";
+import { get as getHistoryEntry, add as addHistoryEntry } from "./history-control.ts";
+import type { GptContext } from "./index.ts";
+import type { ModelData } from "./config-schema.ts";
 
 type DeepinfraResponse = {
 	created: number;
