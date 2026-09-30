@@ -1,6 +1,6 @@
 {
   "include": ["./**/*.js", "./**/*.ts", "./**/*.json"],
-  "exclude": ["build/**", "tests/**", "node_modules/**"],
+  "exclude": ["tests/**", "node_modules/**"],
   "compilerOptions": {
     "types": ["node"],
     "rootDir": ".",                                      /* Probably not necessary any more */
