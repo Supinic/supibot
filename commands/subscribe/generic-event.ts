@@ -179,7 +179,7 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 			}
 
 			const lower = article.guid.toLowerCase();
-			return (guidBlacklist.some(word => lower.includes(word)));
+			return guidBlacklist.every(word => !lower.includes(word));
 		})
 		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
 
