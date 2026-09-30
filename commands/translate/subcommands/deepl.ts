@@ -47,7 +47,7 @@ const getDeeplLanguageList = async (): Promise<DeeplLanguage[]> => {
 
 	const list = languageListSchema.parse(response.body);
 	const storeList = list.map(i => ({
-		code: i.lang,
+		code: i.lang.toLowerCase(),
 		name: i.name,
 		formality: (i.features.formality?.status === "stable")
 	}));
