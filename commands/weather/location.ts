@@ -5,7 +5,6 @@ import type { Context, StrictResult } from "../../classes/command.js";
 import type { User } from "../../classes/user.js";
 import type { UserDataPropertyMap } from "../../classes/custom-data-properties.js";
 import { fetchGeoLocationData } from "../../utils/command-utils.js";
-import { get } from "../gpt/history-control.js";
 
 type GeoCacheData = { empty: true } | {
 	empty: false;

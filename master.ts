@@ -11,7 +11,7 @@ import initializeCrons from "./crons/index.js";
 import { AwayFromKeyboard } from "./classes/afk.js";
 import { Banphrase } from "./classes/banphrase.js";
 import { Channel } from "./classes/channel.js";
-import { type ChatModuleDefinition, ChatModuleManager } from "./classes/chat-module.js";
+import { ChatModuleManager } from "./classes/chat-module.js";
 import { Command, type CommandDefinition } from "./classes/command.js";
 import { Filter } from "./classes/filter.js";
 import { MpvClient as MpvClientConstructor } from "./singletons/mpv-client.js";
