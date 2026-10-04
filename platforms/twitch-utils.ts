@@ -304,7 +304,10 @@ export interface StreamOfflineNotification extends NotificationMessage {
 
 export const isMessageNotification = (input: NotificationMessage): input is MessageNotification => (input.payload.subscription.type === "channel.chat.message");
 export const isWhisperNotification = (input: NotificationMessage): input is WhisperNotification => (input.payload.subscription.type === "user.whisper.message");
-export const isSubscribeNotification = (input: NotificationMessage): input is SubscribeMessageNotification => (input.payload.subscription.type === "channel.subscription.message");
+export const isSubscribeNotification = (input: NotificationMessage): input is SubscribeMessageNotification => {
+	const { type } = input.payload.subscription;
+	return (type === "channel.subscription.message" || type === "channel.subscribe");
+};
 export const isRaidNotification = (input: NotificationMessage): input is RaidNotification => (input.payload.subscription.type === "channel.raid");
 export const isStreamChangeNotification = (input: NotificationMessage): input is StreamOnlineNotification | StreamOfflineNotification => (
 	input.payload.subscription.type === "stream.offline" || input.payload.subscription.type === "stream.online"
