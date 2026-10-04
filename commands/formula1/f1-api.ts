@@ -133,8 +133,12 @@ const fetchOfficalRaceStatusFinished = async (race: Race): Promise<boolean | nul
 
 	const statusResponse = await core.Got.get("GenericAPI")({
 		url: `https://livetiming.formula1.com/static/${session.Path}SessionStatus.json?v=${cacheBust}`,
-		responseType: "text"
+		responseType: "text",
+		throwHttpErrors: false
 	});
+	if (!statusResponse.ok) {
+		return null;
+	}
 
 	const cleanedStatusBody = statusResponse.body.trim();
 	void logger.log("Command.Other", `F1 SessionStatus API result: ${cleanedStatusBody}`);
