@@ -99,7 +99,16 @@ export const ConfigSchema = z.strictObject({
 		lastSeen: loggingObject
 	}),
 	modules: z.strictObject({
-		"chat-modules": moduleBase("chat-modules"),
+		"chat-modules": moduleBase("chat-modules").safeExtend({
+			"link-gatherer": z.object({
+				providers: z.array(z.object({
+					name: z.string(),
+					hostnames: z.array(z.string()).min(1),
+					slugPattern: z.string(),
+					extensions: z.array(z.string())
+				}))
+			}).nullish()
+		}),
 		commands: moduleBase("commands").safeExtend({
 			prefix: z.string(),
 			bannedCombinations: z.array(
@@ -113,3 +122,4 @@ export const ConfigSchema = z.strictObject({
 	}),
 	platforms: z.array(PlatformConfigSchema)
 } satisfies z.ZodRawShape);
+export type ConfigSchemaType = z.infer<typeof ConfigSchema>;

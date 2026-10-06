@@ -1,6 +1,8 @@
 import { SupiDate } from "supi-core";
 import { defineChatModule } from "../../classes/chat-module.ts";
 import { typeRegexGroups } from "../../utils/ts-helpers.ts";
+import { getConfig } from "../../config.ts";
+import type { ConfigSchemaType } from "../../utils/config-validation-schema.ts";
 
 type SourceRow = {
 	ID: number;
@@ -16,33 +18,8 @@ type SeenRow = {
 	Seen: SupiDate;
 };
 
-type ImageHostDefinition = {
-	name: string;
-	hostnames: readonly string[];
-	slugPattern: string;
-	extensions: readonly string[];
-};
-const BASE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "mp4"];
-const HOSTS_DEFINITIONS = [
-	{
-		name: "imgur",
-		hostnames: ["imgur.com", "i.imgur.com"],
-		slugPattern: "[A-Za-z0-9]{5,8}",
-		extensions: BASE_EXTENSIONS
-	},
-	{
-		name: "nuuls",
-		hostnames: ["i.nuuls.com"],
-		slugPattern: "[A-Za-z0-9]{5,8}",
-		extensions: BASE_EXTENSIONS
-	},
-	{
-		name: "kappa",
-		hostnames: ["kappa.lol"],
-		slugPattern: "[A-Za-z0-9]{5,8}",
-		extensions: []
-	}
-] as const satisfies readonly ImageHostDefinition[];
+type ImageHostDefinition = NonNullable<ConfigSchemaType["modules"]["chat-modules"]["link-gatherer"]>["providers"][number];
+const HOSTS_DEFINITIONS = (getConfig().modules["chat-modules"]["link-gatherer"]?.providers ?? []);
 
 const createLinkRegex = (host: ImageHostDefinition): RegExp => {
 	let body;
@@ -68,6 +45,10 @@ export default defineChatModule({
 	platform: ["twitch", "discord"],
 	scope: "platform",
 	initialize: async () => {
+		if (HOSTS_DEFINITIONS.length === 0) {
+			return false;
+		}
+
 		const [sourceTableAvailable, seenTableAvailable] = await Promise.all([
 			core.Query.isTablePresent("data", "Media_Source"),
 			core.Query.isTablePresent("data", "Media_Seen")
