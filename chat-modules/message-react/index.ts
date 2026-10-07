@@ -1,5 +1,8 @@
 import * as z from "zod";
+import { SupiDate } from "supi-core";
 import { defineChatModule } from "../../classes/chat-module.ts";
+
+const DEFAULT_TIMEOUT = 2500;
 
 export default defineChatModule({
 	name: "message-react",
@@ -7,6 +10,7 @@ export default defineChatModule({
 	platform: "all",
 	scope: "channel",
 	config: z.array(z.object({
+		timeout: z.int().min(500).optional(),
 		ignoreCase: z.boolean().optional(),
 		response: z.string(),
 		check: z.union([
@@ -25,8 +29,9 @@ export default defineChatModule({
 			})
 		])
 	})),
+	state: () => ({ timeout: [] as number[] }),
 	handlers: {
-		message (context, runtime) {
+		message (context, { config, state }) {
 			const { channel, platform, user } = context;
 			if (!user) {
 				return;
@@ -38,11 +43,19 @@ export default defineChatModule({
 				return;
 			}
 
+			const now = SupiDate.now();
 			const { message } = context;
-			for (const item of runtime.config) {
+
+			for (let i = 0; i < config.length; i++) {
 				let passed: boolean;
-				const { ignoreCase = false, check, response } = item;
+				const item = config[i];
+				const { ignoreCase = false, check, response, timeout = DEFAULT_TIMEOUT } = item;
 				const checkMessage = (ignoreCase) ? message.toLowerCase() : message;
+
+				const itemTimeout = state.timeout[i] ?? 0;
+				if (now < itemTimeout) {
+					continue;
+				}
 
 				if (check.type === "string") {
 					const { string } = check;
@@ -77,6 +90,7 @@ export default defineChatModule({
 
 				if (passed) {
 					void channel.send(response);
+					state.timeout[i] = now + timeout;
 				}
 			}
 		}
