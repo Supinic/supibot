@@ -8,8 +8,10 @@ import type { SubscribeCommandContext } from "./index.ts";
 
 const DEFAULT_CHANNEL_ID = 38;
 export const rssEventDefinitionSchema = z.object({
+	type: z.literal("rss"),
 	title: z.string(),
 	names: z.array(z.string()).min(1),
+	notes: z.string().optional(),
 	url: z.string(),
 	channelSpecificMention: z.boolean().optional(),
 	cronExpression: z.string().optional(),
@@ -244,14 +246,7 @@ type SpecialResponseEventDefinition = SpecialBaseEventDefinition & {
 	};
 };
 export type SpecialEventDefinition = SpecialHandlerEventDefinition | SpecialResponseEventDefinition;
-export type RssEventDefinition = BaseEventDefinition & {
-	type: "rss";
-	url: string;
-	emote?: string;
-	cronExpression?: string;
-	item?: string;
-	options?: z.infer<typeof rssEventDefinitionSchema>["options"];
-};
+export type RssEventDefinition = z.infer<typeof rssEventDefinitionSchema>;
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
 	process: () => Promise<null | { message: string }>;

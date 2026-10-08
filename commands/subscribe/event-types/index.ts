@@ -14,10 +14,10 @@ import YoutubeVideoSubDefinition from "./youtube-video.ts";
 import rawRssDefinitions from "./rss-definitions.json" with { type: "json" };
 
 const rssJsonSchema = z.array(rssEventDefinitionSchema);
-const rssDefinitions = rssJsonSchema.parse(rawRssDefinitions).map(i => ({
+const rssDefinitions = rssJsonSchema.parse(rawRssDefinitions.map(i => ({
 	...i,
 	type: "rss" as const
-}));
+})));
 
 const definitions = [
 	BrighterShoresSubDefinition,
