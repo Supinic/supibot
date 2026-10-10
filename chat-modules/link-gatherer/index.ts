@@ -24,12 +24,15 @@ const HOSTS_DEFINITIONS = (getConfig().modules["chat-modules"]["link-gatherer"]?
 const createLinkRegex = (host: ImageHostDefinition): RegExp => {
 	let body;
 	const hostnames = host.hostnames.map(i => RegExp.escape(i)).join("|");
-	if (host.extensions.length === 0) {
-		body = String.raw `(?<![\w.-])(?:https?:\/\/)?(?:${hostnames})\/(?<slug>${host.slugPattern})`;
+	if (host.formatParameter) {
+		body = String.raw `(?<![\w.-])(?:https?:\/\/)?(?:${hostnames})\/(?<slug>${host.slugPattern})(?:\.[^/?#\s]+)?(?:\?(?<query>[^#\s]*))?(?=$|[\s#])`;
 	}
 	else {
-		const extensions = host.extensions.map(i => RegExp.escape(i)).join("|");
-		body = String.raw `(?<![\w.-])(?:https?:\/\/)?(?:${hostnames})\/(?<slug>${host.slugPattern})\.(?<extension>${extensions})(?=$|[/?#\s])`;
+		const extension = (host.extensions.length === 0)
+			? String.raw `(?<extension>[^/?#\s]+)`
+			: String.raw `(?<extension>${host.extensions.map(i => RegExp.escape(i)).join("|")})`;
+
+		body = String.raw `(?<![\w.-])(?:https?:\/\/)?(?:${hostnames})\/(?<slug>${host.slugPattern})(?:\.${extension})?(?=$|[/?#\s])`;
 	}
 
 	return new RegExp(body, "gi");
@@ -68,11 +71,16 @@ export default defineChatModule({
 
 			for (const { host, regex } of matchers) {
 				for (const match of context.message.matchAll(regex)) {
-					const { slug, extension = "" } = typeRegexGroups<"slug", "extension">(match);
+					const { slug, extension = "", query = "" } = typeRegexGroups<"slug", "extension" | "query">(match);
 					if (!slug) {
 						continue;
 					}
-					if (host.extensions.length !== 0 && !extension) {
+
+					const realExtension = host.formatParameter
+						? new URLSearchParams(query).get(host.formatParameter)?.toLowerCase() ?? ""
+						: extension.toLowerCase();
+
+					if (host.extensions.length !== 0 && (!realExtension || !host.extensions.includes(realExtension))) {
 						continue;
 					}
 
@@ -81,7 +89,7 @@ export default defineChatModule({
 						.from("data", "Media_Source")
 						.where("Host = %s", host.name)
 						.where("Slug = %s", slug)
-						.where("Extension = %s", extension)
+						.where("Extension = %s", realExtension)
 						.flat("ID")
 						.single()
 					);
@@ -90,7 +98,7 @@ export default defineChatModule({
 						row.setValues({
 							Host: host.name,
 							Slug: slug,
-							Extension: extension
+							Extension: realExtension
 						});
 
 						await row.save();

@@ -105,7 +105,8 @@ export const ConfigSchema = z.strictObject({
 					name: z.string(),
 					hostnames: z.array(z.string()).min(1),
 					slugPattern: z.string(),
-					extensions: z.array(z.string())
+					extensions: z.array(z.string().lowercase()),
+					formatParameter: z.string().optional()
 				}))
 			}).nullish()
 		}),
