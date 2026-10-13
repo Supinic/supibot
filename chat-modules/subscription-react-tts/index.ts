@@ -17,7 +17,7 @@ const adjectives = [
 ];
 
 export default defineChatModule({
-	name: "sub-react-tts",
+	name: "subscription-react-tts",
 	description: "Reacts to Twitch raids with a TTS message",
 	scope: "channel",
 	platform: ["twitch"],
