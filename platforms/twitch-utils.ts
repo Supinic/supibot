@@ -235,7 +235,7 @@ export interface SubscribeMessageNotification extends NotificationMessage {
 			broadcaster_user_login: string;
 			broadcaster_user_name: string;
 			tier: SubscriptionTier;
-			message: {
+			message?: {
 				text: string;
 				emotes: {
 					begin: number;

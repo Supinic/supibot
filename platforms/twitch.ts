@@ -1052,14 +1052,17 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	}
 
 	async handleSub (notification: SubscribeMessageNotification) {
+		await logger.log("Twitch.Sub", JSON.stringify({ notification }));
+
 		const { event } = notification.payload;
+		if (!event.message) {
+			return;
+		}
 
 		const channelData = sb.Channel.get(event.broadcaster_user_login);
 		if (!channelData) {
 			return;
 		}
-
-		await logger.log("Twitch.Sub", JSON.stringify({ event }));
 
 		sb.ChatModule.dispatch({
 			event: "subscription",
