@@ -14,7 +14,11 @@ export default {
 		`<code>${prefix}7tv</code>`,
 		`<code>${prefix}7tv check</code>`,
 		"Posts the list of current rotating emotes.",
-		`You can also use the <code>${prefix}7tv</code> command with on its own (with no arguments) and it will post the list of emotes.`
+		`You can also use the <code>${prefix}7tv</code> command with on its own (with no arguments) and it will post the list of emotes.`,
+		"",
+
+		`<code>${prefix}7tv check (emote name)</code>`,
+		"Checks if the emote is in the list, and also says who requested and when if it does."
 	],
 	execute: async (context, type, emote) => {
 		if (!context.channel) {
