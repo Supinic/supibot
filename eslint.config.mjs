@@ -190,7 +190,9 @@ export default tseslint.config(
 			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/restrict-template-expressions": ["warn", { // Allow numbers in template expressions without requiring explicit stringification
-				allowNumber: true
+				allowNumber: true,
+				allowNullish: false,
+				allowRegExp: false
 			}],
 			"@typescript-eslint/no-confusing-void-expression": ["warn", { // Ignore arrow functions implicitly "returning" another void function's result
 				ignoreVoidReturningFunctions: true
