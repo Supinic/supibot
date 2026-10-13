@@ -8,6 +8,10 @@ export default defineChatModule({
 	description: "Reacts to Twitch raids with a TTS message",
 	platform: ["twitch"],
 	scope: "channel",
+	initialize: () => {
+		const { listenerAddress, listenerPort } = local;
+		return Boolean(listenerAddress && listenerPort);
+	},
 	handlers: {
 		async raid (context) {
 			const { listenerAddress, listenerPort } = local;
