@@ -46,6 +46,18 @@ type TextTransformDefinition = {
 	reverseData?: (message: string) => string | ResultFailure;
 };
 
+const MAX_TEXTCODE_WORD_LENGTH = 16;
+const isValidTextRegex = (string: string): boolean => {
+	for (let i = 0; i < string.length; i++) {
+		const char = string[i];
+		if (char.toLocaleLowerCase() === char.toLocaleUpperCase()) {
+			return false;
+		}
+	}
+
+	return true;
+};
+
 const convert = {
 	method: (string: string, fn: TextTransformFunction) => fn(string),
 	map: (string: string, map: TextTransformMap) => [...string].map(i => map[i] || i).join(""),
@@ -467,6 +479,48 @@ const definitions: TextTransformDefinition[] = [
 		},
 		reverseData: (string) => {
 			const result = textCaseCode.decode(string, "forsen");
+			return (isResultFailure(result)) ? result : result.join("").trim();
+		}
+	},
+	{
+		name: "textcode",
+		type: "method",
+		aliases: ["tc"],
+		description: "Transforms your input into a list of text-coded words, based on GaZaTu's ForsenCode protocol.",
+		data: (string) => {
+			const [codeword, ...rest] = string.split(" ");
+			if (codeword.length > MAX_TEXTCODE_WORD_LENGTH) {
+				return {
+					success: false,
+					reply: `Your code word is too long! Max. ${MAX_TEXTCODE_WORD_LENGTH} characters (yours is ${codeword.length} long)`
+				};
+			}
+			else if (!isValidTextRegex(codeword)) {
+				return {
+					success: false,
+					reply: "Your codeword is not valid! It should only contain letters A-Z."
+				};
+			}
+
+			const result = textCaseCode.encode(rest.join(" "), codeword);
+			return (isResultFailure(result)) ? result : result.join(" ").trim();
+		},
+		reverseData: (string) => {
+			const [codeword, ...rest] = string.split(" ");
+			if (codeword.length > MAX_TEXTCODE_WORD_LENGTH) {
+				return {
+					success: false,
+					reply: `Your code word is too long! Max. ${MAX_TEXTCODE_WORD_LENGTH} characters (yours is ${codeword.length} long)`
+				};
+			}
+			else if (!isValidTextRegex(codeword)) {
+				return {
+					success: false,
+					reply: "Your codeword is not valid! It should only contain letters A-Z."
+				};
+			}
+
+			const result = textCaseCode.decode(rest.join(" "), codeword);
 			return (isResultFailure(result)) ? result : result.join("").trim();
 		}
 	},

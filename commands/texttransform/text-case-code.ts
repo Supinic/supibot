@@ -39,7 +39,7 @@ const encode = (input: string, codeWord: string): string[] | ResultFailure => {
 		let bit = (1 << codeWord.length);
 		const result = [];
 		for (const codeChar of codeWord) {
-			if (codeWord.length === 6 && bit === 32) {
+			if (bit === 32) {
 				let diaeresis = "";
 				if ((value & bit) === 0) {
 					diaeresis = DIAERESIS;
@@ -76,7 +76,7 @@ const decode = (input: string, codeWord: string): string[] | ResultFailure => {
 	const words = input.split(/\s/);
 	const output = [];
 	for (const rawWord of words) {
-		const normalized = rawWord.normalize("NFKD").replaceAll(DIAERESIS, "").toLowerCase();
+		const normalized = rawWord.replaceAll(DIAERESIS, "").toLowerCase();
 		const codeIndex = normalized.indexOf(codeWord.toLowerCase());
 		if (codeIndex === -1) {
 			continue;
@@ -98,8 +98,8 @@ const decode = (input: string, codeWord: string): string[] | ResultFailure => {
 
 		for (let i = 0; i < word.length; i++) {
 			const isUpperCase = (word[i] === word[i].toUpperCase());
-			if (codeWord.length === 6 && bit === 32) {
-				const normalizedStringArray = word[i].normalize("NFKD").split("");
+			if (bit === 32) {
+				const normalizedStringArray = word[i].split("");
 				const hasDiaeresis = (normalizedStringArray[1] === DIAERESIS);
 				if (!hasDiaeresis) {
 					value += bit;
