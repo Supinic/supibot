@@ -1,7 +1,8 @@
-import { SupiDate } from "supi-core";
+import { SupiDate, SupiError } from "supi-core";
 import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 import { defineChatModule } from "../../classes/chat-module.ts";
 import { twitchVodSchema } from "../../utils/schemas.ts";
+import { typeRegexGroups } from "../../utils/ts-helpers.ts";
 const { SONG_REQUESTS_STATE } = cacheKeys;
 
 type StreamRow = {
@@ -9,6 +10,20 @@ type StreamRow = {
 	Date: SupiDate;
 	Start: SupiDate;
 	End: SupiDate;
+};
+
+const twitchRegex = /^((?<hours>\d+)h)?((?<minutes>\d+)m)?((?<seconds>\d+)s)?$/;
+const parseTwitchDuration = (string: string): number | null => {
+	const match = string.match(twitchRegex);
+	console.log(match);
+	if (!match) {
+		return null;
+	}
+
+	const { hours, minutes, seconds } = typeRegexGroups<never, "hours" | "minutes" | "seconds">(match);
+
+	const result = (Number(hours ?? 0) * 3600) + (Number(minutes ?? 0) * 60) + Number(seconds ?? 0);
+	return Number.isSafeInteger(result) ? result : null;
 };
 
 const handle = async (event: "online" | "offline") => {
@@ -56,10 +71,15 @@ const handle = async (event: "online" | "offline") => {
 			await row.load(stream.id);
 
 			if (stream.duration) {
-				const vodDuration = core.Utils.parseVideoDuration(stream.duration);
-				if (vodDuration) {
-					row.values.End = start.clone().addSeconds(vodDuration);
+				const vodDuration = parseTwitchDuration(stream.duration);
+				if (!vodDuration) {
+					throw new SupiError({
+						message: "Unusable Twitch VOD duration",
+						args: { vodDuration, stream }
+					});
 				}
+
+				row.values.End = start.clone().addSeconds(vodDuration);
 			}
 
 			await row.save();
@@ -99,11 +119,11 @@ export default defineChatModule({
 	platform: ["twitch"],
 	handlers: {
 		online () {
-			void handle("online");
+			return handle("online");
 		},
 
 		offline () {
-			void handle("offline");
+			return handle("offline");
 		}
 	}
 });
