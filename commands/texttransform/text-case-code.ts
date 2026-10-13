@@ -1,14 +1,18 @@
 /* eslint-disable no-bitwise */
 import { SupiError } from "supi-core";
+import type { ResultFailure } from "../../classes/command.ts";
 
 const DIAERESIS = "\u{0308}";
 
-const encode = (input: string, codeWord: string) => {
+const encode = (input: string, codeWord: string): string[] | ResultFailure => {
 	if (!codeWord) {
 		throw new Error("Code word not provided");
 	}
 	else if (codeWord.length < 6) {
-		throw new Error("Code word not long enough, at least 6 characters are required");
+		return {
+			success: false,
+			reply: "Your code word not long enough! At least 6 characters are required."
+		};
 	}
 
 	let buffer = "";
@@ -58,12 +62,15 @@ const encode = (input: string, codeWord: string) => {
 	return output;
 };
 
-const decode = (input: string, codeWord: string) => {
+const decode = (input: string, codeWord: string): string[] | ResultFailure => {
 	if (!codeWord) {
 		throw new SupiError({ message: "Code word not provided" });
 	}
 	else if (codeWord.length < 6) {
-		throw new SupiError({ message: "Code word not long enough, at least 6 characters are required" });
+		return {
+			success: false,
+			reply: "Your code word not long enough! At least 6 characters are required."
+		};
 	}
 
 	const words = input.split(/\s/);
@@ -72,7 +79,6 @@ const decode = (input: string, codeWord: string) => {
 		const normalized = rawWord.normalize("NFKD").replaceAll(DIAERESIS, "").toLowerCase();
 		const codeIndex = normalized.indexOf(codeWord.toLowerCase());
 		if (codeIndex === -1) {
-			output.push(rawWord);
 			continue;
 		}
 
@@ -117,6 +123,13 @@ const decode = (input: string, codeWord: string) => {
 		if (appendix) {
 			output.push(appendix, " ");
 		}
+	}
+
+	if (output.length === 0) {
+		return {
+			success: false,
+			reply: "Invalid input provided, couldn't decode anything!"
+		};
 	}
 
 	return output;

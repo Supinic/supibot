@@ -20,7 +20,7 @@ import MorseData from "./definitions/morse.json" with { type: "json" };
 import LingoCockneyDefinition from "./lingo-translations/cockney.json" with { type: "json" };
 import LingoCowboyDefinition from "./lingo-translations/cowboy.json" with { type: "json" };
 import LingoOutbackDefinition from "./lingo-translations/outback.json" with { type: "json" };
-import type { ResultFailure } from "../../classes/command.ts";
+import { isResultFailure, type ResultFailure } from "../../classes/command.ts";
 import { SupiError } from "supi-core";
 
 const lingoSchema = z.object({
@@ -461,8 +461,14 @@ const definitions: TextTransformDefinition[] = [
 		type: "method",
 		aliases: ["forsencode"],
 		description: "Transforms your input into a list of \"forsen\" words, based on GaZaTu's ForsenCode protocol.",
-		data: (string) => textCaseCode.encode(string, "forsen").join(" ").trim(),
-		reverseData: (string) => textCaseCode.decode(string, "forsen").join("").trim()
+		data: (string) => {
+			const result = textCaseCode.encode(string, "forsen");
+			return (isResultFailure(result)) ? result : result.join(" ").trim();
+		},
+		reverseData: (string) => {
+			const result = textCaseCode.decode(string, "forsen");
+			return (isResultFailure(result)) ? result : result.join("").trim();
+		}
 	},
 	{
 		name: "spurdo",
