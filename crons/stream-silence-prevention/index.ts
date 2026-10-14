@@ -13,7 +13,7 @@ export default {
 	expression: "*/5 * * * * *",
 	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
 	code: (async function preventStreamSilence () {
-		if (!sb.MpvClient) {
+		if (!sb.MpvClient || !listenerAddress || !listenerPort) {
 			this.stop();
 			return;
 		}
