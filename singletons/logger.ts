@@ -261,10 +261,6 @@ export class LoggerSingleton {
 	 * Inserts a log message into the database - `chat_data.Log` table
 	 */
 	public async log (tag: Tag, description: string | null = null, channel: Channel | null = null, user: User | null = null) {
-		if (!this.started) {
-			return;
-		}
-
 		const [parentTag, childTag = null] = tag.split(".", 2);
 		const row = await core.Query.getRow("chat_data", "Log");
 
@@ -283,7 +279,7 @@ export class LoggerSingleton {
 			});
 		}
 
-		return result.insertId;
+		return result.insertId as number;
 	}
 
 	/**

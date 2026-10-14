@@ -48,7 +48,7 @@ type DurationStatus = {
 };
 const durationStatuses = responses.duration as Partial<Record<Status, DurationStatus[]>>;
 
-const NO_TEXT_AFK = "(no message)";
+export const NO_TEXT_AFK = "(no message)";
 const DEFAULT_AFK_STATUS = "afk";
 
 type ConstructorData = {

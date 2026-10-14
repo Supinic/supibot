@@ -1,8 +1,9 @@
 import { SupiError } from "supi-core";
+import { NO_TEXT_AFK } from "../../../classes/afk.ts";
 import type { Reminder } from "../../../classes/reminder.ts";
 import type { CheckSubcommandDefinition } from "../index.ts";
 
-type ReminderRow = Pick<Reminder, "ID" | "User_From" | "User_To" | "Schedule" | "Text">;
+type ReminderRow = Pick<Reminder, "ID" | "User_From" | "User_To" | "Schedule" | "Text" | "Type">;
 type HistoricReminderRow = ReminderRow & { Cancelled: boolean; };
 
 export default {
@@ -78,7 +79,24 @@ export default {
 		const reminder = row.valuesObject;
 		if (reminder.User_From !== context.user.ID && reminder.User_To !== context.user.ID) {
 			return {
-				reply: "That reminder was not created by you or for you. Stop peeking!"
+				success: false,
+				reply: "That reminder was not created by you or for you! Stop peeking!"
+			};
+		}
+
+		if (reminder.Type === "Pingme") {
+			if (!reminder.User_From) {
+				throw new SupiError({
+					message: "Assert error: Pingme reminder has no author",
+					args: { reminder }
+				});
+			}
+
+			const toUserData = await sb.User.getAsserted(reminder.User_To);
+			const target = (context.user.ID === reminder.User_From) ? `${toUserData.Name} types` : "you type";
+			return {
+				success: true,
+				reply: `Pingme reminder ID ${ID} - checks when ${target} in chat. ${status}`
 			};
 		}
 
@@ -108,9 +126,9 @@ export default {
 		const delta = (reminder.Schedule)
 			? ` (${core.Utils.timeDelta(reminder.Schedule)})`
 			: "";
-
 		return {
-			reply: `${owner} ID ${ID} ${target}${delta}: ${reminder.Text} ${status}`
+			success: true,
+			reply: `${owner} ID ${ID} ${target}${delta}: ${reminder.Text ?? NO_TEXT_AFK} ${status}`
 		};
 	}
 } satisfies CheckSubcommandDefinition;

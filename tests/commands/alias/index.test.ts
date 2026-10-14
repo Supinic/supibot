@@ -1,10 +1,11 @@
 import { it, describe, beforeEach, mock, afterEach } from "node:test";
 import assert from "node:assert/strict";
 
-import type { SupiDate } from "supi-core";
+import { SupiDate } from "supi-core";
 import { type User, permissions as userPermissions } from "../../../classes/user.ts";
 import { Command, type Context, type ContextData } from "../../../classes/command.ts";
 import type { Channel } from "../../../classes/channel.ts";
+import * as realAliasUtils from "../../../commands/alias/alias-utils.ts";
 
 import {
 	createTestPlatform,
@@ -17,13 +18,6 @@ import {
 } from "../../test-utils.ts";
 
 const EXISTING_COMMANDS = ["EXISTING_COMMAND"];
-
-// @todo I don't like this but it shuts up the local `sb.Command` reassignments
-declare global {
-	var sb: {
-		Command: typeof Command;
-	};
-}
 
 type AliasData = {
 	ID: number;
@@ -40,6 +34,64 @@ type AliasData = {
 	Edited: SupiDate | null;
 };
 
+describe("alias utils", () => {
+	const world = new TestWorld();
+	const parent: realAliasUtils.AliasData = {
+		ID: 1,
+		Name: "original",
+		User_Alias: 123,
+		Channel: null,
+		Command: "ping",
+		Invocation: "pong",
+		Arguments: null,
+		Description: null,
+		Parent: null,
+		Restrictions: null,
+		Created: new SupiDate(),
+		Edited: null
+	};
+
+	const link = {
+		...parent,
+		ID: 2,
+		User_Alias: 123,
+		Channel: null,
+		Command: null,
+		Invocation: null,
+		Arguments: null,
+		Parent: parent.ID
+	} satisfies Parameters<typeof realAliasUtils.getParentAlias>[0];
+
+	beforeEach(() => { world.install(); });
+	afterEach(() => { world.reset(); });
+
+	it("returns a validated classic parent", async () => {
+		world.queueRsData(parent);
+		assert.strictEqual(await realAliasUtils.getParentAlias(link), parent);
+	});
+
+	it("returns undefined for a missing parent", async () => {
+		world.queueRsData(undefined);
+		assert.strictEqual(await realAliasUtils.getParentAlias(link), undefined);
+	});
+
+	it("rejects a parent without an invocation", async () => {
+		world.queueRsData({ ...parent, Invocation: null });
+		await assert.rejects(realAliasUtils.getParentAlias(link), /Parent alias is not classic-type/);
+	});
+
+	it("rejects a parent that is itself a link", async () => {
+		world.queueRsData(link);
+		await assert.rejects(realAliasUtils.getParentAlias(link), /Parent alias is not classic-type/);
+	});
+
+	it("only narrows aliases with string invocations", () => {
+		assert.strictEqual(realAliasUtils.isClassicAlias(parent), true);
+		assert.strictEqual(realAliasUtils.isClassicAlias({ ...parent, Invocation: null }), false);
+		assert.strictEqual(realAliasUtils.isClassicAlias({ ...parent, Invocation: undefined } as unknown as realAliasUtils.AliasData), false);
+	});
+});
+
 describe("$alias", async () => {
 	let existingAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
 	let channelAliasMap: Record<string, Record<string, Partial<AliasData>> | undefined> = {};
@@ -47,7 +99,6 @@ describe("$alias", async () => {
 
 	const world = new TestWorld();
 
-	const realAliasUtils = await import("../../../commands/alias/alias-utils.ts");
 	mock.module("../../../commands/alias/alias-utils.ts", {
 		namedExports: {
 			...realAliasUtils,
@@ -273,7 +324,9 @@ describe("$alias", async () => {
 		it ("1 arg: should succeed when base user owns the provided alias", async () => {
 			const ALIAS_NAME = "Foo";
 			world.queueRsData([ALIAS_NAME]);
-			existingAliasMap[baseUser.ID] = { Foo: {} };
+			existingAliasMap[baseUser.ID] = {
+				Foo: { User_Alias: baseUser.ID, Channel: null, Command: "test", Invocation: "test", Parent: null }
+			};
 
 			const result = await run("check", ALIAS_NAME);
 			expectCommandResultSuccess(result, "Your alias", ALIAS_NAME, "has this definition");
@@ -291,7 +344,13 @@ describe("$alias", async () => {
 			world.setUserId(TARGET_USER, TARGET_USER_ID);
 
 			existingAliasMap[TARGET_USER_ID] = {
-				[ALIAS_NAME]: { Command: BASE_ALIAS_COMMAND }
+				[ALIAS_NAME]: {
+					User_Alias: TARGET_USER_ID,
+					Channel: null,
+					Command: BASE_ALIAS_COMMAND,
+					Invocation: BASE_ALIAS_COMMAND,
+					Parent: null
+				}
 			};
 
 			const result = await run("check", TARGET_USER, ALIAS_NAME);
@@ -427,6 +486,67 @@ describe("$alias", async () => {
 		});
 	});
 
+	describe("linked definitions", () => {
+		const linkedAlias = {
+			ID: 9101,
+			Name: "Linked",
+			User_Alias: BASE_USER_ID,
+			Channel: null,
+			Command: null,
+			Invocation: null,
+			Arguments: null,
+			Parent: 9100
+		};
+		const parentAlias = {
+			ID: 9100,
+			Name: "Original",
+			User_Alias: 123,
+			Channel: null,
+			Command: "ping",
+			Invocation: "pong",
+			Arguments: JSON.stringify(["hello", "world"]),
+			Parent: null
+		};
+
+		beforeEach(() => {
+			world.allowUser("author");
+			world.setUserId("author", parentAlias.User_Alias);
+			world.queueRsData([linkedAlias.Name]);
+			existingAliasMap[BASE_USER_ID] = { [linkedAlias.Name]: { ...linkedAlias } };
+			existingAliasMap[parentAlias.User_Alias] = { [parentAlias.Name]: { ...parentAlias } };
+		});
+
+		it("checks a linked alias using its parent's invocation and arguments", async () => {
+			const result = await run("check", linkedAlias.Name);
+			expectCommandResultSuccess(result, "This alias is a link", "author", "pong hello world");
+		});
+
+		it("prints only the parent's definition in code mode", async () => {
+			const result = await run("code", linkedAlias.Name);
+			assert.strictEqual(result.reply, "pong hello world");
+		});
+
+		it("reports a missing parent without interpolating null", async () => {
+			existingAliasMap[parentAlias.User_Alias] = {};
+			const result = await run("check", linkedAlias.Name);
+			expectCommandResultSuccess(result, "original has been deleted");
+		});
+
+		it("rejects a classic alias with a null invocation", async () => {
+			existingAliasMap[BASE_USER_ID] = {
+				[linkedAlias.Name]: { ...parentAlias, User_Alias: BASE_USER_ID, Invocation: null }
+			};
+			await assert.rejects(run("check", linkedAlias.Name), /Alias is not classic-type/);
+		});
+
+		it("rejects a linked definition with a null invocation", async () => {
+			existingAliasMap[parentAlias.User_Alias] = {
+				[parentAlias.Name]: { ...parentAlias, Invocation: null }
+			};
+			await assert.rejects(run("code", linkedAlias.Name), /Alias is not classic-type/);
+		});
+	});
+
 	describe("copy", () => {
 		it("0 args: should fail, no user name provided", async () => {
 			const resultCopy = await run("copy");
@@ -513,6 +633,7 @@ describe("$alias", async () => {
 					User_Alias: TARGET_USER_ID,
 					Parent: null,
 					Command: "foo",
+					Invocation: "foo",
 					Channel: null,
 					Restrictions: ["copy"] as ("link" | "copy")[]
 				}
@@ -536,6 +657,7 @@ describe("$alias", async () => {
 					User_Alias: TARGET_USER_ID,
 					Parent: null,
 					Command: "foo",
+					Invocation: "foo",
 					Channel: null
 				}
 			};

@@ -202,6 +202,10 @@ const parseRssNews = async function (xml: string, cacheKey: string, options: Rss
 	const result = [];
 	for (const article of eligibleArticles) {
 		const { link, title } = article;
+		if (!link || !title) {
+			continue;
+		}
+
 		result.push(`${title} ${link}`);
 	}
 

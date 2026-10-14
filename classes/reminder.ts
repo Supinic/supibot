@@ -145,17 +145,24 @@ export class Reminder extends TemplateWithId {
 	}
 
 	activateTimeout () {
-		if (!this.Schedule || this.Type === "Deferred") {
+		if (!this.Schedule || this.Type === "Deferred" || this.Type === "Pingme") {
 			return this;
 		}
-		else if (new SupiDate() > this.Schedule) {
+		if (new SupiDate() > this.Schedule) {
 			void this.deactivate(true, false);
 			return this;
 		}
 
+		const text = this.Text;
+		if (!text) {
+			throw new SupiError({
+				message: "Assert error: Scheduled reminder has no Text",
+				args: { reminder: this.ID }
+			});
+		}
+
 		this.timeout = new LongTimeout(async () => {
 			const channelData = (this.Channel === null) ? null : Channel.get(this.Channel);
-			const fromUserData = (this.User_From) ? await User.get(this.User_From, true) : null;
 			const toUserData = await User.get(this.User_To, true);
 			if (!toUserData) {
 				throw new SupiError({
@@ -164,20 +171,21 @@ export class Reminder extends TemplateWithId {
 				});
 			}
 
-			const fromMention = (fromUserData)
-				? await this.Platform.createUserMention(fromUserData, channelData)
-				: null;
-			const toMention = await this.Platform.createUserMention(toUserData, channelData);
+			const fromUserData = (this.User_From === this.User_To)
+				? toUserData
+				: ((this.User_From) ? await User.getAsserted(this.User_From) : null);
 
-			let message;
+			let message: string;
+			const toMention = await this.Platform.createUserMention(toUserData, channelData);
 			if (this.User_From === this.User_To) {
-				message = `${toMention}, reminder from yourself (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `${toMention}, reminder from yourself (${core.Utils.timeDelta(this.Created)}): ${text}`;
 			}
-			else if (!this.User_From) {
-				message = `${toMention}, system reminder (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
+			else if (!fromUserData) {
+				message = `${toMention}, system reminder (${core.Utils.timeDelta(this.Created)}): ${text}`;
 			}
-			else if (this.User_To) {
-				message = `${toMention}, timed reminder from ${fromMention} (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
+			else {
+				const fromMention = await this.Platform.createUserMention(fromUserData, channelData);
+				message = `${toMention}, timed reminder from ${fromMention} (${core.Utils.timeDelta(this.Created)}): ${text}`;
 			}
 
 			const statusAFK = AwayFromKeyboard.get(toUserData);
@@ -212,18 +220,13 @@ export class Reminder extends TemplateWithId {
 					if (channelData.Mirror) {
 						let mirrorMessage: string;
 						if (this.User_From === this.User_To) {
-							mirrorMessage = `${toUserData.Name}, reminder from yourself (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
+							mirrorMessage = `${toUserData.Name}, reminder from yourself (${core.Utils.timeDelta(this.Created)}): ${text}`;
 						}
-						else if (!this.User_From) {
-							mirrorMessage = `${toUserData.Name}, system reminder (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
-						}
-						else if (this.User_To && fromUserData) {
-							mirrorMessage = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${core.Utils.timeDelta(this.Created)}): ${this.Text}`;
+						else if (!fromUserData) {
+							mirrorMessage = `${toUserData.Name}, system reminder (${core.Utils.timeDelta(this.Created)}): ${text}`;
 						}
 						else {
-							throw new SupiError({
-								message: "Invalid combination of parameters in Reminder"
-							});
+							mirrorMessage = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${core.Utils.timeDelta(this.Created)}): ${text}`;
 						}
 
 						await channelData.mirror(mirrorMessage, null, { commandUsed: false });

@@ -1,4 +1,4 @@
-import { SupiDate } from "supi-core";
+import { SupiDate, SupiError } from "supi-core";
 import type { CheckSubcommandDefinition } from "../index.ts";
 import {
 	canEatDailyCookie,
@@ -63,6 +63,13 @@ export default {
 		}
 		else if (canEatDailyCookie(userCookieData, { hasDoubleCookieAccess })) {
 			const cookieType = determineAvailableDailyCookieType(userCookieData, { hasDoubleCookieAccess });
+			if (!cookieType) {
+				throw new SupiError({
+					message: "Assert error: Cookie logic mismatch - can eat cookie, but type says `null`",
+					args: { cookieType, userCookieData, hasDoubleCookieAccess }
+				});
+			}
+
 			string = `${pronoun} have a ${cookieType} cookie waiting to be eaten.`;
 		}
 		else if (hasDonatedDailyCookie(userCookieData)) {

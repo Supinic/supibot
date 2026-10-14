@@ -16,6 +16,13 @@ export default {
 
 		const $ = core.Utils.cheerio(response.body);
 		const text = $("#image-payload").attr("src");
+		if (!text) {
+			return {
+				success: false,
+				reply: "Could not find a fucked up Homer!"
+			};
+		}
+		
 		return {
 			text,
 			reply: `This fucked up Homer does not exist: ${text}`

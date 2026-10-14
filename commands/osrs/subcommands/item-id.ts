@@ -21,7 +21,7 @@ export default {
 		else {
 			return {
 				success: true,
-				reply: `${itemData.name}: ID = ${itemData.id}, HA value = ${itemData.highalch}`
+				reply: `${itemData.name}: ID = ${itemData.id}, HA value = ${itemData.highalch ?? "N/A"}`
 			};
 		}
 	}

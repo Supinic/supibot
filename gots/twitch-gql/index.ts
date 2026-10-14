@@ -1,16 +1,16 @@
 import type { GotRegistryInstanceDefinition } from "supi-core";
 
-const list = [
-	"TWITCH_GQL_OAUTH",
-	"TWITCH_GQL_CLIENT_ID",
-	"TWITCH_GQL_CLIENT_VERSION",
-	"TWITCH_GQL_DEVICE_ID"
-];
-
 export default {
 	name: "TwitchGQL",
 	options: (() => {
-		if (list.some(key => !process.env[key])) {
+		const {
+			TWITCH_GQL_OAUTH: oauth,
+			TWITCH_GQL_CLIENT_ID: clientId,
+			TWITCH_GQL_CLIENT_VERSION: version,
+			TWITCH_GQL_DEVICE_ID: deviceId
+		} = process.env;
+
+		if (!oauth || !clientId || !version || !deviceId) {
 			throw new Error("Twitch GQL core.Got instance cannot initialize - missing configuration variable(s)");
 		}
 
@@ -22,12 +22,12 @@ export default {
 			headers: {
 				Accept: "*/*",
 				"Accept-Language": "en-US",
-				Authorization: `OAuth ${process.env.TWITCH_GQL_OAUTH}`,
-				"Client-ID": process.env.TWITCH_GQL_CLIENT_ID,
-				"Client-Version": process.env.TWITCH_GQL_CLIENT_VERSION,
+				Authorization: `OAuth ${oauth}`,
+				"Client-ID": clientId,
+				"Client-Version": version,
 				"Content-Type": "text/plain;charset=UTF-8",
 				Referer: "https://www.twitch.tv",
-				"X-Device-ID": process.env.TWITCH_GQL_DEVICE_ID
+				"X-Device-ID": deviceId
 			}
 		};
 	}),

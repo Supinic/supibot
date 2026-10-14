@@ -100,7 +100,7 @@ export default {
 				let level = String(found.level);
 				if (context.params.virtual) {
 					level = (name === "overall")
-						? `${found.level} (virtual: ${found.virtualLevel})`
+						? `${found.level} (virtual: ${found.virtualLevel ?? "N/A"})`
 						: String(found.virtualLevel ?? found.level);
 				}
 

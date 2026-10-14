@@ -1,7 +1,7 @@
+import { SupiError } from "supi-core";
 import { type AliasSubcommandDefinition } from "../index.ts";
 import { prefix } from "../../../utils/command-utils.ts";
-
-import { getLinkedAlias, isLinkedAlias, getAliasByNameAndUser, parseAliasArguments } from "../alias-utils.ts";
+import { getParentAlias, isClassicAlias, isLinkedAlias, getAliasByNameAndUser, parseAliasArguments } from "../alias-utils.ts";
 import { type User } from "../../../classes/user.ts";
 
 export default {
@@ -168,7 +168,13 @@ export default {
 		let targetAlias = alias;
 		if (isLinkedAlias(alias)) {
 			// special case for linked aliases
-			const linkedAlias = await getLinkedAlias(alias.Parent);
+			const linkedAlias = await getParentAlias(alias);
+			if (!linkedAlias) {
+				return {
+					reply: `${prefix} alias is a link to a different alias, but the original has been deleted.`
+				};
+			}
+
 			const originalUser = await sb.User.getAsserted(linkedAlias.User_Alias);
 
 			appendix = `This alias is a link to "${alias.Name}" made by ${originalUser.Name}.`;
@@ -178,6 +184,13 @@ export default {
 			return {
 				reply: `${prefix} alias is a link to a different alias, but the original has been deleted.`
 			};
+		}
+
+		if (!isClassicAlias(targetAlias)) {
+			throw new SupiError({
+				message: "Assert error: Alias is not classic-type",
+				args: { targetAlias }
+			});
 		}
 
 		let message;

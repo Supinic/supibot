@@ -283,7 +283,7 @@ export default declare({
 						? core.Utils.fixHTML(core.Utils.removeHTML(i.com ?? ""))
 						: null,
 					file: (typeof i.filename !== "undefined")
-						? `https://i.4cdn.org/${board.name}/${i.tim}${i.ext}`
+						? `https://i.4cdn.org/${board.name}/${i.tim}${i.ext ?? ""}`
 						: null,
 					country: i.country ?? null
 				}));
@@ -321,9 +321,16 @@ export default declare({
 			: "";
 
 		if (resultType === "file") {
+			if (!post.file) {
+				throw new SupiError({
+					message: "Assert error: 4chan post does not have a file",
+					args: { post }
+				});
+			}
+
 			return {
 				reply: (context.params.textOnly)
-					? `${post.file} ${post.content}`
+					? `${post.file} ${post.content ?? ""}`
 					: `${post.ID} ${flagEmoji} (posted ${delta}): ${post.file} ${post.content ?? ""}`
 			};
 		}

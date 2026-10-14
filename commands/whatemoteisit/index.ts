@@ -107,10 +107,10 @@ export default declare({
 
 		let tierString: string;
 		if (emoteType === "SUBSCRIPTIONS") {
+			const tier = (emoteTier) ? `tier ${emoteTier} ` : "";
 			if (!channelName && !channelLogin) {
-				const tier = (emoteTier) ? `tier ${emoteTier}` : "";
 				return {
-					reply: `${emoteCode} (ID ${emoteID}) - ${active} ${tier} emote to an unknown banned/deleted channel. ${cdnLink} ${originString}`
+					reply: `${emoteCode} (ID ${emoteID}) - ${active} ${tier}emote to an unknown banned/deleted channel. ${cdnLink} ${originString}`
 				};
 			}
 			else if (channelName && channelLogin) {
@@ -120,7 +120,7 @@ export default declare({
 				}
 
 				// emoteLink += `channels/${channelID}/emotes/${emoteID}`;
-				tierString = `tier ${emoteTier} ${emoteAssetType.toLowerCase()} sub emote to channel ${channelString}`;
+				tierString = `${tier}${emoteAssetType.toLowerCase()} sub emote to channel ${channelString}`;
 			}
 			else {
 				throw new SupiError({

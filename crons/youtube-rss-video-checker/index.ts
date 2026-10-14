@@ -110,7 +110,7 @@ export default {
 					continue;
 				}
 
-				strings.push(`${item.title} https://youtu.be/${id}`);
+				strings.push(`${item.title ?? "(no title)"} https://youtu.be/${id}`);
 			}
 
 			channelVideosMap.set(channelId, strings);

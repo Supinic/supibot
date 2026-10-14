@@ -251,8 +251,11 @@ export default declare({
 				}
 
 				const { clip, clipKey } = ivrClipSchema.parse(response.body);
-				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
+				if (!clipKey) {
+					throw new SupiError({ message: "Assert error: no clipKey found in IVR schema" });
+				}
 
+				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
 				data = {
 					name: clip.title,
 					ID: `https://clips.twitch.tv/${clip.slug}`,

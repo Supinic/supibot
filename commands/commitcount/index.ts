@@ -56,7 +56,7 @@ export default declare({
 		}
 
 		result.self ??= (!username || context.user.Name === sb.User.normalizeUsername(username));
-		const who = (result.self)
+		const who = (result.self || !username)
 			? "You have"
 			: `${provider.prettyName} user ${username} has`;
 

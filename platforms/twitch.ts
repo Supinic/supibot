@@ -864,7 +864,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 				await core.Cache.setByPrefix(cacheKey, true, { expiry: 30 * 60_000 }); // 30 minutes
 				await logger.log(
 					"Twitch.Other",
-					`User mismatch notified: ${userData.Name} - ${userData.Twitch_ID}`,
+					`User mismatch notified: ${userData.Name} - ${userData.Twitch_ID ?? "N/A"}`,
 					channelData,
 					userData
 				);
@@ -1370,6 +1370,10 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	}
 
 	static async fetchChannelSevenTVEmotes (channelData: Channel): Promise<Emote[]> {
+		if (!channelData.Specific_ID) {
+			return [];
+		}
+
 		const response = await core.Got.get("GenericAPI")<SevenTvEmoteResponse>({
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});

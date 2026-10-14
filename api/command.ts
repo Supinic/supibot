@@ -178,7 +178,7 @@ export default {
 			info.push(`Aliases\n${aliases}`);
 		}
 
-		info.push(`Quick description\n${commandData.Description}`);
+		info.push(`Quick description\n${commandData.Description ?? "N/A"}`);
 
 		if (commandData.Params.length > 0) {
 			const params = commandData.Params.map(i => `${i.name} (${i.type})`).join("\n");

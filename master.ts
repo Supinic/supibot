@@ -170,9 +170,12 @@ globalThis.sb = {
 };
 
 console.timeEnd("basic bot modules");
-console.time("chat modules");
 
-void logger.start();
+console.time("logger start");
+await logger.start();
+console.timeEnd("logger start");
+
+console.time("chat modules");
 const gotInstances = filterModuleDefinitions("name", gotDefinitions as GotRegistryInstanceDefinition[], config.modules.gots);
 core.Got.import(gotInstances);
 
@@ -182,7 +185,6 @@ sb.ChatModule.import(
 	filterModuleDefinitions("name", chatModuleDefinitions, config.modules["chat-modules"])
 );
 await sb.ChatModule.initialize();
-
 console.timeEnd("chat modules");
 
 core.Metrics.registerCounter({

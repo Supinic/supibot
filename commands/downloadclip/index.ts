@@ -39,7 +39,7 @@ export default declare({
 			break;
 		}
 
-		if (resultSlug) {
+		if (!resultSlug) {
 			return {
 				success: false,
 				reply: `No proper clip link provided!`

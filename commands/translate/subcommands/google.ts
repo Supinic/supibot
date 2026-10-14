@@ -123,7 +123,7 @@ export default {
 
 		if (response.statusCode === 400) {
 			const targets = [options.from, options.to].filter(i => i !== "en" && i !== "auto");
-			const languages = targets.map(i => `${i}: ${getName(i)}`);
+			const languages = targets.map(i => `${i}: ${getName(i) ?? "(unknown)"}`);
 			return {
 				success: false,
 				reply: `One or both languages are not supported! (${languages.join(", ")})`

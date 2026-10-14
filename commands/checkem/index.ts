@@ -1,4 +1,3 @@
-import { SupiDate } from "supi-core";
 import { declare, type ContextPlatformSpecificData } from "../../classes/command.ts";
 import type { TwitchMessageData } from "../../platforms/twitch-utils.ts";
 
@@ -75,10 +74,6 @@ export default declare({
 		}
 
 		const checkEmName = REPEATED_NUMBERS_NAMES.get(repeatsAmount);
-		if (repeatsAmount > 2) {
-			console.log(`${checkEmName}!`, new SupiDate(), context.channel.Name, context.user.Name);
-		}
-
 		if (!checkEmName) {
 			return {
 				reply: `${croppedNumber} - you got more than 10 repeating digits?! Big gratz!`,

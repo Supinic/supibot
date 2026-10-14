@@ -7,9 +7,9 @@ const { PLAYSOUNDS_ENABLED } = cacheKeys;
 const {
 	listenerAddress,
 	listenerPort,
-	playsoundListUrl = "(no address configured)"
+	playsoundListUrl
 } = getConfig().local ?? {};
-const listenerEnabled = Boolean(listenerAddress && listenerPort);
+const listUrl = playsoundListUrl ?? "(no address configured)";
 
 const BASE_PLAYSOUND_CACHE_KEY = "playsound-cooldown";
 const getPlaysoundCacheKey = (playsoundName: string) => `${BASE_PLAYSOUND_CACHE_KEY}-${playsoundName}`;
@@ -28,9 +28,9 @@ export default declare({
 	Description: "Plays a sound on Supinic's stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
 	Flags: ["developer", "mention", "pipe", "whitelist"],
 	Params: [],
-	Whitelist_Response: `You can't use the command here, but here's a list of supported playsounds: ${playsoundListUrl}`,
+	Whitelist_Response: `You can't use the command here, but here's a list of supported playsounds: ${listUrl}`,
 	Code: (async function playSound (context, playsound) {
-		if (!listenerEnabled) {
+		if (!listenerAddress || !listenerPort) {
 			return {
 				success: false,
 				reply: `Local playsound listener is not configured!`
@@ -47,7 +47,7 @@ export default declare({
 		else if (!playsound || playsound === "list") {
 			return {
 				success: true,
-				reply: `Currently available playsounds: ${playsoundListUrl}`
+				reply: `Currently available playsounds: ${listUrl}`
 			};
 		}
 

@@ -40,7 +40,6 @@ const { TTS_ENABLED } = cacheKeys;
 const { listenerAddress, listenerPort } = getConfig().local ?? {};
 const epalAudioChannels = getConfig().local?.epalAudioChannels ?? [];
 const PROFILES_CACHE_KEY = "epal-profiles";
-const listenerEnabled = (epalAudioChannels.length === 0 || !listenerAddress || !listenerPort);
 
 export default declare({
 	Name: "epal",
@@ -110,7 +109,7 @@ export default declare({
 		} = core.Utils.randArray(profilesData);
 
 		const ttsStatus = await core.Cache.getByPrefix(TTS_ENABLED) as boolean | undefined;
-		if (context.channel && epalAudioChannels.includes(context.channel.ID) && ttsStatus && listenerEnabled) {
+		if (context.channel && epalAudioChannels.includes(context.channel.ID) && ttsStatus && listenerAddress && listenerPort) {
 			await core.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",

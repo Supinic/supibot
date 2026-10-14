@@ -177,7 +177,9 @@ export const getGlobalEmotes = async () => {
 	return emotes.filter(i => i.type === "7tv");
 };
 
-export const addEmote = async (token: string, emoteId: string, setId: string) => {
+type ModifyResult = { success: true; } | { success: false; statusCode: number; };
+
+export const addEmote = async (token: string, emoteId: string, setId: string): Promise<ModifyResult> => {
 	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation AddEmoteToSet($setId: Id!, $emote: EmoteSetEmoteId!) {
@@ -202,7 +204,7 @@ export const addEmote = async (token: string, emoteId: string, setId: string) =>
 	};
 };
 
-export const removeEmote = async (token: string, emoteId: string, setId: string) => {
+export const removeEmote = async (token: string, emoteId: string, setId: string): Promise<ModifyResult> => {
 	const variables = { emote: { emoteId }, setId };
 	const headers = { Authorization: `Bearer ${token}` };
 	const query = `mutation RemoveEmoteFromSet($setId: Id!, $emote: EmoteSetEmoteId!) {

@@ -131,16 +131,16 @@ export const fetch = async (options: NewsOptions, code: string, query: string): 
 	}
 	else {
 		const { limit } = options;
-		result = sanitizeHtmlString(`${title}${separator}${content ?? ""} ${link} ${delta}`);
+		result = sanitizeHtmlString(`${title}${separator}${content ?? ""} ${link ?? ""} ${delta}`);
 
 		// If the result is too long at first, skip the article content
 		if (result.length >= limit) {
-			result = sanitizeHtmlString(`${title} ${link} ${delta}`);
+			result = sanitizeHtmlString(`${title} ${link ?? ""} ${delta}`);
 		}
 
 		// If the result is still too long, omit the article text completely and only include the link
 		if (result.length >= limit) {
-			result = sanitizeHtmlString(`${link} ${delta}`);
+			result = sanitizeHtmlString(`${link ?? ""} ${delta}`);
 		}
 	}
 

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { SupiDate, SupiError } from "supi-core";
-import { declare } from "../../classes/command.ts";
+import { declare, isResultFailure, type ResultFailure } from "../../classes/command.ts";
 import { fetchGeoLocationData, fetchTimeData, formatTimezoneOffset } from "../../utils/command-utils.ts";
 import rawTimezones from "./timezones.json" with { type: "json" };
 import { typeRegexGroups } from "../../utils/ts-helpers.ts";
@@ -13,7 +13,10 @@ const timezonesSchema = z.array(z.object({
 }));
 const timezones = timezonesSchema.parse(rawTimezones);
 
-const detectTimezone = (...args: string[]) => {
+type FullTimezone = { date: string; offset: string; abbr: string; name: string; };
+type PartialTimezone = { date: string; offset: string; abbr: null; name: null; };
+
+const detectTimezone = (...args: string[]): FullTimezone | PartialTimezone | ResultFailure | null => {
 	const query = args.join(" ");
 	const utcRegex = /(?<base>UTC|GMT)(?<sign>[+-])(?<hours>\d{1,2})(:?(?<minutes>\d{1,2}))?/i;
 	const match = query.match(utcRegex);
@@ -90,6 +93,10 @@ export default declare({
 
 		const zone = detectTimezone(...args);
 		if (zone) {
+			if (isResultFailure(zone)) {
+				return zone;
+			}
+
 			return {
 				reply: (zone.name && zone.abbr)
 					? `TIMEZONEDETECTED ${zone.abbr} is ${zone.name}, which is UTC${zone.offset} and it is ${zone.date} there right now.`

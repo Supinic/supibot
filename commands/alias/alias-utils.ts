@@ -180,7 +180,17 @@ export const getAliasById = async (id: AliasData["ID"]) => {
 };
 
 export const getParentAlias = async (linkedAlias: LinkedAliasData) => {
-	const aliasData = await getAliasById(linkedAlias.Parent) as ClassicAliasData | undefined;
+	const aliasData = await getAliasById(linkedAlias.Parent);
+	if (!aliasData) {
+		return;
+	}
+	if (!isClassicAlias(aliasData)) {
+		throw new SupiError({
+			message: "Assert error: Parent alias is not classic-type",
+			args: { linkedAlias, aliasData }
+		});
+	}
+
 	return aliasData;
 };
 
@@ -208,7 +218,7 @@ export const getChannelAlias = async (name: string, channelId: Channel["ID"]) =>
 );
 
 export const isClassicAlias = (alias: AliasData): alias is ClassicAliasData => (
-	(alias.Command !== null) && (alias.Channel === null) && (alias.User_Alias !== null)
+	(alias.Command !== null) && (typeof alias.Invocation === "string") && (alias.Channel === null) && (alias.User_Alias !== null)
 );
 
 export const isLinkedAlias = (alias: AliasData): alias is LinkedAliasData => (
@@ -222,25 +232,6 @@ export const isOrphanedAlias = (alias: AliasData): alias is OrphanedAliasData =>
 export const isChannelAlias = (alias: AliasData): alias is ChannelAliasData => (
 	(alias.Parent !== null) && (alias.Command === null) && (alias.Channel !== null) && (alias.User_Alias === null)
 );
-
-export const getLinkedAlias = async (parentId: AliasData["ID"]) => {
-	const linkedAlias = await core.Query.getRecordset<LinkedAliasData | undefined>(rs => rs
-		.select("*")
-		.from("data", "Custom_Command_Alias")
-		.where("ID = %n", parentId)
-		.limit(1)
-		.single()
-	);
-
-	if (!linkedAlias) {
-		throw new SupiError({
-			message: "Assert error: Linked alias does not exist",
-			args: { parentId }
-		});
-	}
-
-	return linkedAlias;
-};
 
 export const getGenericAliasRow = async () => (
 	await core.Query.getRow<AliasData>("data", "Custom_Command_Alias")

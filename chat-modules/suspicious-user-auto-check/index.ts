@@ -163,7 +163,7 @@ export default defineChatModule({
 
 				let description: string;
 				if (lower === "me") {
-					description = `Twitch_ID: ${row.values.Twitch_ID} -> ${raw.userId}`;
+					description = `Twitch_ID: ${row.values.Twitch_ID ?? "N/A"} -> ${raw.userId}`;
 					row.setValues({ Twitch_ID: raw.userId });
 				}
 				else {

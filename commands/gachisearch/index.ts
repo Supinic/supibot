@@ -151,7 +151,7 @@ export default declare({
 		let link;
 		if (data.length === 1) {
 			const [first] = data;
-			reply = `"${first.name}" - ${first.isTodo ? "🚧" : ""} https://supinic.com/track/detail/${first.id}`;
+			reply = `"${first.name ?? "(no name)"}" - ${first.isTodo ? "🚧" : ""} https://supinic.com/track/detail/${first.id}`;
 			link = `https://supinic.com/track/detail/${first.id}`;
 		}
 		else {

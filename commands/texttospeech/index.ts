@@ -7,6 +7,7 @@ import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" }
 
 const { TTS_ENABLED } = cacheKeys;
 const { listenerAddress, listenerPort, ttsLengthLimit, ttsListUrl } = getConfig().local ?? {};
+const listUrl = ttsListUrl ?? "(no url defined)";
 
 const locales = z.array(z.object({
 	locale: z.string(),
@@ -16,7 +17,6 @@ const locales = z.array(z.object({
 const htmlListItems = locales.map(i => `<li><code>${i.locale}</code> - ${i.language}</li>`).join("");
 
 let pending = false;
-const ttsEnabled = Boolean(listenerAddress && listenerPort);
 const DEFAULT_TTS_LIMIT = 30_000;
 const limit = ttsLengthLimit ?? DEFAULT_TTS_LIMIT;
 
@@ -33,9 +33,9 @@ export default declare({
 		{ name: "lang", type: "string" },
 		{ name: "speed", type: "number" }
 	],
-	Whitelist_Response: `Check out the possible voices and locales here: ${ttsListUrl}`,
+	Whitelist_Response: `Check out the possible voices and locales here: ${listUrl}`,
 	Code: (async function textToSpeech (context, ...args) {
-		if (!ttsEnabled) {
+		if (!listenerAddress || !listenerPort) {
 			return {
 				success: false,
 				reply: "Local playsound listener is not configured!"
@@ -47,7 +47,7 @@ export default declare({
 			return {
 				cooldown: 5000,
 				success: false,
-				reply: `Check out the possible voices and locales here: ${ttsListUrl}`
+				reply: `Check out the possible voices and locales here: ${listUrl}`
 			};
 		}
 

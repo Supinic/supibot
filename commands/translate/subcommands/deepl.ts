@@ -35,6 +35,11 @@ const getDeeplLanguageList = async (): Promise<DeeplLanguage[]> => {
 	if (cacheData) {
 		return cacheData;
 	}
+	if (!process.env.API_DEEPL_KEY) {
+		throw new SupiError({
+			message: "No DeepL key configured (API_DEEPL_KEY)"
+		});
+	}
 
 	const response = await core.Got.get("GenericAPI")({
 		url: "https://api-free.deepl.com/v3/languages",

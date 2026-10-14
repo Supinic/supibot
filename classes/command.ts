@@ -1073,17 +1073,20 @@ export class Command extends TemplateWithoutId {
 			await context.transaction.end();
 		}
 
-		// Apply all unpings to the result, if it is still a string (aka the response should be sent)
-		if (typeof execution.reply === "string") {
-			execution.reply = await Filter.applyUnping({
-				command,
-				invocation: identifier,
-				channel: channelData ?? null,
-				platform: channelData?.Platform ?? null,
-				string: execution.reply,
-				executor: userData
-			});
+		const { reply } = execution;
+		if (!reply) {
+			return execution;
 		}
+
+		// Apply all unpings to the result, if it is still a string (aka the response should be sent)
+		execution.reply = await Filter.applyUnping({
+			command,
+			invocation: identifier,
+			channel: channelData ?? null,
+			platform: channelData?.Platform ?? null,
+			string: reply,
+			executor: userData
+		});
 
 		const mentionUser = Boolean(
 			!options.skipMention
@@ -1104,7 +1107,9 @@ export class Command extends TemplateWithoutId {
 				channelData
 			);
 
-			execution.reply = `${string}, ${execution.reply}`;
+			if (string) {
+				execution.reply = `${string}, ${execution.reply}`;
+			}
 		}
 
 		// If the `hasPrefix` condition is met (we want the external prefix to be added), we check two more conditions:

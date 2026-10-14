@@ -70,7 +70,7 @@ export default {
 
 			const pole = qualiResults.at(0);
 			if (pole) {
-				const driver = `${pole.Driver.givenName.at(0)}. ${pole.Driver.familyName}`;
+				const driver = `${pole.Driver.givenName[0]}. ${pole.Driver.familyName}`;
 				const time = pole.Q3 ?? pole.Q2 ?? pole.Q1;
 				const constructor = pole.Constructor.name;
 
@@ -79,7 +79,7 @@ export default {
 
 			if (raceResults.length !== 0) {
 				const podium = raceResults.slice(0, 3).map(i => {
-					const driver = `${i.Driver.givenName.at(0)}. ${i.Driver.familyName}`;
+					const driver = `${i.Driver.givenName[0]}. ${i.Driver.familyName}`;
 					const constructor = i.Constructor.name;
 
 					return `#${i.position}: ${driver} (${constructor})`;

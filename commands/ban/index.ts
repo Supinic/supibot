@@ -59,7 +59,7 @@ export default declare({
 			};
 		}
 
-		const options: FilterCreateData = {
+		const options: FilterCreateData & { Type: FilterType } = {
 			Channel: null,
 			User_Alias: null,
 			Command: null,

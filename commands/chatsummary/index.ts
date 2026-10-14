@@ -1,4 +1,4 @@
-import { declare } from "../../classes/command.ts";
+import { declare, type ResultFailure } from "../../classes/command.ts";
 import { SupiDate, SupiError } from "supi-core";
 
 import { GptDeepInfra } from "../gpt/gpt-deepinfra.ts";
@@ -21,7 +21,9 @@ const RUSTLOG_RESPONSES = {
 	default: "Unspecified error occured! Try again later."
 };
 
-const getLocalLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT) => {
+type LogSuccess = { success: true; text: string; };
+
+const getLocalLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT): Promise<LogSuccess> => {
 	const twitch = sb.Platform.getAsserted("twitch");
 	const channelData = sb.Channel.get(channel, twitch);
 	if (!channelData) {
@@ -51,7 +53,7 @@ const getLocalLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT)
 		.map(row => {
 			const userData = usersData.find(i => row.Platform_ID === i.id);
 			if (userData) {
-				return `${userData.name}: ${row.Text}`;
+				return `${userData.name ?? "(unknown)"}: ${row.Text}`;
 			}
 			else {
 				return null;
@@ -65,7 +67,7 @@ const getLocalLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT)
 	};
 };
 
-const getRustlogLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT) => {
+const getRustlogLogs = async (channel: string, limit: number = DEFAULT_LOG_AMOUNT): Promise<LogSuccess | ResultFailure> => {
 	const twitch = sb.Platform.getAsserted("twitch");
 	const channelId = await twitch.getUserID(channel);
 	if (!channelId) {

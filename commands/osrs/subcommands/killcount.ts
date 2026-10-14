@@ -88,9 +88,7 @@ export default {
 
 		const bestActivity = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
 		if (!bestActivity) {
-			throw new SupiError({
-				message: "Assert: Activity not found"
-			});
+			throw new SupiError({ message: "Assert error: OSRS activity not found" });
 		}
 
 		const { name, rank, value } = bestActivity;
@@ -100,10 +98,8 @@ export default {
 
 		const rankString = (rank === null) ? `unranked` : `rank #${rank}`;
 		return {
-			// As of 2025-11-18, the Jagex API no longer produces "-1" for activities of unranked accounts.
-			// It always provides value ("killcount") but rank can still be null.
-			// I'm leaving the check here, but if the API doesn't change, it can be removed.
-			reply: (rank === null && value === null)
+			success: true,
+			reply: (value === null)
 				? `${ironman} ${username} is not ranked for ${name}.`
 				: `${ironman} ${username}'s KC for ${name}: ${value} - ${rankString}.`
 		};
