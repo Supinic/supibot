@@ -461,14 +461,19 @@ export default async function createDebugSandbox (context, scriptArgs) {
 					emotes = await context.platform.fetchGlobalEmotes();
 				}
 
-				return emotes;
+				return structuredClone(emotes);
 			},
 			parseParameter: (value, type) => {
 				if (!ALLOWED_PARAMETER_TYPES.has(type)) {
 					throw new Error("Invalid value type provided");
 				}
 
-				return sb.Command.parseParameter(value, type, true);
+				const result = sb.Command.parseParameter(value, type, true);
+				if (type === "language" && result.success) {
+					return structuredClone(result);
+				}
+
+				return result;
 			},
 			parseParametersFromArguments: (definition, args) => {
 				if (!Array.isArray(definition) || definition.some(i => typeof i.name !== "string" || typeof i.type !== "string")) {
@@ -479,7 +484,8 @@ export default async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("Arguments must be provided as a string Array");
 				}
 
-				return sb.Command.parseParametersFromArguments(definition, args);
+				const result = sb.Command.parseParametersFromArguments(definition, args);
+				return (result.success) ? structuredClone(result) : result;
 			},
 			trim: (...args) => core.Utils.tag.trim(...args),
 			unping: (string) => {
