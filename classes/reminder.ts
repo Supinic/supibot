@@ -154,7 +154,7 @@ export class Reminder extends TemplateWithId {
 		}
 
 		const text = this.Text;
-		if (!text) {
+		if (typeof text !== "string") {
 			throw new SupiError({
 				message: "Assert error: Scheduled reminder has no Text",
 				args: { reminder: this.ID }
