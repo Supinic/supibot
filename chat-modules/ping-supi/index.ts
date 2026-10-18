@@ -3,7 +3,7 @@ import { defineChatModule } from "../../classes/chat-module.ts";
 
 const relaxedRegex = /(supi|supinic(?!\.com)|bupi|супи|супик.?|супиник.?)\b/i;
 // const strictRegex = /\bsupinic(?!\.com)\b/i;
-const skippedUserIds = [1, 1127, 582108, 8697460, 12182780, 17865963];
+const skippedUserIds = [1, 1127, 2646, 582108, 8697460, 12182780, 17865963];
 
 export default defineChatModule({
 	name: "ping-supi",
