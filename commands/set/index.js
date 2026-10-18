@@ -153,13 +153,13 @@ export default {
 
 			let typesString = " ";
 			if (!i.set) {
-				typesString = " (unset only)";
+				typesString = " (unset only) ";
 			}
 			else if (!i.unset) {
-				typesString = " (set only)";
+				typesString = " (set only) ";
 			}
 
-			return `<li><code>${names}</code> (${types}${noPipeInfo}) ${i.description}</li>`;
+			return `<li><code>${names}</code>${typesString}${i.description}</li>`;
 		}).join("");
 
 		return [
