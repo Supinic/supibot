@@ -148,15 +148,16 @@ export default {
 		const list = subcommands.map(i => {
 			let names = i.name;
 			if (i.aliases.length > 0) {
-				names += `(${i.aliases.join(", ")})`;
+				names += ` (${i.aliases.join(", ")})`;
 			}
 
-			const types = [
-				(i.set) ? "set" : "",
-				(i.unset) ? "unset" : ""
-			].filter(Boolean).join("/");
-
-			const noPipeInfo = (i.pipe) ? "" : ", cannot be piped";
+			let typesString = " ";
+			if (!i.set) {
+				typesString = " (unset only)";
+			}
+			else if (!i.unset) {
+				typesString = " (set only)";
+			}
 
 			return `<li><code>${names}</code> (${types}${noPipeInfo}) ${i.description}</li>`;
 		}).join("");
