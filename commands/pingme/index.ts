@@ -1,5 +1,6 @@
 import { SupiDate } from "supi-core";
 import { declare } from "../../classes/command.ts";
+import { REMINDER_ERROR_REASONS } from "../../classes/reminder.ts";
 
 export default declare({
 	Name: "pingme",
@@ -62,7 +63,7 @@ export default declare({
 			const { cause } = result;
 			return {
 				success: false,
-				reply: `Could not set up a ping! ${cause}}`
+				reply: `Could not set up a ping! ${REMINDER_ERROR_REASONS[cause]}`
 			};
 		}
 	}),

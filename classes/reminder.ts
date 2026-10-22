@@ -28,7 +28,7 @@ type HistoryConstructorData = ConstructorData & { Cancelled: boolean; };
 type CreateData = Omit<ConstructorData, "ID">;
 type CreateResult = { success: true; cause: null; ID: Reminder["ID"] } | LimitCheckFailure;
 
-const ERROR_REASONS = {
+export const REMINDER_ERROR_REASONS = {
 	"scheduled-incoming": "That person has too many timed reminders pending for them on that day!",
 	"scheduled-outgoing": "You have too many timed reminders pending on that day!",
 	"public-incoming": "That person has too many public reminders pending!",
@@ -42,7 +42,7 @@ type Cause =
 	| "scheduled-incoming" | "scheduled-outgoing" | "public-incoming"
 	| "public-outgoing" | "private-incoming" | "private-outgoing"
 	| "existing-pingme";
-type LimitCheckFailure = { success: false; cause: Cause; reason: typeof ERROR_REASONS[Cause]; };
+type LimitCheckFailure = { success: false; cause: Cause; reason: typeof REMINDER_ERROR_REASONS[Cause]; };
 type LimitCheckResult = { success: true; } | LimitCheckFailure;
 
 /**
@@ -743,28 +743,28 @@ export class Reminder extends TemplateWithId {
 			return {
 				success: false,
 				cause: "public-incoming",
-				reason: ERROR_REASONS["public-incoming"]
+				reason: REMINDER_ERROR_REASONS["public-incoming"]
 			};
 		}
 		else if (publicOutgoing.length >= outgoingLimit) {
 			return {
 				success: false,
 				cause: "public-outgoing",
-				reason: ERROR_REASONS["public-outgoing"]
+				reason: REMINDER_ERROR_REASONS["public-outgoing"]
 			};
 		}
 		else if (privateIncoming.length >= incomingLimit) {
 			return {
 				success: false,
 				cause: "private-outgoing",
-				reason: ERROR_REASONS["private-outgoing"]
+				reason: REMINDER_ERROR_REASONS["private-outgoing"]
 			};
 		}
 		else if (privateOutgoing.length >= outgoingLimit) {
 			return {
 				success: false,
 				cause: "private-outgoing",
-				reason: ERROR_REASONS["private-outgoing"]
+				reason: REMINDER_ERROR_REASONS["private-outgoing"]
 			};
 		}
 
@@ -804,14 +804,14 @@ export class Reminder extends TemplateWithId {
 				return {
 					success: false,
 					cause: "scheduled-incoming",
-					reason: ERROR_REASONS["scheduled-incoming"]
+					reason: REMINDER_ERROR_REASONS["scheduled-incoming"]
 				};
 			}
 			else if (scheduledOutgoing >= outgoingScheduledLimit) {
 				return {
 					success: false,
 					cause: "scheduled-outgoing",
-					reason: ERROR_REASONS["scheduled-outgoing"]
+					reason: REMINDER_ERROR_REASONS["scheduled-outgoing"]
 				};
 			}
 		}
@@ -831,7 +831,7 @@ export class Reminder extends TemplateWithId {
 				return {
 					success: false,
 					cause: "existing-pingme",
-					reason: ERROR_REASONS["existing-pingme"]
+					reason: REMINDER_ERROR_REASONS["existing-pingme"]
 				};
 			}
 		}
