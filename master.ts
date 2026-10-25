@@ -1,5 +1,4 @@
 import * as supiCore from "supi-core";
-import type { GotRegistryInstanceDefinition } from "supi-core";
 import { getConfig } from "./config.ts";
 import initializeInternalApi from "./api/index.ts";
 
@@ -84,9 +83,7 @@ const connectToPlatform = async (platform: Platform) => {
 	console.timeEnd(`Platform connect: ${platform.name}`);
 };
 
-const MODULE_INITIALIZE_ORDER = [
-	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder]
-] as const;
+const MODULES = [Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder];
 
 const config = getConfig();
 const platformsConfig = config.platforms;
@@ -95,7 +92,6 @@ if (platformsConfig.length === 0) {
 }
 
 console.groupCollapsed("Initialize timers");
-console.time("supi-core");
 
 if (!process.env.MARIA_USER || !process.env.MARIA_PASSWORD || !process.env.MARIA_HOST) {
 	throw new Error("Missing database connection configuration");
@@ -117,8 +113,6 @@ globalThis.core = {
 	Utils: new supiCore.Utils()
 };
 
-console.timeEnd("supi-core");
-
 const platforms: Set<Platform> = new Set();
 for (const definition of platformsConfig) {
 	const platform = await Platform.create(definition.type, definition);
@@ -128,11 +122,8 @@ for (const definition of platformsConfig) {
 console.time("basic bot modules");
 
 // Initialize bot-specific modules with database-driven data
-for (let i = 0; i < MODULE_INITIALIZE_ORDER.length; i++) {
-	console.debug(`Modules batch #${i + 1}`);
-
-	const initOrder = MODULE_INITIALIZE_ORDER[i];
-	const promises = initOrder.map(async (module) => {
+{
+	const promises = MODULES.map(async (module) => {
 		console.time(`Init ${module.name}`);
 		await module.initialize();
 		console.timeEnd(`Init ${module.name}`);
@@ -143,16 +134,18 @@ for (let i = 0; i < MODULE_INITIALIZE_ORDER.length; i++) {
 
 // Initialize the mpv client if configured
 let MpvClient;
-const { listenerAddress, listenerPort } = config.local ?? {};
-if (listenerAddress) {
-	MpvClient = new MpvClientConstructor({
-		host: listenerAddress,
-		port: listenerPort ?? 8080
-	});
-}
-else {
-	console.debug("Missing MPV configuration (listenerAddress), module creation skipped");
-	MpvClient = null;
+{
+	const { listenerAddress, listenerPort } = config.local ?? {};
+	if (listenerAddress) {
+		MpvClient = new MpvClientConstructor({
+			host: listenerAddress,
+			port: listenerPort ?? 8080
+		});
+	}
+	else {
+		console.debug("Missing MPV configuration (listenerAddress), module creation skipped");
+		MpvClient = null;
+	}
 }
 
 globalThis.sb = {
@@ -175,15 +168,11 @@ console.time("logger start");
 await logger.start();
 console.timeEnd("logger start");
 
+core.Got.import(filterModuleDefinitions("name", gotDefinitions, config.modules.gots));
+Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands)); // @todo remove typecast when commands are fully TS
+
 console.time("chat modules");
-const gotInstances = filterModuleDefinitions("name", gotDefinitions as GotRegistryInstanceDefinition[], config.modules.gots);
-core.Got.import(gotInstances);
-
-Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands));
-
-sb.ChatModule.import(
-	filterModuleDefinitions("name", chatModuleDefinitions, config.modules["chat-modules"])
-);
+sb.ChatModule.import(filterModuleDefinitions("name", chatModuleDefinitions, config.modules["chat-modules"]));
 await sb.ChatModule.initialize();
 console.timeEnd("chat modules");
 
@@ -199,22 +188,24 @@ core.Metrics.registerCounter({
 	labelNames: ["platform", "channel"]
 });
 
-const promises = [];
-for (const platform of platforms) {
-	if (!platform.active) {
-		console.debug(`Platform ${platform.name} (ID ${platform.ID}) is set to inactive, not connecting`);
-		continue;
+{
+	const promises = [];
+	for (const platform of platforms) {
+		if (!platform.active) {
+			console.debug(`Platform ${platform.name} (ID ${platform.ID}) is set to inactive, not connecting`);
+			continue;
+		}
+
+		const promise = connectToPlatform(platform);
+		promises.push(promise);
 	}
 
-	const promise = connectToPlatform(platform);
-	promises.push(promise);
-}
+	if (promises.length === 0) {
+		console.warn("No platforms were successfully activated, bot will not connect to any chat service");
+	}
 
-if (promises.length === 0) {
-	console.warn("No platforms were successfully activated, bot will not connect to any chat service");
+	await Promise.all(promises);
 }
-
-await Promise.all(promises);
 
 console.time("crons");
 initializeCrons(config.modules.crons);
