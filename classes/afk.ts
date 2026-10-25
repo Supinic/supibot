@@ -58,7 +58,18 @@ type ConstructorData = {
 	Text: AwayFromKeyboard["Text"] | null;
 	Status?: AwayFromKeyboard["Status"];
 };
-type DatabaseConstructorData = ConstructorData & { Active: boolean; };
+type RowData = {
+	ID: number;
+	User_Alias: number;
+	Started: SupiDate;
+	Started_MS: bigint | null; // `null` while transitioning to BIGINT
+	Ended: SupiDate | null;
+	Ended_MS: bigint | null;
+	Text: string | null;
+	Status: Status;
+	Active: boolean;
+	Interrupted_ID: number | null;
+};
 
 export type NewAfkData = ConstructorData & {
 	Interrupted_ID?: AwayFromKeyboard["ID"] | null;
@@ -88,6 +99,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 	}
 
 	destroy () {}
+
 	getCacheKey (): never {
 		throw new SupiError({
 			message: "AwayFromKeyboard module does not support `getCacheKey`"
@@ -115,46 +127,19 @@ export class AwayFromKeyboard extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await core.Query.getRecordset<ConstructorData[]>(rs => rs
+		const data = await core.Query.getRecordset<RowData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "AFK")
 			.where("Active = %b", true)
 		);
 
 		for (const record of data) {
-			const afk = new AwayFromKeyboard(record);
+			const started = (record.Started_MS !== null) ? new SupiDate(Number(record.Started_MS)) : record.Started;
+			const afk = new AwayFromKeyboard({ ...record, Started: started });
 			AwayFromKeyboard.data.set(afk.User_Alias, afk);
 		}
 
 		AwayFromKeyboard.#activeGauge.set(AwayFromKeyboard.data.size);
-	}
-
-	static async reloadSpecific (...list: AwayFromKeyboard["ID"][]) {
-		if (list.length === 0) {
-			return false;
-		}
-
-		const values = [...AwayFromKeyboard.data.values()];
-
-		const promises = list.map(async (ID) => {
-			const row = await core.Query.getRow<DatabaseConstructorData>("chat_data", "AFK");
-			await row.load(ID);
-
-			const existing = values.find(i => i.ID === ID);
-			if (existing) {
-				AwayFromKeyboard.data.delete(existing.User_Alias);
-			}
-
-			if (!row.values.Active) {
-				return;
-			}
-
-			const created = new AwayFromKeyboard(row.valuesObject);
-			AwayFromKeyboard.data.set(created.User_Alias, created);
-		});
-
-		await Promise.all(promises);
-		return true;
 	}
 
 	static async checkActive (userData: User, channelData: Channel) {
@@ -169,10 +154,12 @@ export class AwayFromKeyboard extends TemplateWithId {
 		AwayFromKeyboard.data.delete(userData.ID);
 
 		// This should only ever update one row, if everything is working properly.
+		const now = SupiDate.now();
 		await core.Query.getRecordUpdater(ru => ru
 			.update("chat_data", "AFK")
 			.set("Active", false)
-			.set("Ended", new SupiDate())
+			.set("Ended", new SupiDate(now))
+			.set("Ended_MS", now)
 			.where("ID = %n", data.ID)
 		);
 
@@ -247,11 +234,13 @@ export class AwayFromKeyboard extends TemplateWithId {
 	 */
 	static async set (userData: User, data: Partial<NewAfkData> = {}) {
 		const now = new SupiDate();
+		const started = data.Started ?? now;
 		const afkData = {
 			Active: true,
 			User_Alias: userData.ID,
 			Text: data.Text ?? null,
-			Started: data.Started ?? now,
+			Started: started,
+			Started_MS: started.getTime(),
 			Status: data.Status ?? DEFAULT_AFK_STATUS,
 			Interrupted_ID: data.Interrupted_ID ?? null
 		} as const;
@@ -265,18 +254,34 @@ export class AwayFromKeyboard extends TemplateWithId {
 			ID: row.values.ID,
 			User_Alias: userData.ID,
 			Text: data.Text ?? NO_TEXT_AFK,
-			Started: data.Started ?? now,
+			Started: started,
 			Status: data.Status ?? DEFAULT_AFK_STATUS
 		});
 
 		AwayFromKeyboard.data.set(userData.ID, afk);
-
 		AwayFromKeyboard.#activeGauge.inc(1);
 		AwayFromKeyboard.#totalCounter.inc({
 			type: afkData.Status
 		});
 
 		return afk;
+	}
+
+	static async unset (ID: number) {
+		const afk = AwayFromKeyboard.get(ID);
+		if (!afk) {
+			return;
+		}
+
+		const row = await core.Query.getRow<RowData>("chat_data", "AFK");
+		await row.load(ID, true);
+		if (!row.loaded || !row.values.Active) {
+			return;
+		}
+
+		AwayFromKeyboard.data.delete(row.values.User_Alias);
+		row.values.Active = false;
+		await row.save({ skipLoad: true });
 	}
 
 	static destroy () {}

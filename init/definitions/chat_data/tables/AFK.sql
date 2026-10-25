@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`AFK` (
   `Active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether the AFK status is active',
   `Interrupted_ID` INT(10) UNSIGNED DEFAULT NULL COMMENT 'If an AFK has been deactivated, but then re-activated, this is the ID of the original status.',
   `Duration_MS` BIGINT UNSIGNED AS (TIMESTAMPDIFF(MICROSECOND, `Started`, `Ended`) DIV 1000) STORED COMMENT 'Duration of each AFK status, in milliseconds. Used for statistics queries.',
+  `Started_MS` BIGINT UNSIGNED NULL,
+  `Ended_MS` BIGINT UNSIGNED NULL,
   PRIMARY KEY (`ID`),
   KEY `AFK_FK_User_Alias` (`User_Alias`),
   KEY `AFK_Self_Interrupted` (`Interrupted_ID`),
