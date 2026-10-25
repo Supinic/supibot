@@ -51,7 +51,7 @@ export default declare({
 		}
 
 		await context.sendIntermediateMessage("Restarting...");
-		setTimeout(() => process.exit(0), 1000);
+		setTimeout(() => process.kill(process.pid, "SIGTERM"), 1000);
 
 		return {
 			reply: null
@@ -64,7 +64,7 @@ export default declare({
 		"",
 
 		"<code>$restart</code>",
-		"Restarts Supibot via process.exit()",
+		"Restarts Supibot via sending a SIGTERM.",
 		"",
 
 		"<code>$restart pull</code>",
