@@ -506,8 +506,9 @@ export class User extends TemplateWithIdString {
 		return `sb-user-${name}`;
 	}
 
-	static destroy () {
+	static async destroy () {
 		clearInterval(User.highLoadUserInterval);
+		await User.handleHighLoad();
 		User.data.clear();
 	}
 }

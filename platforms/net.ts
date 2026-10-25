@@ -113,6 +113,14 @@ export class NetPlatform extends Platform<NetConfig, "net"> {
 		}
 	}
 
+	destroy (): void {
+		for (const client of this.clients.values()) {
+			client.socket.destroy();
+		}
+
+		this.server?.close();
+	}
+
 	private write (message: string, user: User) {
 		const client = this.clients.get(user);
 		if (!client) {

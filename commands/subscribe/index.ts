@@ -24,16 +24,27 @@ export default declare({
 				continue;
 			}
 
-			const cronJob = new CronJob(def.cronExpression ?? DEFAULT_CRON_EXPRESSION, () => handleGenericSubscription(def));
-			cronJob.start();
+			const cronJob = CronJob.from({
+				cronTime: def.cronExpression ?? DEFAULT_CRON_EXPRESSION,
+				onTick: () => handleGenericSubscription(def),
+				waitForCompletion: true,
+				start: true
+			});
 			crons.add(cronJob);
 		}
 	},
-	destroy: function () {
+	destroy: async function () {
+		const promises: Promise<void>[] = [];
 		for (const cronJob of crons) {
-			void cronJob.stop();
+			const result = cronJob.stop();
+			if (!result) {
+				continue;
+			}
+
+			promises.push(result);
 		}
 
+		await Promise.allSettled(promises);
 		crons.clear();
 	},
 	Code: async function subscribe (context, type, ...args) {

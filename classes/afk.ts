@@ -278,6 +278,8 @@ export class AwayFromKeyboard extends TemplateWithId {
 
 		return afk;
 	}
+
+	static destroy () {}
 }
 
 export default AwayFromKeyboard;

@@ -10,13 +10,13 @@ export default {
 	code: async function botRequestDenialManager () {
 		isTableAvailable ??= await core.Query.isTablePresent("data", "Suggestion");
 		if (!isTableAvailable) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
 		const twitchPlatform = sb.Platform.get("twitch");
 		if (!twitchPlatform) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

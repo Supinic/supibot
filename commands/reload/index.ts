@@ -91,7 +91,7 @@ export default declare({
 					};
 				}
 
-				sb.Command.importSpecific(...definitions);
+				await sb.Command.importSpecific(...definitions);
 				return {
 					success: true,
 					reply: `Reloaded ${definitions.length} commands, ${failures.length} errors.`

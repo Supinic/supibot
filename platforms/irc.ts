@@ -66,6 +66,7 @@ interface FauxIrcClient extends EventEmitter {
 	changeNick (nick: string): unknown;
 	say (username: string, message: string): unknown;
 	join (channel: string): unknown;
+	quit (message: string): void;
 }
 
 export class IrcPlatform extends Platform<IrcConfig, "irc"> {
@@ -376,6 +377,10 @@ export class IrcPlatform extends Platform<IrcConfig, "irc"> {
 		}
 
 		return execution;
+	}
+
+	destroy (): void {
+		this.client.quit("Disconnected");
 	}
 
 	createUserMention (userData: User): Promise<string> {

@@ -793,6 +793,8 @@ export class Filter extends TemplateWithId {
 		await Promise.all(promises);
 		return true;
 	}
+
+	static destroy () {}
 }
 
 export default Filter;

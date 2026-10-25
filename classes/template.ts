@@ -15,7 +15,7 @@ export interface TemplateDefinition {
 
 abstract class Template {
 	abstract getCacheKey (): string | never;
-	abstract destroy (): void;
+	abstract destroy (): Promise<void> | void;
 
 	static importable: boolean = false;
 	static uniqueIdentifier: string;
@@ -86,12 +86,17 @@ abstract class Template {
 		await this.loadData();
 	}
 
-	/**
-	 * @abstract
-	 */
+	/** @abstract */
 	static loadData (): Promise<void> {
 		throw new SupiError({
 			message: `Class ${this.name} must implement the static loadData method`
+		});
+	}
+
+	/** @abstract */
+	static destroy (): void | Promise<void> {
+		throw new SupiError({
+			message: `Class ${this.name} must implement the static destroy method`
 		});
 	}
 

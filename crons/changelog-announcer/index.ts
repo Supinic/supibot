@@ -17,7 +17,7 @@ export default {
 	code: (async function changelogAnnouncer () {
 		isTableAvailable ??= await core.Query.isTablePresent("data", "Event_Subscription");
 		if (!isTableAvailable) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

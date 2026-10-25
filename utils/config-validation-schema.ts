@@ -38,6 +38,7 @@ export const ConfigSchema = z.strictObject({
 		defaultBanphrase: z.string(),
 		commandErrorResponse: z.string()
 	}),
+	shutdownTimeout: z.int().positive().optional(),
 	values: z.strictObject({
 		pendingCommandTimeout: z.int().positive(),
 		pajbotBanphraseRequestTimeout: z.int().positive(),

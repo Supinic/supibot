@@ -457,6 +457,8 @@ export class Banphrase extends TemplateWithId {
 			return (result.banned) ? result.banphrase_data.phrase : false;
 		}
 	}
+
+	static destroy (): void {} // @todo check if implementation is required
 }
 
 export default Banphrase;

@@ -34,7 +34,7 @@ export default {
 	code: (async function pruneInactiveEventSubscribers () {
 		const twitch = sb.Platform.get("twitch");
 		if (!twitch) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

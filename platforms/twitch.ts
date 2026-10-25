@@ -317,6 +317,8 @@ export type TwitchConfig = z.infer<typeof TwitchConfigSchema>;
 export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	public readonly supportsMeAction = true;
 	public readonly dynamicChannelAddition = true;
+	public readonly debugUtils = TwitchUtils;
+
 	private readonly reconnectCheck: NodeJS.Timeout;
 	private readonly liveChannelsCheck: NodeJS.Timeout;
 	private readonly previousMessageMeta: Map<Channel["ID"], { time: number; length: number; }> = new Map();
@@ -325,8 +327,10 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	#websocketLatency: number | null = null;
 	#unsuccessfulRenameChannels = new Set();
 
-	public readonly debugUtils = TwitchUtils;
 	private client: WebSocket | null = null;
+	private tokenCheckInterval: NodeJS.Timeout | null = null;
+	private subCacheCheckInterval: NodeJS.Timeout | null = null;
+	private reconnectTimeout: NodeJS.Timeout | null = null;
 
 	constructor (config: TwitchConfig) {
 		const resultConfig = {
@@ -364,7 +368,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			});
 		}
 
-		await TwitchUtils.initTokenCheckInterval();
+		this.tokenCheckInterval ??= await TwitchUtils.initTokenCheckInterval();
 		await TwitchUtils.getAppAccessToken();
 		await TwitchUtils.getConduitId();
 
@@ -410,7 +414,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			}
 		}
 
-		TwitchUtils.initSubCacheCheckInterval();
+		this.subCacheCheckInterval ??= TwitchUtils.initSubCacheCheckInterval();
 
 		const { channels, string } = this.config.reconnectAnnouncement ?? {};
 		if (channels && string) {
@@ -1555,15 +1559,19 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			return;
 		}
 
-		const reconnectTimeout = setTimeout(() => {
+		const timeout = setTimeout(() => {
 			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
 			client.close();
 			void this.connect({ skipSubscriptions: true });
+			this.reconnectTimeout = null;
 		}, NO_EVENT_RECONNECT_TIMEOUT).unref();
+
+		this.reconnectTimeout = timeout;
 
 		const start = SupiDate.now();
 		client.once("pong", () => {
-			clearTimeout(reconnectTimeout);
+			clearTimeout(timeout);
+			this.reconnectTimeout = null;
 
 			const end = SupiDate.now();
 			this.#websocketLatency = end - start;
@@ -1666,10 +1674,18 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			this.client.terminate();
 		}
 
+		if (this.reconnectTimeout) {
+			clearTimeout(this.reconnectTimeout);
+		}
+		if (this.subCacheCheckInterval) {
+			clearInterval(this.subCacheCheckInterval);
+		}
+		if (this.tokenCheckInterval) {
+			clearInterval(this.tokenCheckInterval);
+		}
+
 		clearInterval(this.reconnectCheck);
 		clearInterval(this.liveChannelsCheck);
-
-		this.client = null;
 	}
 
 	get websocketLatency () { return this.#websocketLatency; }

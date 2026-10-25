@@ -43,6 +43,13 @@ const fetchTwitchGlobalEmotes = async () => {
 	return emoteSchema.parse(response.body).data;
 };
 
+const sendMessages = async (channel: Channel, strings: string[]) => {
+	for (const string of strings) {
+		await channel.send(string);
+		await wait(MULTI_MESSAGE_DELAY);
+	}
+};
+
 let previousEmotes: EmoteDescriptor[] | undefined;
 let suggestionTableExists: boolean | null = null;
 
@@ -53,13 +60,13 @@ export default {
 	code: (async function globalEmoteAnnouncer () {
 		const twitchPlatform = sb.Platform.get("twitch");
 		if (!twitchPlatform) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
 		const channelData = sb.Channel.get("supinic", twitchPlatform);
 		if (!channelData) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
@@ -184,6 +191,7 @@ export default {
 			message += `Deleted: ${json.deleted.map(i => i.name).join(" ")}`;
 		}
 
+		const promises = [];
 		for (const [channelId, usernames] of channelUserMap) {
 			const channelData = sb.Channel.getAsserted(channelId);
 			const names = usernames.map(i => `@${i}`).join(" ");
@@ -192,12 +200,9 @@ export default {
 			const limit = channelData.Message_Limit ?? channelData.Platform.messageLimit;
 			const chunks = core.Utils.partitionString(finalMessage, limit, MAX_MESSAGES_SENT);
 
-			void (async (strings) => {
-				for (const string of strings) {
-					await channelData.send(string);
-					await wait(MULTI_MESSAGE_DELAY);
-				}
-			})(chunks);
+			promises.push(sendMessages(channelData, chunks));
 		}
+
+		await Promise.all(promises);
 	})
 } satisfies CronDefinition;

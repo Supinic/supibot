@@ -1,3 +1,4 @@
+import { setTimeout as delay } from "node:timers/promises";
 import { SupiDate, SupiError, type Batch } from "supi-core";
 import { CronJob } from "cron";
 import { getConfig } from "../config.ts";
@@ -55,8 +56,6 @@ const setMetaChannelCommand = async (channelId: number, meta: ChannelCommandMeta
  */
 export class LoggerSingleton {
 	private lastSeenUserMap = new Map<User["ID"], number>();
-
-	private batches = new Set<Batch>();
 	private crons: CronJob[] = [];
 	private started = false;
 
@@ -72,7 +71,7 @@ export class LoggerSingleton {
 	private readonly commandCollector = new Set<number>();
 
 	private readonly lastSeen = new Map<Channel["ID"], Map<User["ID"], { message: string; count: number; date: SupiDate; }>>();
-	private lastSeenRunning = false;
+	private lastSeenRunning: Promise<void> | null = null;
 	private lastSeenCron?: CronJob;
 
 	public async start (): Promise<void> {
@@ -93,8 +92,11 @@ export class LoggerSingleton {
 				this.presentTables.add(table);
 			}
 
-			this.messageCron = new CronJob(messages.cron, () => this.storeMessages());
-
+			this.messageCron = CronJob.from({
+				cronTime: messages.cron,
+				onTick: () => this.storeMessages(),
+				waitForCompletion: true
+			});
 			this.messageCron.start();
 			this.crons.push(this.messageCron);
 		}
@@ -117,67 +119,22 @@ export class LoggerSingleton {
 				]
 			);
 
-			this.commandCron = new CronJob(commands.cron, async () => this.storeCommands(batch));
+			this.commandCron = CronJob.from({
+				cronTime: commands.cron,
+				onTick: () => this.storeCommands(batch),
+				waitForCompletion: true
+			});
 			this.commandCron.start();
-
-			this.commandBatch = batch;
-			this.batches.add(batch);
 			this.crons.push(this.commandCron);
+			this.commandBatch = batch;
 		}
 
 		if (lastSeen.enabled && lastSeen.cron) {
-			this.lastSeenCron = new CronJob(lastSeen.cron, async () => {
-				if (this.lastSeenRunning) {
-					return;
-				}
-
-				this.lastSeenRunning = true;
-
-				const data = [];
-				for (const [channelID, userMap] of this.lastSeen) {
-					for (const [userID, { count, date, message }] of userMap) {
-						data.push({
-							count,
-							channel: channelID,
-							date,
-							message,
-							user: userID
-						});
-					}
-
-					userMap.clear();
-				}
-
-				if (data.length === 0) {
-					this.lastSeenRunning = false;
-					return;
-				}
-
-				try {
-					await core.Query.pool.batch(
-						core.Utils.tag.trim `
-							INSERT INTO chat_data.Message_Meta_User_Alias
-							(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
-							VALUES (?, ?, ?, ?, ?)
-							ON DUPLICATE KEY UPDATE
-							Message_Count = Message_Count + VALUES(Message_Count),
-							Last_Message_Posted = VALUES(Last_Message_Posted),
-							Last_Message_Text = VALUES(Last_Message_Text)
-						`,
-						data.map(i => [
-							i.user,
-							i.channel,
-							i.count,
-							i.date,
-							i.message
-						])
-					);
-				}
-				finally {
-					this.lastSeenRunning = false;
-				}
+			this.lastSeenCron = CronJob.from({
+				cronTime: lastSeen.cron,
+				onTick: () => this.storeLastSeen(),
+				waitForCompletion: true
 			});
-
 			this.lastSeenCron.start();
 			this.crons.push(this.lastSeenCron);
 		}
@@ -185,12 +142,11 @@ export class LoggerSingleton {
 		this.started = true;
 	}
 
-	private storeMessages () {
+	private async storeMessages () {
 		if (!this.started) {
 			return;
 		}
 
-		let i = 0;
 		for (const [name, batch] of typedEntries(this.messageBatches)) {
 			if (batch.records.length === 0) {
 				continue;
@@ -212,8 +168,8 @@ export class LoggerSingleton {
 				continue;
 			}
 
-			setTimeout(() => void batch.insert(), i * 250);
-			i++;
+			await batch.insert();
+			await delay(250);
 		}
 	}
 
@@ -255,6 +211,51 @@ export class LoggerSingleton {
 		]);
 
 		this.commandCollector.clear();
+	}
+
+	private async storeLastSeen () {
+		if (this.lastSeenRunning) {
+			return;
+		}
+
+		const data = [];
+		for (const [channelID, userMap] of this.lastSeen) {
+			for (const [userID, { count, date, message }] of userMap) {
+				data.push({
+					count,
+					channel: channelID,
+					date,
+					message,
+					user: userID
+				});
+			}
+
+			userMap.clear();
+		}
+
+		if (data.length === 0) {
+			return;
+		}
+
+		this.lastSeenRunning = core.Query.pool.batch(
+			core.Utils.tag.trim `
+				INSERT INTO chat_data.Message_Meta_User_Alias
+				(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
+				VALUES (?, ?, ?, ?, ?)
+				ON DUPLICATE KEY UPDATE
+				Message_Count = Message_Count + VALUES(Message_Count),
+				Last_Message_Posted = VALUES(Last_Message_Posted),
+				Last_Message_Text = VALUES(Last_Message_Text)
+			`,
+			data.map(i => [i.user, i.channel, i.count, i.date, i.message])
+		);
+
+		try {
+			await this.lastSeenRunning;
+		}
+		finally {
+			this.lastSeenRunning = null;
+		}
 	}
 
 	/**
@@ -456,19 +457,25 @@ export class LoggerSingleton {
 	/**
 	 * Cleans up and destroys the logger instance
 	 */
-	public destroy (): void {
+	public async destroy (): Promise<void> {
 		for (const cron of this.crons) {
-			void cron.stop();
+			await cron.stop();
 		}
 
 		for (const batch of Object.values(this.messageBatches)) {
+			await batch.insert();
 			batch.clear();
 		}
 
-		for (const batch of this.batches) {
-			batch.clear();
+		if (this.commandBatch) {
+			await this.storeCommands(this.commandBatch);
 		}
-		this.batches.clear();
+
+		if (this.lastSeenRunning) {
+			await this.lastSeenRunning;
+		}
+		await this.storeLastSeen();
+		this.lastSeenUserMap.clear();
 	}
 }
 

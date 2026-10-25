@@ -25,7 +25,7 @@ export default {
 		const cacheValue = await core.Cache.getByPrefix(SOUNDCLOUD_CLIENT_ID) as string | undefined;
 		const soundcloudClientId = cacheValue ?? process.env.SOUNDCLOUD_CLIENT_ID;
 		if (!soundcloudClientId) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

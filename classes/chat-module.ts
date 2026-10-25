@@ -358,6 +358,8 @@ export class ChatModuleManager {
 		return (attachment?.runtime ?? null) as ChatModuleRuntimeMap[N] | null;
 	}
 
+	destroy (): void {} // @todo finish destruction implementation
+
 	private attach (definition: GenericChatModuleDefinition, target: AttachmentTarget, rawArgs: string | null): void {
 		if (definition.scope !== target.scope) {
 			throw new SupiError({

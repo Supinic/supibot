@@ -83,7 +83,7 @@ const connectToPlatform = async (platform: Platform) => {
 	console.timeEnd(`Platform connect: ${platform.name}`);
 };
 
-const MODULES = [Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder];
+const MODULES = [Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder] as const;
 
 const config = getConfig();
 const platformsConfig = config.platforms;
@@ -133,7 +133,7 @@ console.time("basic bot modules");
 }
 
 // Initialize the mpv client if configured
-let MpvClient;
+let MpvClient: MpvClientConstructor | null;
 {
 	const { listenerAddress, listenerPort } = config.local ?? {};
 	if (listenerAddress) {
@@ -148,6 +148,8 @@ let MpvClient;
 	}
 }
 
+const API = initializeInternalApi();
+const ChatModule = new ChatModuleManager();
 globalThis.sb = {
 	Platform,
 	Filter,
@@ -157,9 +159,9 @@ globalThis.sb = {
 	Banphrase,
 	Channel,
 	Reminder,
-	ChatModule: new ChatModuleManager(),
+	ChatModule,
 	MpvClient,
-	API: initializeInternalApi()
+	API
 };
 
 console.timeEnd("basic bot modules");
@@ -172,8 +174,8 @@ core.Got.import(filterModuleDefinitions("name", gotDefinitions, config.modules.g
 Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands)); // @todo remove typecast when commands are fully TS
 
 console.time("chat modules");
-sb.ChatModule.import(filterModuleDefinitions("name", chatModuleDefinitions, config.modules["chat-modules"]));
-await sb.ChatModule.initialize();
+ChatModule.import(filterModuleDefinitions("name", chatModuleDefinitions, config.modules["chat-modules"]));
+await ChatModule.initialize();
 console.timeEnd("chat modules");
 
 core.Metrics.registerCounter({
@@ -208,7 +210,7 @@ core.Metrics.registerCounter({
 }
 
 console.time("crons");
-initializeCrons(config.modules.crons);
+const crons = initializeCrons(config.modules.crons);
 console.timeEnd("crons");
 
 console.debug("Connected to all platforms. Ready!");
@@ -231,3 +233,49 @@ process.on("unhandledRejection", (reason, promise) => {
 		console.error("Could not log unhandled rejection", { e, reason, promise, origin });
 	});
 });
+
+let destructionUnderway = false;
+const cleanup = async (name: string, fn: () => void | Promise<void>) => {
+	try {
+		await fn();
+	}
+	catch (e) {
+		console.error(`Could not clean up ${name}`, { e });
+	}
+};
+const destructionHandler = async () => {
+	if (destructionUnderway) {
+		return;
+	}
+
+	destructionUnderway = true;
+
+	const { shutdownTimeout = 10_000 } = config;
+	setTimeout(() => {
+		console.error("Shutdown deadline exceeded");
+		process.exit(1);
+	}, shutdownTimeout).unref();
+
+	await Promise.all(crons.map(cron => (
+		cleanup(`cron ${cron.name}`, () => cron.stop())
+	)));
+
+	await cleanup("API server", () => API?.server[Symbol.asyncDispose]());
+
+	for (const platform of platforms) {
+		await cleanup(`platform ${platform.name}`, () => platform.destroy());
+	}
+
+	for (const module of MODULES) {
+		await cleanup(module.name, () => module.destroy());
+	}
+
+	await cleanup("logger", () => logger.destroy());
+	await cleanup("ChatModule", () => ChatModule.destroy());
+	await cleanup("MpvClient", () => MpvClient?.destroy());
+	await cleanup("core.Cache", () => core.Cache.destroy());
+	await cleanup("core.Query", () => core.Query.pool.end());
+};
+
+process.on("SIGTERM", () => void destructionHandler());
+process.on("SIGINT", () => void destructionHandler());

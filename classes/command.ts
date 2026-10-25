@@ -306,7 +306,7 @@ export interface CommandDefinition <T extends ParameterDefinitions = ParameterDe
 export type ExecuteFunction = (this: Command, context: Context, ...args: string[]) => StrictResult | Promise<StrictResult>;
 export type DescriptionFunction = (this: Command, prefix: string) => string[] | Promise<string[]>;
 export type CustomInitFunction = (this: Command) => Promise<void> | void;
-export type CustomDestroyFunction = (this: Command) => void;
+export type CustomDestroyFunction = (this: Command) => Promise<void> | void;
 
 export type ExecuteOptions = ContextAppendData & {
 	skipPending?: boolean;
@@ -480,10 +480,10 @@ export class Command extends TemplateWithoutId {
 		this.#customDestroy = data.destroy ?? null;
 	}
 
-	destroy () {
+	async destroy () {
 		if (typeof this.#customDestroy === "function") {
 			try {
-				this.#customDestroy();
+				await this.#customDestroy();
 			}
 			catch (e) {
 				console.warn("Custom command destroy method failed", { command: this.Name, error: e });
@@ -562,7 +562,7 @@ export class Command extends TemplateWithoutId {
 		this.validate();
 	}
 
-	static importSpecific (...definitions: CommandDefinition[]) {
+	static async importSpecific (...definitions: CommandDefinition[]) {
 		if (definitions.length === 0) {
 			return [];
 		}
@@ -573,7 +573,7 @@ export class Command extends TemplateWithoutId {
 			const previousInstance = Command.get(commandName);
 			if (previousInstance) {
 				Command.data.delete(commandName);
-				previousInstance.destroy();
+				await previousInstance.destroy();
 			}
 
 			const currentInstance = new Command(definition);
@@ -1473,10 +1473,13 @@ export class Command extends TemplateWithoutId {
 		return (string.startsWith(prefix) && string.trim().length > prefix.length);
 	}
 
-	static destroy () {
+	static async destroy () {
+		const promises = [];
 		for (const command of Command.data.values()) {
-			command.destroy();
+			promises.push(command.destroy());
 		}
+
+		await Promise.allSettled(promises);
 	}
 
 	static get prefixRegex () {

@@ -7,7 +7,7 @@ export default {
 	code: (async function announceStayHydrated () {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		if (!channelData) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

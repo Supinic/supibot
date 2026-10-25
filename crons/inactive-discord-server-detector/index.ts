@@ -11,7 +11,7 @@ export default {
 	code: (async function detectInactiveDiscordServers () {
 		const platform = sb.Platform.get("discord");
 		if (!platform) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

@@ -146,6 +146,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig, U extends str
 	 * Determines if a given channel within this platform is currently "live", as in livestreaming.
 	 */
 	public abstract isChannelLive (channelData: Channel): Promise<boolean> | null;
+	public abstract destroy (): Promise<void> | void;
 
 	public incrementMessageMetric (type: "read" | "sent", channelIdentifier: ChannelLike | null) {
 		let channel = "(private)";
@@ -557,6 +558,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig, U extends str
 
 class GenericPlatform extends Platform {
 	initListeners (): void {}
+	destroy (): void {}
 	connect (): never { throw new SupiError({ message: "Method unavailable in GenericPlatform" }); }
 	createUserMention (): never { throw new SupiError({ message: "Method unavailable in GenericPlatform" }); }
 	fetchChannelEmotes (): never { throw new SupiError({ message: "Method unavailable in GenericPlatform" }); }

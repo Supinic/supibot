@@ -9,7 +9,7 @@ export default {
 	code: async function activeChattersLog () {
 		isTableAvailable ??= await core.Query.isTablePresent("data", "Active_Chatter_Log");
 		if (!isTableAvailable) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

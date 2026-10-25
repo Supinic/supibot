@@ -1,3 +1,4 @@
+import { setTimeout as delay } from "node:timers/promises";
 import { CronJob } from "cron";
 
 import ActiveChattersLog from "./active-chatters-log/index.ts";
@@ -48,6 +49,7 @@ class CronWrapper {
 	public readonly description: string | null;
 	public readonly expression: string;
 	public readonly job: CronJob;
+	private readonly stopController = new AbortController();
 
 	constructor (def: CronDefinition) {
 		this.name = def.name;
@@ -58,12 +60,30 @@ class CronWrapper {
 		this.job = CronJob.from({
 			cronTime: def.expression,
 			onTick: () => fn(),
-			start: true
+			start: true,
+			waitForCompletion: true
 		});
 	}
 
+	async delay (timeout: number): Promise<boolean> {
+		const { signal } = this.stopController;
+
+		try {
+			await delay(timeout, undefined, { signal });
+			return !signal.aborted;
+		}
+		catch (e) {
+			if (signal.aborted && e instanceof Error && e.name === "AbortError") {
+				return false;
+			}
+
+			throw e;
+		}
+	}
+
 	stop () {
-		void this.job.stop();
+		this.stopController.abort();
+		return this.job.stop();
 	}
 }
 

@@ -14,7 +14,7 @@ export default {
 	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
 	code: (async function preventStreamSilence () {
 		if (!sb.MpvClient || !listenerAddress || !listenerPort) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

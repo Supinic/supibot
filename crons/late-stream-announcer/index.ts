@@ -9,19 +9,19 @@ export default {
 	code: (async function announceLateStream () {
 		const scheduleCommand = sb.Command.get("schedule");
 		if (!scheduleCommand) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
 		const platform = sb.Platform.get("twitch");
 		if (!platform) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
 		const channel = sb.Channel.get("supinic", platform);
 		if (!channel || !channel.Specific_ID) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

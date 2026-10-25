@@ -582,6 +582,8 @@ export class Channel extends TemplateWithId {
 	static normalizeName (username: string): string {
 		return username.toLowerCase().replace(/^@/, "").replaceAll(/\W/g, "");
 	}
+
+	static destroy (): void {} // @todo check if implementation is required
 }
 
 export default Channel;

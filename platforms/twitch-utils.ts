@@ -818,12 +818,10 @@ const initTokenCheckInterval = async () => {
 		await fetchToken();
 	}
 
-	setInterval(() => void fetchToken(), TOKEN_REGENERATE_INTERVAL);
+	return setInterval(() => void fetchToken(), TOKEN_REGENERATE_INTERVAL);
 };
 
-const initSubCacheCheckInterval = () => {
-	setInterval(() => void getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
-};
+const initSubCacheCheckInterval = () => setInterval(() => void getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
 
 const sanitizeMessage = (string: string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");
 

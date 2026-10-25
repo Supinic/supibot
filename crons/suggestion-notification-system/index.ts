@@ -27,7 +27,7 @@ export default {
 		}
 
 		if (!isTableAvailable) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 

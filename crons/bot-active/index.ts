@@ -7,19 +7,19 @@ export default {
 	code: async function verifyBotActivity () {
 		const platform = sb.Platform.get("twitch");
 		if (!platform) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
 		const userData = await sb.User.get(platform.selfName);
 		if (!userData) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
 		const authKey = await userData.getDataProperty("authKey");
 		if (!authKey) {
-			this.stop();
+			void this.stop();
 			return;
 		}
 
