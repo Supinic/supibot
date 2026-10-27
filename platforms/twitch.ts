@@ -1118,6 +1118,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		const {
 			broadcaster_user_id: channelId,
 			broadcaster_user_login: channelName,
+			user_id: userId,
 			user_login: userLogin,
 			user_input: message,
 			id: redemptionId,
@@ -1133,7 +1134,9 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			event: "redemption",
 			platform: this,
 			channel: channelData,
+			channelId,
 			username: userLogin,
+			userId,
 			message,
 			data: {
 				redemption: { id: redemptionId },

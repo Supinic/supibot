@@ -40,7 +40,9 @@ type OnlineEvent<P extends Platform = Platform> = EventBase<"online", P>;
 type OfflineEvent<P extends Platform = Platform> = EventBase<"offline", P>;
 type TwitchRedemptionEvent = EventBase<"redemption", TwitchPlatform> & {
 	username: string;
+	userId: string;
 	message: string;
+	channelId: string;
 	data: {
 		redemption: {
 			id: string;
