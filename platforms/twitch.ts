@@ -1120,6 +1120,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			broadcaster_user_login: channelName,
 			user_login: userLogin,
 			user_input: message,
+			id: redemptionId,
 			reward
 		} = notification.payload.event;
 
@@ -1134,7 +1135,10 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			channel: channelData,
 			username: userLogin,
 			message,
-			data: { reward }
+			data: {
+				redemption: { id: redemptionId },
+				reward
+			}
 		});
 	}
 

@@ -42,6 +42,9 @@ type TwitchRedemptionEvent = EventBase<"redemption", TwitchPlatform> & {
 	username: string;
 	message: string;
 	data: {
+		redemption: {
+			id: string;
+		};
 		reward: {
 			id: string;
 			cost: number;
