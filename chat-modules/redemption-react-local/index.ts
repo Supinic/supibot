@@ -9,7 +9,7 @@ const effectNames = [...SUPPORTED_EFFECTS].join(", ");
 const updateRedemption = async (status: "CANCELED" | "FULFILLED", redemptionId: string, rewardId: string, channelId: string) => {
 	const response = await core.Got.get("Helix")({
 		method: "PATCH",
-		url: "channel_points/custom_reward/redemptions",
+		url: "channel_points/custom_rewards/redemptions",
 		searchParams: {
 			id: redemptionId,
 			reward_id: rewardId,
