@@ -71,7 +71,7 @@ export default declare({
 		const { posts } = subreddit;
 		let validPosts = posts.filter(i => (
 			!i.stickied
-			&& i.hasImage
+			&& (i.hasImage || i.isVideo)
 			&& !repeatedPosts.includes(i.id)
 			&& !i.removed
 		));
