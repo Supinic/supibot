@@ -169,7 +169,7 @@ export class DiscordPlatform extends Platform<DiscordConfig, "discord"> {
 		}
 
 		if (message) {
-			const emojiNameRegex = /^\W+$/;
+			const emojiNameRegex = /^[\w\d]+$/;
 			const words = message
 				.split(/\s+/)
 				.filter(Boolean)
