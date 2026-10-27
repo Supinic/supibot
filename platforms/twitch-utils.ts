@@ -301,6 +301,33 @@ export interface StreamOfflineNotification extends NotificationMessage {
 		};
 	};
 }
+export interface RedemptionNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "channel.channel_points_custom_reward_redemption.add";
+			condition: {
+				broadcaster_user_id: string;
+				reward_id: string;
+			},
+		};
+		event: {
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+			reward: {
+				cost: number;
+				id: string;
+				prompt: string;
+				title: string;
+			};
+			status: string;
+			user_id: string;
+			user_input: string;
+			user_login: string;
+			user_name: string;
+		};
+	};
+}
 
 export const isMessageNotification = (input: NotificationMessage): input is MessageNotification => (input.payload.subscription.type === "channel.chat.message");
 export const isWhisperNotification = (input: NotificationMessage): input is WhisperNotification => (input.payload.subscription.type === "user.whisper.message");
@@ -309,6 +336,7 @@ export const isSubscribeNotification = (input: NotificationMessage): input is Su
 	return (type === "channel.subscription.message" || type === "channel.subscribe");
 };
 export const isRaidNotification = (input: NotificationMessage): input is RaidNotification => (input.payload.subscription.type === "channel.raid");
+export const isRedemptionNotification = (input: NotificationMessage): input is RedemptionNotification => (input.payload.subscription.type === "channel.channel_points_custom_reward_redemption.add");
 export const isStreamChangeNotification = (input: NotificationMessage): input is StreamOnlineNotification | StreamOfflineNotification => (
 	input.payload.subscription.type === "stream.offline" || input.payload.subscription.type === "stream.online"
 );

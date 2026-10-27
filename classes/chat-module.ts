@@ -4,7 +4,7 @@ import type * as z from "zod";
 import type { Channel } from "./channel.ts";
 import type { User } from "./user.ts";
 import type { Platform } from "../platforms/template.ts";
-import type { TwitchPlatform } from "../platforms/twitch.ts";
+import Twitch, { type TwitchPlatform } from "../platforms/twitch.ts";
 import type { DiscordPlatform } from "../platforms/discord.ts";
 import type { CytubePlatform } from "../platforms/cytube.ts";
 import type { IrcPlatform } from "../platforms/irc.ts";
@@ -38,6 +38,18 @@ type RaidEvent<P extends Platform = Platform> = EventBase<"raid", P> & {
 };
 type OnlineEvent<P extends Platform = Platform> = EventBase<"online", P>;
 type OfflineEvent<P extends Platform = Platform> = EventBase<"offline", P>;
+type TwitchRedemptionEvent = EventBase<"redemption", TwitchPlatform> & {
+	username: string;
+	message: string;
+	data: {
+		reward: {
+			id: string;
+			cost: number;
+			prompt: string;
+			title: string;
+		}
+	};
+};
 type TwitchMessageEvent = MessageEvent<TwitchPlatform> & {
 	data: {
 		customRewardId: string | null
@@ -75,6 +87,7 @@ type PlatformEventMap = {
 		offline: OfflineEvent<TwitchPlatform>;
 		raid: RaidEvent<TwitchPlatform>;
 		subscription: SubscriptionEvent<TwitchPlatform>;
+		redemption: TwitchRedemptionEvent;
 	};
 	discord: { message: MessageEvent<DiscordPlatform>; };
 	cytube: { message: MessageEvent<CytubePlatform>; };

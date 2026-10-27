@@ -31,7 +31,7 @@ import TwitchUtils, {
 	type RaidNotification,
 	type StreamOnlineNotification,
 	type StreamOfflineNotification,
-	type TwitchMessageData
+	type TwitchMessageData, type RedemptionNotification, isRedemptionNotification
 } from "./twitch-utils.ts";
 
 import type { Channel } from "../classes/channel.ts";
@@ -472,6 +472,9 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		}
 		else if (isStreamChangeNotification(data)) {
 			await this.handleStreamLiveChange(data);
+		}
+		else if (isRedemptionNotification(data)) {
+			this.handleRedemption(data);
 		}
 		else {
 			console.warn("Unrecognized notification", { data });
@@ -1109,6 +1112,30 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		if (this.logging.hosts) {
 			await logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${viewers} viewers`);
 		}
+	}
+
+	handleRedemption (notification: RedemptionNotification) {
+		const {
+			broadcaster_user_id: channelId,
+			broadcaster_user_login: channelName,
+			user_login: userLogin,
+			user_input: message,
+			reward
+		} = notification.payload.event;
+
+		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
+		if (!channelData || channelData.Mode === "Read" || channelData.Mode === "Inactive") {
+			return;
+		}
+
+		sb.ChatModule.dispatch({
+			event: "redemption",
+			platform: this,
+			channel: channelData,
+			username: userLogin,
+			message,
+			data: { reward }
+		});
 	}
 
 	async handleStreamLiveChange (event: StreamOnlineNotification | StreamOfflineNotification) {
