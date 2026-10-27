@@ -4,7 +4,7 @@ import type * as z from "zod";
 import type { Channel } from "./channel.ts";
 import type { User } from "./user.ts";
 import type { Platform } from "../platforms/template.ts";
-import Twitch, { type TwitchPlatform } from "../platforms/twitch.ts";
+import { type TwitchPlatform } from "../platforms/twitch.ts";
 import type { DiscordPlatform } from "../platforms/discord.ts";
 import type { CytubePlatform } from "../platforms/cytube.ts";
 import type { IrcPlatform } from "../platforms/irc.ts";
