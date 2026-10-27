@@ -1,3 +1,4 @@
+import { logger } from "../../singletons/logger.ts";
 import { defineChatModule } from "../../classes/chat-module.ts";
 
 const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best|real|more)?\s*(viewers|followers)/gi;
@@ -68,28 +69,31 @@ export default defineChatModule({
 				{ shuffle: true }
 			);
 
-			if (!user) {
-				if (raw?.user) {
-					const name = raw.user;
-					await platform.timeout(channel, name, null, reason);
-					await channel.send(`${emote} ${reason}`);
-				}
+			let name;
+			if (!user && raw?.user) {
+				name = raw.user;
+			}
+			else if (user) {
+				const messageCount = await core.Query.getRecordset<number | undefined>(rs => rs
+					.select("Message_Count")
+					.from("chat_data", "Message_Meta_User_Alias")
+					.where("Channel = %n", channel.ID)
+					.where("User_Alias = %n", user.ID)
+					.single()
+					.flat("Message_Count")
+				);
 
-				return;
+				if (typeof messageCount === "undefined" || messageCount <= 1) {
+					name = user.Name;
+				}
 			}
 
-			const messageCount = await core.Query.getRecordset<number | undefined>(rs => rs
-				.select("Message_Count")
-				.from("chat_data", "Message_Meta_User_Alias")
-				.where("Channel = %n", channel.ID)
-				.where("User_Alias = %n", user.ID)
-				.single()
-				.flat("Message_Count")
-			);
-
-			if (typeof messageCount === "undefined" || messageCount <= 1) {
-				await platform.timeout(channel, user, null, reason);
-				await channel.send(`${emote} ${reason}`);
+			if (name) {
+				await Promise.all([
+					platform.timeout(channel, name, null, reason),
+					channel.send(`${emote} ${reason}`),
+					logger.log("Twitch.Ban", `Wanna become famous: "${message}"`, channel, user)
+				]);
 			}
 		}
 	}
