@@ -3,6 +3,7 @@ import { defineChatModule } from "../../classes/chat-module.ts";
 const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best|real|more)?\s*(viewers|followers)/gi;
 const siteRegex = /(streamboo|u\.to|dogehype)/gi;
 const discordRegex = /(add\s*)((me on)|(my))\s*(disc(ord)?)/gi;
+const mathSymbolRegex = /[\u{1D400}-\u{1D7FF}]/gu;
 
 export default defineChatModule({
 	name: "wanna-become-famous",
@@ -18,6 +19,8 @@ export default defineChatModule({
 
 			let reason;
 			const msg = core.Utils.removeAccents(message).toLowerCase();
+			const mathCharacters = [...msg.matchAll(mathSymbolRegex)].length;
+
 			if (msg.includes("become famous?")) {
 				reason = "becoming famous";
 			}
@@ -50,6 +53,9 @@ export default defineChatModule({
 			}
 			else if (discordRegex.test(msg)) {
 				reason = "getting added on discord";
+			}
+			else if (mathCharacters > 3) {
+				reason = "posting sus text";
 			}
 			else {
 				return;
