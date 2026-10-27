@@ -13,6 +13,7 @@ import PingSupiModule from "./ping-supi/index.ts";
 import PyramidDetectionModule from "./pyramid-detection/index.ts";
 import RaidReactionModule from "./raid-react/index.ts";
 import RaidReactionTtsModule from "./raid-react-tts/index.ts";
+import RedemptionReactLocalModule from "./redemption-react-local/index.ts";
 import StreamPointsRedemptionModule from "./stream-points-redemptions/index.ts";
 import SubscriptionReactionModule from "./subscription-react/index.ts";
 import SubscriptionReactionTtsModule from "./subscription-react-tts/index.ts";
@@ -44,6 +45,7 @@ export const chatModuleDefinitions = [
 	PyramidDetectionModule,
 	RaidReactionModule,
 	RaidReactionTtsModule,
+	RedemptionReactLocalModule,
 	StreamPointsRedemptionModule,
 	SubscriptionReactionModule,
 	SubscriptionReactionTtsModule,
