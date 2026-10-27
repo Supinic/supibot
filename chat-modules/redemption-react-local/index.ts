@@ -7,13 +7,23 @@ const SUPPORTED_EFFECTS = new Set(["wobbly-windows"]);
 const effectNames = [...SUPPORTED_EFFECTS].join(", ");
 
 const updateRedemption = async (status: "CANCELED" | "FULFILLED", redemptionId: string, rewardId: string, channelId: string) => {
+	const accessToken = await core.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN") as string | undefined;
+	if (!accessToken) {
+		return;
+	}
+
 	const response = await core.Got.get("Helix")({
 		method: "PATCH",
 		url: "channel_points/custom_rewards/redemptions",
+		headers: {
+			"Client-ID": process.env.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${accessToken}`
+		},
 		searchParams: {
 			id: redemptionId,
 			reward_id: rewardId,
 			broadcaster_id: channelId
+
 		},
 		json: { status }
 	});
