@@ -3,7 +3,7 @@ import { defineChatModule } from "../../classes/chat-module.ts";
 
 const { local = {} } = getConfig();
 
-const SUPPORTED_EFFECTS = new Set(["wobbly-windows"]);
+const SUPPORTED_EFFECTS = new Set(["fall-apart", "wobbly-windows"]);
 const effectNames = [...SUPPORTED_EFFECTS].join(", ");
 
 /**
