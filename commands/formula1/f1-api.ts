@@ -7,6 +7,7 @@ import { openMeteoWeatherProvider } from "../weather/providers/index.ts";
 import type { NumericCoordinates } from "../../utils/globals.ts";
 import { isResultFailure } from "../../classes/command.ts";
 import { logger } from "../../singletons/logger.ts";
+import race from "./subcommands/race.ts";
 
 const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
@@ -110,6 +111,7 @@ const formulaOneStatusShape = z.object({
 	Status: z.string()
 });
 
+const addRaceLength = (date: SupiDate): SupiDate => date.clone().addHours(3);
 const fetchOfficalRaceStatusFinished = async (race: Race): Promise<boolean | null> => {
 	const cacheBust = Math.floor(SupiDate.now() / 15_000);
 	const sessionResponse = await core.Got.get("GenericAPI")({
@@ -322,7 +324,7 @@ export const fetchNextRaceDetail = async () => {
 
 	const now = new SupiDate();
 	const raceStart = new SupiDate(`${race.date} ${race.time}`);
-	const raceEnd = raceStart.clone().addHours(2); // Compensate for the race being underway
+	const raceEnd = addRaceLength(raceStart); // Compensate for the race being underway
 
 	let nextSessionString = "";
 	let nextSessionStart: SupiDate | number = Infinity;
@@ -336,7 +338,7 @@ export const fetchNextRaceDetail = async () => {
 			if (now <= sessionStart && sessionStart.valueOf() < nextSessionStart.valueOf()) {
 				nextSessionType = session;
 				nextSessionStart = sessionStart;
-				nextSessionEnd = nextSessionStart.clone().addHours(2); // Compensate for the session being underway
+				nextSessionEnd = addRaceLength(nextSessionStart); // Compensate for the session being underway
 			}
 		}
 	}
@@ -346,7 +348,7 @@ export const fetchNextRaceDetail = async () => {
 			if (now <= sessionStart && sessionStart.valueOf() < nextSessionStart.valueOf()) {
 				nextSessionType = session;
 				nextSessionStart = sessionStart;
-				nextSessionEnd = nextSessionStart.clone().addHours(2); // Compensate for the session being underway
+				nextSessionEnd = addRaceLength(nextSessionStart); // Compensate for the session being underway
 			}
 		}
 	}
