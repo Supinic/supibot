@@ -163,7 +163,6 @@
     },
     {
       "name": "poop",
-      "aliases": ["💩"],
       "status": "now pooping",
       "textSuffix": "🚽",
       "noTextString": "💩"

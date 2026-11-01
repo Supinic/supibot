@@ -1,13 +1,13 @@
 import { SupiError } from "supi-core";
 import { declare } from "../../classes/command.ts";
-import { afkDefinitions } from "../../classes/afk.ts";
+import { afkDefinitions, type Status } from "../../classes/afk.ts";
 
 const { invocations, specialSuffixes } = afkDefinitions;
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;
 
 export default declare({
 	Name: "afk",
-	Aliases: ["gn", "brb", "shower", "food", "lurk", "poop", "💩", "work", "study", "nap"],
+	Aliases: ["gn", "brb", "shower", "food", "lurk", "poop", "work", "study", "nap"] satisfies Status[],
 	Cooldown: 10_000,
 	Description: "Flags you as AFK. Supports a custom AFK message.",
 	Flags: ["pipe"],
@@ -22,7 +22,7 @@ export default declare({
 		}
 
 		const invocation = context.invocation;
-		const target = invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
+		const target = invocations.find(i => i.name === invocation);
 		if (!target) {
 			throw new SupiError({
 				message: "Assert error: AFK invocation does not match",

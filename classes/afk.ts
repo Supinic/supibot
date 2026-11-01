@@ -30,7 +30,6 @@ const responsesSchema = z.object({
 	}),
 	invocations: z.array(z.object({
 		name: z.enum(afkStatuses),
-		aliases: z.array(z.string()).min(1).optional(),
 		status: z.string(),
 		textSuffix: z.string().nullable(),
 		specialSuffix: specialSuffixesSchema.keyof().optional(),
@@ -46,7 +45,7 @@ type DurationStatus = {
 	interval: [number, number | null];
 	responses: string[];
 };
-const durationStatuses = responses.duration as Partial<Record<Status, DurationStatus[]>>;
+const durationStatuses = responses.duration satisfies Partial<Record<Status, DurationStatus[]>>;
 
 export const NO_TEXT_AFK = "(no message)";
 const DEFAULT_AFK_STATUS = "afk";
