@@ -13,6 +13,14 @@ type RandomLine = {
 
 export const fetchUserRandomLine = async (userData: User, channelData: Channel): Promise<ResultFailure | RandomLine> => {
 	const channelName = channelData.getDatabaseName();
+	const tableExists = await core.Query.isTablePresent("chat_line", channelName);
+	if (!tableExists) {
+		return {
+			success: false,
+			reply: "This channel is not currently being logged!"
+		};
+	}
+
 	const userMessageCount = await core.Query.getRecordset<number | null>(rs => rs
 		.select("Message_Count AS Count")
 		.from("chat_data", "Message_Meta_User_Alias")
@@ -90,6 +98,13 @@ export const fetchUserRandomLine = async (userData: User, channelData: Channel):
 
 export const fetchChannelRandomLine = async function (channelData: Channel): Promise<ResultFailure | RandomLine> {
 	const channelName = channelData.getDatabaseName();
+	const tableExists = await core.Query.isTablePresent("chat_line", channelName);
+	if (!tableExists) {
+		return {
+			success: false,
+			reply: "This channel is not currently being logged!"
+		};
+	}
 
 	const channelMessageCount = await core.Query.getRecordset<number | null>(rs => rs
 		.select("MAX(ID) AS Total")
