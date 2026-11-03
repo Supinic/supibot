@@ -891,22 +891,26 @@ export class Reminder extends TemplateWithId {
 
 			if (row.loaded) {
 				const historyRow = await core.Query.getRow<HistoryConstructorData>("chat_data", "Reminder_History");
+				await historyRow.load(ID, true);
 
-				historyRow.setValues({
-					ID,
-					User_From: row.values.User_From,
-					User_To: row.values.User_To,
-					Channel: row.values.Channel,
-					Platform: row.values.Platform,
-					Type: row.values.Type,
-					Text: row.values.Text,
-					Created: row.values.Created,
-					Schedule: row.values.Schedule,
-					Private_Message: row.values.Private_Message,
-					Cancelled: Boolean(cancelled)
-				});
+				if (!historyRow.loaded) {
+					historyRow.setValues({
+						ID,
+						User_From: row.values.User_From,
+						User_To: row.values.User_To,
+						Channel: row.values.Channel,
+						Platform: row.values.Platform,
+						Type: row.values.Type,
+						Text: row.values.Text,
+						Created: row.values.Created,
+						Schedule: row.values.Schedule,
+						Private_Message: row.values.Private_Message,
+						Cancelled: Boolean(cancelled)
+					});
 
-				await historyRow.save({ skipLoad: true });
+					await historyRow.save({ skipLoad: true });
+				}
+
 				await row.delete();
 			}
 		}
