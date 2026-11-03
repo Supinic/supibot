@@ -142,9 +142,7 @@ const BaseIvrUserDataSchema = z.object({
 	displayName: z.string(),
 	id: z.string(),
 	bio: z.string().nullable(),
-	follows: z.null(),
-	followers: z.number(),
-	profileViewCount: z.null(),
+	followers: z.number().nullish(),
 	chatColor: z.string().nullable(),
 	logo: z.string(),
 	banner: z.string().nullable(),
@@ -198,7 +196,6 @@ const RegularIvrUserDataSchema = BaseIvrUserDataSchema.extend({
 });
 
 const BannedIvrUserDataSchema = BaseIvrUserDataSchema.extend({
-	followers: z.number().nullish(),
 	emotePrefix: z.string().nullish(),
 	banned: z.literal(true),
 	banReason: z.union([
