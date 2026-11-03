@@ -149,7 +149,7 @@ const BaseIvrUserDataSchema = z.object({
 	verifiedBot: z.null(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
-	emotePrefix: z.string().nullable(),
+	emotePrefix: z.string().nullish(),
 	roles: z.object({
 		isAffiliate: z.boolean(),
 		isPartner: z.boolean(),
