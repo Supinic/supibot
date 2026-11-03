@@ -238,6 +238,13 @@ export default declare({
 			}
 		});
 
+		if (!gameDataResponse.ok) {
+			return {
+				success: false,
+				reply: "Could not find this Steam game!"
+			};
+		}
+
 		const gameSchema = steamGameDataSchema.parse(gameDataResponse.body)[gameId];
 		if (!gameSchema || !gameSchema.success) {
 			return {
