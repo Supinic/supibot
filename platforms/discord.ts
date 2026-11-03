@@ -9,13 +9,13 @@ import {
 	type GuildMember,
 	type Message as DiscordMessage,
 	type User as DiscordUser,
+	type TextChannel,
 	ChannelType,
 	Client,
 	GatewayIntentBits,
 	Partials,
 	PermissionFlagsBits,
 	Routes,
-	TextChannel,
 	escapeMarkdown
 } from "discord.js";
 
@@ -65,7 +65,7 @@ const IGNORED_CHANNEL_TYPES = new Set([
 
 const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
 
-const isTextChannel = (input: DiscordChannel): input is TextChannel => (input instanceof TextChannel);
+const isTextChannel = (input: DiscordChannel): input is TextChannel => (input.type === ChannelType.GuildText);
 
 const formatEmoji = (emote: Emote) => {
 	// const name = emote.name ?? "_";
@@ -540,6 +540,16 @@ export class DiscordPlatform extends Platform<DiscordConfig, "discord"> {
 			}
 
 			this.resolveUserMessage(null, userData, msg);
+		}
+		else {
+			throw new SupiError({
+				message: "Unexpected Discord channel/PM state",
+				args: {
+					privateMessage,
+					channelType: messageObject.channel.type,
+					data: JSON.stringify(messageObject)
+				}
+			});
 		}
 
 		this.incrementMessageMetric("read", channelData);
