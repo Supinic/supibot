@@ -1,21 +1,49 @@
+import * as z from "zod";
 import { SupiDate } from "supi-core";
+import { declare } from "../../classes/command.ts";
 
-/**
- * @param {Object[]} mediaEntities
- * @returns {string[]}
- */
-const extractMediaLinks = (mediaEntities) => {
+const mediaEntityShape = z.discriminatedUnion("type", [
+	z.object({
+		type: z.literal("video"),
+		video_info: z.object({
+			variants: z.array(z.object({
+				bitrate: z.number().optional(),
+				url: z.string()
+			}))
+		})
+	}),
+	z.object({
+		type: z.literal("photo"),
+		media_url_https: z.string()
+	})
+]);
+
+const timelineSchema = z.object({
+	data: z.object({
+		timeline: z.array(z.object({
+			_probably_pinned: z.boolean().optional(),
+			created_at: z.string(),
+			id_str: z.string(),
+			full_text: z.string().nullish(),
+			possibly_sensitive: z.boolean(),
+			retweeted_status: z.object({}).optional(),
+			entities: z.object({
+				media: z.array(mediaEntityShape)
+			})
+		}))
+	})
+});
+
+const extractMediaLinks = (mediaEntities: z.infer<typeof mediaEntityShape>[]): string[] => {
 	const result = [];
 	for (const item of mediaEntities) {
 		if (item.type === "video") {
 			const { variants } = item.video_info;
-			const [bestVariant] = variants
-				.filter(i => typeof i.bitrate === "number")
-				.sort((a, b) => b.bitrate - a.bitrate);
+			const [bestVariant] = variants.sort((a, b) => (b.bitrate ?? 0) - (a.bitrate ?? 0));
 
 			result.push(bestVariant.url);
 		}
-		else if (item.type === "photo") {
+		else {
 			result.push(item.media_url_https);
 		}
 	}
@@ -23,13 +51,13 @@ const extractMediaLinks = (mediaEntities) => {
 	return result;
 };
 
-export default {
+export default declare({
 	Name: "twitter",
 	Aliases: ["tweet"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the last tweet from a given user. No retweets or replies, just plain standalone tweets.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention", "non-nullable", "pipe"],
 	Params: [
 		{ name: "includeReplies", type: "boolean" },
 		{ name: "includeRetweets", type: "boolean" },
@@ -62,7 +90,9 @@ export default {
 			};
 		}
 
-		let eligibleTweets = response.body.data.timeline.filter(i => i._probably_pinned !== true);
+		const { timeline } = timelineSchema.parse(response.body).data;
+
+		let eligibleTweets = timeline.filter(i => i._probably_pinned !== true);
 		if (context.params.mediaOnly) {
 			eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
 			if (eligibleTweets.length === 0) {
@@ -102,11 +132,9 @@ export default {
 			isSensitiveContentAllowed = true;
 		}
 		else {
-			if (context.channel.NSFW) {
-				isSensitiveContentAllowed = true;
-			}
-
-			isSensitiveContentAllowed = Boolean(await context.channel.getDataProperty("twitterNSFW"));
+			isSensitiveContentAllowed = (context.channel.NSFW)
+				? true
+				: Boolean(await context.channel.getDataProperty("twitterNSFW"));
 		}
 
 		if (!isSensitiveContentAllowed) {
@@ -125,11 +153,12 @@ export default {
 			tweet = core.Utils.randArray(eligibleTweets);
 		}
 		else {
-			tweet = eligibleTweets[0];
+			tweet = eligibleTweets.at(0);
 		}
 
 		if (!tweet) {
 			return {
+				success: false,
 				reply: "That account has not tweeted so far."
 			};
 		}
@@ -142,6 +171,7 @@ export default {
 		if (context.params.mediaOnly) {
 			const links = extractMediaLinks(tweet.entities.media).join(" ");
 			return {
+				success: true,
 				reply: (context.params.textOnly)
 					? links
 					: `${fixedText} ${links} (posted ${delta})`
@@ -149,13 +179,14 @@ export default {
 		}
 		else {
 			return {
+				success: true,
 				reply: (context.params.textOnly)
 					? fixedText
 					: `${fixedText} (posted ${delta})`
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) => [
+	Dynamic_Description: (prefix) => [
 		"Fetches the last tweet of a provided account.",
 		"Excludes retweets by default - this can be changed with a parameter.",
 		"",
@@ -200,4 +231,4 @@ export default {
 		"Filters out all tweets that contain no media, and only posts the link(s) to the media in a given tweet.",
 		""
 	]
-};
+});

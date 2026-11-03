@@ -157,7 +157,7 @@ import TranslateCommand from "./translate/index.ts";
 import TransliterateCommand from "./transliterate/index.ts";
 import TuckCommand from "./tuck/index.ts";
 import TwitchLottoCommand from "./twitchlotto/index.ts";
-import TwitterCommand from "./twitter/index.js";
+import TwitterCommand from "./twitter/index.ts";
 import UnmentionCommand from "./unmention/index.ts";
 import UnpingCommand from "./unping/index.ts";
 import UrbanCommand from "./urban/index.ts";
