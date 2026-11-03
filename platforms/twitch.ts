@@ -1063,6 +1063,8 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 
 		const { event } = notification.payload;
 		if (!event.message) {
+			// check for `event.message` since we can get a "slim" version of the event which occurs
+			// when someone subscribes, but doesn't share the sub in chat (yet). that one does not have `message`
 			return;
 		}
 
