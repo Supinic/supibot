@@ -7,7 +7,6 @@ import { openMeteoWeatherProvider } from "../weather/providers/index.ts";
 import type { NumericCoordinates } from "../../utils/globals.ts";
 import { isResultFailure } from "../../classes/command.ts";
 import { logger } from "../../singletons/logger.ts";
-import race from "./subcommands/race.ts";
 
 const url = "https://api.jolpi.ca/ergast/f1/";
 const regularSessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"] as const;
