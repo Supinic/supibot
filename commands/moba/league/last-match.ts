@@ -77,8 +77,7 @@ export default {
 		const gameType = gameQueue.shortName ?? "(unknown)";
 
 		// The ?? operator is probably not necessary here, but just "in case" Riot API receives a new key.
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
+		const position = TEAM_POSITIONS_MAP[player.teamPosition];
 		const championsData = await getChampionData();
 		const champName = getChampionName(championsData, player.championName);
 

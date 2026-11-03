@@ -51,6 +51,7 @@ export const DEFAULT_REGION_KEY = "leagueDefaultRegion";
 export const QUEUE_DATA_CACHE_KEY = "league-queues-data";
 
 export const TEAM_POSITIONS_MAP = {
+	"": "",
 	TOP: "top",
 	MIDDLE: "mid",
 	JUNGLE: "jungle",
