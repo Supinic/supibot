@@ -169,9 +169,9 @@ export const getQueueDescription = async (queueId: number) => {
 
 	const queue = queueData.find(i => i.queueId === queueId);
 	if (!queue) {
-		throw new SupiError({
-			message: "Queue ID not found"
-		});
+		// fallback in case of an unlisted queue ID
+		// noted on 2026-11-10 in this game data (queue = CHERRY) https://haste.zneix.eu/raw/ycunubixiw
+		return null;
 	}
 
 	return queue;

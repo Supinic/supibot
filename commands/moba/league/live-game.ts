@@ -46,7 +46,7 @@ export default {
 
 		const championData = await getChampionData();
 		const gameQueue = await getQueueDescription(gameQueueConfigId);
-		const gameType = gameQueue.shortName ?? "(unknown)";
+		const gameType = gameQueue?.shortName ?? "(unknown game mode)";
 
 		const alliedTeam = [];
 		const enemyTeam = [];

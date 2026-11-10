@@ -74,7 +74,7 @@ export default {
 
 		const creepScore = player.totalMinionsKilled + player.neutralMinionsKilled;
 		const creepsPerMinute = core.Utils.round(creepScore / gameLengthMinutes, 1);
-		const gameType = gameQueue.shortName ?? "(unknown)";
+		const gameType = gameQueue?.shortName ?? `(game mode ${info.gameMode})`;
 
 		// The ?? operator is probably not necessary here, but just "in case" Riot API receives a new key.
 		const position = TEAM_POSITIONS_MAP[player.teamPosition];
