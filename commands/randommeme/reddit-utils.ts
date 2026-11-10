@@ -1,7 +1,7 @@
 import * as z from "zod";
 import rawConfig from "./config.json" with { type: "json" };
 import { filterNonNullable } from "../../utils/ts-helpers.ts";
-import type { ResultFailure } from "../../classes/command.ts";
+import { isResultFailure, type ResultFailure } from "../../classes/command.ts";
 
 const configShape = z.object({
 	repeats: z.number(),
@@ -80,12 +80,14 @@ type Subreddit = {
 	name: string;
 	quarantine: boolean;
 	nsfw: boolean;
+	isMulti: boolean;
 	posts: RedditPost[];
 };
 type RedditPost = {
 	id: string;
 	title: string;
 	url: string;
+	subreddit: string;
 	commentsUrl: string;
 	author: string;
 	created: number;
@@ -173,6 +175,7 @@ const parsePost = (data: z.infer<typeof postShape>): RedditPost => {
 		id: data.id,
 		url: data.url,
 		title,
+		subreddit: data.subreddit_name_prefixed,
 		author: data.author,
 		hasText: Boolean(data.selftext && data.selftext_html),
 		hasImage: (data.post_hint === "image"),
@@ -209,21 +212,8 @@ export const getRawRedditPost = (post: RedditPost): RawRedditPost => ({
 	galleryLinks: post.galleryLinks
 });
 
-type SubredditSuccess = {
-	success: true;
-	subreddit: Subreddit;
-};
-const createSubredditKey = (name: string) => `cache-subreddit-${name}`;
-export const getSubreddit = async (name: string): Promise<SubredditSuccess | ResultFailure> => {
-	const key = createSubredditKey(name);
-	const cachedData = await core.Cache.getByPrefix(key) as Subreddit | undefined;
-	if (cachedData) {
-		return {
-			success: true,
-			subreddit: cachedData
-		};
-	}
-
+type SubredditMeta = { name: string; quarantine: boolean; nsfw: boolean; };
+const getSubredditMetadata = async (name: string): Promise<SubredditMeta | ResultFailure> => {
 	const aboutResponse = await core.Got.get("Reddit")({
 		url: `https://oauth.reddit.com/r/${name}/about.json`
 	});
@@ -252,8 +242,68 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 	if ("after" in aboutData || "children" in aboutData) {
 		return {
 			success: false,
-			reply: `There is no subreddit with that name!`
+			reply: `Subreddit ${name} does not exist!`
 		};
+	}
+
+	return {
+		name: aboutData.display_name,
+		quarantine: Boolean(aboutData.quarantine),
+		nsfw: Boolean(aboutData.over18)
+	};
+};
+
+type SubredditSuccess = {
+	success: true;
+	subreddit: Subreddit;
+};
+const createSubredditKey = (name: string) => {
+	if (name.includes("+")) {
+		const names = name.split("+").map(i => i.toLowerCase()).sort();
+		return `cache-multireddit-${names.join("-")}`;
+	}
+	else {
+		return `cache-subreddit-${name.toLowerCase()}`;
+	}
+};
+export const getSubreddit = async (name: string): Promise<SubredditSuccess | ResultFailure> => {
+	const key = createSubredditKey(name);
+	const cachedData = await core.Cache.getByPrefix(key) as Subreddit | undefined;
+	if (cachedData) {
+		return {
+			success: true,
+			subreddit: cachedData
+		};
+	}
+
+	let displayName: string;
+	let nsfw = false;
+	let quarantine = false;
+	let isMulti = false;
+	if (name.includes("+")) {
+		const list = name.split("+");
+		for (const part of list) {
+			const meta = await getSubredditMetadata(part);
+			if (isResultFailure(meta)) {
+				return meta;
+			}
+
+			nsfw ||= meta.nsfw;
+			quarantine ||= meta.quarantine;
+		}
+
+		isMulti = true;
+		displayName = list.join("-");
+	}
+	else {
+		const meta = await getSubredditMetadata(name);
+		if (isResultFailure(meta)) {
+			return meta;
+		}
+
+		displayName = meta.name;
+		nsfw = meta.nsfw;
+		quarantine = meta.quarantine;
 	}
 
 	const postsResponse = await core.Got.get("Reddit")({
@@ -270,10 +320,11 @@ export const getSubreddit = async (name: string): Promise<SubredditSuccess | Res
 	const rawPostsData = postsSchema.parse(postsResponse.body).data.children;
 	const posts = rawPostsData.map(i => parsePost(i.data));
 	const subreddit = {
-		name: aboutData.display_name,
-		quarantine: Boolean(aboutData.quarantine),
-		nsfw: Boolean(aboutData.over18),
-		posts
+		name: displayName,
+		quarantine,
+		nsfw,
+		posts,
+		isMulti
 	};
 
 	await core.Cache.setByPrefix(key, subreddit, {

@@ -37,17 +37,17 @@ export default declare({
 		}
 
 		const input = args.at(0) ?? core.Utils.randArray(redditConfig.defaultMemeSubreddits);
-		const subredditName = encodeURIComponent(input.toLowerCase());
-		const result = await getSubreddit(subredditName);
+		const result = await getSubreddit(input.toLowerCase());
 		if (!result.success) {
 			return result;
 		}
 
 		const { subreddit } = result;
+		const forumName = (subreddit.isMulti) ? "Multireddit" : "Subreddit";
 		if (safeSpace && (redditConfig.banned.includes(subreddit.name) || subreddit.nsfw)) {
 			return {
 				success: false,
-				reply: `Subreddit ${input} is flagged as 18+, and thus not safe to post here!`
+				reply: `${forumName} ${input} is flagged as 18+, and thus not safe to post here!`
 			};
 		}
 		else if (subreddit.nsfw && context.append.pipe) {
@@ -87,7 +87,7 @@ export default declare({
 			else {
 				return {
 					success: false,
-					reply: `Subreddit ${input} has no eligible (non-stickied, self or text) posts!`
+					reply: `${forumName} ${input} has no eligible (non-stickied, self or text) posts!`
 				};
 			}
 		}
@@ -98,7 +98,7 @@ export default declare({
 				repeatedPostsMap.delete(repeatedPostKey);
 				return {
 					success: false,
-					reply: `Subreddit ${input} only has NSFW posts! This channel is marked as SFW posts only.`
+					reply: `${forumName} ${input} only has NSFW posts! This channel is marked as SFW posts only.`
 				};
 			}
 		}
@@ -110,7 +110,7 @@ export default declare({
 				repeatedPostsMap.delete(repeatedPostKey);
 				return {
 					success: false,
-					reply: `Subreddit ${input} has no posts with the flair ${context.params.flair}!`
+					reply: `${forumName} ${input} has no posts with the flair ${context.params.flair}!`
 				};
 			}
 		}
@@ -122,7 +122,7 @@ export default declare({
 				repeatedPostsMap.delete(repeatedPostKey);
 				return {
 					success: false,
-					reply: `Subreddit ${input} has no posts that don't have the flair ${context.params.ignoreFlair}!`
+					reply: `${forumName} ${input} has no posts that don't have the flair ${context.params.ignoreFlair}!`
 				};
 			}
 		}
@@ -132,7 +132,7 @@ export default declare({
 				repeatedPostsMap.delete(repeatedPostKey);
 				return {
 					success: false,
-					reply: `Subreddit ${input} has no posts that are not galleries!`
+					reply: `${forumName} ${input} has no posts that are not galleries!`
 				};
 			}
 		}
@@ -142,7 +142,7 @@ export default declare({
 				repeatedPostsMap.delete(repeatedPostKey);
 				return {
 					success: false,
-					reply: `Subreddit ${input} has no posts that are not videos!`
+					reply: `${forumName} ${input} has no posts that are not videos!`
 				};
 			}
 		}
@@ -193,7 +193,7 @@ export default declare({
 			success: true,
 			reply: core.Utils.fixHTML(core.Utils.tag.trim `
 				${symbol}
-				r/${subreddit.name}:
+				${post.subreddit}:
 				${post.title} ${fixedUrl} (Score: ${post.score}, posted ${delta}${xpost})
 				${commentsUrl}
 				${galleryLinksString}
@@ -221,10 +221,16 @@ export default declare({
 		"",
 
 		`<code>${prefix}rm (subreddit)</code>`,
-		`<code>${prefix}randommeme (subreddit)</code>`,
 		"Posts a random post from the specified subreddit.",
 		"NSFW-marked subreddits are not available outside of channels marked for that content.",
 		"NSFW-marked posts will be filtered out in channels not marked for that content.",
+		"",
+
+		`<code>${prefix}rm (multireddit)</code>`,
+		`<code>${prefix}rm czech+slovakia+suomi</code>`,
+		"Posts a random post from the specified multireddit.",
+		"This just means a random post from either of the provided subreddits is rolled at random.",
+		"If just one subreddit is NSFW, then the entire multireddit will not be available in non-NSFW channels",
 		"",
 
 		`<code>${prefix}rm (subreddit) galleryLinks:true</code>`,
