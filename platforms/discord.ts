@@ -60,7 +60,9 @@ const IGNORED_CHANNEL_TYPES = new Set([
 	ChannelType.GuildCategory,
 	ChannelType.AnnouncementThread,
 	ChannelType.PrivateThread,
-	ChannelType.PublicThread
+	ChannelType.PublicThread,
+	ChannelType.GuildVoice,
+	ChannelType.GuildStageVoice
 ]);
 
 const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
