@@ -15,6 +15,9 @@ const mediaEntityShape = z.discriminatedUnion("type", [
 	z.object({
 		type: z.literal("photo"),
 		media_url_https: z.string()
+	}),
+	z.object({
+		type: z.literal("animated_gif")
 	})
 ]);
 
@@ -43,7 +46,7 @@ const extractMediaLinks = (mediaEntities: z.infer<typeof mediaEntityShape>[]): s
 
 			result.push(bestVariant.url);
 		}
-		else {
+		else if (item.type === "photo") {
 			result.push(item.media_url_https);
 		}
 	}
