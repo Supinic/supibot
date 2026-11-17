@@ -1,6 +1,5 @@
 import { declare, type SubcommandDefinition } from "../../classes/command.ts";
 import { AliasSubcommands } from "./subcommands/index.ts";
-import { prefix } from "../../utils/command-utils.ts";
 
 export type AliasSubcommandDefinition = SubcommandDefinition<typeof aliasCommandDefinition>;
 
