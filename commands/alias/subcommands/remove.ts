@@ -1,6 +1,6 @@
 import { type AliasSubcommandDefinition } from "../index.ts";
 import { prefix } from "../../../utils/command-utils.ts";
-import { type AliasData, cleanPublishedAliases, getAliasByNameAndUser, getGenericAliasRow } from "../alias-utils.ts";
+import { cleanPublishedAliases, getAliasByNameAndUser, getGenericAliasRow } from "../alias-utils.ts";
 
 export default {
 	name: "remove",

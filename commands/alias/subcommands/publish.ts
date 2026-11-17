@@ -1,4 +1,4 @@
-import alias, { type AliasSubcommandDefinition } from "../index.ts";
+import { type AliasSubcommandDefinition } from "../index.ts";
 import { prefix } from "../../../utils/command-utils.ts";
 import {
 	ALIAS_NAME_REGEX,
