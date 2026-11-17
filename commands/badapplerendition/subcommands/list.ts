@@ -4,9 +4,14 @@ export default {
 	name: "list",
 	aliases: ["show"],
 	title: "Post the list link",
-	description: ["Simply posts the link to the Bad Apple!! list."],
+	getDescription: (prefix) => [
+		`<code>${prefix}bar list</code>`,
+		`<code>${prefix}bar show</code>`,
+		"Posts the link to the Bad Apple!! list: https://supinic.com/data/bad-apple/list"
+	],
 	default: false,
 	execute: () => ({
+		success: true,
 		reply: `https://supinic.com/data/bad-apple/list`
 	})
 } satisfies BadAppleSubcommandDefinition;

@@ -4,8 +4,13 @@ export default {
 	name: "random",
 	aliases: ["roll"],
 	title: "Random link",
-	default: false,
-	description: ["Rolls a random Bad Apple!! rendition from the list, and posts its details."],
+	default: true,
+	getDescription: (prefix) => [
+		`<code>${prefix}bar</code>`,
+		`<code>${prefix}bar random</code>`,
+		`<code>${prefix}bar roll</code>`,
+		"Rolls a random Bad Apple!! rendition from the list, and posts its details."
+	],
 	execute: async () => {
 		const random = await core.Query.getRecordset<BadAppleRow | undefined>(rs => rs
 			.select("ID", "Device", "Link", "Timestamp")

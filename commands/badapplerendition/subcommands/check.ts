@@ -9,8 +9,10 @@ export default {
 	aliases: ["add"],
 	title: "New video",
 	default: false,
-	description: [
-		"Checks if your provided link is in the database, and creates a suggestion to add, if it isn't."
+	getDescription: (prefix) => [
+		`<code>${prefix}bar add</code>`,
+		`<code>${prefix}bar check</code>`,
+		"Checks if your provided Bad Apple rendition link is in the database, and creates a suggestion to add if it isn't."
 	],
 	execute: async (context, ...args) => {
 		const linkParser = await getLinkParser();
