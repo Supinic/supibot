@@ -1,11 +1,12 @@
-import { type AliasSubcommandDefinition } from "../index.ts";
+import alias, { type AliasSubcommandDefinition } from "../index.ts";
 import { prefix } from "../../../utils/command-utils.ts";
 import {
 	ALIAS_NAME_REGEX,
 	ALIAS_INVALID_NAME_RESPONSE,
 	getChannelAlias,
 	getAliasByNameAndUser,
-	getClassicAliasRow
+	getClassicAliasRow,
+	isLinkedAlias, getParentAlias, isClassicAlias
 } from "../alias-utils.ts";
 
 export default {
@@ -88,15 +89,24 @@ export default {
 				};
 			}
 
+			const parent = (isLinkedAlias(alias)) ? await getParentAlias(alias) : alias;
+			if (!parent || !isClassicAlias(parent)) {
+				return {
+					success: false,
+					reply: "Your provided alias does not have any definition to publish!"
+				};
+			}
+
 			const row = await core.Query.getRow("data", "Custom_Command_Alias");
 			row.setValues({
 				Name: aliasName,
 				Channel: context.channel.ID,
-				Parent: alias.Parent ?? alias.ID
+				Parent: parent.ID
 			});
 
 			await row.save({ skipLoad: true });
 			return {
+				success: true,
 				reply: `Successfully published alias ${aliasName} in this channel. Users in this channel can now use it directly.`
 			};
 		}
@@ -113,6 +123,7 @@ export default {
 			await row.delete();
 
 			return {
+				success: true,
 				reply: `Successfully unpublished alias ${aliasName} in this channel. Users in this channel won't be able to use it directly.`
 			};
 		}

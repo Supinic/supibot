@@ -1,5 +1,5 @@
-import { SupiDate, SupiError } from "supi-core";
-import { type AliasSubcommandDefinition } from "../index.ts";
+import { type Row, SupiDate, SupiError } from "supi-core";
+import alias, { type AliasSubcommandDefinition } from "../index.ts";
 import { prefix } from "../../../utils/command-utils.ts";
 import {
 	ALIAS_NAME_REGEX,
@@ -8,7 +8,7 @@ import {
 	getLinkedAliasRow,
 	getParentAlias,
 	isLinkedAlias,
-	isRestricted
+	isRestricted, cleanPublishedAliases, type LinkedAliasData
 } from "../alias-utils.ts";
 
 export default {
@@ -89,7 +89,7 @@ export default {
 			}
 
 			const originalUser = await sb.User.getAsserted(linkedAlias.User_Alias);
-			appendix = `You tried to create a link out of an already linked alias (alias ${targetAlias.Name} by ${originalUser.Name}), so I used the original as your template.`;
+			appendix = ` You tried to create a link out of an already linked alias (alias ${targetAlias.Name} by ${originalUser.Name}), so I used the original as your template.`;
 			targetAlias = linkedAlias;
 			targetAlias.Name = aliasName;
 		}
@@ -99,14 +99,15 @@ export default {
 				reply: `Unfortunately, it looks like the original alias has been removed!`
 			};
 		}
-		else if (!ALIAS_NAME_REGEX.test(targetAlias.Name)) {
+
+		if (!ALIAS_NAME_REGEX.test(name)) {
 			return {
 				success: false,
 				reply: `Linked alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
 			};
 		}
 
-		const row = await getLinkedAliasRow();
+		let existingRow: Row<LinkedAliasData> | null = null;
 		if (existingAlias) {
 			/* node:coverage ignore next 5 */
 			if (subInvocation !== "linkplace") {
@@ -115,9 +116,23 @@ export default {
 				});
 			}
 
-			await row.load(existingAlias.ID);
+			if (existingAlias.ID === targetAlias.ID) {
+				return {
+					success: false,
+					reply: `Cannot ${context.invocation} your alias into itself!`
+				};
+			}
+
+			const { deletedIds } = await cleanPublishedAliases(existingAlias.ID);
+			if (deletedIds.length !== 0) {
+				appendix += `Your replaced alias was also published in ${deletedIds.length} channels - these have been removed.`;
+			}
+
+			existingRow = await getLinkedAliasRow();
+			await existingRow.load(existingAlias.ID);
 		}
 
+		const row = await getLinkedAliasRow();
 		row.setValues({
 			User_Alias: context.user.ID,
 			Channel: null,
@@ -132,6 +147,9 @@ export default {
 		});
 
 		await row.save({ skipLoad: true });
+		if (existingRow) {
+			await existingRow.delete();
+		}
 
 		const verb = (subInvocation === "linkplace") ? "linked and replaced" : "linked";
 		const nameString = (customLinkName && customLinkName !== targetAlias.Name)
@@ -139,7 +157,7 @@ export default {
 			: "";
 
 		return {
-			reply: `Successfully ${verb} alias${nameString}. When the original changes, so will yours. ${appendix}`
+			reply: `Successfully ${verb} alias${nameString}. When the original changes, so will yours.${appendix}`
 		};
 	}
 } satisfies AliasSubcommandDefinition;

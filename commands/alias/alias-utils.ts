@@ -52,7 +52,7 @@ type PossiblyLinkedAliasData = AliasData & {
 	Arguments: null;
 	Parent: AliasData["ID"] | null;
 };
-type LinkedAliasData = PossiblyLinkedAliasData & { Parent: AliasData["ID"]; };
+export type LinkedAliasData = PossiblyLinkedAliasData & { Parent: AliasData["ID"]; };
 type OrphanedAliasData = PossiblyLinkedAliasData & { Parent: null; };
 type ChannelAliasData = AliasData & {
 	User_Alias: null;
@@ -216,6 +216,30 @@ export const getChannelAlias = async (name: string, channelId: Channel["ID"]) =>
 		.single()
 	)
 );
+
+export const cleanPublishedAliases = async (id: AliasData["ID"]) => {
+	const publishedAliasIds = await core.Query.getRecordset<AliasData["ID"][]>(rs => rs
+		.select("ID")
+		.from("data", "Custom_Command_Alias")
+		.where("Channel IS NOT NULL")
+		.where("Parent = %n", id)
+		.flat("ID")
+	);
+
+	if (publishedAliasIds.length !== 0) {
+		await core.Query.getRecordDeleter(rd => rd
+			.delete()
+			.from("data", "Custom_Command_Alias")
+			.where("ID IN %n+", publishedAliasIds)
+			.where("Channel IS NOT NULL")
+			.where("Parent = %n", id)
+		);
+	}
+
+	return {
+		deletedIds: publishedAliasIds
+	};
+};
 
 export const isClassicAlias = (alias: AliasData): alias is ClassicAliasData => (
 	(alias.Command !== null) && (typeof alias.Invocation === "string") && (alias.Channel === null) && (alias.User_Alias !== null)

@@ -1435,7 +1435,69 @@ describe("$alias", async () => {
 		});
 
 		describe("linkplace", () => {
-			it("2 args: should succeed when linking an alias with a conflicting name", async () => {
+			const baseAlias = {
+				ID: 9600,
+				Name: "base",
+				User_Alias: BASE_USER_ID,
+				Channel: null,
+				Command: "echo",
+				Invocation: "echo",
+				Arguments: null,
+				Parent: null
+			};
+
+			describe("replacing linked alias", () => {
+				for (const throughLink of [false, true]) {
+					const appendix = (throughLink) ? " through an existing link" : "";
+
+					it(`rejects replacing an alias with a link to itself${appendix}`, async () => {
+						const base = { ...baseAlias };
+						const link = {
+							...base,
+							ID: 9601,
+							Name: "linked",
+							Command: null,
+							Invocation: null,
+							Parent: base.ID
+						};
+
+						world.allowUser(BASE_USERNAME);
+						world.setUserId(BASE_USERNAME, BASE_USER_ID);
+						existingAliasMap[BASE_USER_ID] = { [base.Name]: base };
+
+						if (throughLink) {
+							existingAliasMap[BASE_USER_ID][link.Name] = link;
+						}
+
+						world.setRow("data", "Custom_Command_Alias", base.ID, base);
+
+						const targetName = (throughLink) ? link.Name : base.Name;
+						console.log(`$linkplace ${BASE_USERNAME} ${targetName} ${base.Name}`, { link, base });
+						const result = await run("linkplace", BASE_USERNAME, targetName, base.Name);
+						const rows = world.rows.splice(0);
+
+						expectCommandResultFailure(result);
+						assert.ok(rows.every(row => !row.deleted && !row.stored), "Expected the base alias to be left intact");
+					});
+				}
+			});
+
+			it("leaves the existing alias intact when the target alias is missing", async () => {
+				const base = { ...baseAlias };
+				world.allowUser("dave");
+				world.setUserId("dave", 504);
+
+				existingAliasMap[BASE_USER_ID] = { [base.Name]: base };
+				world.setRow("data", "Custom_Command_Alias", base.ID, base);
+
+				const result = await run("linkplace", "dave", "missing", base.Name);
+				const rows = world.rows.splice(0);
+
+				expectCommandResultFailure(result, "does not have");
+				assert.ok(rows.every(row => !row.deleted && !row.stored), "Expected the base alias to be left intact");
+			});
+
+			it("deletes the existing alias and inserts a fresh link when the existing alias has a dependent link", async () => {
 				const ALIAS_NAME = "home";
 				const REMOTE_USER = "jane";
 				const REMOTE_USER_ID = 510;
@@ -1458,24 +1520,46 @@ describe("$alias", async () => {
 						Parent: null
 					}
 				};
-				// Base user also already owns "home" - will be overwritten
-				existingAliasMap[BASE_USER_ID] = {
-					[ALIAS_NAME]: {
-						ID: EXISTING_ALIAS_ID,
-						Name: ALIAS_NAME,
-						User_Alias: BASE_USER_ID,
-						Command: "go",
-						Invocation: ALIAS_NAME,
-						Arguments: "",
-						Parent: null
-					}
-				};
 
+				// Base user also already owns "home" - will be overwritten
+				const existingAlias = {
+					ID: EXISTING_ALIAS_ID,
+					Name: ALIAS_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "go",
+					Invocation: ALIAS_NAME,
+					Arguments: "",
+					Parent: null
+				};
+				existingAliasMap[BASE_USER_ID] = { [ALIAS_NAME]: existingAlias };
+				world.setRow("data", "Custom_Command_Alias", EXISTING_ALIAS_ID, existingAlias);
+
+				const dependent = {
+					ID: 9702,
+					Name: "linked",
+					User_Alias: REMOTE_USER_ID,
+					Channel: null,
+					Command: null,
+					Invocation: null,
+					Arguments: null,
+					Parent: EXISTING_ALIAS_ID
+				};
+				existingAliasMap[REMOTE_USER_ID][dependent.Name] = dependent;
+				world.setRow("data", "Custom_Command_Alias", dependent.ID, dependent);
+
+				world.queueRsData([]); // No channels have published the alias being replaced.
 				const result = await run("linkplace", REMOTE_USER, ALIAS_NAME);
+				const rows = world.rows.splice(0);
 				expectCommandResultSuccess(result, "Successfully", "linked and replaced");
 
-				const row = world.rows.pop();
-				assert.ok(row, "Expected a Row to be saved");
+				const deletedRow = rows.find(row => row.deleted);
+				assert.ok(deletedRow?.loaded, "Expected the existing row to be loaded and deleted");
+				assert.strictEqual(deletedRow.values.ID, EXISTING_ALIAS_ID);
+
+				const row = rows.find(row => row.stored);
+				assert.ok(row, "Expected a row to be saved");
+				assert.strictEqual(row.loaded, false, "Expected an insert into a fresh row");
+				assert.strictEqual(row.values.ID, undefined);
 				assert.strictEqual(row.values.Parent, REMOTE_USER_ALIAS_ID);
 				assert.strictEqual(row.values.Name, ALIAS_NAME);
 				assert.strictEqual(row.values.Command, null);
@@ -1483,7 +1567,7 @@ describe("$alias", async () => {
 				assert.strictEqual(row.values.Arguments, null);
 			});
 
-			it("3 args: should succeed when linking a local alias by name with a custom name", async () => {
+			it("deletes and recreates an alias when a custom name conflicts", async () => {
 				const ALIAS_NAME = "home";
 				const CUSTOM_NAME = "foobar";
 				const REMOTE_USER = "kate";
@@ -1508,23 +1592,31 @@ describe("$alias", async () => {
 					}
 				};
 				// Base user already owns "foobar" - will be overwritten by custom name
-				existingAliasMap[BASE_USER_ID] = {
-					[CUSTOM_NAME]: {
-						ID: EXISTING_ALIAS_ID,
-						Name: CUSTOM_NAME,
-						User_Alias: BASE_USER_ID,
-						Command: "go",
-						Invocation: CUSTOM_NAME,
-						Arguments: "",
-						Parent: null
-					}
+				const existingAlias = {
+					ID: EXISTING_ALIAS_ID,
+					Name: CUSTOM_NAME,
+					User_Alias: BASE_USER_ID,
+					Command: "go",
+					Invocation: CUSTOM_NAME,
+					Arguments: "",
+					Parent: null
 				};
+				existingAliasMap[BASE_USER_ID] = { [CUSTOM_NAME]: existingAlias };
+				world.setRow("data", "Custom_Command_Alias", EXISTING_ALIAS_ID, existingAlias);
 
+				world.queueRsData([]); // No channels have published the alias being replaced.
 				const result = await run("linkplace", REMOTE_USER, ALIAS_NAME, CUSTOM_NAME);
+				const rows = world.rows.splice(0);
 				expectCommandResultSuccess(result, "Successfully", "linked and replaced", "custom name", CUSTOM_NAME);
 
-				const row = world.rows.pop();
-				assert.ok(row, "Expected a Row to be saved");
+				const deletedRow = rows.find(row => row.deleted);
+				assert.ok(deletedRow?.loaded, "Expected the existing row to be loaded and deleted");
+				assert.strictEqual(deletedRow.values.ID, EXISTING_ALIAS_ID);
+
+				const row = rows.find(row => row.stored);
+				assert.ok(row, "Expected a row to be saved");
+				assert.strictEqual(row.loaded, false, "Expected an insert into a fresh row");
+				assert.strictEqual(row.values.ID, undefined);
 				assert.strictEqual(row.values.Parent, REMOTE_USER_ALIAS_ID);
 				assert.strictEqual(row.values.Name, CUSTOM_NAME);
 				assert.strictEqual(row.values.Command, null);
@@ -1611,7 +1703,8 @@ describe("$alias", async () => {
 						Command: "bar",
 						Invocation: ALIAS_NAME,
 						Arguments: "",
-						Parent: null
+						Parent: null,
+						Channel: null
 					}
 				};
 
@@ -1628,6 +1721,56 @@ describe("$alias", async () => {
 				assert.ok(!row.values.User_Alias);
 				assert.ok(!row.values.Invocation);
 				assert.ok(!row.values.Command);
+			});
+
+			describe("publishing with links", () => {
+				const copyScenarios = [
+					{ aliasName: "linked", parentID: 10, title: "publishes a personal link using its base alias" },
+					{ aliasName: "copy", parentID: 12, title: "publishes an independent copy even when its source has become a link" }
+				];
+
+				for (const { aliasName, parentID, title } of copyScenarios) {
+					it(title, async () => {
+						const context = createPublishContext(5, true);
+						const base = {
+							ID: 10,
+							Name: "base",
+							User_Alias: BASE_USER_ID,
+							Channel: null,
+							Command: "echo",
+							Invocation: "echo",
+							Arguments: null,
+							Parent: null
+						};
+						const link = {
+							...base,
+							ID: 11,
+							Name: "linked",
+							Command: null,
+							Invocation: null,
+							Parent: base.ID
+						};
+
+						const copy = {
+							...base,
+							ID: 12,
+							Name: "copy",
+							Parent: link.ID
+						};
+						existingAliasMap[BASE_USER_ID] = {
+							[base.Name]: base,
+							[link.Name]: link,
+							[copy.Name]: copy
+						};
+
+						const result = await baseCommand.execute(context, "publish", aliasName);
+						const row = world.rows.pop();
+
+						expectCommandResultSuccess(result, "Successfully published", aliasName);
+						assert.ok(row?.stored, "Expected channel alias to be saved");
+						assert.strictEqual(row.values.Parent, parentID);
+					});
+				}
 			});
 
 			it("2 args: should fail when current user owns an illegally named alias", async () => {
@@ -1794,7 +1937,8 @@ describe("$alias", async () => {
 					Command: "bar",
 					Invocation: EXISTING_ALIAS_NAME,
 					Arguments: "",
-					Parent: null
+					Parent: null,
+					Channel: null
 				};
 				existingAliasMap[EXISTING_USER_ID] = {
 					[EXISTING_ALIAS_NAME]: EXISTING_ALIAS
