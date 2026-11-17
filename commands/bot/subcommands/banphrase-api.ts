@@ -1,3 +1,5 @@
+import { type BotSubcommandDefinition } from "../index.ts";
+
 const ALLOWED_MODES = [
 	{
 		name: "Ignore",
@@ -19,15 +21,17 @@ const ALLOWED_MODES = [
 		name: "Whisper",
 		description: "Won't reply in the main channel at all, but the response will be private messaged to target user."
 	}
-];
+] as const;
 const HTML_MODE_LIST = ALLOWED_MODES.map(i => `<li><code>${i.name}</code><br>${i.description}</li><br>`).join("");
 
 export default {
 	name: "banphrase-api",
+	title: "Banphrase API",
 	aliases: ["api", "banphrase"],
-	description: [
-		`<code>$bot api url:(link) mode:(mode)</code>`,
-		`<code>$bot api channel:(channel) url:(link) mode:(mode)</code>`,
+	default: false,
+	getDescription: (prefix) => [
+		`<code>${prefix}bot api url:(link) mode:(mode)</code>`,
+		`<code>${prefix}bot api channel:(channel) url:(link) mode:(mode)</code>`,
 		`Configures the channel's Pajbot banphrase API. You can use one of: "api", "banphrase", "banphrase-api" for the sub-command.`,
 		"You can change the URL, but it has to reply properly to a test message.",
 		`You can unset the URL by using "url:none".`,
@@ -38,9 +42,10 @@ export default {
 		"",
 		`<ul>${HTML_MODE_LIST}</ul>`
 	],
-	execute: async (context, options = {}) => {
+	execute: async (context) => {
 		const { params } = context;
-		const { channelData } = options;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;
 
 		const result = [];
 		if (params.url) {
@@ -52,14 +57,15 @@ export default {
 			else {
 				let url;
 				try {
-					url = new URL(params.url).hostname ?? params.url;
+					// hostname contains empty string if none is available
+					url = new URL(params.url).hostname || params.url;
 				}
 				catch {
 					url = params.url;
 				}
 
 				try {
-					await sb.Banphrase.executeExternalAPI("test", "pajbot", url);
+					await sb.Banphrase.executeExternalAPI("test", "Pajbot", url);
 				}
 				catch {
 					return {
@@ -75,8 +81,8 @@ export default {
 		}
 
 		if (params.mode) {
-			params.mode = core.Utils.capitalize(params.mode.toLowerCase());
-			const found = ALLOWED_MODES.find(i => i.name === params.mode);
+			const capitalized = core.Utils.capitalize(params.mode.toLowerCase());
+			const found = ALLOWED_MODES.find(i => i.name === capitalized);
 			if (!found) {
 				const allowedTypes = ALLOWED_MODES.map(i => i.name).join(", ");
 				return {
@@ -85,8 +91,9 @@ export default {
 				};
 			}
 
-			await channelData.saveProperty("Banphrase_API_Downtime", params.mode);
-			result.push(`Banphrase API mode has been set to ${params.mode}.`);
+			const mode = found.name;
+			await channelData.saveProperty("Banphrase_API_Downtime", mode);
+			result.push(`Banphrase API mode has been set to ${mode}.`);
 		}
 
 		if (result.length === 0) {
@@ -101,4 +108,4 @@ export default {
 			};
 		}
 	}
-};
+} satisfies BotSubcommandDefinition;

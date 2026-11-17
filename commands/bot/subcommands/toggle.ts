@@ -1,20 +1,25 @@
+import type { BotSubcommandDefinition } from "../index.ts";
+
 export default {
 	name: "toggle",
+	title: "Temporarily disable/re-enable the bot",
 	aliases: ["enable", "disable"],
-	description: [
-		`<code>$bot disable</code>`,
-		`<code>$bot disable channel:(name)</code>`,
+	getDescription: (prefix) => [
+		`<code>${prefix}bot disable</code>`,
+		`<code>${prefix}bot disable channel:(name)</code>`,
 		"After a 5 second timeout, disables the bot given channel until enabled again.",
 		"If no channel is provided, the current is used.",
 		"",
 
-		`<code>$bot enable supinic</code>`,
-		`<code>$bot enable channel:(name)</code>`,
+		`<code>${prefix}bot enable supinic</code>`,
+		`<code>${prefix}bot enable channel:(name)</code>`,
 		"If the bot has been disabled in the given channel, this command will re-enable it.",
 		"This also fixes other minor problems with the bot not replying."
 	],
-	execute: async (context, options = {}) => {
-		const { channelData, subcommand } = options;
+	execute: (context, subcommand) => {
+		const { params } = context;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;
 		const channelString = (channelData === context.channel) ? "this channel" : `channel "${channelData.Name}"`;
 
 		if (subcommand === "disable") {
@@ -56,4 +61,4 @@ export default {
 			};
 		}
 	}
-};
+} satisfies BotSubcommandDefinition;

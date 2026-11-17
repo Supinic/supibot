@@ -20,6 +20,7 @@ import type { User } from "./user.ts";
 import { createMessageLoggingTable } from "../utils/create-db-table.ts";
 import { TemplateWithId } from "./template.ts";
 import type { Emote } from "../utils/globals.ts";
+import { filterNonNullable } from "../utils/ts-helpers.ts";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 
@@ -541,8 +542,8 @@ export class Channel extends TemplateWithId {
 		}
 	}
 
-	static async reloadSpecific (...list: Channel["Name"][]) {
-		const channelsData = list.map(i => Channel.get(i)).filter(Boolean) as Channel[];
+	static async reloadSpecific (...list: Like[]) {
+		const channelsData = filterNonNullable(list.map(i => Channel.get(i)));
 		if (channelsData.length === 0) {
 			return false;
 		}
