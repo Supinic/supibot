@@ -42,6 +42,10 @@ import type { TwitchSubscriberData } from "../utils/schemas.ts";
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
 const SEVEN_TV_ZERO_WIDTH_FLAG = 0b100000000;
+const EMOTE_REQUEST_OPTIONS = {
+	timeout: { request: 5000 },
+	retry: { limit: 0 }
+};
 
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = cacheKeys;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
@@ -1325,7 +1329,8 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			throwHttpErrors: false,
 			searchParams: {
 				user_id: selfId
-			}
+			},
+			...EMOTE_REQUEST_OPTIONS
 		});
 
 		const result = response.body.data;
@@ -1338,7 +1343,8 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 				searchParams: {
 					user_id: selfId,
 					after: cursor
-				}
+				},
+				...EMOTE_REQUEST_OPTIONS
 			});
 
 			result.push(...pageResponse.body.data);
@@ -1358,7 +1364,8 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		}
 
 		const response = await core.Got.get("GenericAPI")<BttvEmoteResponse>({
-			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
+			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`,
+			...EMOTE_REQUEST_OPTIONS
 		});
 
 		if (!response.ok) {
@@ -1386,7 +1393,8 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 
 	static async fetchChannelFFZEmotes (channelData: Channel): Promise<Emote[]> {
 		const response = await core.Got.get("GenericAPI")<FfzEmoteResponse>({
-			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
+			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`,
+			...EMOTE_REQUEST_OPTIONS
 		});
 
 		if (!response.ok) {
@@ -1415,7 +1423,8 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		}
 
 		const response = await core.Got.get("GenericAPI")<SevenTvEmoteResponse>({
-			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
+			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`,
+			...EMOTE_REQUEST_OPTIONS
 		});
 
 		if (!response.ok) {
@@ -1442,13 +1451,16 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchPlatform.fetchTwitchEmotes(this.selfId),
 			core.Got.get("GenericAPI")<BttvEmote[]>({
-				url: "https://api.betterttv.net/3/cached/emotes/global"
+				url: "https://api.betterttv.net/3/cached/emotes/global",
+				...EMOTE_REQUEST_OPTIONS
 			}),
 			core.Got.get("GenericAPI")<FfzEmoteResponse>({
-				url: "https://api.frankerfacez.com/v1/set/global"
+				url: "https://api.frankerfacez.com/v1/set/global",
+				...EMOTE_REQUEST_OPTIONS
 			}),
 			core.Got.get("GenericAPI")<GlobalSevenTvEmoteResponse>({
-				url: "https://7tv.io/v3/emote-sets/global"
+				url: "https://7tv.io/v3/emote-sets/global",
+				...EMOTE_REQUEST_OPTIONS
 			})
 		]);
 
