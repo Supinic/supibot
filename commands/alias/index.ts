@@ -37,7 +37,7 @@ const aliasCommandDefinition = declare({
 		if (!subcommand) {
 			return {
 				success: false,
-				reply: core.Utils.tag.trim `Invalid sub-command provided! Check the extended help here: ${url}`
+				reply: `Invalid sub-command provided! Check the extended help here: ${url}`
 			};
 		}
 

@@ -1,5 +1,8 @@
+import type { BotSubcommandDefinition } from "../index.ts";
+
 export default {
 	name: "offline-only",
+	title: "Enable/disable offline-only mode",
 	aliases: ["enable-offline-only", "disable-offline-only"],
 	description: [
 		`<code>$bot offline-only</code>`,
@@ -9,8 +12,10 @@ export default {
 		"After the stream ends, Supibot will automatically reactivate. There might be delay up to 2 minutes for both online/offline events.",
 		"Note: The stream must go online/offline for this mode to activate. If it is already live, Supibot won't deactivate until it goes live again in the future."
 	],
-	execute: async (context, options = {}) => {
-		const { channelData, subcommand } = options;
+	execute: async (context, subcommand) => { // @todo `subcommand` could be based on `name` + `aliases` types as union
+		const { params } = context;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;
 		if (subcommand === "offline-only") {
 			return {
 				success: false,
@@ -18,8 +23,9 @@ export default {
 			};
 		}
 
-		const moduleData = sb.ChatModule.get("offline-only-mode");
-		const existingModuleCheck = await core.Query.getRecordset(rs => rs
+		const moduleData = sb.ChatModule.getAsserted("offline-only-mode");
+		// Guaranteed numeric 1 or undefined
+		const existingModuleCheck = await core.Query.getRecordset<1 | undefined>(rs => rs
 			.select("1")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Channel = %n", channelData.ID)
@@ -46,10 +52,11 @@ export default {
 			await sb.Channel.reloadSpecific(channelData);
 
 			return {
+				success: true,
 				reply: `Channel ${channelData.Name} is now in offline-only mode.`
 			};
 		}
-		else if (subcommand === "disable-offline-only") {
+		else {
 			if (!existingModuleCheck) {
 				return {
 					success: false,
@@ -65,9 +72,11 @@ export default {
 			);
 
 			await sb.Channel.reloadSpecific(channelData);
+
 			return {
+				success: true,
 				reply: `Channel ${channelData.Name} is now no longer in offline-only mode.`
 			};
 		}
 	}
-};
+} satisfies BotSubcommandDefinition;

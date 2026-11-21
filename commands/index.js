@@ -12,7 +12,7 @@ import BanCommand from "./ban/index.ts";
 import BanCheckCommand from "./bancheck/index.ts";
 import BeeFactCommand from "./beefact/index.ts";
 import BlockCommand from "./block/index.ts";
-import BotCommand from "./bot/index.js";
+import BotCommand from "./bot/index.ts";
 import BotSubsCommand from "./botsubs/index.ts";
 import FourChanCommand from "./chan/index.ts";
 import ChannelFounderListCommand from "./channelfounderlist/index.ts";

@@ -217,16 +217,14 @@ export const fetchRandomUserLine = async function (channelId: string, userId: st
 };
 
 type ChannelAdditionResponse =
-	| { success: false; reason: string; }
-	| { success: false; code: number; }
+	| { success: false; statusCode: number; }
 	| { success: true; };
 
 export const addChannel = async function (channelId: string): Promise<ChannelAdditionResponse> {
 	if (!process.env.API_RUSTLOG_ADMIN_KEY) {
-		return {
-			success: false,
-			reason: "no-key"
-		};
+		throw new SupiError({
+			message: "No Rustlog admin key configured API_RUSTLOG_ADMIN_KEY"
+		});
 	}
 
 	const response = await core.Got.get("GenericAPI")({
@@ -244,7 +242,7 @@ export const addChannel = async function (channelId: string): Promise<ChannelAdd
 	if (!response.ok) {
 		return {
 			success: false,
-			code: response.statusCode
+			statusCode: response.statusCode
 		};
 	}
 	else {

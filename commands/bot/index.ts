@@ -1,51 +1,35 @@
-import subcommands from "./subcommands/index.js";
+import { BotSubcommands } from "./subcommands/index.ts";
+import { declare, type SubcommandDefinition } from "../../classes/command.ts";
+import { BadAppleSubcommands } from "../badapplerendition/subcommands/index.ts";
 
-export default {
+export type BotSubcommandDefinition = SubcommandDefinition<typeof botCommandDefinition>;
+
+const botCommandDefinition = declare({
 	Name: "bot",
 	Aliases: null,
-	Author: "supinic",
 	Cooldown: 2500,
 	Description: "Allows channel owners and Supibot ambassadors to set various parameters for the bot, for their managed channel.",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention", "pipe", "skip-banphrase"],
 	Params: [
 		{ name: "channel", type: "string" },
 		{ name: "mode", type: "string" },
 		{ name: "url", type: "string" }
 	],
 	Whitelist_Response: null,
-	Code: (async function bot (context, command, value) {
-		const { params } = context;
-		if (!command) {
+	Code: (async function bot (context, commandName, ...args) {
+		if (!commandName) {
 			return {
 				success: false,
 				reply: "No sub-command provided! Check the command's extended help for more info."
 			};
 		}
 
-		const subcommand = subcommands.find(i => i.name === command || i.aliases?.includes(command));
-		if (!subcommand) {
-			return {
-				success: false,
-				reply: "Invalid command provided!"
-			};
-		}
-
-		const channelData = (params.channel || value)
-			? sb.Channel.get(params.channel ?? value)
-			: context.channel;
-
+		const { params } = context;
+		const channelData = (params.channel) ? sb.Channel.get(params.channel) : context.channel;
 		if (!channelData) {
-			const channelName = params.channel ?? value ?? context.channel?.Name ?? null;
-			if (command.includes("join") && channelName && channelName.toLowerCase() === context.user.Name) {
-				return {
-					success: false,
-					reply: `I can't rejoin your channel, you haven't requested me yet! To request me in your channel, use this form: https://supinic.com/bot/request-bot/form`
-				};
-			}
-
 			return {
 				success: false,
-				reply: "Invalid or no channel provided!"
+				reply: "When using this command in PMs, you must provide the channel! Use the channel:target_channel parameter."
 			};
 		}
 
@@ -61,20 +45,27 @@ export default {
 			};
 		}
 
-		return await subcommand.execute(context, {
-			channelData,
-			subcommand: command
-		});
+		const subcommand = BotSubcommands.get(commandName);
+		if (!subcommand) {
+			return {
+				success: false,
+				reply: `Unknown command provided! Use one of these: ${BotSubcommands.names.join(", ")}`
+			};
+		}
+
+		return await subcommand.execute.call(this, context, commandName, ...args);
 	}),
-	Dynamic_Description: (async function () {
-		const subcommandDescriptions = subcommands.map(cmd => cmd.description.join("<br>")).join("<br><br>");
+	Dynamic_Description: async () => {
+		const description = await BadAppleSubcommands.createDescription();
 		return [
 			"Various bot configuration related commands.",
 			"For a given channel, only its owner or ambassadors can use this command.",
 			`All sub-commands listed accept the "channel:(name)" parameter, if you want to configure a channel outside of the channel itself.`,
 			"",
 
-			subcommandDescriptions
+			...description
 		];
-	})
-};
+	}
+});
+
+export default botCommandDefinition;
