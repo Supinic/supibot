@@ -31,7 +31,7 @@ export default {
 		`<code>${prefix}osrs price (item)</code>`,
 		`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`
 	],
-	execute: async function ({ context }, ...args) {
+	execute: async function (state, ...args) {
 		const query = args.join(" ");
 		const item = await fetchItemId(query);
 		if (item === null) {
