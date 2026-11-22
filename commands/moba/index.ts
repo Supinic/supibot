@@ -1,29 +1,33 @@
 import { SupiError } from "supi-core";
-import { declare, type SubcommandCollection, type SubcommandDefinition } from "../../classes/command.ts";
-
 import LeagueGameDefinition from "./league/index.ts";
+import {
+	declare,
+	type CommandDefinition,
+	type SubcommandCollection,
+	type SubcommandDefinition
+} from "../../classes/command.ts";
 
-export type MobaSubcommandDefinition = SubcommandDefinition<typeof mobaCommandDefinition>;
 export type MobaGameDefinition = {
 	requiredEnvs: string[];
 	subcommandCollection: SubcommandCollection;
 	addendum?: string[]
 };
 
+const MOBA_COMMAND_PARAMS = [{ name: "rawData", type: "boolean" }] as const;
 const GAMES: Partial<Record<string, MobaGameDefinition>> = {
 	league: LeagueGameDefinition
 };
 
+export type MobaCommandShape = CommandDefinition<typeof MOBA_COMMAND_PARAMS>;
+export type MobaSubcommandDefinition = SubcommandDefinition<MobaCommandShape>;
+
 const mobaCommandDefinition = declare({
 	Name: "moba",
 	Aliases: ["league", "dota"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "This command lets you check many things related to several MOBA games - League of Legends ($league).",
 	Flags: ["mention", "pipe", "skip-banphrase"],
-	Params: [
-		{ name: "rawData", type: "boolean" }
-	],
+	Params: MOBA_COMMAND_PARAMS,
 	Whitelist_Response: null,
 	Code: (async function moba (context, command, ...args) {
 		if (context.invocation === "moba") {
@@ -82,6 +86,6 @@ const mobaCommandDefinition = declare({
 			...list
 		];
 	}
-});
+}) satisfies MobaCommandShape;
 
 export default mobaCommandDefinition;
