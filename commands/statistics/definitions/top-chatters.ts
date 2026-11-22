@@ -11,7 +11,7 @@ export default {
 		`Posts the top ${BASE_LIMIT} users by chat lines sent in the context of the current channel.`,
 		"The usernames are \"unpinged\" by default, so don't worry you'll massping the entire chat!"
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const { channel } = context;
 		if (!channel) {
 			return {

@@ -24,7 +24,7 @@ export default {
 		"If you use <code>copy</code>, it will only create an alias if you don't already have one with that name.",
 		"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking."
 	],
-	execute: async function (context, type, ...args) {
+	execute: async function ({ context }, type, ...args) {
 		const [targetUsername, targetAliasName] = args;
 		if (!targetUsername) {
 			return {

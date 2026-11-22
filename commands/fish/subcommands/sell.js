@@ -28,7 +28,7 @@ export default {
 		`<code>$fish sell duplicate junk</code>`,
 		"Sells all but one of your fish or junk, keeping one exemplar for showcase purposes."
 	],
-	execute: async (context, specifier, modifier) => {
+	execute: async ({ context }, specifier, modifier) => {
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
 		if (fishData.catch.fish === 0 && fishData.catch.junk === 0) {

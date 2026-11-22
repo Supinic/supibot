@@ -15,7 +15,7 @@ export default {
 		`<code>$fish stats global</code>`,
 		"Shows off the total, global statistics of fisherman all around the world."
 	],
-	execute: async (context, userOrGlobal) => {
+	execute: async ({ context }, userOrGlobal) => {
 		let targetUserData;
 		if (userOrGlobal === "global") {
 			targetUserData = null;

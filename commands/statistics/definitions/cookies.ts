@@ -96,7 +96,7 @@ export const UserCookieCountStatistic = {
 		`<code>${prefix}stats cookies (user)</code>`,
 		"Checks the cookies eaten for someone else, with the same karma check as above."
 	],
-	execute: async (context, type, user?: string) => await getUserCookieCountStatistics(context, user)
+	execute: async ({ context }, type, user?: string) => await getUserCookieCountStatistics(context, user)
 } satisfies StatsSubcommandDefinition;
 
 export const TotalCookieCountStatistic = {

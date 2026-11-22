@@ -31,7 +31,7 @@ export default {
 		`<code>${prefix}osrs kc @Supinic Corrupted Gauntlet</code>`,
 		"Same as above, but if the target has their OSRS username set, you can use the command like this."
 	],
-	execute: async function (context, ...args) {
+	execute: async function ({ context }, ...args) {
 		let parsedUserData;
 		let activity;
 		if (!context.params.activity && !context.params.boss) {

@@ -13,7 +13,7 @@ export default {
 		`<code>${prefix}alias edit <u>hello</u> translate to:italian Hello!</code>`,
 		"Edits an existing alias, without the need of removing and re-adding it."
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		const [name, command, ...rest] = args;
 		if (!name || !command) {
 			return {

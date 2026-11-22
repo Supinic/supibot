@@ -12,7 +12,7 @@ export default {
 		`<code>${prefix}check location (username)</code>`,
 		`Checks someone else's location, as above.`
 	],
-	execute: async (context, identifier) => {
+	execute: async ({ context }, identifier) => {
 		const targetUser = (identifier)
 			? await sb.User.get(identifier, true)
 			: context.user;

@@ -10,7 +10,7 @@ export default {
 		`<code>${prefix}check logs</code>`,
 		`Checks the Supibot chat line logging status of the current channel.`
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		if (!context.channel) {
 			return {
 				success: false,

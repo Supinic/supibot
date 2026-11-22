@@ -40,7 +40,7 @@ export default {
 		`<code>fail-only</code> → Supibot will react instead of replying, but only for when nothing is caught, or when junk is caught`,
 		`<code>all</code> → Supibot will react instead of replying for all fishing results`
 	],
-	execute: async (context, type, value) => {
+	execute: async ({ context }, type, value) => {
 		if (!type) {
 			return {
 				success: false,

@@ -30,7 +30,7 @@ export default {
 		`Creates a new alias, or updates an existing alias of your own. If you replace an existing one, you will lose its original definition.`
 
 	],
-	execute: async function (context, invocation, ...args) {
+	execute: async function ({ context }, invocation, ...args) {
 		const [name, command, ...rest] = args;
 		if (!name || !command) {
 			return {

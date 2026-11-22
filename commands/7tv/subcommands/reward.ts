@@ -85,7 +85,7 @@ export default {
 		"If the command is currently linked to a reward, this will disable the link.",
 		`You can also use "unlink" or "unset" instead of "remove".`
 	],
-	execute: async (context, type, ...args) => {
+	execute: async ({ context }, type, ...args) => {
 		if (!context.channel) {
 			return {
 				success: false,

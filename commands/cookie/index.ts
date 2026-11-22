@@ -24,7 +24,7 @@ const cookieCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, type, ...args);
+		return await subcommand.execute.call(this, { context }, type, ...args);
 	}),
 	Dynamic_Description: async () => {
 		const utcMidnightToday = SupiDate.getTodayUTC();

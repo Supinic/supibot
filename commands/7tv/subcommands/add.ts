@@ -35,7 +35,7 @@ export default {
 		"Replaces an already added emote with a new one.",
 		"This will only work if the old emote has been added by you specifically."
 	],
-	execute: async (context, type, ...args) => {
+	execute: async ({ context }, type, ...args) => {
 		if (!context.channel) {
 			return {
 				success: false,

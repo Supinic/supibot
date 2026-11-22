@@ -29,7 +29,7 @@ export default {
 		`<code>$fish show @Supinic 🐳</code>`,
 		"Check out another user's collection of a specific piece of fish (catch) or junk."
 	],
-	execute: async (context, userOrType, optionalType) => {
+	execute: async ({ context }, userOrType, optionalType) => {
 		let catchTypeData = null;
 		let showTypeData = defaultShowType;
 		let targetUserData = context.user;

@@ -10,7 +10,7 @@ export default {
 		`<code>${prefix}osrs search (query)</code>`,
 		`Attempts to post a direct OSRS Wiki link to whatever you're looking for.`
 	],
-	execute: async function (context, ...args) {
+	execute: async function ({ context }, ...args) {
 		const search = args.join(" ");
 		if (!search) {
 			return {

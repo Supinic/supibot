@@ -24,7 +24,7 @@ export default {
 		`<code>${prefix}check cookie (username)</code>`,
 		`Checks if someone else has a fortune cookie ready for today.`
 	],
-	execute: async (context, identifier) => {
+	execute: async ({ context }, identifier) => {
 		const targetUser = (identifier) ? await sb.User.get(identifier, true) : context.user;
 		if (!targetUser) {
 			return {

@@ -40,7 +40,7 @@ export default {
 		"Runs another user's alias, without needing to copy it from them first.",
 		""
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		if (subInvocation !== "try" && subInvocation !== "run") {
 			throw new SupiError({
 				message: `Assert error: $alias run did not receive "run" or "try" as subInvocation`

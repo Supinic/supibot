@@ -53,7 +53,7 @@ const botCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, commandName, ...args);
+		return await subcommand.execute.call(this, { context }, commandName, ...args);
 	}),
 	Dynamic_Description: async () => {
 		const description = await BadAppleSubcommands.createDescription();

@@ -14,7 +14,7 @@ export default {
 		"You (as the creator of the alias) will still be able to copy and link it yourself, though.",
 		`Use "copy" and "link" as the type name respectively to allow/disallow each operation.`
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		const [name, restriction] = args;
 		if (!name || !restriction || (restriction !== "link" && restriction !== "copy")) {
 			return {

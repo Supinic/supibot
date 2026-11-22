@@ -10,7 +10,7 @@ export default {
 		`<code>${prefix}osrs itemid (item name)</code>`,
 		`Posts the item's in-game ID. Shows up to 5 best matching results.`
 	],
-	execute: async function (context, ...args) {
+	execute: async function ({ context }, ...args) {
 		const itemData = await fetchItemId(args.join(" "));
 		if (!itemData) {
 			return {

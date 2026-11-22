@@ -12,7 +12,7 @@ export default {
 		"After the stream ends, Supibot will automatically reactivate. There might be delay up to 2 minutes for both online/offline events.",
 		"Note: The stream must go online/offline for this mode to activate. If it is already live, Supibot won't deactivate until it goes live again in the future."
 	],
-	execute: async (context, subcommand) => { // @todo `subcommand` could be based on `name` + `aliases` types as union
+	execute: async ({ context }, subcommand) => { // @todo `subcommand` could be based on `name` + `aliases` types as union
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;

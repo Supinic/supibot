@@ -23,7 +23,7 @@ const pathOfExileCommandDefinition = declare({
 		}
 
 		const rest = args.slice(1);
-		return await subcommand.execute.call(this, context, type, ...rest);
+		return await subcommand.execute.call(this, { context }, type, ...rest);
 	}),
 	Dynamic_Description: async () => {
 		const description = await PathOfExileSubcommands.createDescription();

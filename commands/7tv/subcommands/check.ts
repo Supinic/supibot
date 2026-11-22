@@ -20,7 +20,7 @@ export default {
 		`<code>${prefix}7tv check (emote name)</code>`,
 		"Checks if the emote is in the list, and also says who requested and when if it does."
 	],
-	execute: async (context, type, emote) => {
+	execute: async ({ context }, type, emote) => {
 		if (!context.channel) {
 			return {
 				success: false,

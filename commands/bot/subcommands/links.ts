@@ -12,7 +12,7 @@ export default {
 		"Disables or enables automatic replacement of all links in a channel.",
 		`If enabled, all links will be replaced by "[LINK]" or a similar placeholder.`
 	],
-	execute: async (context, subcommand) => {
+	execute: async ({ context }, subcommand) => {
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;

@@ -17,7 +17,7 @@ const doesNotExistCommandDefinition = declare({
 	Whitelist_Response: null,
 	Code: (async function doesnotexist (context, type) {
 		const subcommand = DoesNotExistSubcommands.get(type) ?? DoesNotExistSubcommands.default;
-		const result = await subcommand.execute.call(this, context);
+		const result = await subcommand.execute.call(this, { context });
 
 		if (context.params.linkOnly && result.text) {
 			return {

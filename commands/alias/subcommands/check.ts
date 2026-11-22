@@ -41,7 +41,7 @@ export default {
 		`<code>${prefix}alias check (user) (alias name)</code>`,
 		"Two parameters - user name + alias name - gives you the definition of that user's alias."
 	],
-	execute: async function (context, invocation, ...args) {
+	execute: async function ({ context }, invocation, ...args) {
 		const [firstName, secondName] = args;
 		if (!firstName && !secondName) {
 			const username = encodeURIComponent(context.user.Name);

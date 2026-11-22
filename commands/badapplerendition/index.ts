@@ -34,7 +34,7 @@ const badAppleCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, ...args);
+		return await subcommand.execute.call(this, { context }, ...args);
 	},
 	Dynamic_Description: async () => {
 		const description = await BadAppleSubcommands.createDescription();

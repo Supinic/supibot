@@ -9,7 +9,7 @@ export default {
 		`<code>${prefix}stats reminders</code>`,
 		"Shows how many times you or someone else have reminded someone."
 	],
-	execute: async (context, _type, username) => {
+	execute: async ({ context }, _type, username) => {
 		const user = (username) ? await sb.User.get(username) : context.user;
 		if (!user) {
 			return {

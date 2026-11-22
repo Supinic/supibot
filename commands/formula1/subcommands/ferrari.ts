@@ -42,7 +42,7 @@ export default {
 		`<code>$f1 ferrari link</code>`,
 		"After a radio is posted, will post a YouTube link to the specific moment (but only if available)"
 	],
-	execute: (context, subInvocation, type) => {
+	execute: ({ context }, subInvocation, type) => {
 		const channelID = context.channel?.ID ?? "whispers";
 		let repeatedArray = repeatedQuotes.get(channelID);
 		if (!repeatedArray) {

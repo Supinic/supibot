@@ -11,7 +11,7 @@ export default {
 		"Forcefully checks if a given channel is still live on Twitch.",
 		"This is useful if Supibot still thinks a channel is online/offline when the opposite is actually true."
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelName = params.channel ?? context.channel!.Name;

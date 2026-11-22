@@ -29,7 +29,7 @@ export default {
 		`<code>${prefix}osrs (username) virtual:true</code>`,
 		"Will take into account virtual levels."
 	],
-	execute: async function (context, ...args) {
+	execute: async function ({ context }, ...args) {
 		const identifier = args.join(" ");
 		const parsedUserData = await parseUserIdentifier(context, identifier);
 		if (!parsedUserData.success) {

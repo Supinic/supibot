@@ -9,7 +9,7 @@ export default {
 		`<code>${prefix}check subscriptions</code>`,
 		"Fetches the list of your active event subscriptions within Supibot."
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const types = await core.Query.getRecordset<string[]>(rs => rs
 			.select("Type")
 			.from("data", "Event_Subscription")

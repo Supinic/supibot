@@ -17,7 +17,7 @@ export default {
 		`<code>${prefix}7tv amount 10</code>`,
 		"Sets the amount of emotes in the list."
 	],
-	execute: async (context, type, rawLimit) => {
+	execute: async ({ context }, type, rawLimit) => {
 		if (!context.channel) {
 			return {
 				success: false,

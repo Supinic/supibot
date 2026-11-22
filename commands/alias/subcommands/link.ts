@@ -36,7 +36,7 @@ export default {
 		"Takes someone else's alias, and creates a link of it for you, with your own custom name for it.",
 		"This can also be used to create links to your own aliases - essentially creating aliases of your own aliases 😅"
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		const [username, aliasName] = args;
 		if (!username || !aliasName) {
 			return {

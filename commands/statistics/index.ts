@@ -28,7 +28,7 @@ const statisticsCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, type, ...args);
+		return await subcommand.execute.call(this, { context }, type, ...args);
 	}),
 	Dynamic_Description: async (prefix) => {
 		const subcommandsDescription = await StatsSubcommands.createDescription();

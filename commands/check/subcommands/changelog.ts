@@ -12,7 +12,7 @@ export default {
 		`<code>${prefix}check changelog (ID)</code>`,
 		`Posts a link to the specific changelog entry based on its ID.`
 	],
-	execute: async (context, identifier) => {
+	execute: async ({ context }, identifier) => {
 		if (!identifier) {
 			return {
 				success: true,

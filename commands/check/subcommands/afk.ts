@@ -15,7 +15,7 @@ export default {
 		`<code>${prefix}check ambassadors (your own username)</code>`,
 		`Checks if you're AFK - only usable within private messages, because otherwise you certainly wouldn't be AFK anymore.`
 	],
-	execute: async (context, identifier) => {
+	execute: async ({ context }, identifier) => {
 		if (!identifier) {
 			return {
 				success: false,

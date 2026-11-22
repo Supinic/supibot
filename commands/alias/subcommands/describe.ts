@@ -13,7 +13,7 @@ export default {
 		"Gives your command a description, which can then be checked by you or others.",
 		`If you don't provide a description, or use the word "none" exactly, the description will be reset.`
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		const [name, ...rest] = args;
 		if (!name) {
 			return {

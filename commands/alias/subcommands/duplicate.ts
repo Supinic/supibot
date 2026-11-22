@@ -20,7 +20,7 @@ export default {
 		`<code>${prefix}alias duplicate (old-name) (new-name)</code>`,
 		"Creates a new alias (new-name) with the definition of an existing alias (old-name)."
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		const [oldAliasName, newAliasName] = args;
 		if (!oldAliasName || !newAliasName) {
 			return {

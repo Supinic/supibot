@@ -19,7 +19,7 @@ export default {
 	flags: {
 		default: true
 	},
-	execute: async (context, type, regionName, ...args) => {
+	execute: async ({ context }, type, regionName, ...args) => {
 		const leagueUser = await parseUserIdentifier(context, regionName, args.join(" "));
 		if (!leagueUser.success) {
 			return leagueUser;

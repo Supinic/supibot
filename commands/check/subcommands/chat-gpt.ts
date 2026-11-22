@@ -19,7 +19,7 @@ export default {
 		`<code>${prefix}check gpt total</code>`,
 		`Checks how many tokens you've used up overall (since April 2023).`
 	],
-	execute: async (context, target) => {
+	execute: async ({ context }, target) => {
 		if (target === "total") {
 			const total = await core.Query.getRecordset<number | undefined>(rs => rs
 				.select("(SUM(Input_Tokens) + SUM(Output_Tokens)) AS Total")

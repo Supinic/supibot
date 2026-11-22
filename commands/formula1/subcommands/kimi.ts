@@ -15,7 +15,7 @@ export default {
 		`<code>$f1 gimi</code>`,
 		"Posts a random Kimi Räikkönen quote or radio comms."
 	],
-	execute: (context) => {
+	execute: ({ context }) => {
 		const channelID = context.channel?.ID ?? "whispers";
 		let repeatedArray = repeatedQuotes.get(channelID);
 		if (!repeatedArray) {

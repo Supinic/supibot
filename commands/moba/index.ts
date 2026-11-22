@@ -6,7 +6,7 @@ import LeagueGameDefinition from "./league/index.ts";
 export type MobaSubcommandDefinition = SubcommandDefinition<typeof mobaCommandDefinition>;
 export type MobaGameDefinition = {
 	requiredEnvs: string[];
-	subcommandCollection: SubcommandCollection
+	subcommandCollection: SubcommandCollection;
 	addendum?: string[]
 };
 
@@ -51,11 +51,11 @@ const mobaCommandDefinition = declare({
 		const { subcommandCollection } = game;
 		const subcommand = subcommandCollection.get(command);
 		if (subcommand) {
-			return await subcommand.execute.call(this, context, command, ...args);
+			return await subcommand.execute.call(this, { context }, command, ...args);
 		}
 		else {
 			const defaultSubcommand = subcommandCollection.default;
-			return await defaultSubcommand.execute.call(this, context, defaultSubcommand.name, command, ...args);
+			return await defaultSubcommand.execute.call(this, { context }, defaultSubcommand.name, command, ...args);
 		}
 	}),
 	Dynamic_Description: async () => {
