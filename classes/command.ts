@@ -348,7 +348,7 @@ export class SubcommandCollection <T extends CommandDefinition = CommandDefiniti
 	private readonly defaultCommand: SubcommandDefinition<T, S> | null;
 	private readonly subcommands: SubcommandDefinition<T, S>[];
 
-	constructor (name: string, subcommands: SubcommandDefinition<T, S>[]) {
+	constructor (name: string, subcommands: SubcommandDefinition<T, NoInfer<S>>[]) {
 		this.name = name;
 		this.subcommands = subcommands;
 		this.names = this.subcommands.map(i => i.name);
