@@ -1,6 +1,5 @@
 import { BotSubcommands } from "./subcommands/index.ts";
 import { declare, type SubcommandDefinition } from "../../classes/command.ts";
-import { BadAppleSubcommands } from "../badapplerendition/subcommands/index.ts";
 
 export type BotSubcommandDefinition = SubcommandDefinition<typeof botCommandDefinition>;
 
@@ -53,10 +52,10 @@ const botCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, commandName, ...args);
+		return await subcommand.execute.call(this, { context }, commandName, ...args);
 	}),
 	Dynamic_Description: async () => {
-		const description = await BadAppleSubcommands.createDescription();
+		const description = await BotSubcommands.createDescription();
 		return [
 			"Various bot configuration related commands.",
 			"For a given channel, only its owner or ambassadors can use this command.",

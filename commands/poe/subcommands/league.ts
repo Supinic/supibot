@@ -39,7 +39,7 @@ export default {
 		`<code>${prefix}poe2</code>`,
 		"Posts info about the current PoE 2 league, with info about the upcoming league if available."
 	],
-	execute: (context) => {
+	execute: ({ context }) => {
 		// @todo remove this type cast when context.invocation is a specific union in the future
 		const invocation = context.invocation as "poe" | "poe2";
 		const leagues = GAME_LEAGUES[invocation];

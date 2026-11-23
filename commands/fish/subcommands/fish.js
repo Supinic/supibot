@@ -65,7 +65,7 @@ export default {
 		`<code>$fish skipStory:true</code>`,
 		"Does not generate a GPT story about your fishing results, if successful."
 	],
-	execute: async (context, ...args) => {
+	execute: async ({ context }, ...args) => {
 		let whisperOnFailure = false;
 		let discordReactionType = "none";
 		if (context.channel) {

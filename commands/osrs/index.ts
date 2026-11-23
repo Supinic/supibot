@@ -30,7 +30,7 @@ const osrsCommandDefinition = declare({
 			subcommand = OsrsSubcommands.default;
 		}
 
-		return await subcommand.execute.call(this, context, ...args);
+		return await subcommand.execute.call(this, { context }, ...args);
 	}),
 	Dynamic_Description: async function (prefix) {
 		const subcommandsDescription = await OsrsSubcommands.createDescription();

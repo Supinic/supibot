@@ -10,7 +10,7 @@ export default {
 		`<code>${prefix}alias published</code>`,
 		"Lists the currently published channel aliases in the current channel"
 	],
-	execute: function (context) {
+	execute: function ({ context }) {
 		if (!context.channel) {
 			return {
 				success: false,

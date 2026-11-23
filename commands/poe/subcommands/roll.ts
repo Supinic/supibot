@@ -20,7 +20,7 @@ export default {
 	title: "Roll a random build",
 	aliases: [],
 	description: ["Generates a build by taking a random skill gem and a random ascendancy and putting them together."],
-	execute: (context) => {
+	execute: ({ context }) => {
 		// @todo remove this type cast when context.invocation is a specific union in the future
 		const invocation = context.invocation as "poe" | "poe2";
 		if (invocation === "poe2") {

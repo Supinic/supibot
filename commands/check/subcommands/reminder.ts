@@ -18,7 +18,7 @@ export default {
 		`<code>${prefix}check reminder last</code>`,
 		`Checks the last reminder you've created.`
 	],
-	execute: async (context, rawIdentifier) => {
+	execute: async ({ context }, rawIdentifier) => {
 		let identifier: number | string | undefined = rawIdentifier;
 		if (identifier === "last") {
 			identifier = await core.Query.getRecordset<number | undefined>(rs => rs

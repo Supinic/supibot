@@ -30,7 +30,7 @@ export default {
 		"Searches for info about a race given by its name or country.",
 		"Use <code>season</code> or <code>year</code> to select a season, otherwise defaults to current year."
 	],
-	execute: async (context, type, ...rest) => {
+	execute: async ({ context }, type, ...rest) => {
 		if (rest.length === 0) {
 			return await fetchNextRaceDetail();
 		}

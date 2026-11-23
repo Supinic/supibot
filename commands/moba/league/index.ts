@@ -1,5 +1,5 @@
 import { SubcommandCollection } from "../../../classes/command.ts";
-import type { MobaSubcommandDefinition, MobaGameDefinition } from "../index.ts";
+import { type MobaSubcommandDefinition, type MobaGameDefinition, type MobaCommandShape } from "../index.ts";
 
 import LastMatchCommand from "./last-match.ts";
 import LiveGameCommand from "./live-game.ts";
@@ -11,7 +11,7 @@ const subcommands = [
 	RankCommand
 ] satisfies MobaSubcommandDefinition[];
 
-const subcommandCollection = new SubcommandCollection("league", subcommands);
+const subcommandCollection = new SubcommandCollection<MobaCommandShape>("league", subcommands);
 export default {
 	requiredEnvs: ["API_RIOT_GAMES_KEY"],
 	subcommandCollection,

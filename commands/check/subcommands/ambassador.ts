@@ -13,7 +13,7 @@ export default {
 		`<code>${prefix}check ambassadors (channel name)</code>`,
 		`Posts a list of Supibot Ambassadors in provided channel.`
 	],
-	execute: async (context, identifier) => {
+	execute: async ({ context }, identifier) => {
 		if (!identifier && !context.channel) {
 			return {
 				success: false,

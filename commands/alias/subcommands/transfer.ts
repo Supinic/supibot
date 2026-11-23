@@ -13,7 +13,7 @@ export default {
 		"Only works on Twitch at the moment, by checking that it is the same account for your and the old username.",
 		"You must also not have any conflicting aliases - you will get warned first."
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		if (!context.user.Twitch_ID) {
 			return {
 				success: false,

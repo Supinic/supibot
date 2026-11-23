@@ -14,7 +14,7 @@ export default {
 		"Gives your daily cookie to another other user, if you so wish.",
 		"Cookies received in this fashion cannot be passed to someone else."
 	],
-	execute: async (context, type, receiver) => {
+	execute: async ({ context }, type, receiver) => {
 		if (!receiver) {
 			return {
 				success: false,

@@ -6,7 +6,6 @@ export type StatsSubcommandDefinition = SubcommandDefinition<typeof statisticsCo
 const statisticsCommandDefinition = declare({
 	Name: "statistics",
 	Aliases: ["stat", "stats"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you or other users, e.g. total AFK time.",
 	Flags: ["mention", "pipe"],
@@ -28,7 +27,7 @@ const statisticsCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, type, ...args);
+		return await subcommand.execute.call(this, { context }, type, ...args);
 	}),
 	Dynamic_Description: async (prefix) => {
 		const subcommandsDescription = await StatsSubcommands.createDescription();

@@ -8,7 +8,7 @@ export default {
 	description: [
 		`<code>word</code> - <a href="https://www.thisworddoesnotexist.com/">This word does not exist (text response)</a>`
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const response = await core.Got.get("FakeAgent")({
 			url: "https://www.thisworddoesnotexist.com/",
 			responseType: "text",

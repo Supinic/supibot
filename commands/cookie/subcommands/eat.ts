@@ -12,7 +12,7 @@ export default {
 		`<code>${prefix}cookie eat</code>`,
 		"Opens up, eats and reads a daily fortune cookie."
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const platform = sb.Platform.getAsserted("twitch");
 		const cookieData = await getValidUserCookieData(context.user);
 		const hasDoubleCookieAccess = await platform.fetchUserAdminSubscription(context.user);

@@ -67,7 +67,7 @@ export const translateCommandDefinition = declare({
 			};
 		}
 
-		const result = await subcommand.execute.call(this, context, engine, query);
+		const result = await subcommand.execute.call(this, { context }, engine, query);
 		if (logTableExists) {
 			const row = await core.Query.getRow<LogTableRow>("data", "Translate_Log");
 			row.setValues({

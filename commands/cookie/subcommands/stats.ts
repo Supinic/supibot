@@ -16,5 +16,5 @@ export default {
 		`<code>$cookie stats (user)</code>`,
 		"Checks the cookies eaten for someone else, with the same karma check as above."
 	],
-	execute: async (context, type, user) => await getUserCookieCountStatistics(context, user)
+	execute: async ({ context }, type, user) => await getUserCookieCountStatistics(context, user)
 } satisfies CookieSubcommandDefinition;

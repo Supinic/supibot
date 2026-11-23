@@ -10,7 +10,7 @@ export default {
 		"If you recently renamed your Twitch account, you can use this command to get Supibot back immediately!",
 		"This also works for other channels that you are an ambassador in."
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;

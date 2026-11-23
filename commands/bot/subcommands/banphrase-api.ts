@@ -42,7 +42,7 @@ export default {
 		"",
 		`<ul>${HTML_MODE_LIST}</ul>`
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;

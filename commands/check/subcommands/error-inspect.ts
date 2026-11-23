@@ -11,7 +11,7 @@ export default {
 		`<code>${prefix}check error (ID)</code>`,
 		`If you have been granted access, you can check the full text of an error within Supibot, based on its ID.`
 	],
-	execute: async (context, rawIdentifier) => {
+	execute: async ({ context }, rawIdentifier) => {
 		const inspectErrorStacks = await context.user.getDataProperty("inspectErrorStacks");
 		if (!inspectErrorStacks) {
 			return {

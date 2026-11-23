@@ -28,7 +28,7 @@ const checkCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, identifier);
+		return await subcommand.execute.call(this, { context }, identifier);
 	}),
 	Dynamic_Description: async (prefix) => {
 		// no need to pass the command itself as param, since no subcommands are executed

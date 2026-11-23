@@ -13,7 +13,7 @@ export default {
 		"Removes your command alias with the given name.",
 		"If some channels have published this alias, you will be notified about it after it's deleted."
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		const [name] = args;
 		if (!name) {
 			return {

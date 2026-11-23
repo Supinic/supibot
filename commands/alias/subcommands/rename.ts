@@ -16,7 +16,7 @@ export default {
 		`<code>${prefix}alias rename (old-name) (new-name)</code>`,
 		"Renames your command alias from old-name to new-name."
 	],
-	execute: async function (context, invocation, ...args) {
+	execute: async function ({ context }, invocation, ...args) {
 		const [oldAliasName, newAliasName] = args;
 		if (!oldAliasName || !newAliasName) {
 			return {

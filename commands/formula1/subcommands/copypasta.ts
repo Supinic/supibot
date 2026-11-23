@@ -15,7 +15,7 @@ export default {
 		`<code>$f1 copypasta</code>`,
 		"Posts a random Formula 1 related copypasta."
 	],
-	execute: (context) => {
+	execute: ({ context }) => {
 		const channelID = context.channel?.ID ?? "whispers";
 		let repeatedArray = repeatedPastas.get(channelID);
 		if (!repeatedArray) {

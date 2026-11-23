@@ -41,7 +41,7 @@ const aliasCommandDefinition = declare({
 			};
 		}
 
-		return await subcommand.execute.call(this, context, subInvocation, ...subArgs);
+		return await subcommand.execute.call(this, { context }, subInvocation, ...subArgs);
 	}),
 	Dynamic_Description: async (prefix) => {
 		const subcommandDescriptions = await AliasSubcommands.createDescription();

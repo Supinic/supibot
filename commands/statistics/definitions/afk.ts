@@ -15,7 +15,7 @@ export const AfkStatistic = {
 		`<code>${prefix}stats total-afk</code>`,
 		"Checks all AFK statuses together."
 	],
-	execute: async (context, type, user) => {
+	execute: async ({ context }, type, user) => {
 		const targetUser = (user)
 			? await sb.User.get(user)
 			: context.user;
@@ -101,7 +101,7 @@ export const LongestAfkStatistic = {
 		`<code>${prefix}stats longestafk</code>`,
 		"Checks the longest time you (or another user) have been AFK for."
 	],
-	execute: async (context, type, user) => {
+	execute: async ({ context }, type, user) => {
 		const targetUser = (user) ? await sb.User.get(user) : context.user;
 		if (!targetUser) {
 			return {

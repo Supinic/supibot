@@ -22,11 +22,11 @@ export default {
 
 		const subcommand = subcommands.find(i => i.name === subcommandName || i.aliases.includes(subcommandName));
 		if (subcommand) {
-			return await subcommand.execute(context, ...rest);
+			return await subcommand.execute({ context }, ...rest);
 		}
 		else {
 			const defaultSubcommand = subcommands.find(i => i.default);
-			return await defaultSubcommand.execute(context, subcommandName, ...rest);
+			return await defaultSubcommand.execute({ context }, subcommandName, ...rest);
 		}
 	}),
 	Dynamic_Description: (async function () {

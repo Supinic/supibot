@@ -10,7 +10,7 @@ export default {
 		`<code>anime</code> - <a href="https://thisanimedoesnotexist.ai/">This anime does not exist</a>`,
 		"Supports the <code>summary</code> parameter - will give you a link to many variations of the same image"
 	],
-	execute: (context) => {
+	execute: ({ context }) => {
 		if (context.params.summary) {
 			const seed = randomInt(10000, 99999);
 			const text = `https://thisanimedoesnotexist.ai/slider.html?seed=${seed}`;

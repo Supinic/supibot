@@ -12,7 +12,7 @@ export default {
 		"Enables the 3rd party Rustlog service in either the current, or in a provided channel.",
 		`This service gathers the chat logs in the channel, which are then used in Supibot for the <code>$randomline</code> command.`
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelName = params.channel ?? context.channel!.Name;

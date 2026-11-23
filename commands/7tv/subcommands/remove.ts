@@ -13,7 +13,7 @@ export default {
 		`<code>${prefix}7tv remove (emote name)</code>`,
 		`Removes a given emote from the list.`
 	],
-	execute: async (context, type, ...args) => {
+	execute: async ({ context }, type, ...args) => {
 		if (!context.channel) {
 			return {
 				success: false,

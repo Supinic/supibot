@@ -14,7 +14,7 @@ export default {
 		`<code>$f1 year:1990 wcc</code>`,
 		"Posts a summary for the season's WCC - constructor standings."
 	],
-	execute: async (context) => {
+	execute: async ({ context }) => {
 		const year = context.params.season ?? context.params.year ?? new SupiDate().year;
 		const standings = await fetchConstructorStandings(year);
 		if (standings.length === 0) {

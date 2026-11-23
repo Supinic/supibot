@@ -16,7 +16,7 @@ export default {
 		"If the bot has been disabled in the given channel, this command will re-enable it.",
 		"This also fixes other minor problems with the bot not replying."
 	],
-	execute: (context, subcommand) => {
+	execute: ({ context }, subcommand) => {
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;

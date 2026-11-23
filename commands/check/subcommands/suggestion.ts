@@ -20,7 +20,7 @@ export default {
 		`<code>${prefix}check suggestion</code>`,
 		"Checks the status and info of a suggestion that you made. You can use \"last\" instead of an ID to check the last one you made."
 	],
-	execute: async (context, rawIdentifier) => {
+	execute: async ({ context }, rawIdentifier) => {
 		let identifier: number | string | undefined = rawIdentifier;
 		if (!identifier) {
 			return {

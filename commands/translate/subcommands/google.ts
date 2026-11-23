@@ -60,7 +60,7 @@ export default {
 			`<code>${list.join(" ")}</code>`
 		];
 	},
-	execute: async function (context, type, query) {
+	execute: async function ({ context }, type, query) {
 		if (context.params.formality) {
 			return {
 				success: false,

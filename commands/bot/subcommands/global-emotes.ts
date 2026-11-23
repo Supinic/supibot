@@ -11,7 +11,7 @@ export default {
 		"Supibot has access to all emotes from all servers it's on, and these might prove to be annoying somewhat.",
 		"This configuration lets you disable those, only the ones from the current server will be used."
 	],
-	execute: async (context, subcommand) => {
+	execute: async ({ context }, subcommand) => {
 		const { params } = context;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const channelData = (params.channel) ? sb.Channel.getAsserted(params.channel) : context.channel!;

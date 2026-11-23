@@ -102,7 +102,7 @@ export default {
 			`Only supports these languages: ${formalitySupportedLanguageNames.join(", ")}`
 		];
 	},
-	execute: async function (context, _subInvocation, query) {
+	execute: async function ({ context }, _subInvocation, query) {
 		if (!process.env.API_DEEPL_KEY) {
 			throw new SupiError({
 				message: "No DeepL key configured (API_DEEPL_KEY)"

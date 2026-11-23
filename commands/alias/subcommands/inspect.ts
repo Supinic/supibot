@@ -12,7 +12,7 @@ export default {
 		`<code>${prefix}alias inspect (username) (alias)</code>`,
 		"If your or someone else's alias has a description, this command will print it to chat."
 	],
-	execute: async function (context, subInvocation, ...args) {
+	execute: async function ({ context }, subInvocation, ...args) {
 		let user;
 		let aliasName;
 		let prefix;

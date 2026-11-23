@@ -21,7 +21,7 @@ export default {
 		"An alias being published means that anyone in that channel will be able to use it as if they had made it.",
 		"Naturally, if a user has their own alias with the same name, that one will be used first."
 	],
-	execute: async function (context, invocation, ...args) {
+	execute: async function ({ context }, invocation, ...args) {
 		const channel = context.channel;
 		if (!channel) {
 			return {

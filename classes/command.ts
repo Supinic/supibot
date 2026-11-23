@@ -332,23 +332,23 @@ export type ExtractContext <T extends CommandDefinition> = Parameters<T["Code"]>
 type SubcommandDescription =
 	| { description: string[]; getDescription?: never; }
 	| { description?: never; getDescription: (prefix: string) => string[] | Promise<string[]>; };
-export type SubcommandDefinition <T extends CommandDefinition = CommandDefinition> = {
+export type SubcommandDefinition<T extends CommandDefinition = CommandDefinition, S extends object = object> = {
 	name: string;
 	title: string;
 	aliases: string[];
 	default?: boolean;
 	flags?: Record<string, boolean>;
-	execute: (this: Command, context: ExtractContext<T>, ...args: string[]) => StrictResult | Promise<StrictResult>;
+	execute: (this: Command, state: { context: ExtractContext<T> } & S, ...args: string[]) => StrictResult | Promise<StrictResult>;
 } & SubcommandDescription;
 
-export class SubcommandCollection {
+export class SubcommandCollection <T extends CommandDefinition = CommandDefinition, S extends object = object> {
 	public readonly name: string;
 	public readonly names: readonly string[];
 
-	private readonly defaultCommand: SubcommandDefinition | null;
-	private readonly subcommands: SubcommandDefinition[];
+	private readonly defaultCommand: SubcommandDefinition<T, S> | null;
+	private readonly subcommands: SubcommandDefinition<T, S>[];
 
-	constructor (name: string, subcommands: SubcommandDefinition[]) {
+	constructor (name: string, subcommands: SubcommandDefinition<T, NoInfer<S>>[]) {
 		this.name = name;
 		this.subcommands = subcommands;
 		this.names = this.subcommands.map(i => i.name);
@@ -359,7 +359,7 @@ export class SubcommandCollection {
 			: null;
 	}
 
-	get (name: string | undefined) {
+	get (name: string | undefined): SubcommandDefinition<T, S> | null {
 		if (typeof name !== "string") {
 			return null;
 		}
@@ -373,7 +373,7 @@ export class SubcommandCollection {
 		return null;
 	}
 
-	getAsserted (name: string) {
+	getAsserted (name: string): SubcommandDefinition<T, S> {
 		const subcommand = this.get(name);
 		if (!subcommand) {
 			throw new SupiError({
@@ -401,7 +401,7 @@ export class SubcommandCollection {
 		return result;
 	}
 
-	get default () {
+	get default (): SubcommandDefinition<T, S> {
 		if (!this.defaultCommand) {
 			throw new SupiError({
 				message: "No default subcommand in collection",
