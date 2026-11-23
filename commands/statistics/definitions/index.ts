@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { SubcommandCollection, type SubcommandDefinition } from "../../../classes/command.ts";
 
 import ActiveChatterStatistic from "./active-chatters.ts";
@@ -21,5 +22,9 @@ const subcommands: SubcommandDefinition[] = [
 	ReminderStatistic,
 	TopChattersStatistic
 ];
+
+// check all statistics are lowercased - needed to ensure that lowercasing user input is valid
+const shape = z.array(z.object({ name: z.string().lowercase() }));
+shape.parse(subcommands);
 
 export const StatsSubcommands = new SubcommandCollection("stats", subcommands);

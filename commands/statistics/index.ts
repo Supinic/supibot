@@ -6,7 +6,6 @@ export type StatsSubcommandDefinition = SubcommandDefinition<typeof statisticsCo
 const statisticsCommandDefinition = declare({
 	Name: "statistics",
 	Aliases: ["stat", "stats"],
-	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you or other users, e.g. total AFK time.",
 	Flags: ["mention", "pipe"],
