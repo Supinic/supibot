@@ -1,6 +1,4 @@
 import { SupiError } from "supi-core";
-import { logger } from "../singletons/logger.ts";
-
 import type { TwitchPlatform } from "./twitch.ts";
 import type { User } from "../classes/user.ts";
 import type { Channel } from "../classes/channel.ts";
