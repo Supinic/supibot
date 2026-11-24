@@ -1163,26 +1163,29 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			return;
 		}
 
-		if (type === "stream.online") {
-			sb.ChatModule.dispatch({
-				event: "online",
-				channel: channelData,
-				platform: this
-			});
+		void logger.log("Twitch.Other", `Live status EventSub: ${type}; channel=${channelName} (${channelId}; meta=${JSON.stringify(event.metadata)}`);
 
+		if (type === "stream.online") {
 			const existing = await this.getLiveChannelIdList();
 			if (!existing.includes(channelId)) {
 				await this.addLiveChannelIdList(channelId);
+
+				sb.ChatModule.dispatch({
+					event: "online",
+					channel: channelData,
+					platform: this
+				});
 			}
 		}
 		else {
-			sb.ChatModule.dispatch({
-				event: "offline",
-				channel: channelData,
-				platform: this
-			});
-
-			await this.removeLiveChannelIdList(channelId);
+			const removed = await this.removeLiveChannelIdList(channelId);
+			if (removed !== 0) {
+				sb.ChatModule.dispatch({
+					event: "offline",
+					channel: channelData,
+					platform: this
+				});
+			}
 		}
 	}
 
@@ -1303,7 +1306,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 	}
 
 	async removeLiveChannelIdList (channelId: string): Promise<number> {
-		return await core.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
+		return await core.Cache.server.lrem(LIVE_STREAMS_KEY, 0, channelId);
 	}
 
 	async isChannelLive (channelData: Channel) {
@@ -1645,7 +1648,7 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 
 		const currentlyLiveChannelsSet = new Set<string>();
 		for (let slice = 0; slice < cacheLiveChannelIds.length; slice += STREAM_SLICE_PAGE) {
-			const channelIds = cacheLiveChannelIds.slice(slice * STREAM_SLICE_PAGE, (slice + 1) * STREAM_SLICE_PAGE);
+			const channelIds = cacheLiveChannelIds.slice(slice, slice + STREAM_SLICE_PAGE);
 			const searchParams = new URLSearchParams({
 				type: "live",
 				first: String(STREAM_SLICE_PAGE)
@@ -1673,6 +1676,13 @@ export class TwitchPlatform extends Platform<TwitchConfig, "twitch"> {
 			if (!channelData) {
 				continue;
 			}
+
+			const removed = await this.removeLiveChannelIdList(channelId);
+			if (removed === 0) {
+				continue;
+			}
+
+			void logger.log("Twitch.Other", `Live status Helix: offline; channel=${channelData.Name} (${channelId}`);
 
 			sb.ChatModule.dispatch({
 				event: "offline",

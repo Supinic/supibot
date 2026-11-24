@@ -11,7 +11,7 @@ const APP_ACCESS_CACHE_KEY = "twitch-app-access-token";
 const CONDUIT_ID_KEY = "twitch-conduit-id";
 const USER_CHANNEL_ACTIVITY_PREFIX = "twitch-user-activity-";
 const SUBSCRIPTIONS_CACHE_KEY = "twitch-subscriptions";
-const SUBSCRIPTIONS_CACHE_EXPIRY = 120 * 60_000; // 60 minutes
+const SUBSCRIPTIONS_CACHE_EXPIRY = 120 * 60_000; // 120 minutes
 const SUBSCRIPTIONS_CACHE_INTERVAL = 30 * 60_000; // 30 minutes, 1/4 of sub cache expiry
 const TOKEN_REGENERATE_INTERVAL = 60 * 60_000; // 60 minutes
 
@@ -703,13 +703,12 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 		},
 		searchParams: {
 			status: "enabled"
-		}
+		},
+		retry: { limit: 3 }
 	});
 
-	const result: EnabledSubscription[] = [...response.body.data];
 	let cursor: string | null = response.body.pagination.cursor ?? null;
-	let retries = 0;
-
+	const result: EnabledSubscription[] = [...response.body.data];
 	while (cursor) {
 		const loopResponse = await core.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 			url: "https://api.twitch.tv/helix/eventsub/subscriptions",
@@ -723,27 +722,19 @@ const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 			searchParams: {
 				status: "enabled",
 				after: cursor
-			}
+			},
+			retry: { limit: 3 }
 		});
 
-		if (response.ok || !Array.isArray(loopResponse.body.data)) {
-			result.push(...loopResponse.body.data);
-			cursor = loopResponse.body.pagination.cursor ?? null;
+		if (!loopResponse.ok) {
+			throw new SupiError({
+				message: "Too many subscription fetch failures",
+				args: { body: loopResponse.body }
+			});
 		}
-		else {
-			if (retries > 3) {
-				throw new SupiError({
-					message: "Too many subscription fetch failures",
-					args: { body: loopResponse.body }
-				});
-			}
 
-			retries++;
-			void logger.log(
-				"Twitch.Warning",
-				`Subscription fetch failed or is incompatible: ${response.statusCode}; ${JSON.stringify(response.body)}`
-			);
-		}
+		result.push(...loopResponse.body.data);
+		cursor = loopResponse.body.pagination.cursor ?? null;
 	}
 
 	return result;
