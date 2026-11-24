@@ -1,6 +1,7 @@
 import { declare } from "../../classes/command.ts";
 import * as z from "zod";
 import { SupiError } from "supi-core";
+import { logger } from "../../singletons/logger.ts";
 
 const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
 const urbanResponseSchema = z.object({
@@ -19,16 +20,8 @@ const urbanResponseSchema = z.object({
 		})
 	)
 });
-const urbanAutocompleteResponseSchema = z.object({
-	results: z.array(
-		z.object({
-			preview: z.string(),
-			term: z.string()
-		})
-	)
-});
-
 type UrbanItem = z.infer<typeof urbanResponseSchema>["list"][number];
+
 const prepareItemStrings = (item: UrbanItem) => {
 	const url = new URL(item.permalink);
 	// const id = url.pathname.replace("/", ""); // Looks like this no longer works as of cca. 2025-07-06
@@ -92,49 +85,29 @@ export default declare({
 				term
 			},
 			throwHttpErrors: false,
-			retry: {
-				limit: 0
-			},
-			timeout: {
-				request: 10_000
-			}
+			retry: { limit: 0 },
+			timeout: { request: 10_000 }
 		});
 
-		if (response.statusCode === 500) {
-			const autocompleteResponse = await core.Got.get("GenericAPI")({
-				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
-				searchParams: {
-					api_key: URBAN_FAUX_ACCESS_KEY,
-					term
-				},
-				retry: {
-					limit: 0
-				},
-				timeout: {
-					request: 10_000
-				}
-			});
-
-			const { results } = urbanAutocompleteResponseSchema.parse(autocompleteResponse.body);
-			const match = results.find(i => i.term.toLowerCase() === term);
-			if (match) {
-				return {
-					reply: `Short description: ${match.preview}`
-				};
-			}
-			else {
-				return {
-					success: false,
-					reply: core.Utils.tag.trim `
-						For whatever reason, UrbanDictionary cannot process this word! 
-						Check it for yourself: https://api.urbandictionary.com/v0/define?term=${term}
-					`
-				};
-			}
+		if (!response.ok) {
+			return {
+				success: false,
+				reply: "Urban Dictionary is currently overloaded! Try again later."
+			};
 		}
 
-		const { list } = urbanResponseSchema.parse(response.body);
-		const items = list
+		const { data } = urbanResponseSchema.safeParse(response.body);
+		if (!data) {
+			const string = JSON.stringify(response.body);
+			void logger.log("Command.Warning", `Urban Dictionary zod parse failure: ${string}`, context.channel, context.user);
+
+			return {
+				success: false,
+				reply: "Urban Dictionary is currently overloaded! Try again later."
+			};
+		}
+
+		const items = data.list
 			.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase())
 			.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
