@@ -34,18 +34,18 @@ const execute = async ({ context }, operation) => {
 
 	if (operation === "reset") {
 		if (!trap.active) { // If not active, run the entire command again → will set up traps.
-			return await execute(context);
+			return await execute({ context });
 		}
 		else if (now < trap.end) { // If not ready, run the entire command again → will error out with proper timing.
-			return await execute(context);
+			return await execute({ context });
 		}
 
-		const trapsRetrieveResult = await execute(context);
+		const trapsRetrieveResult = await execute({ context });
 		if (trapsRetrieveResult.success === false) {
 			return trapsRetrieveResult;
 		}
 
-		const trapsSetupResult = await execute(context);
+		const trapsSetupResult = await execute({ context });
 		if (trapsSetupResult.success === false) {
 			return trapsSetupResult;
 		}
