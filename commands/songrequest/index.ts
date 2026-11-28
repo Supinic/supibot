@@ -416,8 +416,8 @@ export default declare({
 				It is playing ${when}.
 				${seekString}
 				${pauseString}
-				Your videos: ${limits.requests + 1}/${REQUEST_AMOUNT_LIMIT}
-				Length of your videos: ${Math.round(limits.totalTime + segmentLength)}/${REQUEST_TIME_LIMIT}
+				you have ${limits.requests + 1}/${REQUEST_AMOUNT_LIMIT} videos queued,
+				for a duration of ${Math.round(limits.totalTime + segmentLength)} seconds
 			`
 		};
 	}),
